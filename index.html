@@ -1,0 +1,2088 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Fe y Vida Quest</title>
+<style>
+  :root{
+    --gold:#D9A63B;
+    --magenta:#D6247A;
+    --teal:#0FA3A0;
+    --purple:#5A2E86;
+    --purple-dark:#3A1C5A;
+    --cream:#FFF8EC;
+    --ink:#2A1A3A;
+    --glow: rgba(255,215,0,.85);
+    --danger:#C43B3B;
+    --good:#2E9E4F;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 50% 0%, var(--purple) 0%, var(--purple-dark) 55%, #200f33 100%);
+    color:var(--cream);
+    height:100%;
+    display:flex;
+    justify-content:center;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    /* Fixed height (not min-height) + its own overflow-y, not 100vh alone —
+       on iOS Safari 100vh is measured against the viewport with the address
+       bar hidden, which is taller than what's actually visible when the bar
+       is showing (the normal state). min-height:100vh then let the WHOLE
+       page grow past the real visible area, making the entire screen
+       vertically scrollable even though nothing on it actually needed to
+       scroll. 100dvh (dynamic viewport height, iOS 15.4+) tracks the real
+       visible height instead; html/body get overflow:hidden so any residual
+       mismatch scrolls only inside #app, never the whole page. */
+    height:100vh;
+    height:100dvh;
+    overflow-y:auto;
+    padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 22px);
+    display:flex;
+    flex-direction:column;
+  }
+  .screen{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+  }
+  .screen.screen-enter{ animation:fadeIn .25s ease-out; }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  h1{font-size:1.5rem;margin:.2em 0 .1em;color:var(--gold);text-align:center;}
+  h2{font-size:1.15rem;margin:.3em 0;color:var(--gold);text-align:center;}
+  p{line-height:1.45;font-size:.98rem;}
+  .center{text-align:center;}
+  .spacer{flex:1;}
+  .btn{
+    display:block;
+    width:100%;
+    border:2px solid var(--gold);
+    background:linear-gradient(180deg,var(--magenta),#a3155e);
+    color:#fff;
+    font-weight:700;
+    font-size:1rem;
+    letter-spacing:.02em;
+    padding:14px 12px;
+    border-radius:14px;
+    margin:8px 0;
+    cursor:pointer;
+    transition:transform .08s ease;
+  }
+  .btn:active{transform:scale(.97);box-shadow:0 0 14px 4px var(--glow);border-color:#fff;}
+  .btn.secondary{background:linear-gradient(180deg,var(--teal),#087572);}
+  .btn.gold{background:linear-gradient(180deg,var(--gold),#b3822a);color:var(--ink);}
+  .btn.outline{background:transparent;color:var(--gold);}
+  .btn:disabled{opacity:.4;pointer-events:none;}
+  .badge-icon{filter:drop-shadow(0 0 6px rgba(0,0,0,.4));}
+
+  .lang-grid{display:flex;flex-direction:column;gap:14px;margin-top:24px;}
+  .lang-btn{font-size:1.3rem;padding:22px;border-radius:18px;}
+
+  .progressWrap{margin:10px 0 18px;}
+  .progressBar{background:rgba(255,255,255,.15);border:1px solid var(--gold);border-radius:20px;height:22px;overflow:hidden;}
+  .progressFill{height:100%;background:linear-gradient(90deg,var(--gold),#fff6c9);transition:width .4s ease;}
+  .progressLabel{text-align:center;font-size:.82rem;margin-top:4px;color:var(--cream);opacity:.9;}
+
+  .missionGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0;}
+  .missionTile{
+    background:rgba(255,255,255,.06);
+    border:2px solid var(--gold);
+    border-radius:16px;
+    padding:10px 4px 8px;
+    text-align:center;
+    cursor:pointer;
+  }
+  .missionTile:not(.done):active{box-shadow:0 0 14px 4px var(--glow);}
+  .missionTile.done{border-color:var(--good);background:rgba(46,158,79,.18);opacity:.85;cursor:default;}
+  .missionTile .ic{font-size:2rem;display:block;}
+  .missionTile .lbl{font-size:.68rem;margin-top:4px;display:block;font-weight:600;}
+  .missionTile .chk{font-size:.9rem;color:var(--good);}
+  .passportTile{grid-column:span 3;}
+
+  .qaBox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:16px;margin:10px 0;}
+  .answerBtn{
+    display:block;width:100%;text-align:left;
+    background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.35);
+    color:#fff;padding:12px 14px;border-radius:12px;margin:8px 0;font-size:.95rem;cursor:pointer;
+  }
+  .answerBtn:active{box-shadow:0 0 10px 3px var(--glow);}
+  .answerBtn.correct{background:rgba(46,158,79,.5);border-color:var(--good);}
+  .answerBtn.wrong{background:rgba(196,59,59,.5);border-color:var(--danger);}
+  .answerBtn.disabled{pointer-events:none;}
+
+  .matchGrid{display:grid;gap:6px;margin:12px 0;}
+  .matchCard{
+    aspect-ratio:1/1;border-radius:8px;border:2px solid var(--gold);
+    background:linear-gradient(160deg,var(--purple),var(--purple-dark));
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    overflow:hidden;
+  }
+  .matchCard.flipped,.matchCard.matched{background:linear-gradient(160deg,#fff,#f1e2c4);}
+  .matchCard.matched{border-color:var(--good);opacity:.5;filter:brightness(.6);cursor:default;}
+  .matchCard img{width:100%;height:100%;object-fit:cover;display:block;}
+  .chancesRow{text-align:center;font-size:1.1rem;margin:4px 0;}
+
+  .photoPreview{width:100%;border-radius:16px;border:3px solid var(--gold);margin:10px 0;object-fit:cover;max-height:340px;}
+  .cameraIconBox{font-size:4rem;text-align:center;margin:18px 0;}
+
+  .passportBook{background:linear-gradient(160deg,#fff,#f1e2c4);color:var(--ink);border-radius:18px;border:4px solid var(--gold);flex:1;min-height:280px;overflow:hidden;position:relative;}
+  /* Width no longer fixed here (was 1100% / 11 pages) -- the track carries
+     2 extra "phantom" clone slides for the wrap animation (see screenPassport),
+     so both widths are set inline per-render from PASSPORT_TRACK_SLOTS instead. */
+  .passportTrack{display:flex;height:100%;}
+  .passportPage{flex-shrink:0;box-sizing:border-box;padding:18px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+  .passportBadge{font-size:4.5rem;margin:10px 0;}
+  .passportNav{display:flex;justify-content:space-between;align-items:center;margin:12px 0;}
+  .navArrow{font-size:2rem;background:none;border:none;color:var(--gold);cursor:pointer;padding:6px 16px;}
+  .dots{display:flex;gap:6px;justify-content:center;margin:6px 0 2px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);}
+  .dot.active{background:var(--gold);}
+
+  .ticketBox{background:linear-gradient(160deg,var(--gold),#c99a2e);color:var(--ink);border-radius:18px;padding:26px 18px;text-align:center;border:3px dashed var(--ink);margin:16px 0;}
+  .ticketBox .tk{font-size:3.5rem;}
+
+  .smallNote{font-size:.78rem;opacity:.75;text-align:center;margin-top:6px;}
+
+  /* Follow the Light — 3x3 image-tile memory grid (2026-09-30 redesign) */
+  .flGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}
+  .flPad{aspect-ratio:1/1;border-radius:12px;border:2px solid var(--gold);background:linear-gradient(160deg,var(--purple),var(--purple-dark));display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;transition:transform .1s ease,box-shadow .15s ease;}
+  .flPad:active{transform:scale(.95);}
+  .flPad.lit{box-shadow:0 0 20px 6px var(--glow);border-color:#fff;}
+  .flPad.disabled{pointer-events:none;}
+  .flPad img{width:100%;height:100%;object-fit:cover;display:block;}
+  .flMsg{min-height:1.3em;}
+  .flMsg.wrong{color:var(--danger);font-weight:700;}
+
+  /* Word Unscramble */
+  .wuAnswerRow{display:flex;gap:8px;justify-content:center;margin:18px 0 10px;flex-wrap:wrap;}
+  .wuSlot{width:38px;height:46px;border:2px solid var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;background:rgba(255,255,255,.06);}
+  .wuSlot.filled{background:rgba(255,255,255,.18);}
+  .wuAnswerRow.correct .wuSlot{border-color:var(--good);background:rgba(46,158,79,.4);}
+  .wuAnswerRow.wrong .wuSlot{border-color:var(--danger);background:rgba(196,59,59,.4);animation:wuShake .4s;}
+  @keyframes wuShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .wuTray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+  .wuTile{width:42px;height:48px;border:2px solid var(--gold);border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;cursor:pointer;}
+  .wuTile:active{box-shadow:0 0 10px 3px var(--glow);}
+  .wuTile.used{opacity:.2;pointer-events:none;}
+
+  /* Catch the Light — Kaboom!-style: icons no longer take taps of their own
+     (pointer-events:none — the STAGE captures the drag instead), so no
+     cursor:pointer here any more. touch-action:none on the stage stops the
+     phone's own scroll/pan gesture from fighting the hands drag. */
+  .clHud{display:flex;justify-content:space-between;align-items:center;font-size:.95rem;margin:4px 0;}
+  .clStage{position:relative;flex:1;min-height:260px;background:rgba(255,255,255,.05);border:2px solid var(--gold);border-radius:16px;overflow:hidden;margin:8px 0;touch-action:none;}
+  .clIcon{position:absolute;top:-50px;font-size:2.2rem;user-select:none;line-height:1;pointer-events:none;}
+  .clHands{position:absolute;bottom:6px;font-size:2.8rem;line-height:1;transform:translateX(-50%);user-select:none;pointer-events:none;}
+  .clCountdownNum{font-size:5rem;font-weight:800;color:var(--gold);margin:18px 0;}
+
+  /* Acts of Kindness Sort */
+  .kindBtns{display:flex;gap:10px;}
+  .kindBtns .btn{flex:1;}
+  .kindBtn.correct{background:linear-gradient(180deg,var(--good),#1c6d35);border-color:#fff;}
+  .kindBtn.wrong{background:linear-gradient(180deg,var(--danger),#8a2626);border-color:#fff;}
+  .kindBtn.disabled{pointer-events:none;opacity:.7;}
+
+  /* Hidden Blessings */
+  .hbScene{position:relative;flex:1;min-height:280px;border-radius:16px;overflow:hidden;border:2px solid var(--gold);margin:10px 0;background:radial-gradient(circle at 30% 20%,var(--purple) 0%,var(--purple-dark) 60%,#1a0c28 100%);}
+  .hbSpot{position:absolute;width:15%;aspect-ratio:1/1;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:1.7rem;opacity:.16;filter:grayscale(85%) brightness(.7);cursor:pointer;transition:opacity .2s ease,filter .2s ease;}
+  .hbSpot.found{opacity:1;filter:none;animation:hbPop .35s ease;pointer-events:none;}
+  @keyframes hbPop{0%{transform:translate(-50%,-50%) scale(.6);}60%{transform:translate(-50%,-50%) scale(1.3);}100%{transform:translate(-50%,-50%) scale(1);}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+<script>
+"use strict";
+
+var STORAGE_KEY = "fevidaQuestState_v1";
+
+var T = {
+  en: {
+    chooseLanguage:"Choose Your Language",
+    english:"ENGLISH", spanish:"ESPAÑOL",
+    welcomeTitle:"Welcome to Fe y Vida Quest!",
+    welcomeBody:"Complete faith-filled missions around the booth to earn digital badges. Finish any 5 of the 10 to unlock your Golden Ticket for a chance at swag prizes. Ready?",
+    startQuest:"START YOUR QUEST", changeLanguage:"CHANGE LANGUAGE",
+    mainMenu:"MAIN MENU", returnToMenu:"RETURN TO MENU", returnToMainMenu:"RETURN TO MAIN MENU",
+    questPoints:"Quest Points",
+    passport:"Passport", showTicket:"🎟 VIEW GOLDEN TICKET",
+    faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
+    serviceSprintName:"Service Sprint", chooseJoyName:"Choose Joy",
+    done:"DONE",
+    ff_intro:"Answer all 10 questions correctly to earn your badge!",
+    nextQuestion:"NEXT QUESTION", collectAward:"COLLECT AWARD", playAgain:"PLAY AGAIN", tryAgain:"TRY AGAIN",
+    ff_resultsTitlePass:"Perfect Score!", ff_resultsTitleFail:"So Close!",
+    ff_resultsBodyPass:"You answered all 10 questions correctly!",
+    ff_resultsBodyFail:"Don't worry — give it another shot!",
+    scoreOf:function(c,t){return "You got "+c+" out of "+t+" correct.";},
+    fm_intro:"Match all the pairs on each level!",
+    fm_loading:"Loading tiles...",
+    fm_level:function(n,total){return "Level "+n+" of "+total;},
+    chancesLeft:"Chances left:",
+    fm_failTitle:"Out of Chances!",
+    fm_failBody:"Give this level another try.",
+    fm_passTitle:"All 3 Levels Complete!",
+    fm_passBody:"You matched every pair. Amazing work!",
+    bl_title:"Be the Light",
+    bl_body:"Head to the Fe y Vida Hope Wall and post an encouraging message for someone else. Once you've done it, tap the button below.",
+    ss_title:"Service Sprint",
+    ss_body:"Find another participant and do one small act of kindness or service for them. Once you've done it, tap the button below.",
+    missionCompleted:"MISSION COMPLETED",
+    cj_title:"Choose Joy",
+    cj_body:"Take a joyful photo with a friend at the Fe y Vida booth!",
+    takePhoto:"TAKE PHOTO", savePhoto:"SAVE PHOTO", retakePhoto:"RETAKE PHOTO",
+    joyousPhotoTitle:"Your Joyous Photo!",
+    awardTitle:"Mission Complete!",
+    awardBody:function(pts,badge){return "You won "+pts+" Quest Points and unlocked the "+badge+" Badge!";},
+    passportTitle:"Fe y Vida Passport",
+    missionBadge:function(n){return "MISSION "+n+" BADGE";},
+    joyousPhotoPage:"JOYOUS PHOTO",
+    badgeLocked:"???",
+    ticketTitle:"Golden Ticket Unlocked!",
+    ticketBody:"Show this screen to a Fe y Vida booth staff member to play for a prize!",
+    clearTicket:"CLEAR TICKET",
+    themeFaith:"Faith", themeLove:"God's Love", themeLight:"Be a Light to the World",
+    themeFriend:"Friendship", themeHope:"Hope",
+    themeHoliness:"Holiness", themeGrace:"Grace", themeSalvation:"Salvation",
+    themeForgiveness:"Forgiveness", themeMercy:"Mercy",
+
+    followLightName:"Follow the Light", wordUnscrambleName:"Word Unscramble",
+    catchLightName:"Catch the Light", kindnessSortName:"Acts of Kindness",
+    hiddenBlessingsName:"Hidden Blessings",
+
+    fl_repeat:"REPEAT PATTERN", fl_incorrect:"INCORRECT TILE!", fl_tryAgainMsg:"TRY AGAIN",
+    fl_failTitle:"So Close!", fl_failBody:"You ran out of chances — give it another try from Level 1.",
+    fl_passTitle:"Amazing Memory!", fl_passBody:"You repeated every pattern across all 8 levels!",
+
+    wu_intro:"Tap the letters in order to unscramble each word. Solve all 5 to win!",
+    wu_word:function(n,total){return "Word "+n+" of "+total;},
+    wu_passTitle:"Word Master!", wu_passBody:"You unscrambled all 5 words!",
+    clearWord:"CLEAR",
+
+    cl_intro:"Slide the hands left and right to catch the falling lights! Miss too many and you'll start over — you get 3 chances across all 4 levels.",
+    cl_level:function(n,total){return "Level "+n+" of "+total;},
+    cl_getReady:function(n){return "Get Ready for Level "+n+"!";},
+    cl_caught:function(n,total){return "Caught: "+n+" / "+total;},
+    cl_passTitle:"Great Reflexes!", cl_passBody:"You caught every light across all 4 levels!",
+    cl_failTitle:"So Close!", cl_failBody:"You ran out of chances — give it another try from Level 1.",
+
+    ks_intro:"Read each scenario and decide — is it a kind act, or not?",
+    ks_kind:"KIND", ks_notKind:"NOT KIND",
+    ks_passTitle:"Kindness Champion!", ks_passBody:"You sorted every scenario correctly!",
+    ks_failTitle:"Out of Chances!", ks_failBody:"Give this mission another try.",
+
+    hb_intro:"Look closely — find all 6 hidden blessings tucked into the scene!",
+    hb_found:function(n,total){return "Found: "+n+" / "+total;},
+    hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
+  },
+  es: {
+    chooseLanguage:"Elige Tu Idioma",
+    english:"INGLÉS", spanish:"ESPAÑOL",
+    welcomeTitle:"¡Bienvenido a Fe y Vida Quest!",
+    welcomeBody:"Completa misiones llenas de fe en el stand para ganar insignias digitales. Termina 5 de las 10 para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
+    startQuest:"COMIENZA TU AVENTURA", changeLanguage:"CAMBIAR IDIOMA",
+    mainMenu:"MENÚ PRINCIPAL", returnToMenu:"VOLVER AL MENÚ", returnToMainMenu:"VOLVER AL MENÚ PRINCIPAL",
+    questPoints:"Puntos de Aventura",
+    passport:"Pasaporte", showTicket:"🎟 VER BOLETO DORADO",
+    faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
+    serviceSprintName:"Carrera de Servicio", chooseJoyName:"Elige la Alegría",
+    done:"COMPLETADO",
+    ff_intro:"¡Responde las 10 preguntas correctamente para ganar tu insignia!",
+    nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
+    ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitleFail:"¡Tan Cerca!",
+    ff_resultsBodyPass:"¡Respondiste las 10 preguntas correctamente!",
+    ff_resultsBodyFail:"No te preocupes, ¡inténtalo de nuevo!",
+    scoreOf:function(c,t){return "Obtuviste "+c+" de "+t+" correctas.";},
+    fm_intro:"¡Empareja todos los pares en cada nivel!",
+    fm_loading:"Cargando fichas...",
+    fm_level:function(n,total){return "Nivel "+n+" de "+total;},
+    chancesLeft:"Oportunidades restantes:",
+    fm_failTitle:"¡Sin Oportunidades!",
+    fm_failBody:"Inténtalo de nuevo en este nivel.",
+    fm_passTitle:"¡Los 3 Niveles Completos!",
+    fm_passBody:"¡Emparejaste todos los pares! Excelente trabajo.",
+    bl_title:"Sé la Luz",
+    bl_body:"Ve al Muro de la Esperanza de Fe y Vida y escribe un mensaje de aliento para alguien más. Cuando termines, toca el botón de abajo.",
+    ss_title:"Carrera de Servicio",
+    ss_body:"Busca a otro participante y haz un pequeño acto de bondad o servicio por él o ella. Cuando termines, toca el botón de abajo.",
+    missionCompleted:"MISIÓN COMPLETADA",
+    cj_title:"Elige la Alegría",
+    cj_body:"¡Toma una foto alegre con un amigo en el stand de Fe y Vida!",
+    takePhoto:"TOMAR FOTO", savePhoto:"GUARDAR FOTO", retakePhoto:"TOMAR OTRA FOTO",
+    joyousPhotoTitle:"¡Tu Foto Alegre!",
+    awardTitle:"¡Misión Completada!",
+    awardBody:function(pts,badge){return "¡Ganaste "+pts+" Puntos de Aventura y desbloqueaste la insignia "+badge+"!";},
+    passportTitle:"Pasaporte Fe y Vida",
+    missionBadge:function(n){return "INSIGNIA MISIÓN "+n;},
+    joyousPhotoPage:"FOTO ALEGRE",
+    badgeLocked:"???",
+    ticketTitle:"¡Boleto Dorado Desbloqueado!",
+    ticketBody:"¡Muestra esta pantalla a un miembro del personal de Fe y Vida para jugar por un premio!",
+    clearTicket:"BORRAR BOLETO",
+    themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé Luz para el Mundo",
+    themeFriend:"Amistad", themeHope:"Esperanza",
+    themeHoliness:"Santidad", themeGrace:"Gracia", themeSalvation:"Salvación",
+    themeForgiveness:"Perdón", themeMercy:"Misericordia",
+
+    followLightName:"Sigue la Luz", wordUnscrambleName:"Desordena Palabras",
+    catchLightName:"Atrapa la Luz", kindnessSortName:"Actos de Bondad",
+    hiddenBlessingsName:"Bendiciones Escondidas",
+
+    fl_repeat:"REPITE EL PATRÓN", fl_incorrect:"¡FICHA INCORRECTA!", fl_tryAgainMsg:"INTÉNTALO DE NUEVO",
+    fl_failTitle:"¡Tan Cerca!", fl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
+    fl_passTitle:"¡Memoria Increíble!", fl_passBody:"¡Repetiste cada patrón en los 8 niveles!",
+
+    wu_intro:"Toca las letras en orden para descifrar cada palabra. ¡Resuelve las 5 para ganar!",
+    wu_word:function(n,total){return "Palabra "+n+" de "+total;},
+    wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Descifraste las 5 palabras!",
+    clearWord:"BORRAR",
+
+    cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 3 oportunidades en los 4 niveles.",
+    cl_level:function(n,total){return "Nivel "+n+" de "+total;},
+    cl_getReady:function(n){return "¡Prepárate para el Nivel "+n+"!";},
+    cl_caught:function(n,total){return "Atrapadas: "+n+" / "+total;},
+    cl_passTitle:"¡Excelentes Reflejos!", cl_passBody:"¡Atrapaste todas las luces en los 4 niveles!",
+    cl_failTitle:"¡Tan Cerca!", cl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
+
+    ks_intro:"Lee cada escenario y decide: ¿es un acto de bondad o no?",
+    ks_kind:"BONDAD", ks_notKind:"NO ES BONDAD",
+    ks_passTitle:"¡Campeón de la Bondad!", ks_passBody:"¡Clasificaste todos los escenarios correctamente!",
+    ks_failTitle:"¡Sin Oportunidades!", ks_failBody:"Inténtalo de nuevo en esta misión.",
+
+    hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
+    hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
+    hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
+  }
+};
+
+function t(key){ var lang = state.lang || "en"; return T[lang][key]; }
+
+var MISSIONS = [
+  {id:"faithFlash", icon:"⚡", badgeImg:"tiles/badge_faith.png", nameKey:"faithFlashName", themeKey:"themeFaith"},
+  {id:"faithMatch", icon:"🃏", badgeImg:"tiles/badge_love.png", nameKey:"faithMatchName", themeKey:"themeLove"},
+  {id:"beTheLight", icon:"🔦", badgeImg:"tiles/badge_light.png", nameKey:"beTheLightName", themeKey:"themeLight"},
+  {id:"serviceSprint", icon:"🏃", badgeImg:"tiles/badge_friendship.png", nameKey:"serviceSprintName", themeKey:"themeFriend"},
+  {id:"chooseJoy", icon:"📸", badgeImg:"tiles/badge_hope.png", nameKey:"chooseJoyName", themeKey:"themeHope"},
+  // 5 new missions added 2026-09-29, per Dan. Real badge art wired in
+  // 2026-09-29 (same day) — Dan supplied 5 more stained-glass badges
+  // (Badges\Holiness Badge.png, Grace Badge.png, Salvation Badge.png,
+  // Forgineness.png, Mercy Badge.png), knocked out to transparent 320x320
+  // circles the same way as the original 5 (supersampled ellipse alpha
+  // mask) and saved as tiles/badge_holiness.png etc. Assigned by feel, not
+  // 1:1 with each mission's own name: Forgiveness went to Acts of Kindness
+  // Sort specifically because "you forgive a friend who made a mistake" is
+  // one of that mission's own actual scenarios, not just a loose theme match.
+  {id:"followLight", icon:"🕹️", badgeImg:"tiles/badge_holiness.png", nameKey:"followLightName", themeKey:"themeHoliness"},
+  {id:"wordUnscramble", icon:"🔤", badgeImg:"tiles/badge_grace.png", nameKey:"wordUnscrambleName", themeKey:"themeGrace"},
+  {id:"catchLight", icon:"✨", badgeImg:"tiles/badge_salvation.png", nameKey:"catchLightName", themeKey:"themeSalvation"},
+  {id:"kindnessSort", icon:"🤲", badgeImg:"tiles/badge_forgiveness.png", nameKey:"kindnessSortName", themeKey:"themeForgiveness"},
+  {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"}
+];
+
+// Reusable badge <img> with a graceful fallback to the mission's emoji icon
+// (in the existing .passportBadge circle styling) if its PNG isn't there yet
+// — lets the 5 new missions work end-to-end today, before Dan's new badge
+// art exists, and upgrades automatically the moment each file is dropped in.
+// 10 mission-badge pages + 1 Joyous Photo page. Kept as its own constant
+// (rather than re-deriving MISSIONS.length+1 at every call site) so the
+// Passport's page-count/wrap math and the "/11" CSS above (percentages
+// can't reference a JS constant, so they're hand-kept in sync with this)
+// stay easy to grep together if the mission count ever changes again.
+var PASSPORT_PAGES = MISSIONS.length + 1;
+// The rendered track carries 2 extra "phantom" slides beyond the real
+// PASSPORT_PAGES -- a clone of the last page before slot 0 and a clone of
+// the first page after the last real slot -- purely so a wrap (11th page ->
+// 1st, or 1st -> 11th) can animate as one continuous slide in the swiped
+// direction instead of either snapping instantly or visibly scrolling
+// backward across every page in between. See screenPassport()/render()'s
+// passport hook (2026-09-29, per Dan reporting wraps didn't visually scroll).
+var PASSPORT_TRACK_SLOTS = PASSPORT_PAGES + 2;
+// Golden Ticket now unlocks at 5 of the 10 missions (2026-09-29, per Dan) —
+// deliberately NOT tied to MISSIONS.length any more, since the whole point
+// of this change is that the two can differ (half the missions, not all of
+// them). 5 x 100 pts/mission = 500.
+var GOLDEN_TICKET_MISSIONS_NEEDED = 5;
+var GOLDEN_TICKET_POINTS = GOLDEN_TICKET_MISSIONS_NEEDED * 100;
+
+function badgeImgHtml(m, sizePx){
+  // margin:0 auto (2026-09-29, per Dan — the Award screen's badge sat at the
+  // left edge, not centered): .screen has no align-items:center of its own
+  // (buttons/paragraphs rely on the flex default of stretch to go full-width),
+  // so this span — a direct flex-item child there — stretches to fill the
+  // full screen width; .center's text-align:center only ever centers INLINE
+  // content, never a display:block element with its own explicit width like
+  // this img, so margin:auto is what actually centers it within that
+  // stretched span. Harmless where it was already centered another way
+  // (e.g. the Passport page, whose own flex column DOES set align-items:
+  // center, sizing the span down to the image's own width with nothing left
+  // for margin:auto to distribute).
+  return '<span style="display:inline-block;">' +
+    '<img class="badge-icon" src="' + m.badgeImg + '" style="width:' + sizePx + 'px;height:' + sizePx + 'px;display:block;margin:0 auto;" ' +
+      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';">' +
+    '<div class="passportBadge" style="display:none;margin:0;">' + m.icon + '</div>' +
+  '</span>';
+}
+
+// Placeholder trivia — general well-established Catholic facts.
+// TODO(Dan): replace with real NCYC-specific questions before the event.
+var FAITH_FLASH_QUESTIONS = [
+  {en:{q:"How many Sacraments does the Catholic Church celebrate?",a:["5","7","9"]}, es:{q:"¿Cuántos Sacramentos celebra la Iglesia Católica?",a:["5","7","9"]}, correct:1},
+  {en:{q:"What prayer did Jesus teach his followers to pray?",a:["The Our Father","The Hail Mary","The Glory Be"]}, es:{q:"¿Qué oración enseñó Jesús a sus seguidores?",a:["El Padre Nuestro","El Ave María","El Gloria"]}, correct:0},
+  {en:{q:"What color do priests usually wear during Lent?",a:["Purple","Green","Red"]}, es:{q:"¿Qué color usan los sacerdotes durante la Cuaresma?",a:["Morado","Verde","Rojo"]}, correct:0},
+  {en:{q:"Which book of the Bible tells the story of Creation?",a:["Genesis","Exodus","Psalms"]}, es:{q:"¿Qué libro de la Biblia cuenta la historia de la Creación?",a:["Génesis","Éxodo","Salmos"]}, correct:0},
+  {en:{q:"Which of these is one of the three Theological Virtues?",a:["Faith","Courage","Patience"]}, es:{q:"¿Cuál de estas es una de las tres Virtudes Teologales?",a:["Fe","Valentía","Paciencia"]}, correct:0},
+  {en:{q:"What do Catholics call Mary, the mother of Jesus?",a:["The Blessed Mother","The Holy Spirit","Saint Peter"]}, es:{q:"¿Cómo llaman los católicos a María, la madre de Jesús?",a:["La Santísima Madre","El Espíritu Santo","San Pedro"]}, correct:0},
+  {en:{q:"On what day do Catholics traditionally attend Mass?",a:["Sunday","Wednesday","Friday"]}, es:{q:"¿Qué día asisten tradicionalmente los católicos a Misa?",a:["Domingo","Miércoles","Viernes"]}, correct:0},
+  {en:{q:"What is the name of the bread and wine that become the Body and Blood of Christ at Mass?",a:["The Eucharist","The Rosary","The Creed"]}, es:{q:"¿Cómo se llama el pan y el vino que se convierten en el Cuerpo y la Sangre de Cristo en la Misa?",a:["La Eucaristía","El Rosario","El Credo"]}, correct:0},
+  {en:{q:"Which Apostle is known as \"the Rock\" on whom Jesus built his Church?",a:["Peter","Paul","John"]}, es:{q:"¿Qué Apóstol es conocido como \"la roca\" sobre la cual Jesús construyó su Iglesia?",a:["Pedro","Pablo","Juan"]}, correct:0},
+  {en:{q:"What prayer uses beads to help meditate on the life of Jesus?",a:["The Rosary","The Angelus","The Magnificat"]}, es:{q:"¿Qué oración usa cuentas para meditar en la vida de Jesús?",a:["El Rosario","El Ángelus","El Magnificat"]}, correct:0}
+];
+
+var MATCH_SYMBOLS = [
+  "tiles/faith_tile2_00.jpg","tiles/faith_tile2_01.jpg","tiles/faith_tile2_02.jpg","tiles/faith_tile2_03.jpg",
+  "tiles/faith_tile2_04.jpg","tiles/faith_tile2_05.jpg","tiles/faith_tile2_06.jpg","tiles/faith_tile2_07.jpg",
+  "tiles/faith_tile2_08.jpg","tiles/faith_tile2_09.jpg","tiles/faith_tile2_10.jpg","tiles/faith_tile2_11.jpg",
+  "tiles/faith_tile2_12.jpg","tiles/faith_tile2_13.jpg","tiles/faith_tile2_14.jpg","tiles/faith_tile2_15.jpg"
+];
+
+var matchTilesPreloaded = false;
+var matchTilesReady = false; // true once every tile below has actually finished loading+decoding
+// decoding="sync" on the game-grid <img> tags (see screenFaithMatch) wasn't
+// enough on its own -- on a slow connection the real network fetch simply
+// hasn't finished by the time a tile is first flipped, and no decode hint
+// can paint bytes that haven't arrived yet. So this now tracks REAL
+// completion (onload, not just .src being set) and screenFaithMatch holds on
+// a tiny "Loading tiles..." beat until every one has resolved, instead of
+// racing the player to the first flip (2026-09-30, per Dan -- the blank-tile
+// flash was still happening intermittently after the decode-hint-only fix).
+function preloadMatchTiles(){
+  if(matchTilesPreloaded) return;
+  matchTilesPreloaded = true;
+  var remaining = MATCH_SYMBOLS.length;
+  function tileDone(){
+    remaining--;
+    if(remaining <= 0){
+      matchTilesReady = true;
+      if(state.screen === "faithMatch") render();
+    }
+  }
+  MATCH_SYMBOLS.forEach(function(src){
+    var img = new Image();
+    img.onload = function(){
+      // .decode() actually decodes the bitmap into the browser's image cache
+      // (not just fetching the bytes), which is what keeps a later fresh
+      // <img> pointing at this same src from needing to redecode on paint.
+      if(img.decode) img.decode().then(tileDone).catch(tileDone);
+      else tileDone();
+    };
+    img.onerror = tileDone; // don't let one bad tile block the game forever
+    img.src = src;
+  });
+}
+var MATCH_LEVELS = [4,4,4]; // grid dimension (NxN) — 3 levels, 4x4 each (8x8 was too hard, removed 2026-09-28)
+// Brief hold on the fully-matched (dimmed) board after the last pair of a
+// level is caught, before the next level's fresh deck replaces it
+// (2026-09-30, per Dan) -- previously the level advanced instantly, so the
+// very last matched pair never visibly appeared.
+var FM_LEVEL_PAUSE_MS = 900;
+var MATCH_CHANCES = [10,10,10]; // chances per level, matching MATCH_LEVELS (raised from 6, 2026-09-29, per Dan)
+
+function defaultState(){
+  return {
+    lang: null,
+    screen: "language",
+    points: 0,
+    missions: {
+      faithFlash: {done:false, badge:false},
+      faithMatch: {done:false, badge:false, level:0},
+      beTheLight: {done:false, badge:false},
+      serviceSprint: {done:false, badge:false},
+      chooseJoy: {done:false, badge:false},
+      followLight: {done:false, badge:false},
+      wordUnscramble: {done:false, badge:false},
+      catchLight: {done:false, badge:false},
+      kindnessSort: {done:false, badge:false},
+      hiddenBlessings: {done:false, badge:false}
+    },
+    photo: null,
+    session: { faithFlash:null, faithMatch:null, chooseJoy:null,
+      followLight:null, wordUnscramble:null, catchLight:null,
+      kindnessSort:null, hiddenBlessings:null },
+    awardMissionId: null,
+    passportPage: 0
+  };
+}
+
+// Switched from localStorage to sessionStorage (2026-09-29, per Dan) — a
+// booth device reopening the same URL across separate deploys/visits kept
+// resuming the previous participant's saved progress, since localStorage
+// persists indefinitely for the origin regardless of which tab or visit
+// wrote it. sessionStorage is scoped to the one browser tab: a genuinely
+// new visit (a fresh QR scan opening its own tab) always starts clean, but
+// the ORIGINAL persistence requirement — surviving the player backgrounding
+// the app or taking a phone call mid-mission — still holds, since mobile
+// browsers keep a backgrounded tab's sessionStorage intact and restore it
+// even after the OS evicts the tab's process under memory pressure. Only
+// an actual tab close (or the in-app CLEAR TICKET, unchanged) starts over.
+function loadState(){
+  try{
+    var raw = sessionStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    var parsed = JSON.parse(raw);
+    var d = defaultState();
+    // shallow-merge to survive future field additions
+    return Object.assign(d, parsed, {
+      missions: Object.assign(d.missions, parsed.missions||{}),
+      session: Object.assign(d.session, parsed.session||{})
+    });
+  }catch(e){ return defaultState(); }
+}
+
+function saveState(){
+  try{ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+var state = loadState();
+
+function go(screen){ state.screen = screen; saveState(); render(); }
+
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+
+/* ---------- Language / Welcome ---------- */
+
+function selectLanguage(lang){ state.lang = lang; go("welcome"); }
+
+function screenLanguage(){
+  return '<div class="screen center">' +
+    '<div class="spacer"></div>' +
+    '<h1>Fe y Vida Quest</h1>' +
+    '<h2>' + T.en.chooseLanguage + ' / ' + T.es.chooseLanguage + '</h2>' +
+    '<div class="lang-grid">' +
+      '<button class="btn lang-btn" onclick="selectLanguage(\'en\')">' + T.en.english + '</button>' +
+      '<button class="btn lang-btn secondary" onclick="selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
+    '</div>' +
+    '<div class="spacer"></div>' +
+  '</div>';
+}
+
+function screenWelcome(){
+  return '<div class="screen center">' +
+    '<div class="spacer"></div>' +
+    '<h1>' + t("welcomeTitle") + '</h1>' +
+    '<p>' + t("welcomeBody") + '</p>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn gold" onclick="go(\'mainMenu\')">' + t("startQuest") + '</button>' +
+    '<button class="btn outline" onclick="go(\'language\')">' + t("changeLanguage") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Main Menu ---------- */
+
+// Renamed from allMissionsDone (2026-09-29, per Dan) — unlock is now a
+// points threshold (5 of 10 missions' worth), not literally every mission.
+function goldenTicketUnlocked(){
+  return state.points >= GOLDEN_TICKET_POINTS;
+}
+
+function openMission(id){
+  if(state.missions[id].done) return;
+  if(id === "faithFlash"){ initFaithFlash(); go("faithFlash"); }
+  else if(id === "faithMatch"){ preloadMatchTiles(); initFaithMatchLevel(state.missions.faithMatch.level||0); go("faithMatch"); }
+  else if(id === "beTheLight"){ go("beTheLight"); }
+  else if(id === "serviceSprint"){ go("serviceSprint"); }
+  else if(id === "chooseJoy"){ initChooseJoy(); go("chooseJoy"); }
+  else if(id === "followLight"){ initFollowLightRun(); go("followLight"); flStartLevel(); }
+  else if(id === "wordUnscramble"){ initWordUnscramble(); go("wordUnscramble"); }
+  // No explicit clRunReadyCountdown() call here -- go()'s own render() call
+  // already triggers it via the render()-hook (same as clStart() never
+  // needed an explicit call either), and calling it AGAIN right after would
+  // start a second, overlapping countdown chain that halves the visible
+  // time per number (found live: 5,4,3,2,1,0 came out as 5,3,1,go).
+  else if(id === "catchLight"){ initCatchLight(); go("catchLight"); }
+  else if(id === "kindnessSort"){ initKindnessSort(); go("kindnessSort"); }
+  else if(id === "hiddenBlessings"){ initHiddenBlessings(); go("hiddenBlessings"); }
+}
+
+function screenMainMenu(){
+  var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
+  var tiles = MISSIONS.map(function(m){
+    var done = state.missions[m.id].done;
+    return '<div class="missionTile' + (done?' done':'') + '" onclick="openMission(\'' + m.id + '\')">' +
+      '<span class="ic">' + (done ? "✅" : m.icon) + '</span>' +
+      '<span class="lbl">' + t(m.nameKey) + '</span>' +
+      (done ? '<span class="chk">✓ ' + t("done") + '</span>' : '') +
+    '</div>';
+  }).join("");
+  tiles += '<div class="missionTile passportTile" onclick="openPassport()">' +
+      '<span class="ic">📔</span><span class="lbl">' + t("passport") + '</span>' +
+    '</div>';
+  var ticketBtn = goldenTicketUnlocked() ? '<button class="btn gold" onclick="go(\'goldenTicket\')">' + t("showTicket") + '</button>' : "";
+  return '<div class="screen">' +
+    '<h1>Fe y Vida Quest</h1>' +
+    '<div class="progressWrap">' +
+      '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
+      '<div class="progressLabel">' + state.points + ' / ' + GOLDEN_TICKET_POINTS + ' ' + t("questPoints") + '</div>' +
+    '</div>' +
+    '<div class="missionGrid">' + tiles + '</div>' +
+    '<div class="spacer"></div>' +
+    ticketBtn +
+  '</div>';
+}
+
+function openPassport(){ go("passport"); }
+
+/* ---------- Award Screen ---------- */
+
+function grantMission(id, missionState){
+  state.missions[id].done = true;
+  state.missions[id].badge = true;
+  state.points += 100;
+  Object.assign(state.missions[id], missionState || {});
+  state.awardMissionId = id;
+  go("award");
+}
+
+function screenAward(){
+  var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
+  if(!m) return screenMainMenu();
+  return '<div class="screen center">' +
+    '<div class="spacer"></div>' +
+    badgeImgHtml(m, 150) +
+    '<h1>' + t("awardTitle") + '</h1>' +
+    '<p>' + t("awardBody")(100, t(m.themeKey)) + '</p>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn gold" onclick="afterAward()">' + t("returnToMainMenu") + '</button>' +
+  '</div>';
+}
+
+function afterAward(){
+  state.awardMissionId = null;
+  // Auto-advance to the Golden Ticket screen only the ONE time a mission
+  // completion actually crosses the unlock threshold (2026-09-29, per Dan's
+  // 5-of-10 change) — every mission is worth exactly 100 pts, so "this
+  // completion's own 100 pts is what pushed it over" is just points-100
+  // being below the line while points itself is at or past it. Without this
+  // check, completing mission #6 through #10 after already unlocking early
+  // would keep bouncing the player back to the ticket screen instead of
+  // letting them keep going for the rest of the badges.
+  var justUnlocked = (state.points - 100 < GOLDEN_TICKET_POINTS) && goldenTicketUnlocked();
+  saveState();
+  if(justUnlocked) go("goldenTicket"); else go("mainMenu");
+}
+
+/* ---------- Faith Flash ---------- */
+
+function initFaithFlash(){
+  var order = shuffle(FAITH_FLASH_QUESTIONS.map(function(_,i){return i;}));
+  state.session.faithFlash = {order:order, index:0, correct:0, answered:null, answerOrder:shuffle([0,1,2]), status:"playing"};
+  saveState();
+}
+
+function ffAnswer(choiceIdx){
+  var s = state.session.faithFlash;
+  if(!s || s.answered !== null) return;
+  var q = FAITH_FLASH_QUESTIONS[s.order[s.index]];
+  var actualIdx = s.answerOrder[choiceIdx];
+  s.answered = choiceIdx;
+  var isCorrect = actualIdx === q.correct;
+  if(isCorrect) s.correct++;
+  saveState(); render();
+  if(!isCorrect){
+    setTimeout(function(){
+      var s2 = state.session.faithFlash;
+      if(!s2 || s2.status !== "playing") return;
+      s2.status = "results";
+      saveState(); render();
+    }, 1300);
+  }
+}
+
+function ffNext(){
+  var s = state.session.faithFlash;
+  if(!s) return;
+  if(s.index >= s.order.length - 1){
+    s.status = "results";
+    saveState(); render();
+  } else {
+    s.index++; s.answered = null; s.answerOrder = shuffle([0,1,2]); saveState(); render();
+  }
+}
+
+function ffCollectAward(){
+  state.session.faithFlash = null;
+  grantMission("faithFlash");
+}
+
+function ffPlayAgain(){ initFaithFlash(); go("faithFlash"); }
+
+function screenFaithFlash(){
+  var s = state.session.faithFlash;
+  if(!s){ initFaithFlash(); s = state.session.faithFlash; }
+  var lang = state.lang || "en";
+
+  if(s.status === "results"){
+    var pass = s.correct === s.order.length;
+    return '<div class="screen center">' +
+      '<h1>' + (pass ? t("ff_resultsTitlePass") : t("ff_resultsTitleFail")) + '</h1>' +
+      '<p>' + (pass ? t("ff_resultsBodyPass") : t("ff_resultsBodyFail")) + '</p>' +
+      // Denominator is how many questions were actually ANSWERED (s.index+1
+      // -- s.index is still the failed question's own 0-based index when a
+      // wrong answer ends the round early, since ffAnswer never advances it),
+      // not the full 10-question deck -- a fail on question 5 should read
+      // "4 out of 5", not "4 out of 10" (2026-09-29, per Dan). On an actual
+      // pass this is equivalent to s.order.length anyway (all 10 attempted).
+      '<p class="center"><strong>' + t("scoreOf")(s.correct, s.index+1) + '</strong></p>' +
+      '<div class="spacer"></div>' +
+      (pass ? '<button class="btn gold" onclick="ffCollectAward()">' + t("collectAward") + '</button>'
+            : '<button class="btn gold" onclick="ffPlayAgain()">' + t("playAgain") + '</button>') +
+      '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+
+  var q = FAITH_FLASH_QUESTIONS[s.order[s.index]];
+  var qLang = q[lang];
+  var answered = s.answered !== null;
+  var answersHtml = s.answerOrder.map(function(actualIdx, displayedI){
+    var cls = "answerBtn";
+    if(answered){
+      cls += " disabled";
+      if(actualIdx === q.correct) cls += " correct";
+      else if(displayedI === s.answered) cls += " wrong";
+    }
+    return '<button class="' + cls + '" onclick="ffAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
+  }).join("");
+
+  var isCorrect = answered && s.answerOrder[s.answered] === q.correct;
+
+  return '<div class="screen">' +
+    '<h2>' + t("faithFlashName") + '</h2>' +
+    '<p class="smallNote">' + (s.index+1) + ' / ' + s.order.length + '</p>' +
+    '<div class="qaBox">' +
+      '<p><strong>' + qLang.q + '</strong></p>' +
+      answersHtml +
+    '</div>' +
+    '<div class="spacer"></div>' +
+    (answered && isCorrect ? '<button class="btn gold" onclick="ffNext()">' + t("nextQuestion") + '</button>' : '') +
+    '<button class="btn outline" onclick="ffQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+function ffQuit(){ state.session.faithFlash = null; go("mainMenu"); }
+
+/* ---------- Faith Match ---------- */
+
+function buildMatchDeck(dim){
+  var pairs = (dim*dim)/2;
+  // Pick a random subset of the tile pool each time instead of always the
+  // first N in order — since all 3 levels now use the same 4x4 size (8
+  // pairs), without this every level would show the exact same 8 tiles.
+  var pool = pairs <= MATCH_SYMBOLS.length ? shuffle(MATCH_SYMBOLS).slice(0,pairs) : MATCH_SYMBOLS;
+  var deck = [];
+  for(var i=0;i<pairs;i++){
+    var sym = pool[i % pool.length];
+    deck.push(sym, sym);
+  }
+  deck = shuffle(deck);
+  return deck.map(function(sym,id){ return {id:id, symbol:sym, matched:false}; });
+}
+
+function initFaithMatchLevel(levelIdx){
+  var dim = MATCH_LEVELS[levelIdx];
+  state.missions.faithMatch.level = levelIdx;
+  state.session.faithMatch = {
+    level: levelIdx, dim: dim, chances: MATCH_CHANCES[levelIdx], maxChances: MATCH_CHANCES[levelIdx],
+    cards: buildMatchDeck(dim), flipped: [], status: "playing"
+  };
+  saveState();
+}
+
+function fmFlip(cardId){
+  var s = state.session.faithMatch;
+  if(!s || s.status !== "playing" || s.chances <= 0) return;
+  if(s.flipped.length >= 2) return;
+  var card = s.cards[cardId];
+  if(card.matched || s.flipped.indexOf(cardId) !== -1) return;
+  s.flipped.push(cardId);
+  if(s.flipped.length === 2){
+    var a = s.cards[s.flipped[0]], b = s.cards[s.flipped[1]];
+    if(a.symbol === b.symbol){
+      // A correct match resolves immediately -- unlike a mismatch, there's
+      // no reason to pause on it to let the player study both cards before
+      // they flip back down -- so the tiles dim without delay (2026-09-30,
+      // per Dan; previously both cases shared the same 650ms pause).
+      fmEvaluate();
+      return;
+    }
+  }
+  saveState(); render();
+  if(s.flipped.length === 2){
+    setTimeout(fmEvaluate, 650);
+  }
+}
+
+function fmEvaluate(){
+  var s = state.session.faithMatch;
+  if(!s || s.flipped.length !== 2) return;
+  var a = s.cards[s.flipped[0]], b = s.cards[s.flipped[1]];
+  if(a.symbol === b.symbol){
+    a.matched = true; b.matched = true;
+    s.flipped = [];
+    var allMatched = s.cards.every(function(c){ return c.matched; });
+    if(allMatched){
+      if(s.level === MATCH_LEVELS.length - 1){
+        s.status = "complete";
+      } else {
+        var nextLevel = s.level + 1;
+        saveState(); render();
+        setTimeout(function(){
+          var s2 = state.session.faithMatch;
+          if(!s2 || s2.status !== "playing") return;
+          initFaithMatchLevel(nextLevel);
+          render();
+        }, FM_LEVEL_PAUSE_MS);
+        return;
+      }
+    }
+  } else {
+    s.flipped = [];
+    s.chances--;
+    if(s.chances <= 0){
+      saveState(); render();
+      setTimeout(function(){
+        var s2 = state.session.faithMatch;
+        if(!s2 || s2.status !== "playing") return;
+        s2.status = "failed";
+        saveState(); render();
+      }, 1300);
+      return;
+    }
+  }
+  saveState(); render();
+}
+
+function fmCollectAward(){
+  var level = state.session.faithMatch.level;
+  state.session.faithMatch = null;
+  state.missions.faithMatch.level = 0;
+  grantMission("faithMatch");
+}
+
+function fmTryAgain(){
+  var level = state.missions.faithMatch.level;
+  initFaithMatchLevel(level);
+  go("faithMatch");
+}
+
+function fmQuit(){ state.session.faithMatch = null; go("mainMenu"); }
+
+// Renders `max` heart slots (hiding the ones beyond `current` with
+// visibility:hidden rather than omitting them) so the "Chances left:" label
+// beside it never shifts as chances tick down -- the row's total text width
+// stays constant at its starting (max) width instead of shrinking around a
+// centered midpoint (2026-09-29, per Dan).
+function chancesHeartsHtml(current, max){
+  var html = "";
+  for(var i=0;i<max;i++){
+    html += '<span style="visibility:' + (i < current ? "visible" : "hidden") + '">❤️</span>';
+  }
+  return html;
+}
+
+function screenFaithMatch(){
+  if(!matchTilesReady){
+    // Guaranteed brief in practice (preload starts at app boot), but this is
+    // what actually prevents the blank-white-tile flash: no card can be
+    // flipped until every tile image has genuinely finished loading.
+    return '<div class="screen center"><p class="smallNote">' + t("fm_loading") + '</p></div>';
+  }
+  var s = state.session.faithMatch;
+  if(!s){ initFaithMatchLevel(state.missions.faithMatch.level||0); s = state.session.faithMatch; }
+
+  if(s.status === "failed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("fm_failTitle") + '</h1>' +
+      '<p>' + t("fm_failBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="fmTryAgain()">' + t("tryAgain") + '</button>' +
+      '<button class="btn outline" onclick="fmQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+
+  if(s.status === "complete"){
+    return '<div class="screen center">' +
+      '<h1>' + t("fm_passTitle") + '</h1>' +
+      '<p>' + t("fm_passBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="fmCollectAward()">' + t("collectAward") + '</button>' +
+      '<button class="btn outline" onclick="fmQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+
+  var dim = s.dim;
+  var cellsHtml = s.cards.map(function(c){
+    var shown = c.matched || s.flipped.indexOf(c.id) !== -1;
+    var cls = "matchCard" + (c.matched ? " matched" : (shown ? " flipped" : ""));
+    // decoding="sync": render() replaces the WHOLE grid's innerHTML on every
+    // flip/match, so every matchCard <img> (even an already-matched one) is a
+    // brand-new DOM node each time -- if the browser's decoded-bitmap cache
+    // has been evicted (common on mobile) that forces a redecode, which paints
+    // one/two blank-white frames first under the default async decoding.
+    // Forcing a synchronous decode removes that flash (2026-09-30, per Dan).
+    var inner = shown ? '<img src="' + c.symbol + '" alt="" decoding="sync">' : "";
+    return '<div class="' + cls + '" onclick="fmFlip(' + c.id + ')">' + inner + '</div>';
+  }).join("");
+
+  return '<div class="screen">' +
+    '<h2>' + t("faithMatchName") + '</h2>' +
+    '<p class="smallNote">' + t("fm_level")(s.level+1, MATCH_LEVELS.length) + '</p>' +
+    '<div class="chancesRow">' + t("chancesLeft") + ' ' + chancesHeartsHtml(Math.max(0,s.chances), s.maxChances || MATCH_CHANCES[s.level]) + '</div>' +
+    '<div class="matchGrid" style="grid-template-columns:repeat(' + dim + ',1fr)">' + cellsHtml + '</div>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn outline" onclick="fmQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Be the Light / Service Sprint ---------- */
+
+function screenBeTheLight(){
+  return '<div class="screen center">' +
+    '<div class="spacer"></div>' +
+    '<div style="font-size:3.5rem;">🔦</div>' +
+    '<h1>' + t("bl_title") + '</h1>' +
+    '<p>' + t("bl_body") + '</p>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn gold" onclick="grantMission(\'beTheLight\')">' + t("missionCompleted") + '</button>' +
+    '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("returnToMenu") + '</button>' +
+  '</div>';
+}
+
+function screenServiceSprint(){
+  return '<div class="screen center">' +
+    '<div class="spacer"></div>' +
+    '<div style="font-size:3.5rem;">🏃</div>' +
+    '<h1>' + t("ss_title") + '</h1>' +
+    '<p>' + t("ss_body") + '</p>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn gold" onclick="grantMission(\'serviceSprint\')">' + t("missionCompleted") + '</button>' +
+    '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("returnToMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Choose Joy ---------- */
+
+function initChooseJoy(){
+  state.session.chooseJoy = {pendingPhoto:null};
+  saveState();
+}
+
+function cjTakePhoto(){
+  document.getElementById("cameraInput").click();
+}
+
+function handlePhotoCapture(ev){
+  var file = ev.target.files && ev.target.files[0];
+  ev.target.value = "";
+  if(!file) return;
+  var img = new Image();
+  var reader = new FileReader();
+  reader.onload = function(e){
+    img.onload = function(){
+      var maxDim = 800;
+      var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      var canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+      if(!state.session.chooseJoy) state.session.chooseJoy = {};
+      state.session.chooseJoy.pendingPhoto = dataUrl;
+      saveState(); render();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function cjRetake(){
+  state.session.chooseJoy.pendingPhoto = null;
+  saveState(); render();
+}
+
+function cjSave(){
+  state.photo = state.session.chooseJoy.pendingPhoto;
+  state.session.chooseJoy = null;
+  go("joyousPhoto");
+}
+
+function cjQuit(){ state.session.chooseJoy = null; go("mainMenu"); }
+
+function screenChooseJoy(){
+  var s = state.session.chooseJoy;
+  if(!s){ initChooseJoy(); s = state.session.chooseJoy; }
+  var body;
+  if(s.pendingPhoto){
+    body = '<img class="photoPreview" src="' + s.pendingPhoto + '">' +
+      '<button class="btn gold" onclick="cjSave()">' + t("savePhoto") + '</button>' +
+      '<button class="btn secondary" onclick="cjRetake()">' + t("retakePhoto") + '</button>';
+  } else {
+    body = '<div class="cameraIconBox">📸</div>' +
+      '<p class="center">' + t("cj_body") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="cjTakePhoto()">' + t("takePhoto") + '</button>';
+  }
+  return '<div class="screen center">' +
+    '<h1>' + t("cj_title") + '</h1>' +
+    body +
+    '<button class="btn outline" onclick="cjQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+function screenJoyousPhoto(){
+  return '<div class="screen center">' +
+    '<h1>' + t("joyousPhotoTitle") + '</h1>' +
+    '<img class="photoPreview" src="' + state.photo + '">' +
+    '<div class="spacer"></div>' +
+    '<button class="btn gold" onclick="cjCollectAward()">' + t("collectAward") + '</button>' +
+  '</div>';
+}
+
+function cjCollectAward(){ grantMission("chooseJoy"); }
+
+/* ---------- Follow the Light ---------- */
+// Simon-style pattern memory on a 3x3 grid of image tiles (redesigned
+// 2026-09-30, per Dan, to mirror Faith Match's header: "Level X of X" +
+// a shared "Chances left" pool of 3 across all 8 levels, instead of the
+// original 4-pad/no-chances version). Tiles reuse Faith Match's own tile
+// art (MATCH_SYMBOLS) rather than needing bespoke assets: each level picks
+// 9 distinct images at random for the grid, then a random tap pattern of
+// that level's target length. A wrong tap costs a chance and replays the
+// SAME pattern from the start (not a new one) so the player can still
+// memorize it; running out of chances restarts the whole run from Level 1,
+// same philosophy as Catch the Light.
+var FL_LEVELS = [3,4,5,6,7,8,9,10]; // pattern length per level (Level 1..8)
+var FL_GRID_TILES = 9; // 3x3
+var FL_MAX_MISSES = 3; // chances shared across all 8 levels
+var FL_SHOW_ON_MS = 550, FL_SHOW_GAP_MS = 250; // per-tile flash / gap while playing back a pattern
+var FL_PRE_SHOW_MS = 800; // "after a moment" pause before playback starts on a fresh level
+var FL_TAP_FLASH_MS = 400; // how long a tile's image shows after a correct tap
+var FL_WRONG_MSG_MS = 900; // how long "INCORRECT TILE!" shows before "TRY AGAIN"
+var FL_RETRY_MSG_MS = 900; // how long "TRY AGAIN" shows before the pattern replays
+var FL_LEVEL_PAUSE_MS = 900; // pause after a level's pattern is completed, before the next level begins
+
+function initFollowLightRun(){
+  state.session.followLight = {level:0, chances:FL_MAX_MISSES, maxChances:FL_MAX_MISSES, status:"playing"};
+  flSetupLevel(0);
+}
+
+function flSetupLevel(levelIdx){
+  var s = state.session.followLight;
+  var patternLen = FL_LEVELS[levelIdx];
+  var pattern = [];
+  for(var i=0;i<patternLen;i++) pattern.push(Math.floor(Math.random()*FL_GRID_TILES));
+  s.level = levelIdx;
+  s.tiles = shuffle(MATCH_SYMBOLS).slice(0, FL_GRID_TILES);
+  s.pattern = pattern;
+  s.playerIndex = 0;
+  s.showingIndex = -1;
+  s.phase = "ready";
+  saveState();
+}
+
+// Pauses on a blank grid for FL_PRE_SHOW_MS ("after a moment"), then hands
+// off to flPlayPattern(). Called once right after entering a fresh level
+// (openMission, flTryAgain, and flLevelComplete's own advance-to-next-level).
+function flStartLevel(){
+  setTimeout(function(){
+    var s = state.session.followLight;
+    if(!s || s.status !== "playing" || s.phase !== "ready") return;
+    s.phase = "showing";
+    saveState(); render();
+    flPlayPattern();
+  }, FL_PRE_SHOW_MS);
+}
+
+// Plays back the current level's pattern one tile at a time via its own
+// setTimeout chain. Guards on s.phase==="showing" at every step so a
+// quit/retry/wrong-tap mid-playback can't leave a stray timer still
+// flashing tiles after the player has moved on.
+function flPlayPattern(){
+  var s = state.session.followLight;
+  if(!s || s.phase !== "showing") return;
+  var step = 0;
+  function showNext(){
+    var s2 = state.session.followLight;
+    if(!s2 || s2.phase !== "showing") return;
+    if(step >= s2.pattern.length){
+      s2.showingIndex = -1;
+      s2.phase = "input";
+      saveState(); render();
+      return;
+    }
+    s2.showingIndex = s2.pattern[step];
+    saveState(); render();
+    setTimeout(function(){
+      var s3 = state.session.followLight;
+      if(!s3 || s3.phase !== "showing") return;
+      s3.showingIndex = -1;
+      saveState(); render();
+      step++;
+      setTimeout(showNext, FL_SHOW_GAP_MS);
+    }, FL_SHOW_ON_MS);
+  }
+  showNext();
+}
+
+function flTileTap(tileIdx){
+  var s = state.session.followLight;
+  if(!s || s.phase !== "input") return;
+  if(tileIdx !== s.pattern[s.playerIndex]){ flWrongTap(); return; }
+  s.showingIndex = tileIdx;
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.followLight;
+    if(!s2 || s2.phase !== "input") return;
+    s2.showingIndex = -1;
+    s2.playerIndex++;
+    if(s2.playerIndex >= s2.pattern.length){ flLevelComplete(); return; }
+    saveState(); render();
+  }, FL_TAP_FLASH_MS);
+}
+
+function flWrongTap(){
+  var s = state.session.followLight;
+  s.chances--;
+  s.showingIndex = -1;
+  flPlayFailSound();
+  if(s.chances <= 0){
+    s.status = "failed";
+    saveState(); render();
+    return;
+  }
+  s.phase = "wrong";
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.followLight;
+    if(!s2 || s2.status !== "playing") return;
+    s2.phase = "retry";
+    s2.playerIndex = 0;
+    saveState(); render();
+    setTimeout(function(){
+      var s3 = state.session.followLight;
+      if(!s3 || s3.status !== "playing" || s3.phase !== "retry") return;
+      s3.phase = "showing";
+      saveState(); render();
+      flPlayPattern();
+    }, FL_RETRY_MSG_MS);
+  }, FL_WRONG_MSG_MS);
+}
+
+function flLevelComplete(){
+  var s = state.session.followLight;
+  s.showingIndex = -1;
+  if(s.level >= FL_LEVELS.length - 1){
+    s.status = "complete";
+    saveState(); render();
+    return;
+  }
+  s.phase = "levelComplete";
+  saveState(); render();
+  var nextLevel = s.level + 1;
+  setTimeout(function(){
+    var s2 = state.session.followLight;
+    if(!s2 || s2.status !== "playing") return;
+    flSetupLevel(nextLevel);
+    render();
+    flStartLevel();
+  }, FL_LEVEL_PAUSE_MS);
+}
+
+// Simple Web Audio beep for a wrong tap — this app has no sound-asset
+// pipeline elsewhere, so a synthesized tone avoids needing a bespoke audio
+// file. The AudioContext is created lazily (browsers block it until a user
+// gesture) and reused rather than rebuilt on every wrong tap.
+var flAudioCtx = null;
+function flPlayFailSound(){
+  try {
+    if(!flAudioCtx) flAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var ctx = flAudioCtx;
+    var osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(220, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.25);
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.3);
+  } catch(e){}
+}
+
+function flCollectAward(){ state.session.followLight = null; grantMission("followLight"); }
+// Running out of chances restarts the whole 8-level run from Level 1 (same
+// convention as Catch the Light's clTryAgain), not just the failed level.
+function flTryAgain(){ initFollowLightRun(); go("followLight"); flStartLevel(); }
+function flQuit(){ state.session.followLight = null; go("mainMenu"); }
+
+function screenFollowLight(){
+  var s = state.session.followLight;
+  if(!s){ initFollowLightRun(); s = state.session.followLight; flStartLevel(); }
+
+  if(s.status === "failed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("fl_failTitle") + '</h1>' +
+      '<p>' + t("fl_failBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="flTryAgain()">' + t("tryAgain") + '</button>' +
+      '<button class="btn outline" onclick="flQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+  if(s.status === "complete"){
+    return '<div class="screen center">' +
+      '<h1>' + t("fl_passTitle") + '</h1>' +
+      '<p>' + t("fl_passBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="flCollectAward()">' + t("collectAward") + '</button>' +
+      '<button class="btn outline" onclick="flQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+
+  var msg = "", msgCls = "flMsg center";
+  if(s.phase === "input") msg = t("fl_repeat");
+  else if(s.phase === "wrong"){ msg = t("fl_incorrect"); msgCls = "flMsg center wrong"; }
+  else if(s.phase === "retry") msg = t("fl_tryAgainMsg");
+
+  var tilesHtml = s.tiles.map(function(src, i){
+    var lit = s.showingIndex === i;
+    var cls = "flPad" + (lit ? " lit" : "") + (s.phase !== "input" ? " disabled" : "");
+    var inner = lit ? '<img src="' + src + '" alt="" decoding="sync">' : "";
+    return '<div class="' + cls + '" onclick="flTileTap(' + i + ')">' + inner + '</div>';
+  }).join("");
+
+  return '<div class="screen">' +
+    '<h2>' + t("followLightName") + '</h2>' +
+    '<p class="smallNote">' + t("fm_level")(s.level+1, FL_LEVELS.length) + '</p>' +
+    '<div class="chancesRow">' + t("chancesLeft") + ' ' + chancesHeartsHtml(Math.max(0,s.chances), s.maxChances) + '</div>' +
+    '<div class="flGrid">' + tilesHtml + '</div>' +
+    '<p class="' + msgCls + '">' + msg + '</p>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn outline" onclick="flQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Word Unscramble ---------- */
+// Curated per-language word lists (not literal translations of each other —
+// picked separately so both feel like natural, similarly-simple faith words
+// rather than forcing an EN word's exact meaning into an awkward ES fit).
+// TODO(Dan): swap in different/NCYC-specific words any time — nothing else
+// needs to change.
+var WORD_UNSCRAMBLE_WORDS = {
+  en: ["HOPE","GRACE","MERCY","FAITH","TRUST"],
+  es: ["FE","PAZ","AMOR","GRACIA","ESPERANZA"]
+};
+
+function wuScrambleWord(word){
+  var letters = word.split("");
+  var scrambled;
+  do { scrambled = shuffle(letters); } while(scrambled.join("") === word && letters.length > 1);
+  return scrambled;
+}
+
+function wuSetupWord(s){
+  var lang = state.lang || "en";
+  var word = WORD_UNSCRAMBLE_WORDS[lang][s.order[s.index]];
+  s.word = word;
+  s.letters = wuScrambleWord(word);
+  s.picked = [];
+  s.feedback = null; // "correct" | "wrong" | null, transient
+}
+
+function initWordUnscramble(){
+  var lang = state.lang || "en";
+  var order = shuffle(WORD_UNSCRAMBLE_WORDS[lang].map(function(_,i){return i;}));
+  var s = {order:order, index:0, status:"playing"};
+  wuSetupWord(s);
+  state.session.wordUnscramble = s;
+  saveState();
+}
+
+// No fail state, per spec — this is a puzzle, not a knowledge/reflex test.
+// A wrong full attempt just shakes and clears for another try.
+function wuPick(letterPos){
+  var s = state.session.wordUnscramble;
+  if(!s || s.feedback) return;
+  if(s.picked.indexOf(letterPos) !== -1) return;
+  if(s.picked.length >= s.word.length) return;
+  s.picked.push(letterPos);
+  if(s.picked.length === s.word.length){
+    var guess = s.picked.map(function(p){ return s.letters[p]; }).join("");
+    if(guess === s.word){
+      s.feedback = "correct";
+      saveState(); render();
+      setTimeout(function(){
+        var s2 = state.session.wordUnscramble;
+        if(!s2) return;
+        if(s2.index >= s2.order.length - 1){
+          s2.status = "results";
+          saveState(); render();
+        } else {
+          s2.index++;
+          wuSetupWord(s2);
+          saveState(); render();
+        }
+      }, 900);
+    } else {
+      s.feedback = "wrong";
+      saveState(); render();
+      setTimeout(function(){
+        var s2 = state.session.wordUnscramble;
+        if(!s2) return;
+        s2.picked = [];
+        s2.feedback = null;
+        saveState(); render();
+      }, 900);
+    }
+  } else {
+    saveState(); render();
+  }
+}
+
+function wuClear(){
+  var s = state.session.wordUnscramble;
+  if(!s || s.feedback) return;
+  s.picked = [];
+  saveState(); render();
+}
+
+function wuCollectAward(){ state.session.wordUnscramble = null; grantMission("wordUnscramble"); }
+function wuQuit(){ state.session.wordUnscramble = null; go("mainMenu"); }
+
+function screenWordUnscramble(){
+  var s = state.session.wordUnscramble;
+  if(!s){ initWordUnscramble(); s = state.session.wordUnscramble; }
+
+  if(s.status === "results"){
+    return '<div class="screen center">' +
+      '<h1>' + t("wu_passTitle") + '</h1>' +
+      '<p>' + t("wu_passBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="wuCollectAward()">' + t("collectAward") + '</button>' +
+    '</div>';
+  }
+
+  var rowCls = "wuAnswerRow" + (s.feedback ? " " + s.feedback : "");
+  var slotsHtml = "";
+  for(var i=0;i<s.word.length;i++){
+    var filled = i < s.picked.length;
+    slotsHtml += '<div class="wuSlot' + (filled?' filled':'') + '">' + (filled ? s.letters[s.picked[i]] : "") + '</div>';
+  }
+  var trayHtml = s.letters.map(function(ch, pos){
+    var used = s.picked.indexOf(pos) !== -1;
+    return '<div class="wuTile' + (used?' used':'') + '" onclick="wuPick(' + pos + ')">' + ch + '</div>';
+  }).join("");
+
+  return '<div class="screen">' +
+    '<h2>' + t("wordUnscrambleName") + '</h2>' +
+    '<p class="smallNote">' + t("wu_word")(s.index+1, s.order.length) + '</p>' +
+    '<p class="center">' + t("wu_intro") + '</p>' +
+    '<div class="' + rowCls + '">' + slotsHtml + '</div>' +
+    '<div class="wuTray">' + trayHtml + '</div>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn outline" onclick="wuClear()">' + t("clearWord") + '</button>' +
+    '<button class="btn outline" onclick="wuQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Catch the Light ---------- */
+// Redesigned 2026-09-29, per Dan, modeled on the Atari 2600 game Kaboom! —
+// a pair of open hands (🤲, palms up) sits at the bottom of the stage and
+// the player drags them left/right (a pointerdown anywhere on the stage
+// jumps the hands there; dragging keeps following the pointer, like an
+// analog paddle controller) to catch falling lights (✨) before they pass
+// the hands. A light that gets past uncaught costs one of 3 chances SHARED
+// across all 4 levels (not reset per level) — run out at any point and the
+// whole thing restarts from Level 1. Clearing Level 4 with a chance still
+// in hand completes the mission. Levels only raise the count and fall
+// speed, per Dan's spec:
+var CL_LEVELS = [
+  {count:20, fallMs:3200},
+  {count:30, fallMs:2700},
+  {count:40, fallMs:2300},
+  {count:50, fallMs:2000}
+];
+var CL_MAX_MISSES = 3;
+var CL_SPAWN_MS = 700, CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
+// A "GET READY FOR LEVEL X" beat with a visible 5->0 countdown, shown before
+// the very first level and before each subsequent one (2026-09-29, per Dan).
+var CL_READY_SECONDS = 5;
+// Brief hold on the cleared stage after the last light of a level is caught,
+// before the "GET READY" beat for the next level begins (2026-09-29, per Dan).
+var CL_LEVEL_PAUSE_MS = 900;
+var clReadyRunning = false; // guards clRunReadyCountdown against double-starting (see its own comment)
+
+// Unlike every other mission, this one runs a CONTINUOUS animation loop
+// (falling icons + the hands following the player's finger), which doesn't
+// mix well with this app's normal "re-render the whole screen from state"
+// pattern — a mid-round render() would wipe out every in-flight falling
+// icon (and its own timers) along with everything else. So while a round is
+// "playing", the falling icons, the hands' position, and the HUD are all
+// updated via DIRECT DOM writes, completely bypassing render() — the normal
+// render() pipeline only runs again once the round actually ends
+// (clEndRound) or completes a level (still mid-round, but only touches the
+// HUD text, not a full re-render).
+var clRunning = false; // true only while the spawn/tick intervals are live
+var clTimers = {spawn:null, tick:null, falls:[]};
+var clActiveIcons = []; // {el, resolved} for every light currently in flight
+var clHandX = 0; // current hand center, in px relative to the stage
+var clDragging = false;
+
+function initCatchLight(){
+  state.session.catchLight = {level:0, spawnedInLevel:0, resolvedInLevel:0, caughtInLevel:0, misses:0, status:"playing", phase:"ready", countdown:CL_READY_SECONDS};
+  saveState();
+}
+
+// Renders the "GET READY" beat once per number (5,4,3,2,1,0 -- each shown
+// for a full second, including 0, before the level actually begins) via the
+// normal render() pipeline, not a direct-DOM trick like the live gameplay
+// below -- there's no falling-icon animation to protect from a re-render
+// during this beat. Self-terminating (no interval to leak/clear), but
+// clReadyRunning still guards against two overlapping chains if this were
+// ever accidentally triggered twice (e.g. by both an explicit call site and
+// the render() resume-hook in the same tick).
+function clRunReadyCountdown(){
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing" || s.phase !== "ready"){ clReadyRunning = false; return; }
+  clReadyRunning = true;
+  render();
+  setTimeout(function(){
+    var s2 = state.session.catchLight;
+    if(!s2 || s2.status !== "playing" || s2.phase !== "ready"){ clReadyRunning = false; return; }
+    if(s2.countdown <= 0){ clReadyRunning = false; clBeginLevel(); return; }
+    s2.countdown--;
+    saveState();
+    clRunReadyCountdown();
+  }, 1000);
+}
+
+// Flips from the "GET READY" beat to the real stage+hands screen and starts
+// the level's own spawn/collision loop.
+function clBeginLevel(){
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing") return;
+  s.phase = "playing";
+  saveState();
+  render();
+}
+
+function clClearTimers(){
+  if(clTimers.spawn) clearInterval(clTimers.spawn);
+  if(clTimers.tick) clearInterval(clTimers.tick);
+  clTimers.falls.forEach(function(id){ clearTimeout(id); });
+  clTimers.spawn = null; clTimers.tick = null; clTimers.falls = [];
+  clRunning = false;
+  clActiveIcons = [];
+  clDragging = false;
+}
+
+function clUpdateHud(){
+  var s = state.session.catchLight;
+  if(!s) return;
+  var levelEl = document.getElementById("clLevel");
+  var scoreEl = document.getElementById("clScore");
+  var heartsEl = document.getElementById("clHearts");
+  var levelCfg = CL_LEVELS[s.level];
+  if(levelEl) levelEl.textContent = t("cl_level")(s.level+1, CL_LEVELS.length);
+  if(scoreEl) scoreEl.textContent = t("cl_caught")(s.caughtInLevel, levelCfg.count);
+  if(heartsEl) heartsEl.textContent = "❤️".repeat(Math.max(0, CL_MAX_MISSES - s.misses));
+}
+
+function clUpdateHandPosition(){
+  var hands = document.getElementById("clHands");
+  if(hands) hands.style.left = clHandX + "px";
+}
+
+function clMoveHandTo(clientX){
+  var stage = document.getElementById("clStage");
+  if(!stage) return;
+  var rect = stage.getBoundingClientRect();
+  clHandX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+  clUpdateHandPosition();
+}
+
+function clPointerDown(ev){
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing") return;
+  clDragging = true;
+  clMoveHandTo(ev.clientX);
+}
+function clPointerMove(ev){
+  if(!clDragging) return;
+  clMoveHandTo(ev.clientX);
+}
+function clPointerUp(){ clDragging = false; }
+
+function clSpawnIcon(){
+  var stage = document.getElementById("clStage");
+  var s = state.session.catchLight;
+  if(!stage || !s || s.status !== "playing") return;
+  var levelCfg = CL_LEVELS[s.level];
+  if(s.spawnedInLevel >= levelCfg.count) return; // this level's full quota is already in flight or resolved — just waiting on the rest
+  s.spawnedInLevel++;
+  saveState();
+  var el = document.createElement("div");
+  el.className = "clIcon";
+  el.textContent = CL_ICON;
+  var stageW = stage.clientWidth;
+  el.style.left = Math.max(4, Math.floor(Math.random() * Math.max(1, stageW - 40))) + "px";
+  el.style.top = "-50px";
+  el.style.transition = "none";
+  stage.appendChild(el);
+  void el.offsetHeight; // force reflow so the transition below actually starts from -50px, not skips straight to the end
+  var stageH = stage.clientHeight;
+  // setTimeout(fn,0), not requestAnimationFrame -- rAF is suspended whenever
+  // the document isn't in the "visible" state (per the Page Visibility spec),
+  // which real phones only enter while genuinely backgrounded, but this is
+  // still the more robust choice for a page a player may glance away from
+  // and back to mid-round; either way it needs a deferred tick after the
+  // reflow above, and a plain macrotask delivers that regardless of paint
+  // scheduling.
+  setTimeout(function(){
+    el.style.transition = "top " + levelCfg.fallMs + "ms linear";
+    el.style.top = (stageH + 20) + "px";
+  }, 0);
+  var record = {el:el, resolved:false};
+  clActiveIcons.push(record);
+  // If it's never caught by clCollisionTick, its own fall timer resolves it
+  // as a miss once it's had time to reach the bottom.
+  var fallId = setTimeout(function(){ clResolveIcon(record, false); }, levelCfg.fallMs + 30);
+  clTimers.falls.push(fallId);
+}
+
+function clResolveIcon(record, caught){
+  if(record.resolved) return;
+  record.resolved = true;
+  if(record.el.parentNode) record.el.parentNode.removeChild(record.el);
+  var idx = clActiveIcons.indexOf(record);
+  if(idx !== -1) clActiveIcons.splice(idx, 1);
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing") return;
+  s.resolvedInLevel++;
+  if(caught) s.caughtInLevel++; else s.misses++;
+  saveState();
+  clUpdateHud();
+  if(s.misses >= CL_MAX_MISSES){ clEndRound("fail"); return; }
+  clCheckLevelComplete();
+}
+
+// Runs every CL_TICK_MS while a round is live — the only way to detect a
+// "catch" now that lights fall via a CSS transition the hands must
+// intercept, not something the player taps directly (topic.index has no
+// equivalent since this is the one continuously-animated mission).
+function clCollisionTick(){
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing") return;
+  var hands = document.getElementById("clHands");
+  if(!hands) return;
+  var handsRect = hands.getBoundingClientRect();
+  clActiveIcons.slice().forEach(function(record){
+    if(record.resolved) return;
+    var r = record.el.getBoundingClientRect();
+    var cx = r.left + r.width/2, cy = r.top + r.height/2;
+    if(cy >= handsRect.top && cy <= handsRect.bottom && cx >= handsRect.left && cx <= handsRect.right){
+      clResolveIcon(record, true);
+    }
+  });
+}
+
+function clCheckLevelComplete(){
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing") return;
+  if(s.resolvedInLevel < CL_LEVELS[s.level].count) return;
+  if(s.level >= CL_LEVELS.length - 1){ clEndRound("win"); return; }
+  // Stop the live spawn/tick loop for the "GET READY" beat between levels —
+  // clBeginLevel() (at the end of clRunReadyCountdown) restarts it once the
+  // countdown finishes, via the same render()-hook every other entry point
+  // into a level uses. Hold on the now-cleared stage for a moment first so
+  // catching the last light doesn't cut straight into the next screen.
+  clClearTimers();
+  setTimeout(function(){
+    var s2 = state.session.catchLight;
+    if(!s2 || s2.status !== "playing") return;
+    s2.level++;
+    s2.spawnedInLevel = 0; s2.resolvedInLevel = 0; s2.caughtInLevel = 0;
+    s2.phase = "ready"; s2.countdown = CL_READY_SECONDS;
+    saveState();
+    clRunReadyCountdown();
+  }, CL_LEVEL_PAUSE_MS);
+}
+
+function clStart(){
+  if(clRunning) return;
+  clRunning = true;
+  var s = state.session.catchLight;
+  // Reconciles any lights that were spawned-but-unresolved at the moment of
+  // a page reload (their DOM elements are gone, so they can never be caught
+  // or missed) back into the still-to-spawn count, so a reload mid-level can
+  // never soft-lock a level a few lights short of its own quota. A no-op on
+  // every normal start, since both are already 0 then.
+  if(s) s.spawnedInLevel = s.resolvedInLevel;
+  var stage = document.getElementById("clStage");
+  if(stage){
+    clHandX = stage.clientWidth/2;
+    stage.onpointerdown = clPointerDown;
+    stage.onpointermove = clPointerMove;
+    stage.onpointerup = clPointerUp;
+    stage.onpointercancel = clPointerUp;
+    stage.onpointerleave = clPointerUp;
+  }
+  clUpdateHandPosition();
+  clUpdateHud();
+  clTimers.spawn = setInterval(clSpawnIcon, CL_SPAWN_MS);
+  clTimers.tick = setInterval(clCollisionTick, CL_TICK_MS);
+}
+
+function clEndRound(reason){
+  var s = state.session.catchLight;
+  clClearTimers();
+  var stage = document.getElementById("clStage");
+  if(stage) stage.innerHTML = "";
+  if(!s) return;
+  s.status = (reason === "win") ? "passed" : "failed";
+  saveState();
+  render();
+}
+
+function clCollectAward(){ state.session.catchLight = null; grantMission("catchLight"); }
+function clTryAgain(){ initCatchLight(); go("catchLight"); }
+function clQuit(){ clClearTimers(); clReadyRunning = false; state.session.catchLight = null; go("mainMenu"); }
+
+function screenCatchLight(){
+  var s = state.session.catchLight;
+  if(!s){ initCatchLight(); s = state.session.catchLight; }
+
+  if(s.status === "failed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("cl_failTitle") + '</h1>' +
+      '<p>' + t("cl_failBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="clTryAgain()">' + t("tryAgain") + '</button>' +
+      '<button class="btn outline" onclick="clQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+  if(s.status === "passed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("cl_passTitle") + '</h1>' +
+      '<p>' + t("cl_passBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="clCollectAward()">' + t("collectAward") + '</button>' +
+      '<button class="btn outline" onclick="clQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+
+  if(s.phase === "ready"){
+    return '<div class="screen center">' +
+      '<div class="spacer"></div>' +
+      '<h1>' + t("cl_getReady")(s.level+1) + '</h1>' +
+      '<div class="clCountdownNum">' + s.countdown + '</div>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn outline" onclick="clQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+
+  var levelCfg = CL_LEVELS[s.level];
+  return '<div class="screen">' +
+    '<h2>' + t("catchLightName") + '</h2>' +
+    '<p class="center smallNote">' + t("cl_intro") + '</p>' +
+    '<div class="clHud">' +
+      '<span id="clLevel">' + t("cl_level")(s.level+1, CL_LEVELS.length) + '</span>' +
+      '<span id="clScore">' + t("cl_caught")(s.caughtInLevel, levelCfg.count) + '</span>' +
+      '<span id="clHearts">' + "❤️".repeat(Math.max(0, CL_MAX_MISSES - s.misses)) + '</span>' +
+    '</div>' +
+    '<div class="clStage" id="clStage"><div class="clHands" id="clHands">' + CL_HAND_EMOJI + '</div></div>' +
+    '<button class="btn outline" onclick="clQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Acts of Kindness Sort ---------- */
+
+var KINDNESS_SCENARIOS = [
+  {en:"You share your snack with someone who forgot theirs.", es:"Compartes tu merienda con alguien que olvidó la suya.", correct:"kind"},
+  {en:"You laugh at someone who trips and falls.", es:"Te ríes de alguien que se tropieza y se cae.", correct:"unkind"},
+  {en:"You hold the door open for the person behind you.", es:"Le sostienes la puerta a la persona detrás de ti.", correct:"kind"},
+  {en:"You ignore a new student sitting alone at lunch.", es:"Ignoras a un estudiante nuevo que está sentado solo en el almuerzo.", correct:"unkind"},
+  {en:"You help a friend carry their heavy backpack.", es:"Ayudas a un amigo a cargar su mochila pesada.", correct:"kind"},
+  {en:"You spread a rumor about a classmate.", es:"Difundes un rumor sobre un compañero de clase.", correct:"unkind"},
+  {en:"You compliment someone on a job well done.", es:"Felicitas a alguien por un trabajo bien hecho.", correct:"kind"},
+  {en:"You cut in line ahead of others.", es:"Te metes en la fila delante de otros.", correct:"unkind"},
+  {en:"You forgive a friend who made a mistake.", es:"Perdonas a un amigo que cometió un error.", correct:"kind"},
+  {en:"You leave someone out of a group activity on purpose.", es:"Dejas a alguien fuera de una actividad grupal a propósito.", correct:"unkind"}
+];
+var KINDNESS_CHANCES = 3;
+
+function initKindnessSort(){
+  var order = shuffle(KINDNESS_SCENARIOS.map(function(_,i){return i;}));
+  state.session.kindnessSort = {order:order, index:0, chances:KINDNESS_CHANCES, answered:null, status:"playing"};
+  saveState();
+}
+
+function ksAnswer(bucket){
+  var s = state.session.kindnessSort;
+  if(!s || s.answered) return;
+  var scenario = KINDNESS_SCENARIOS[s.order[s.index]];
+  var isCorrect = bucket === scenario.correct;
+  s.answered = bucket;
+  if(!isCorrect) s.chances--;
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.kindnessSort;
+    if(!s2) return;
+    if(!isCorrect && s2.chances <= 0){
+      s2.status = "failed";
+      saveState(); render();
+      return;
+    }
+    if(s2.index >= s2.order.length - 1){
+      s2.status = "passed";
+      saveState(); render();
+    } else {
+      s2.index++;
+      s2.answered = null;
+      saveState(); render();
+    }
+  }, 1100);
+}
+
+function ksCollectAward(){ state.session.kindnessSort = null; grantMission("kindnessSort"); }
+function ksTryAgain(){ initKindnessSort(); go("kindnessSort"); }
+function ksQuit(){ state.session.kindnessSort = null; go("mainMenu"); }
+
+function screenKindnessSort(){
+  var s = state.session.kindnessSort;
+  if(!s){ initKindnessSort(); s = state.session.kindnessSort; }
+  var lang = state.lang || "en";
+
+  if(s.status === "failed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("ks_failTitle") + '</h1>' +
+      '<p>' + t("ks_failBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="ksTryAgain()">' + t("tryAgain") + '</button>' +
+      '<button class="btn outline" onclick="ksQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+  if(s.status === "passed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("ks_passTitle") + '</h1>' +
+      '<p>' + t("ks_passBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="ksCollectAward()">' + t("collectAward") + '</button>' +
+      '<button class="btn outline" onclick="ksQuit()">' + t("mainMenu") + '</button>' +
+    '</div>';
+  }
+
+  var scenario = KINDNESS_SCENARIOS[s.order[s.index]];
+  var answered = s.answered !== null;
+  function btnCls(bucket){
+    var cls = "btn kindBtn";
+    if(answered){
+      cls += " disabled";
+      if(bucket === scenario.correct) cls += " correct";
+      else if(bucket === s.answered) cls += " wrong";
+    }
+    return cls;
+  }
+
+  return '<div class="screen">' +
+    '<h2>' + t("kindnessSortName") + '</h2>' +
+    '<p class="smallNote">' + (s.index+1) + ' / ' + s.order.length + '</p>' +
+    '<p class="center">' + t("ks_intro") + '</p>' +
+    '<div class="qaBox"><p class="center"><strong>' + scenario[lang] + '</strong></p></div>' +
+    '<div class="chancesRow">' + t("chancesLeft") + ' ' + "❤️".repeat(Math.max(0,s.chances)) + '</div>' +
+    '<div class="spacer"></div>' +
+    '<div class="kindBtns">' +
+      '<button class="' + btnCls("kind") + '" onclick="ksAnswer(\'kind\')">' + t("ks_kind") + '</button>' +
+      '<button class="' + btnCls("unkind") + '" onclick="ksAnswer(\'unkind\')">' + t("ks_notKind") + '</button>' +
+    '</div>' +
+    '<button class="btn outline" onclick="ksQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Hidden Blessings ---------- */
+// Positions are % coordinates within the .hbScene box (a themed gradient
+// "scene," not a custom illustration — see the CSS comment above .hbScene).
+// TODO(Dan): if you'd rather have a real illustrated background with icons
+// tucked into the art, swap .hbScene's CSS background for an image and
+// reposition these to match — the tap/found logic needs no changes either way.
+var HIDDEN_BLESSINGS_SPOTS = [
+  {x:18, y:22, icon:"✝️"}, {x:75, y:16, icon:"❤️"}, {x:42, y:48, icon:"🕊️"},
+  {x:82, y:62, icon:"⭐"}, {x:22, y:78, icon:"🙏"}, {x:60, y:85, icon:"✝️"}
+];
+
+function initHiddenBlessings(){
+  state.session.hiddenBlessings = {found:[], status:"playing"};
+  saveState();
+}
+
+function hbTapSpot(idx){
+  var s = state.session.hiddenBlessings;
+  if(!s || s.status !== "playing") return;
+  if(s.found.indexOf(idx) !== -1) return;
+  s.found.push(idx);
+  if(s.found.length >= HIDDEN_BLESSINGS_SPOTS.length) s.status = "passed";
+  saveState(); render();
+}
+
+function hbCollectAward(){ state.session.hiddenBlessings = null; grantMission("hiddenBlessings"); }
+function hbQuit(){ state.session.hiddenBlessings = null; go("mainMenu"); }
+
+function screenHiddenBlessings(){
+  var s = state.session.hiddenBlessings;
+  if(!s){ initHiddenBlessings(); s = state.session.hiddenBlessings; }
+
+  if(s.status === "passed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("hb_passTitle") + '</h1>' +
+      '<p>' + t("hb_passBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="hbCollectAward()">' + t("collectAward") + '</button>' +
+    '</div>';
+  }
+
+  var spotsHtml = HIDDEN_BLESSINGS_SPOTS.map(function(spot, idx){
+    var found = s.found.indexOf(idx) !== -1;
+    return '<div class="hbSpot' + (found?' found':'') + '" style="left:' + spot.x + '%;top:' + spot.y + '%;" onclick="hbTapSpot(' + idx + ')">' + spot.icon + '</div>';
+  }).join("");
+
+  return '<div class="screen">' +
+    '<h2>' + t("hiddenBlessingsName") + '</h2>' +
+    '<p class="smallNote">' + t("hb_found")(s.found.length, HIDDEN_BLESSINGS_SPOTS.length) + '</p>' +
+    '<p class="center">' + t("hb_intro") + '</p>' +
+    '<div class="hbScene">' + spotsHtml + '</div>' +
+    '<button class="btn outline" onclick="hbQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Passport ---------- */
+
+// Holds the track's current position in RAW SLOT units (0..PASSPORT_TRACK_SLOTS-1),
+// not a page index — slot 0 and the last slot are the phantom clones (see
+// PASSPORT_TRACK_SLOTS above), so a real page's own slot is always page+1.
+var lastTrackSlot = 1;
+
+function passportNav(delta){
+  var raw = state.passportPage + delta;
+  var wrapped = raw < 0 || raw > PASSPORT_PAGES-1;
+  state.passportPage = (raw + PASSPORT_PAGES) % PASSPORT_PAGES;
+  // Which phantom slide (if any) render()'s animation hook should slide
+  // THROUGH on its way to the real page — +1 wrapping forward (last page ->
+  // first), -1 wrapping backward (first page -> last), 0 for an ordinary step.
+  state.passportWrapDelta = wrapped ? delta : 0;
+  saveState(); render();
+}
+
+var passportTouchStartX = null;
+function passportTouchStart(ev){ passportTouchStartX = ev.changedTouches[0].clientX; }
+function passportTouchEnd(ev){
+  if(passportTouchStartX === null) return;
+  var dx = ev.changedTouches[0].clientX - passportTouchStartX;
+  passportTouchStartX = null;
+  if(dx > 40) passportNav(-1);
+  else if(dx < -40) passportNav(1);
+}
+
+function passportPageInner(page){
+  if(page < MISSIONS.length){
+    var m = MISSIONS[page];
+    var earned = state.missions[m.id].badge;
+    return '<p class="smallNote">' + t("missionBadge")(page+1) + '</p>' +
+      (earned ? badgeImgHtml(m, 120) : '<div class="passportBadge">❔</div>') +
+      '<p><strong>' + (earned ? t(m.themeKey) : t("badgeLocked")) + '</strong></p>';
+  }
+  return '<p class="smallNote">' + t("joyousPhotoPage") + '</p>' +
+    (state.photo ? '<img class="photoPreview" src="' + state.photo + '" style="max-height:220px;">' : '<div class="passportBadge">❔</div><p>' + t("badgeLocked") + '</p>');
+}
+
+function screenPassport(){
+  var page = state.passportPage;
+  var dotsHtml = "";
+  for(var i=0;i<PASSPORT_PAGES;i++) dotsHtml += '<div class="dot' + (i===page?' active':'') + '"></div>';
+
+  var pageStyle = 'style="width:' + (100/PASSPORT_TRACK_SLOTS) + '%"';
+  // Phantom clone of the LAST real page first, then the PASSPORT_PAGES real
+  // pages, then a phantom clone of the FIRST real page — see
+  // PASSPORT_TRACK_SLOTS above for why. A real page's own slot is always
+  // its index + 1.
+  var pagesHtml = '<div class="passportPage" ' + pageStyle + '>' + passportPageInner(PASSPORT_PAGES-1) + '</div>';
+  for(var i=0;i<PASSPORT_PAGES;i++) pagesHtml += '<div class="passportPage" ' + pageStyle + '>' + passportPageInner(i) + '</div>';
+  pagesHtml += '<div class="passportPage" ' + pageStyle + '>' + passportPageInner(0) + '</div>';
+
+  return '<div class="screen">' +
+    '<h2>' + t("passportTitle") + '</h2>' +
+    '<div class="passportBook" ontouchstart="passportTouchStart(event)" ontouchend="passportTouchEnd(event)">' +
+      '<div class="passportTrack" id="passportTrack" style="width:' + (PASSPORT_TRACK_SLOTS*100) + '%;transform:translateX(-' + ((page+1)*100/PASSPORT_TRACK_SLOTS) + '%)">' + pagesHtml + '</div>' +
+    '</div>' +
+    '<div class="dots">' + dotsHtml + '</div>' +
+    '<div class="passportNav">' +
+      '<button class="navArrow" onclick="passportNav(-1)">‹</button>' +
+      '<button class="navArrow" onclick="passportNav(1)">›</button>' +
+    '</div>' +
+    '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Golden Ticket ---------- */
+
+function clearTicket(){
+  state.points = 0;
+  MISSIONS.forEach(function(m){ state.missions[m.id].done = false; });
+  state.missions.faithMatch.level = 0;
+  go("mainMenu");
+}
+
+function screenGoldenTicket(){
+  return '<div class="screen center">' +
+    '<div class="spacer"></div>' +
+    '<h1>' + t("ticketTitle") + '</h1>' +
+    '<div class="ticketBox"><div class="tk">🎟️</div><strong>FE Y VIDA QUEST</strong></div>' +
+    '<p>' + t("ticketBody") + '</p>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn gold" onclick="clearTicket()">' + t("clearTicket") + '</button>' +
+    // Added 2026-09-29, per Dan — previously CLEAR TICKET was the only way
+    // off this screen, which meant actually using it (even just to look) was
+    // destructive. This one is a plain, non-destructive go('mainMenu') —
+    // nothing about points/missions/badges changes — so a player who reaches
+    // the Golden Ticket early (5 of 10 missions) can back out and keep
+    // playing the remaining ones.
+    '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
+/* ---------- Render ---------- */
+
+var lastRenderedScreen = null;
+
+function render(){
+  var app = document.getElementById("app");
+  var html;
+  switch(state.screen){
+    case "language": html = screenLanguage(); break;
+    case "welcome": html = screenWelcome(); break;
+    case "mainMenu": html = screenMainMenu(); break;
+    case "award": html = screenAward(); break;
+    case "faithFlash": html = screenFaithFlash(); break;
+    case "faithMatch": html = screenFaithMatch(); break;
+    case "beTheLight": html = screenBeTheLight(); break;
+    case "serviceSprint": html = screenServiceSprint(); break;
+    case "chooseJoy": html = screenChooseJoy(); break;
+    case "joyousPhoto": html = screenJoyousPhoto(); break;
+    case "followLight": html = screenFollowLight(); break;
+    case "wordUnscramble": html = screenWordUnscramble(); break;
+    case "catchLight": html = screenCatchLight(); break;
+    case "kindnessSort": html = screenKindnessSort(); break;
+    case "hiddenBlessings": html = screenHiddenBlessings(); break;
+    case "passport": html = screenPassport(); break;
+    case "goldenTicket": html = screenGoldenTicket(); break;
+    default: html = screenLanguage();
+  }
+  var isNewScreen = state.screen !== lastRenderedScreen;
+  var enteringPassportFresh = state.screen === "passport" && isNewScreen;
+  lastRenderedScreen = state.screen;
+  app.innerHTML = html;
+  if(isNewScreen){
+    var el = app.querySelector(".screen");
+    if(el) el.classList.add("screen-enter");
+  }
+  if(state.screen === "passport"){
+    var track = document.getElementById("passportTrack");
+    if(track){
+      var realSlot = state.passportPage + 1; // slot 0 is the phantom clone of the last page
+      if(enteringPassportFresh){
+        // First time opening the Passport this visit — snap straight to the
+        // target page, no slide-in from whatever page was open last time.
+        lastTrackSlot = realSlot;
+        track.style.transition = "none";
+        track.style.transform = "translateX(-" + (lastTrackSlot*100/PASSPORT_TRACK_SLOTS) + "%)";
+      } else if(state.passportWrapDelta){
+        // Wrapping (last page -> first, or first -> last): slide through the
+        // phantom clone sitting just past the real end in the swiped
+        // direction — visually identical to the real target page — then,
+        // once the transition finishes, silently (no transition) snap the
+        // track to the REAL page's own slot. Undetectable to the eye since
+        // the phantom and the real page render identical content; avoids
+        // both an instant snap (what Dan reported — no visible scroll at
+        // all) and a long backward scroll across every page in between.
+        var phantomSlot = state.passportWrapDelta > 0 ? PASSPORT_TRACK_SLOTS-1 : 0;
+        track.style.transition = "none";
+        track.style.transform = "translateX(-" + (lastTrackSlot*100/PASSPORT_TRACK_SLOTS) + "%)";
+        void track.offsetWidth; // force reflow so the transition below actually starts from here
+        requestAnimationFrame(function(){
+          track.style.transition = "transform .32s ease";
+          track.style.transform = "translateX(-" + (phantomSlot*100/PASSPORT_TRACK_SLOTS) + "%)";
+        });
+        lastTrackSlot = realSlot;
+        setTimeout(function(){
+          if(!track.isConnected) return; // the user already navigated away/re-rendered — nothing to fix up
+          track.style.transition = "none";
+          track.style.transform = "translateX(-" + (realSlot*100/PASSPORT_TRACK_SLOTS) + "%)";
+        }, 340);
+      } else {
+        // Start the freshly-inserted track at the PREVIOUS page (no
+        // transition yet, so this is invisible), then animate to the new
+        // page on the next frame — full DOM replacement on every render
+        // means a transform set once at insertion never animates on its own.
+        track.style.transition = "none";
+        track.style.transform = "translateX(-" + (lastTrackSlot*100/PASSPORT_TRACK_SLOTS) + "%)";
+        void track.offsetWidth; // force reflow so the transition below actually starts from here
+        requestAnimationFrame(function(){
+          track.style.transition = "transform .32s ease";
+          track.style.transform = "translateX(-" + (realSlot*100/PASSPORT_TRACK_SLOTS) + "%)";
+        });
+        lastTrackSlot = realSlot;
+      }
+    }
+  }
+  // Catch the Light runs its falling-icon animation via direct DOM writes
+  // (see clStart()), not through this render() pipeline, so a mid-round
+  // re-render never wipes out in-flight icons. The one case that DOES need
+  // to (re)start the loop from here is a genuine page reload landing back on
+  // this screen mid-round (e.g. the tab was discarded under memory pressure)
+  // — clRunning is a fresh `false` in that case since it's a brand-new script
+  // instance, so this picks the round back up (with whatever score/misses/
+  // time was last saved) instead of leaving the stage empty and frozen. The
+  // "GET READY" countdown (clReadyRunning) gets the same treatment for a
+  // reload landing mid-countdown.
+  var clSession = state.session.catchLight;
+  if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
+    if(clSession.phase === "playing" && !clRunning) clStart();
+    else if(clSession.phase === "ready" && !clReadyRunning) clRunReadyCountdown();
+  }
+}
+
+document.getElementById("cameraInput").addEventListener("change", handlePhotoCapture);
+window.addEventListener("pagehide", saveState);
+window.addEventListener("visibilitychange", saveState);
+
+render();
+// Kicked off at boot, not when Faith Match is opened (2026-09-29, per Dan —
+// the first tile tapped showed blank white until its image finished
+// loading). Starting the fetch this early gives it the whole language
+// select -> welcome -> main menu detour most players take before ever
+// reaching Faith Match to finish in the background; openMission('faithMatch')
+// still calls this too, but preloadMatchTiles() is idempotent
+// (matchTilesPreloaded guards it) so that call is now just a harmless no-op
+// safety net for the rare case someone reaches it before this finishes.
+preloadMatchTiles();
+</script>
+</body>
+</html>
