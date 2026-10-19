@@ -103,6 +103,10 @@
   .missionTile .lbl{font-size:.68rem;margin-top:4px;display:block;font-weight:600;}
   .missionTile .chk{font-size:.9rem;color:var(--good);}
   .passportTile{grid-column:span 3;}
+  /* TEMPORARY test aid -- see tempResetHtml() */
+  .tempReset{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;padding:8px;border:1px dashed rgba(255,255,255,.4);border-radius:12px;}
+  .tempResetLbl{width:100%;font-size:.68rem;letter-spacing:.06em;opacity:.7;}
+  .tempReset button{background:transparent;color:var(--cream);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:6px 8px;font-size:.72rem;cursor:pointer;}
 
   .qaBox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:16px;margin:10px 0;}
   .answerBtn{
@@ -139,7 +143,9 @@
   .pzPiece.locked{cursor:default;pointer-events:none;}
   .pzOutline{fill:none;stroke:var(--gold);stroke-width:2.5;stroke-linejoin:round;pointer-events:none;}
   .pzPiece.dragging .pzOutline{stroke:#fff;}
-  .pzSvg.solved .pzOutline{stroke:var(--good);}
+  .pzSvg.solved .pzOutline{display:none;}
+  .pzFull{pointer-events:none;animation:pzFade .4s ease-out;}
+  @keyframes pzFade{from{opacity:0;}to{opacity:1;}}
   .pzMsg{min-height:1.6em;text-align:center;font-weight:700;margin:2px 0;}
   .pzMsg.good{color:var(--good);font-size:1.2rem;}
 
@@ -296,10 +302,10 @@ var T = {
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
 
     pz_intro:"Drag each piece into the frame to rebuild the picture. It snaps into place when it fits.",
-    pz_round:function(n,total){return "Puzzle "+n+" of "+total;},
+    pz_round:function(n,total){return "Level "+n+" of "+total;},
     pz_pieces:function(n,total){return "Pieces placed: "+n+" / "+total;},
-    pz_solved:"Solved!", pz_next:"Next puzzle in a moment...",
-    pz_passTitle:"Puzzle Master!", pz_passBody:"You rebuilt all 3 stained-glass pictures!",
+    pz_solved:"Solved!", pz_next:"Next level in a moment...",
+    pz_passTitle:"Puzzle Master!", pz_passBody:"You rebuilt all 4 stained-glass pictures!",
   },
   es: {
     chooseLanguage:"Elige Tu Idioma",
@@ -378,10 +384,10 @@ var T = {
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
 
     pz_intro:"Arrastra cada pieza al marco para armar la imagen. Encaja en su lugar cuando coincide.",
-    pz_round:function(n,total){return "Rompecabezas "+n+" de "+total;},
+    pz_round:function(n,total){return "Nivel "+n+" de "+total;},
     pz_pieces:function(n,total){return "Piezas colocadas: "+n+" / "+total;},
-    pz_solved:"¡Resuelto!", pz_next:"Siguiente rompecabezas en un momento...",
-    pz_passTitle:"¡Maestro del Rompecabezas!", pz_passBody:"¡Armaste las 3 imágenes de vitral!",
+    pz_solved:"¡Resuelto!", pz_next:"Siguiente nivel en un momento...",
+    pz_passTitle:"¡Maestro del Rompecabezas!", pz_passBody:"¡Armaste las 4 imágenes de vitral!",
   }
 };
 
@@ -675,9 +681,38 @@ function screenMainMenu(){
       '<div class="progressLabel">' + state.points + ' / ' + GOLDEN_TICKET_POINTS + ' ' + t("questPoints") + '</div>' +
     '</div>' +
     '<div class="missionGrid">' + tiles + '</div>' +
+    tempResetHtml() +
     '<div class="spacer"></div>' +
     ticketBtn +
   '</div>';
+}
+
+// TEMPORARY test aid (2026-10-19, per Dan): one small button per completed
+// mission that makes it playable again. Delete this function, resetMission,
+// the tempResetHtml() call in screenMainMenu and the .tempReset CSS before the
+// event -- or just set SHOW_TEMP_RESET to false. English only on purpose.
+var SHOW_TEMP_RESET = true;
+function tempResetHtml(){
+  if(!SHOW_TEMP_RESET) return "";
+  var done = MISSIONS.filter(function(m){ return state.missions[m.id].done; });
+  if(!done.length) return "";
+  return '<div class="tempReset"><div class="tempResetLbl">TEMP RESET (testing only)</div>' +
+    done.map(function(m){
+      return '<button onclick="resetMission(\'' + m.id + '\')">&#8635; ' + t(m.nameKey) + '</button>';
+    }).join("") + '</div>';
+}
+
+// Makes a completed mission playable again: clears its done flag and its saved
+// game, and takes back its 100 points so earning it again isn't double
+// counted. The Passport badge is kept, as with CLEAR TICKET.
+function resetMission(id){
+  var ms = state.missions[id];
+  if(!ms || !ms.done) return;
+  ms.done = false;
+  if(id === "faithMatch") ms.level = 0;
+  state.points = Math.max(0, state.points - 100);
+  if(state.session[id] !== undefined) state.session[id] = null;
+  go("mainMenu");
 }
 
 function openPassport(){ go("passport"); }
@@ -1902,24 +1937,32 @@ function screenHiddenBlessings(){
 /* ---------- Stained-Glass Puzzle ---------- */
 
 // Replaced Service Sprint (2026-10-19, per Dan), then turned from a sliding
-// puzzle into a jigsaw (2026-10-19, per Dan -- slide puzzles were too hard).
-// Three puzzles, each cut from a random Faith Match picture (the same 16 tile
-// images, already preloaded). The player drags loose, jigsaw-shaped pieces
-// from a tray into an empty frame (no guide image, per Dan); a piece within
-// reach of its own spot snaps in and locks, anything else springs back to the
-// tray. No
-// chances, no timer -- it cannot be failed.
+// puzzle into a jigsaw (per Dan -- slide puzzles were too hard), then given 4
+// levels of 8 / 16 / 24 / 32 pieces (per Dan). Each level is cut from a random
+// Faith Match picture (the same 16 tile images, already preloaded). The player
+// drags loose, jigsaw-shaped pieces from a tray into an empty frame; a piece
+// within reach of its own spot snaps in and locks, anything else springs back
+// to the tray. No chances, no timer -- it cannot be failed. When a level is
+// finished the whole picture is shown for 3 seconds with no piece lines.
 // The whole board is ONE <svg> in a fixed 340-unit-wide coordinate space that
-// scales to the screen. Dragging moves pieces by direct DOM writes (not
-// render(), which would replace the piece being held); render() only runs
-// when a puzzle is solved. Piece edges (the knobs) come from a seeded random
-// generator, so a page reload rebuilds exactly the same pieces.
-var PZ_GRIDS = [3, 3, 4];       // pieces per side, per puzzle (9, 9, 16 pieces)
+// scales to the screen. The board is always square, so a level's grid decides
+// the piece shape (4x2 gives tall pieces, 8x4 gives narrow ones). Dragging
+// moves pieces by direct DOM writes (not render(), which would replace the
+// piece being held); render() only runs when a level is solved. Piece edges
+// (the knobs) come from a seeded random generator, so a page reload rebuilds
+// exactly the same pieces.
+var PZ_LEVELS = [
+  {cols:4, rows:2},   // level 1:  8 pieces
+  {cols:4, rows:4},   // level 2: 16 pieces
+  {cols:6, rows:4},   // level 3: 24 pieces
+  {cols:8, rows:4}    // level 4: 32 pieces
+];
 var PZ_W = 340;                 // board is PZ_W x PZ_W units
-var PZ_TRAY_PIECE = 52;         // width of a piece resting in the tray, in units
-var PZ_TRAY_CELL = 64;          // spacing between pieces in the tray
-var PZ_SNAP = 0.5;              // snap distance, as a fraction of a piece
+var PZ_TRAY_BUDGET = 230;       // most height the tray may use, in units
+var PZ_TRAY_PAD = 10;           // room around a tray piece for its knobs
+var PZ_SNAP_MIN = 24;           // snap distance is half the short side, but at least this
 var PZ_LIFT = 36;               // a held piece rides this far above the finger
+var PZ_SOLVED_MS = 3000;        // how long the finished picture is shown
 var pzAdvancing = false;        // true while the "solved" hold is pending
 var pzCtx = null;               // geometry of the board currently on screen
 var pzDrag = null;              // the piece being dragged, if any
@@ -1933,51 +1976,61 @@ function pzRng(seed){
   };
 }
 
-// One side of a piece, from (x0,y0) to (x1,y1). tab: +1 knob out, -1 knob in, 0 flat.
-function pzEdge(x0, y0, x1, y1, tab, s){
+// One side of a piece, from (x0,y0) to (x1,y1). tab: +1 knob out, -1 knob in,
+// 0 flat. The knob is sized from m (the piece's shorter side) and centered on
+// the edge, so it looks the same on a long edge and a short one.
+function pzEdge(x0, y0, x1, y1, tab, m){
   if(!tab) return ' L' + x1 + ' ' + y1;
-  var dx = x1 - x0, dy = y1 - y0, r = 0.14 * s;
-  var ax = x0 + dx*0.38, ay = y0 + dy*0.38, bx = x0 + dx*0.62, by = y0 + dy*0.62;
-  return ' L' + ax + ' ' + ay + ' A' + r + ' ' + r + ' 0 1 ' + (tab > 0 ? 1 : 0) + ' ' + bx + ' ' + by + ' L' + x1 + ' ' + y1;
+  var dx = x1 - x0, dy = y1 - y0, len = Math.sqrt(dx*dx + dy*dy), ux = dx/len, uy = dy/len;
+  var mx = (x0 + x1)/2, my = (y0 + y1)/2, half = 0.12 * m, r = 0.14 * m;
+  return ' L' + (mx - ux*half) + ' ' + (my - uy*half) +
+         ' A' + r + ' ' + r + ' 0 1 ' + (tab > 0 ? 1 : 0) + ' ' + (mx + ux*half) + ' ' + (my + uy*half) +
+         ' L' + x1 + ' ' + y1;
 }
 
-// Geometry for puzzle `round`: piece outlines, slots, and tray positions.
-// `placed` pieces get no tray position.
+// Geometry for level s.round: piece outlines, slots, and tray positions
+// (pieces already placed get none).
 function pzBuild(s){
-  var n = PZ_GRIDS[s.round], size = PZ_W / n, rng = pzRng(s.seeds[s.round]);
-  var r, c, hT = [], vT = [];
-  for(r=0;r<n;r++){ hT[r] = []; vT[r] = []; for(c=0;c<n;c++){ hT[r][c] = rng() < 0.5 ? 1 : -1; vT[r][c] = rng() < 0.5 ? 1 : -1; } }
-  var order = [], i;
-  for(i=0;i<n*n;i++) order.push(i);
-  for(i=order.length-1;i>0;i--){ var j = Math.floor(rng()*(i+1)), tmp = order[i]; order[i] = order[j]; order[j] = tmp; }
+  var lvl = PZ_LEVELS[s.round], cols = lvl.cols, rows = lvl.rows, n = cols * rows;
+  var pw = PZ_W / cols, ph = PZ_W / rows, m = Math.min(pw, ph), rng = pzRng(s.seeds[s.round]);
+  var r, c, i, hT = [], vT = [];
+  for(r=0;r<rows;r++){ hT[r] = []; vT[r] = []; for(c=0;c<cols;c++){ hT[r][c] = rng() < 0.5 ? 1 : -1; vT[r][c] = rng() < 0.5 ? 1 : -1; } }
+  var order = [];
+  for(i=0;i<n;i++) order.push(i);
+  for(i=n-1;i>0;i--){ var j = Math.floor(rng()*(i+1)), tmp = order[i]; order[i] = order[j]; order[j] = tmp; }
   var pieces = [];
-  for(i=0;i<n*n;i++){
-    r = Math.floor(i/n); c = i % n;
-    var top = r > 0 ? -vT[r-1][c] : 0, right = c < n-1 ? hT[r][c] : 0;
-    var bottom = r < n-1 ? vT[r][c] : 0, left = c > 0 ? -hT[r][c-1] : 0;
-    var d = 'M0 0' + pzEdge(0,0,size,0,top,size) + pzEdge(size,0,size,size,right,size) +
-            pzEdge(size,size,0,size,bottom,size) + pzEdge(0,size,0,0,left,size) + ' Z';
-    pieces.push({id:i, row:r, col:c, d:d, sx:c*size, sy:r*size});
+  for(i=0;i<n;i++){
+    r = Math.floor(i/cols); c = i % cols;
+    var top = r > 0 ? -vT[r-1][c] : 0, right = c < cols-1 ? hT[r][c] : 0;
+    var bottom = r < rows-1 ? vT[r][c] : 0, left = c > 0 ? -hT[r][c-1] : 0;
+    var d = 'M0 0' + pzEdge(0,0,pw,0,top,m) + pzEdge(pw,0,pw,ph,right,m) +
+            pzEdge(pw,ph,0,ph,bottom,m) + pzEdge(0,ph,0,0,left,m) + ' Z';
+    pieces.push({id:i, row:r, col:c, d:d, sx:c*pw, sy:r*ph});
   }
-  var k = PZ_TRAY_PIECE / size, cols = Math.max(1, Math.floor(PZ_W / PZ_TRAY_CELL)), slot = 0;
-  var trayTop = PZ_W + 22;
+  // Largest tray scale that still fits every piece within the tray budget.
+  var k = 0.7, cw, ch, tc = 1, tr = n;
+  for(; k >= 0.2; k -= 0.02){
+    cw = pw*k + PZ_TRAY_PAD; ch = ph*k + PZ_TRAY_PAD;
+    tc = Math.max(1, Math.floor(PZ_W / cw)); tr = Math.ceil(n / tc);
+    if(tr * ch <= PZ_TRAY_BUDGET) break;
+  }
+  var trayTop = PZ_W + 22, slot = 0;
   order.forEach(function(id){
     if(s.placed.indexOf(id) !== -1) return;
     var p = pieces[id];
-    p.tx = (slot % cols) * PZ_TRAY_CELL + (PZ_W - cols*PZ_TRAY_CELL)/2 + (PZ_TRAY_CELL - PZ_TRAY_PIECE)/2;
-    p.ty = trayTop + Math.floor(slot/cols) * PZ_TRAY_CELL + 10;
+    p.tx = (PZ_W - tc*cw)/2 + (slot % tc)*cw + PZ_TRAY_PAD/2;
+    p.ty = trayTop + Math.floor(slot / tc)*ch + PZ_TRAY_PAD/2;
     p.k = k; slot++;
   });
-  var rows = Math.ceil((n*n - s.placed.length) / cols), allRows = Math.ceil(n*n / cols);
-  return {n:n, size:size, pieces:pieces, k:k, H: PZ_W + 22 + allRows*PZ_TRAY_CELL + 20, unplacedRows:rows};
+  return {cols:cols, rows:rows, n:n, pw:pw, ph:ph, m:m, pieces:pieces, k:k, H: trayTop + tr*ch + 12};
 }
 
 function initStainedGlass(){
   pzAdvancing = false; pzDrag = null;
   var seeds = [];
-  for(var i=0;i<PZ_GRIDS.length;i++) seeds.push(1 + Math.floor(Math.random()*2000000000));
+  for(var i=0;i<PZ_LEVELS.length;i++) seeds.push(1 + Math.floor(Math.random()*2000000000));
   state.session.stainedGlass = {
-    round: 0, imgs: shuffle(MATCH_SYMBOLS).slice(0, PZ_GRIDS.length),
+    round: 0, imgs: shuffle(MATCH_SYMBOLS).slice(0, PZ_LEVELS.length),
     seeds: seeds, placed: [], status: "playing"
   };
   saveState();
@@ -2012,9 +2065,9 @@ function pzDown(ev, id){
 
 function pzMove(ev){
   if(!pzDrag || (ev.pointerId !== undefined && ev.pointerId !== pzDrag.pointerId)) return;
-  var size = pzCtx.size, p = pzToSvg(ev);
-  var x = Math.min(PZ_W - size*0.8, Math.max(-size*0.2, p.x - size/2));
-  var y = Math.min(pzCtx.H - size*0.8, Math.max(-size*0.2, p.y - size/2 - PZ_LIFT));
+  var pw = pzCtx.pw, ph = pzCtx.ph, p = pzToSvg(ev);
+  var x = Math.min(PZ_W - pw*0.8, Math.max(-pw*0.2, p.x - pw/2));
+  var y = Math.min(pzCtx.H - ph*0.8, Math.max(-ph*0.2, p.y - ph/2 - PZ_LIFT));
   pzDrag.x = x; pzDrag.y = y;
   pzSetPos(pzDrag.el, x, y, 1);
 }
@@ -2025,11 +2078,11 @@ function pzUp(ev){
   window.removeEventListener("pointerup", pzUp);
   window.removeEventListener("pointercancel", pzUp);
   var d = pzDrag; pzDrag = null;
-  var s = state.session.stainedGlass, piece = pzCtx.pieces[d.id], size = pzCtx.size;
+  var s = state.session.stainedGlass, piece = pzCtx.pieces[d.id];
   d.el.classList.remove("dragging");
   if(!s || s.status !== "playing") return;
   var dist = Math.sqrt(Math.pow(d.x - piece.sx, 2) + Math.pow(d.y - piece.sy, 2));
-  if(dist < size * PZ_SNAP){
+  if(dist < Math.max(PZ_SNAP_MIN, pzCtx.m * 0.5)){
     d.el.style.transition = "transform .12s ease";
     pzSetPos(d.el, piece.sx, piece.sy, 1);
     d.el.classList.add("locked");
@@ -2038,8 +2091,8 @@ function pzUp(ev){
     if(firstLoose && firstLoose !== d.el) svg.insertBefore(d.el, firstLoose);
     s.placed.push(d.id);
     var prog = document.getElementById("pzProgress");
-    if(prog) prog.textContent = t("pz_pieces")(s.placed.length, pzCtx.n * pzCtx.n);
-    if(s.placed.length >= pzCtx.n * pzCtx.n){
+    if(prog) prog.textContent = t("pz_pieces")(s.placed.length, pzCtx.n);
+    if(s.placed.length >= pzCtx.n){
       s.status = "solved"; saveState();
       setTimeout(function(){ if(state.screen === "stainedGlass") render(); }, 250);
     } else {
@@ -2055,7 +2108,7 @@ function pzAdvance(){
   pzAdvancing = false;
   var s = state.session.stainedGlass;
   if(!s || s.status !== "solved") return;
-  if(s.round >= PZ_GRIDS.length - 1){
+  if(s.round >= PZ_LEVELS.length - 1){
     s.status = "passed";
   } else {
     s.round++; s.placed = []; s.status = "playing";
@@ -2085,39 +2138,45 @@ function screenStainedGlass(){
     '</div>';
   }
 
-  var solved = s.status === "solved";
+  var solved = s.status === "solved", lastLevel = s.round >= PZ_LEVELS.length - 1;
   // Also covers a page reload during the "solved" hold: the pending timer is
   // gone, so schedule the advance again whenever this view is drawn.
-  if(solved && !pzAdvancing){ pzAdvancing = true; setTimeout(pzAdvance, FM_LEVEL_PAUSE_MS); }
+  if(solved && !pzAdvancing){ pzAdvancing = true; setTimeout(pzAdvance, PZ_SOLVED_MS); }
 
-  var g = pzBuild(s), img = s.imgs[s.round], total = g.n * g.n;
-  pzCtx = {n:g.n, size:g.size, pieces:g.pieces, H:g.H};
+  var g = pzBuild(s), img = s.imgs[s.round];
+  pzCtx = {n:g.n, pw:g.pw, ph:g.ph, m:g.m, pieces:g.pieces, H:g.H};
   var defs = "", placedHtml = "", looseHtml = "";
   g.pieces.forEach(function(p){
-    var isPlaced = solved || s.placed.indexOf(p.id) !== -1;
+    if(solved) return; // a finished level shows only the whole picture (below), so no piece seams can show
+    var isPlaced = s.placed.indexOf(p.id) !== -1;
     defs += '<clipPath id="pzC' + p.id + '"><path d="' + p.d + '"/></clipPath>';
     var x = isPlaced ? p.sx : p.tx, y = isPlaced ? p.sy : p.ty, k = isPlaced ? 1 : p.k;
     var html = '<g class="pzPiece' + (isPlaced ? ' locked' : '') + '" id="pzP' + p.id + '" ' +
       'style="transform:translate(' + x + 'px,' + y + 'px) scale(' + k + ');" ' +
       'onpointerdown="pzDown(event,' + p.id + ')">' +
-      '<image href="' + img + '" x="' + (-p.col*g.size) + '" y="' + (-p.row*g.size) + '" width="' + PZ_W + '" height="' + PZ_W + '" preserveAspectRatio="none" clip-path="url(#pzC' + p.id + ')"/>' +
+      // invisible box so a narrow piece is easy to grab anywhere on it
+      '<rect x="0" y="0" width="' + g.pw + '" height="' + g.ph + '" fill="transparent"/>' +
+      '<image href="' + img + '" x="' + (-p.col*g.pw) + '" y="' + (-p.row*g.ph) + '" width="' + PZ_W + '" height="' + PZ_W + '" preserveAspectRatio="none" clip-path="url(#pzC' + p.id + ')"/>' +
       '<path d="' + p.d + '" class="pzOutline"/>' +
     '</g>';
     if(isPlaced) placedHtml += html; else looseHtml += html;
   });
+  // Finished level: the whole picture drawn over the pieces, so no seams or
+  // piece lines show for the 3-second hold.
+  var full = solved ? '<image class="pzFull" href="' + img + '" x="0" y="0" width="' + PZ_W + '" height="' + PZ_W + '" preserveAspectRatio="none"/>' : '';
   var svg = '<svg id="pzSvg" class="pzSvg' + (solved ? ' solved' : '') + '" viewBox="0 0 ' + PZ_W + ' ' + g.H + '" role="img" aria-label="' + t("stainedGlassName") + '">' +
     '<defs>' + defs + '</defs>' +
     '<rect x="0" y="0" width="' + PZ_W + '" height="' + PZ_W + '" class="pzBoardRect"/>' +
     '<rect x="0" y="' + (PZ_W + 12) + '" width="' + PZ_W + '" height="' + (g.H - PZ_W - 12) + '" rx="10" class="pzTrayRect"/>' +
-    placedHtml + looseHtml +
+    placedHtml + looseHtml + full +
   '</svg>';
 
   return '<div class="screen">' +
     '<h2>' + t("stainedGlassName") + '</h2>' +
-    '<p class="smallNote">' + t("pz_round")(s.round+1, PZ_GRIDS.length) + ' &nbsp;|&nbsp; <span id="pzProgress">' + t("pz_pieces")(solved ? total : s.placed.length, total) + '</span></p>' +
+    '<p class="smallNote">' + t("pz_round")(s.round+1, PZ_LEVELS.length) + ' &nbsp;|&nbsp; <span id="pzProgress">' + t("pz_pieces")(solved ? g.n : s.placed.length, g.n) + '</span></p>' +
     (solved ? '<p class="pzMsg good">' + t("pz_solved") + '</p>' : '<p class="center pzIntro">' + t("pz_intro") + '</p>') +
     svg +
-    (solved ? '<p class="smallNote center">' + t("pz_next") + '</p>' : '') +
+    (solved && !lastLevel ? '<p class="smallNote center">' + t("pz_next") + '</p>' : '') +
     '<div class="spacer"></div>' +
     '<button class="btn outline" onclick="pzQuit()">' + t("mainMenu") + '</button>' +
   '</div>';
