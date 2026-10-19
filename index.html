@@ -1938,7 +1938,7 @@ function screenHiddenBlessings(){
 
 // Replaced Service Sprint (2026-10-19, per Dan), then turned from a sliding
 // puzzle into a jigsaw (per Dan -- slide puzzles were too hard), then given 4
-// levels of 8 / 16 / 24 / 32 pieces (per Dan). Each level is cut from a random
+// levels of 12 / 16 / 20 / 24 pieces (per Dan). Each level is cut from a random
 // Faith Match picture (the same 16 tile images, already preloaded). The player
 // drags loose, jigsaw-shaped pieces from a tray into an empty frame; a piece
 // within reach of its own spot snaps in and locks, anything else springs back
@@ -1946,16 +1946,16 @@ function screenHiddenBlessings(){
 // finished the whole picture is shown for 3 seconds with no piece lines.
 // The whole board is ONE <svg> in a fixed 340-unit-wide coordinate space that
 // scales to the screen. The board is always square, so a level's grid decides
-// the piece shape (4x2 gives tall pieces, 8x4 gives narrow ones). Dragging
+// the piece shape (4x3 gives slightly tall pieces, 6x4 narrower ones). Dragging
 // moves pieces by direct DOM writes (not render(), which would replace the
 // piece being held); render() only runs when a level is solved. Piece edges
 // (the knobs) come from a seeded random generator, so a page reload rebuilds
 // exactly the same pieces.
 var PZ_LEVELS = [
-  {cols:4, rows:2},   // level 1:  8 pieces
+  {cols:4, rows:3},   // level 1: 12 pieces
   {cols:4, rows:4},   // level 2: 16 pieces
-  {cols:6, rows:4},   // level 3: 24 pieces
-  {cols:8, rows:4}    // level 4: 32 pieces
+  {cols:5, rows:4},   // level 3: 20 pieces
+  {cols:6, rows:4}    // level 4: 24 pieces
 ];
 var PZ_W = 340;                 // board is PZ_W x PZ_W units
 var PZ_TRAY_BUDGET = 230;       // most height the tray may use, in units
