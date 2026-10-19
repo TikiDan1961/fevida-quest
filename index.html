@@ -127,6 +127,22 @@
   .matchCard img{width:100%;height:100%;object-fit:cover;display:block;}
   .chancesRow{text-align:center;font-size:1.1rem;margin:4px 0;}
 
+  /* Stained-Glass Puzzle (2026-10-19, replaced Service Sprint). Each tile is an
+     absolutely positioned slice of one Faith Match picture (background-size
+     300% shows one ninth of it); moving a tile just changes left/top, so the
+     transition below is the slide animation. */
+  .pzBoard{position:relative;width:100%;aspect-ratio:1/1;margin:10px 0;background:rgba(0,0,0,.3);border:2px solid var(--gold);border-radius:10px;overflow:hidden;touch-action:manipulation;}
+  .pzTile{position:absolute;width:33.3333%;height:33.3333%;padding:2px;transition:left .15s ease,top .15s ease;cursor:pointer;}
+  .pzTile>div{width:100%;height:100%;border-radius:6px;border:2px solid var(--gold);background-color:var(--purple-dark);background-size:300% 300%;background-repeat:no-repeat;}
+  .pzTile.empty{cursor:default;}
+  .pzTile.empty>div{background-image:none !important;border:2px dashed rgba(255,255,255,.35);background-color:rgba(0,0,0,.35);}
+  .pzBoard.solved .pzTile>div{border-color:var(--good);}
+  .pzTile.pzShake>div{animation:pzShake .25s;}
+  @keyframes pzShake{25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+  .pzPeek{position:absolute;inset:0;display:none;background-size:100% 100%;background-repeat:no-repeat;border-radius:8px;z-index:2;}
+  .pzMsg{min-height:1.6em;text-align:center;font-weight:700;margin:2px 0;}
+  .pzMsg.good{color:var(--good);font-size:1.2rem;}
+
   .photoPreview{width:100%;border-radius:16px;border:3px solid var(--gold);margin:10px 0;object-fit:cover;max-height:340px;}
   .cameraIconBox{font-size:4rem;text-align:center;margin:18px 0;}
 
@@ -213,7 +229,7 @@ var T = {
     questPoints:"Quest Points",
     passport:"Passport", showTicket:"🎟 VIEW GOLDEN TICKET",
     faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
-    serviceSprintName:"Service Sprint", chooseJoyName:"Choose Joy",
+    stainedGlassName:"Stained-Glass Puzzle", chooseJoyName:"Choose Joy",
     done:"DONE",
     ff_intro:"Answer all 10 questions correctly to earn your badge!",
     nextQuestion:"NEXT QUESTION", collectAward:"COLLECT AWARD", playAgain:"PLAY AGAIN", tryAgain:"TRY AGAIN",
@@ -231,8 +247,6 @@ var T = {
     fm_passBody:"You matched every pair. Amazing work!",
     bl_title:"Be the Light",
     bl_body:"Head to the Fe y Vida Hope Wall and post an encouraging message for someone else. Once you've done it, tap the button below.",
-    ss_title:"Service Sprint",
-    ss_body:"Find another participant and do one small act of kindness or service for them. Once you've done it, tap the button below.",
     missionCompleted:"MISSION COMPLETED",
     cj_title:"Choose Joy",
     cj_body:"Take a joyful photo with a friend at the Fe y Vida booth!",
@@ -248,7 +262,7 @@ var T = {
     ticketBody:"Show this screen to a Fe y Vida booth staff member to play for a prize!",
     clearTicket:"CLEAR TICKET",
     themeFaith:"Faith", themeLove:"God's Love", themeLight:"Be a Light to the World",
-    themeFriend:"Friendship", themeHope:"Hope",
+    themeUnity:"Unity", themeHope:"Hope",
     themeHoliness:"Holiness", themeGrace:"Grace", themeSalvation:"Salvation",
     themeForgiveness:"Forgiveness", themeMercy:"Mercy",
 
@@ -280,6 +294,13 @@ var T = {
     hb_intro:"Look closely — find all 6 hidden blessings tucked into the scene!",
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
+
+    pz_intro:"Slide the pieces to rebuild the picture. Tap a piece next to the empty space.",
+    pz_round:function(n,total){return "Puzzle "+n+" of "+total;},
+    pz_moves:function(n){return "Moves: "+n;},
+    pz_peek:function(n){return "PEEK ("+n+" left)";},
+    pz_solved:"Solved!", pz_next:"Next puzzle in a moment...",
+    pz_passTitle:"Puzzle Master!", pz_passBody:"You rebuilt all 3 stained-glass pictures!",
   },
   es: {
     chooseLanguage:"Elige Tu Idioma",
@@ -291,7 +312,7 @@ var T = {
     questPoints:"Puntos de Aventura",
     passport:"Pasaporte", showTicket:"🎟 VER BOLETO DORADO",
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
-    serviceSprintName:"Carrera de Servicio", chooseJoyName:"Elige la Alegría",
+    stainedGlassName:"Rompecabezas de Vitral", chooseJoyName:"Elige la Alegría",
     done:"COMPLETADO",
     ff_intro:"¡Responde las 10 preguntas correctamente para ganar tu insignia!",
     nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
@@ -309,8 +330,6 @@ var T = {
     fm_passBody:"¡Emparejaste todos los pares! Excelente trabajo.",
     bl_title:"Sé la Luz",
     bl_body:"Ve al Muro de la Esperanza de Fe y Vida y escribe un mensaje de aliento para alguien más. Cuando termines, toca el botón de abajo.",
-    ss_title:"Carrera de Servicio",
-    ss_body:"Busca a otro participante y haz un pequeño acto de bondad o servicio por él o ella. Cuando termines, toca el botón de abajo.",
     missionCompleted:"MISIÓN COMPLETADA",
     cj_title:"Elige la Alegría",
     cj_body:"¡Toma una foto alegre con un amigo en el stand de Fe y Vida!",
@@ -326,7 +345,7 @@ var T = {
     ticketBody:"¡Muestra esta pantalla a un miembro del personal de Fe y Vida para jugar por un premio!",
     clearTicket:"BORRAR BOLETO",
     themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé Luz para el Mundo",
-    themeFriend:"Amistad", themeHope:"Esperanza",
+    themeUnity:"Unidad", themeHope:"Esperanza",
     themeHoliness:"Santidad", themeGrace:"Gracia", themeSalvation:"Salvación",
     themeForgiveness:"Perdón", themeMercy:"Misericordia",
 
@@ -358,6 +377,13 @@ var T = {
     hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
+
+    pz_intro:"Desliza las piezas para armar la imagen. Toca una pieza junto al espacio vacío.",
+    pz_round:function(n,total){return "Rompecabezas "+n+" de "+total;},
+    pz_moves:function(n){return "Movimientos: "+n;},
+    pz_peek:function(n){return "VER ("+n+" restantes)";},
+    pz_solved:"¡Resuelto!", pz_next:"Siguiente rompecabezas en un momento...",
+    pz_passTitle:"¡Maestro del Rompecabezas!", pz_passBody:"¡Armaste las 3 imágenes de vitral!",
   }
 };
 
@@ -367,7 +393,10 @@ var MISSIONS = [
   {id:"faithFlash", icon:"⚡", badgeImg:"tiles/badge_faith.png", nameKey:"faithFlashName", themeKey:"themeFaith"},
   {id:"faithMatch", icon:"🃏", badgeImg:"tiles/badge_love.png", nameKey:"faithMatchName", themeKey:"themeLove"},
   {id:"beTheLight", icon:"🔦", badgeImg:"tiles/badge_light.png", nameKey:"beTheLightName", themeKey:"themeLight"},
-  {id:"serviceSprint", icon:"🏃", badgeImg:"tiles/badge_friendship.png", nameKey:"serviceSprintName", themeKey:"themeFriend"},
+  // Stained-Glass Puzzle replaced Service Sprint in this slot (2026-10-19, per
+  // Dan). It reuses Service Sprint's old badge art (tiles/badge_friendship.png)
+  // until a dedicated "Unity" badge exists; swap badgeImg when it does.
+  {id:"stainedGlass", icon:"🧩", badgeImg:"tiles/badge_friendship.png", nameKey:"stainedGlassName", themeKey:"themeUnity"},
   {id:"chooseJoy", icon:"📸", badgeImg:"tiles/badge_hope.png", nameKey:"chooseJoyName", themeKey:"themeHope"},
   // 5 new missions added 2026-09-29, per Dan. Real badge art wired in
   // 2026-09-29 (same day) — Dan supplied 5 more stained-glass badges
@@ -469,7 +498,7 @@ function preloadMatchTiles(){
     remaining--;
     if(remaining <= 0){
       matchTilesReady = true;
-      if(state.screen === "faithMatch") render();
+      if(state.screen === "faithMatch" || state.screen === "stainedGlass") render();
     }
   }
   MATCH_SYMBOLS.forEach(function(src){
@@ -478,8 +507,15 @@ function preloadMatchTiles(){
       // .decode() actually decodes the bitmap into the browser's image cache
       // (not just fetching the bytes), which is what keeps a later fresh
       // <img> pointing at this same src from needing to redecode on paint.
-      if(img.decode) img.decode().then(tileDone).catch(tileDone);
-      else tileDone();
+      // The 1.5s fallback (2026-10-19) keeps a decode() promise that never
+      // settles -- seen in a background/unpainted tab -- from leaving Faith
+      // Match and the Stained-Glass Puzzle stuck on "Loading tiles..." forever;
+      // the bytes have already arrived by this point.
+      var finished = false;
+      function once(){ if(!finished){ finished = true; tileDone(); } }
+      if(img.decode) img.decode().then(once).catch(once);
+      else once();
+      setTimeout(once, 1500);
     };
     img.onerror = tileDone; // don't let one bad tile block the game forever
     img.src = src;
@@ -502,7 +538,7 @@ function defaultState(){
       faithFlash: {done:false, badge:false},
       faithMatch: {done:false, badge:false, level:0},
       beTheLight: {done:false, badge:false},
-      serviceSprint: {done:false, badge:false},
+      stainedGlass: {done:false, badge:false},
       chooseJoy: {done:false, badge:false},
       followLight: {done:false, badge:false},
       wordUnscramble: {done:false, badge:false},
@@ -513,7 +549,7 @@ function defaultState(){
     photo: null,
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null },
     awardMissionId: null,
     passportPage: 0
   };
@@ -537,10 +573,14 @@ function loadState(){
     var parsed = JSON.parse(raw);
     var d = defaultState();
     // shallow-merge to survive future field additions
-    return Object.assign(d, parsed, {
+    var merged = Object.assign(d, parsed, {
       missions: Object.assign(d.missions, parsed.missions||{}),
       session: Object.assign(d.session, parsed.session||{})
     });
+    // A tab saved by an earlier build may still be on the retired Service
+    // Sprint screen (replaced by Stained-Glass Puzzle, 2026-10-19).
+    if(merged.screen === "serviceSprint") merged.screen = "mainMenu";
+    return merged;
   }catch(e){ return defaultState(); }
 }
 
@@ -602,7 +642,7 @@ function openMission(id){
   if(id === "faithFlash"){ initFaithFlash(); go("faithFlash"); }
   else if(id === "faithMatch"){ preloadMatchTiles(); initFaithMatchLevel(state.missions.faithMatch.level||0); go("faithMatch"); }
   else if(id === "beTheLight"){ go("beTheLight"); }
-  else if(id === "serviceSprint"){ go("serviceSprint"); }
+  else if(id === "stainedGlass"){ preloadMatchTiles(); initStainedGlass(); go("stainedGlass"); }
   else if(id === "chooseJoy"){ initChooseJoy(); go("chooseJoy"); }
   else if(id === "followLight"){ initFollowLightRun(); go("followLight"); flStartLevel(); }
   else if(id === "wordUnscramble"){ initWordUnscramble(); go("wordUnscramble"); }
@@ -955,7 +995,7 @@ function screenFaithMatch(){
   '</div>';
 }
 
-/* ---------- Be the Light / Service Sprint ---------- */
+/* ---------- Be the Light ---------- */
 
 function screenBeTheLight(){
   return '<div class="screen center">' +
@@ -965,18 +1005,6 @@ function screenBeTheLight(){
     '<p>' + t("bl_body") + '</p>' +
     '<div class="spacer"></div>' +
     '<button class="btn gold" onclick="grantMission(\'beTheLight\')">' + t("missionCompleted") + '</button>' +
-    '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("returnToMenu") + '</button>' +
-  '</div>';
-}
-
-function screenServiceSprint(){
-  return '<div class="screen center">' +
-    '<div class="spacer"></div>' +
-    '<div style="font-size:3.5rem;">🏃</div>' +
-    '<h1>' + t("ss_title") + '</h1>' +
-    '<p>' + t("ss_body") + '</p>' +
-    '<div class="spacer"></div>' +
-    '<button class="btn gold" onclick="grantMission(\'serviceSprint\')">' + t("missionCompleted") + '</button>' +
     '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("returnToMenu") + '</button>' +
   '</div>';
 }
@@ -1873,6 +1901,175 @@ function screenHiddenBlessings(){
   '</div>';
 }
 
+/* ---------- Stained-Glass Puzzle ---------- */
+
+// Replaced Service Sprint (2026-10-19, per Dan). A 3x3 sliding-tile puzzle
+// cut from three random Faith Match pictures (the same 16 tile images, so
+// there is no new art and they are already preloaded). 3 puzzles, no chances,
+// no timer -- it cannot be failed. Each puzzle is scrambled by making random
+// LEGAL slides from the solved board, which guarantees it is solvable
+// (randomly placing the tiles would make about half the boards impossible).
+// Tiles are moved by direct DOM writes (left/top, with a CSS transition)
+// instead of render(), since render() replaces the whole board and so could
+// never animate the slide; render() only runs when a puzzle is solved.
+var PZ_ROUNDS = 3;
+var PZ_SCRAMBLE = [30, 50, 70]; // random legal slides per puzzle, easy to harder
+var PZ_PEEKS = 3;               // peeks across the whole mission
+var PZ_PEEK_MS = 2000;
+var PZ_EMPTY = 8;               // piece id of the missing (bottom-right) piece
+var pzPeekingNow = false;       // not persisted: a peek is only 2 seconds
+var pzAdvancing = false;        // true while the "solved" hold is pending
+
+function pzNeighbors(pos){
+  var r = Math.floor(pos/3), c = pos%3, out = [];
+  if(r > 0) out.push(pos-3);
+  if(r < 2) out.push(pos+3);
+  if(c > 0) out.push(pos-1);
+  if(c < 2) out.push(pos+1);
+  return out;
+}
+
+function pzIsSolved(tiles){
+  for(var i=0;i<tiles.length;i++){ if(tiles[i] !== i) return false; }
+  return true;
+}
+
+function pzScramble(slides){
+  var tiles, empty, prev, i, opts, n;
+  do{
+    tiles = [0,1,2,3,4,5,6,7,8]; empty = 8; prev = -1;
+    for(i=0;i<slides;i++){
+      // never undo the slide just made, or the walk wastes moves going back and forth
+      opts = pzNeighbors(empty).filter(function(p){ return p !== prev; });
+      n = opts[Math.floor(Math.random()*opts.length)];
+      tiles[empty] = tiles[n]; tiles[n] = PZ_EMPTY;
+      prev = empty; empty = n;
+    }
+  } while(pzIsSolved(tiles));
+  return tiles;
+}
+
+function initStainedGlass(){
+  pzPeekingNow = false; pzAdvancing = false;
+  state.session.stainedGlass = {
+    round: 0,
+    imgs: shuffle(MATCH_SYMBOLS).slice(0, PZ_ROUNDS),
+    tiles: pzScramble(PZ_SCRAMBLE[0]), // tiles[position] = piece id
+    moves: 0, peeks: PZ_PEEKS, status: "playing"
+  };
+  saveState();
+}
+
+function pzPlaceTile(piece, pos){
+  var el = document.getElementById("pzT" + piece);
+  if(!el) return;
+  el.style.left = ((pos%3) * 33.3333) + "%";
+  el.style.top = (Math.floor(pos/3) * 33.3333) + "%";
+}
+
+function pzTapPiece(piece){
+  var s = state.session.stainedGlass;
+  if(!s || s.status !== "playing" || pzPeekingNow || piece === PZ_EMPTY) return;
+  var pos = s.tiles.indexOf(piece);
+  var empty = s.tiles.indexOf(PZ_EMPTY);
+  if(pzNeighbors(pos).indexOf(empty) === -1){
+    var bad = document.getElementById("pzT" + piece);
+    if(bad){ bad.classList.add("pzShake"); setTimeout(function(){ bad.classList.remove("pzShake"); }, 260); }
+    return;
+  }
+  s.tiles[empty] = piece; s.tiles[pos] = PZ_EMPTY; s.moves++;
+  pzPlaceTile(piece, empty); pzPlaceTile(PZ_EMPTY, pos);
+  var mv = document.getElementById("pzMoves");
+  if(mv) mv.textContent = t("pz_moves")(s.moves);
+  if(pzIsSolved(s.tiles)){
+    s.status = "solved";
+    saveState();
+    // let the last slide finish, then show the completed picture
+    setTimeout(function(){ if(state.screen === "stainedGlass") render(); }, 200);
+  } else {
+    saveState();
+  }
+}
+
+function pzPeek(){
+  var s = state.session.stainedGlass;
+  if(!s || s.status !== "playing" || pzPeekingNow || s.peeks <= 0) return;
+  s.peeks--; saveState(); pzPeekingNow = true;
+  var ov = document.getElementById("pzPeekOverlay"), btn = document.getElementById("pzPeekBtn");
+  if(ov) ov.style.display = "block";
+  if(btn){ btn.textContent = t("pz_peek")(s.peeks); btn.disabled = true; }
+  setTimeout(function(){
+    pzPeekingNow = false;
+    var ov2 = document.getElementById("pzPeekOverlay"), b2 = document.getElementById("pzPeekBtn");
+    if(ov2) ov2.style.display = "none";
+    if(b2) b2.disabled = s.peeks <= 0;
+  }, PZ_PEEK_MS);
+}
+
+function pzAdvance(){
+  pzAdvancing = false;
+  var s = state.session.stainedGlass;
+  if(!s || s.status !== "solved") return;
+  if(s.round >= PZ_ROUNDS - 1){
+    s.status = "passed";
+  } else {
+    s.round++; s.tiles = pzScramble(PZ_SCRAMBLE[s.round]); s.moves = 0; s.status = "playing";
+  }
+  saveState();
+  if(state.screen === "stainedGlass") render();
+}
+
+function pzCollectAward(){ state.session.stainedGlass = null; grantMission("stainedGlass"); }
+function pzQuit(){ state.session.stainedGlass = null; go("mainMenu"); }
+
+function screenStainedGlass(){
+  if(!matchTilesReady){
+    // same guard as Faith Match: the pictures are the Faith Match tiles, and
+    // they are preloaded at app boot, so this is a brief beat at most
+    return '<div class="screen center"><p class="smallNote">' + t("fm_loading") + '</p></div>';
+  }
+  var s = state.session.stainedGlass;
+  if(!s){ initStainedGlass(); s = state.session.stainedGlass; }
+
+  if(s.status === "passed"){
+    return '<div class="screen center">' +
+      '<h1>' + t("pz_passTitle") + '</h1>' +
+      '<p>' + t("pz_passBody") + '</p>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn gold" onclick="pzCollectAward()">' + t("collectAward") + '</button>' +
+    '</div>';
+  }
+
+  var solved = s.status === "solved";
+  // Also covers a page reload during the "solved" hold: the pending timer is
+  // gone, so schedule the advance again whenever this view is drawn.
+  if(solved && !pzAdvancing){ pzAdvancing = true; setTimeout(pzAdvance, FM_LEVEL_PAUSE_MS); }
+
+  var img = s.imgs[s.round];
+  var tilesHtml = "";
+  for(var piece=0; piece<9; piece++){
+    var pos = s.tiles.indexOf(piece);
+    var isEmpty = piece === PZ_EMPTY && !solved;
+    tilesHtml += '<div class="pzTile' + (isEmpty ? ' empty' : '') + '" id="pzT' + piece + '" ' +
+      'style="left:' + ((pos%3) * 33.3333) + '%;top:' + (Math.floor(pos/3) * 33.3333) + '%;" ' +
+      'onclick="pzTapPiece(' + piece + ')">' +
+      '<div style="background-image:url(\'' + img + '\');background-position:' + ((piece%3) * 50) + '% ' + (Math.floor(piece/3) * 50) + '%;"></div>' +
+    '</div>';
+  }
+  var peekOverlay = '<div class="pzPeek" id="pzPeekOverlay" style="background-image:url(\'' + img + '\');"></div>';
+
+  return '<div class="screen">' +
+    '<h2>' + t("stainedGlassName") + '</h2>' +
+    '<p class="smallNote">' + t("pz_round")(s.round+1, PZ_ROUNDS) + ' &nbsp;|&nbsp; <span id="pzMoves">' + t("pz_moves")(s.moves) + '</span></p>' +
+    (solved ? '<p class="pzMsg good">' + t("pz_solved") + '</p>' : '<p class="center">' + t("pz_intro") + '</p>') +
+    '<div class="pzBoard' + (solved ? ' solved' : '') + '">' + tilesHtml + peekOverlay + '</div>' +
+    (solved ? '<p class="smallNote center">' + t("pz_next") + '</p>' :
+      '<button id="pzPeekBtn" class="btn secondary" onclick="pzPeek()"' + (s.peeks <= 0 ? ' disabled' : '') + '>' + t("pz_peek")(s.peeks) + '</button>') +
+    '<div class="spacer"></div>' +
+    '<button class="btn outline" onclick="pzQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
 /* ---------- Passport ---------- */
 
 // Holds the track's current position in RAW SLOT units (0..PASSPORT_TRACK_SLOTS-1),
@@ -1983,7 +2180,7 @@ function render(){
     case "faithFlash": html = screenFaithFlash(); break;
     case "faithMatch": html = screenFaithMatch(); break;
     case "beTheLight": html = screenBeTheLight(); break;
-    case "serviceSprint": html = screenServiceSprint(); break;
+    case "stainedGlass": html = screenStainedGlass(); break;
     case "chooseJoy": html = screenChooseJoy(); break;
     case "joyousPhoto": html = screenJoyousPhoto(); break;
     case "followLight": html = screenFollowLight(); break;
