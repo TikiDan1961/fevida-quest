@@ -175,6 +175,42 @@
   .expandClone{position:fixed;z-index:100;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;
     transition:left .28s ease-in,top .28s ease-in,width .28s ease-in,height .28s ease-in,border-radius .28s ease-in,opacity .25s ease-out;}
   .expandClone img.spr{width:48px;height:48px;image-rendering:pixelated;transition:transform .28s ease-in;}
+  /* Pilgrim scene on the Home Screen (2026-10-20, per Dan): a hill with a church, a winding path and a little pilgrim who walks
+     toward the church as the player earns Quest Points. The scene picture is 125x100 pixels, drawn at the full screen width and
+     anchored to the bottom; everything on it is placed in percentages so it scales with the picture. */
+  .pixHome.pixSky > .pixScene{position:absolute;left:0;right:0;bottom:0;width:auto;aspect-ratio:125/100;z-index:auto;pointer-events:none;}
+  .pixSceneArt{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;}
+  .churchGlow{position:absolute;left:43.2%;top:30%;width:12.8%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,226,120,.9) 0,rgba(255,226,120,0) 68%);opacity:.3;animation:glowPulse 2.6s ease-in-out infinite alternate;}
+  .churchGlow.lit{transform:scale(1.35);opacity:.6;animation-name:glowPulseLit;}
+  @keyframes glowPulse{from{opacity:.2;}to{opacity:.6;}}
+  @keyframes glowPulseLit{from{opacity:.45;}to{opacity:.85;}}
+  .pixSpark{position:absolute;left:46.8%;top:.5%;width:5.6%;image-rendering:pixelated;animation:sparkBlink 2.6s steps(1) infinite;}
+  @keyframes sparkBlink{0%{opacity:0;}55%{opacity:1;}65%{opacity:.35;}75%{opacity:1;}85%{opacity:0;}100%{opacity:0;}}
+  .pixDove{position:absolute;left:-14%;top:12%;width:12.8%;aspect-ratio:16/12;animation:doveFly 28s linear infinite;animation-delay:-3s;}
+  @keyframes doveFly{0%{left:-14%;}55%{left:112%;}100%{left:112%;}}
+  .pixDoveBob{width:100%;height:100%;animation:doveBob 3.2s ease-in-out infinite alternate;}
+  @keyframes doveBob{from{transform:translateY(-35%);}to{transform:translateY(35%);}}
+  .pixDoveSprite{width:100%;height:100%;background:url("tiles/dove.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:doveFlap .36s steps(1) infinite;}
+  @keyframes doveFlap{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
+  .pilgrim{position:absolute;width:8.8%;aspect-ratio:11/15;z-index:2;pointer-events:auto;cursor:pointer;}
+  .pilgrim::before{content:"";position:absolute;left:-60%;right:-60%;top:-40%;bottom:-15%;}
+  .pilgrim.hop{animation:pilgrimHop .4s ease-out;}
+  @keyframes pilgrimHop{0%{transform:translateY(0);}40%{transform:translateY(-45%);}100%{transform:translateY(0);}}
+  .pilgrimFlip{width:100%;height:100%;}
+  .pilgrimFlip.left{transform:scaleX(-1);}
+  .pilgrimSprite{width:100%;height:100%;background:url("tiles/pilgrim.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:pilgrimBreath 1.8s steps(1) infinite;}
+  .pilgrim.walking .pilgrimSprite{animation:pilgrimStep .5s steps(1) infinite,pilgrimBob .5s steps(1) infinite;}
+  @keyframes pilgrimBreath{0%{transform:translateY(0);}50%{transform:translateY(-6.6%);}100%{transform:translateY(0);}}
+  @keyframes pilgrimBob{0%{transform:translateY(0);}50%{transform:translateY(-6.6%);}100%{transform:translateY(0);}}
+  @keyframes pilgrimStep{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
+  .pilgrimBubble{position:absolute;z-index:3;display:none;box-sizing:border-box;max-width:80%;padding:8px 12px;background:#fff;color:#1E2F7A;border:3px solid #1B1F3B;border-radius:10px;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.25;text-align:center;box-shadow:0 3px 0 rgba(20,30,90,.35);
+    pointer-events:auto;cursor:pointer;transform-origin:var(--tail,50%) 100%;}
+  .pilgrimBubble.show{display:block;animation:bubblePop .18s ease-out;}
+  .pilgrimBubble::after{content:"";position:absolute;top:100%;left:var(--tail,50%);width:9px;height:9px;margin:-6px 0 0 -7px;background:#fff;border-right:3px solid #1B1F3B;border-bottom:3px solid #1B1F3B;transform:rotate(45deg);}
+  @keyframes bubblePop{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+  @media (prefers-reduced-motion:reduce){ .pixDove{display:none;} .pixSpark{animation:none;opacity:1;} .churchGlow,.pilgrimSprite,.pilgrim.walking .pilgrimSprite{animation:none;} .pilgrim.hop{animation:none;} }
   /* Main Menu: pixel sky with slowly drifting clouds, tiles as solid cards sitting on it. The sky
      and cloud pictures are 125x270 pixels drawn at the full screen width and anchored to the bottom;
      the cloud layer is two screens wide and slides one screen-width to the left, so it loops with no jump. */
@@ -447,6 +483,10 @@ var T = {
     pathOfLightName:"Path of Light", tbdName:"TBD",
     comingSoon:"COMING SOON", comingSoonToast:"Coming soon!",
     missionsFolder:"Missions", goldenTicketLabel:"Golden Ticket",
+    pilgrimStart:"Hi, I'm Pilgrim! Open Missions to start our journey.", pilgrimNice:"Great job! Let's keep walking with faith.",
+    pilgrimTry:function(n){return "Try "+n+" next!";}, pilgrimToGo:function(p){return p+" more Quest Points to reach the church!";},
+    pilgrimTicket:"We made it! Open your Golden Ticket!",
+    pilgrimCheer1:"Let your light shine!", pilgrimCheer2:"Walk with faith!", pilgrimCheer3:"Keep going, friend!",
     ticketLocked:function(p){return "Earn "+p+" points to unlock the Golden Ticket!";},
 
     fl_repeat:"REPEAT PATTERN", fl_incorrect:"INCORRECT TILE!", fl_tryAgainMsg:"TRY AGAIN",
@@ -535,6 +575,10 @@ var T = {
     pathOfLightName:"Camino de Luz", tbdName:"Por definir",
     comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
     missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
+    pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.",
+    pilgrimTry:function(n){return "¡Prueba "+n+"!";}, pilgrimToGo:function(p){return "¡Faltan "+p+" Puntos de Aventura para llegar a la iglesia!";},
+    pilgrimTicket:"¡Lo logramos! ¡Abre tu Boleto Dorado!",
+    pilgrimCheer1:"¡Deja brillar tu luz!", pilgrimCheer2:"¡Camina con fe!", pilgrimCheer3:"¡Sigue adelante, amigo!",
     ticketLocked:function(p){return "¡Gana "+p+" puntos para desbloquear el Boleto Dorado!";},
 
     fl_repeat:"REPITE EL PATRÓN", fl_incorrect:"¡FICHA INCORRECTA!", fl_tryAgainMsg:"INTÉNTALO DE NUEVO",
@@ -800,6 +844,7 @@ function defaultState(){
       kindnessSort:null, hiddenBlessings:null, stainedGlass:null },
     awardMissionId: null,
     folderOpen: false,
+    pilgrimP: null,
     passportPage: 0
   };
 }
@@ -1075,6 +1120,147 @@ function openFromIcon(icon, screenId){
   setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); iconExpanding = false; }, 650);
 }
 
+/* ---------- Pilgrim scene on the Home Screen (2026-10-20, per Dan) ---------- */
+
+// The picture is tiles/scene_home.png (125x100 pixels). PILGRIM_PATH is the winding path drawn in it, as
+// 65 points spaced evenly along its length, from the bottom of the hill (0) to the church door (1).
+var SCENE_W = 125, SCENE_H = 100, PILGRIM_W = 11, PILGRIM_H = 15;
+var PILGRIM_PATH = [[18.0,99.0],[22.1,98.6],[26.1,98.2],[30.2,97.8],[34.2,97.4],[38.3,96.9],[42.3,96.5],[46.4,96.1],[50.4,95.6],[54.4,95.1],[58.5,94.5],[62.5,94.0],[66.6,93.5],[70.6,93.0],[74.6,92.4],[78.7,91.9],[82.7,91.2],[86.7,90.6],[90.7,89.8],[94.7,88.8],[98.5,87.4],[101.9,85.3],[101.1,82.0],[97.2,80.6],[93.3,79.7],[89.3,78.9],[85.3,78.2],[81.3,77.5],[77.2,76.9],[73.2,76.2],[69.2,75.6],[65.2,75.0],[61.1,74.5],[57.1,74.0],[53.0,73.5],[49.0,73.0],[45.0,72.5],[40.9,71.9],[36.9,71.2],[32.9,70.3],[29.1,69.0],[26.6,66.4],[30.2,64.6],[34.1,63.6],[38.1,62.7],[42.1,62.0],[46.1,61.3],[50.2,60.7],[54.2,60.2],[58.3,59.8],[62.3,59.4],[66.4,59.1],[70.4,58.7],[74.5,58.3],[78.5,57.9],[82.6,57.3],[86.5,56.2],[87.8,53.3],[84.4,51.3],[80.4,50.2],[76.5,49.3],[72.5,48.5],[68.5,47.5],[64.8,45.9],[62.0,43.0]];
+var PILGRIM_LEN = (function(){ var n = 0; for(var i=1;i<PILGRIM_PATH.length;i++) n += Math.hypot(PILGRIM_PATH[i][0]-PILGRIM_PATH[i-1][0], PILGRIM_PATH[i][1]-PILGRIM_PATH[i-1][1]); return n; })();
+var PILGRIM_SPEED = 24 / PILGRIM_LEN;   // 24 picture pixels a second, as a fraction of the whole path
+
+var pilgrimPos = null;          // how far along the path the pilgrim stands right now (0 to 1)
+var pilgrimFaceLeft = null;
+var pilgrimRaf = 0, pilgrimBubbleTimer = 0, pilgrimStartTimer = 0, pilgrimGreetTimer = 0;
+var pilgrimGreetPending = false, pilgrimMsgI = 0;
+
+function pilgrimPoint(f){
+  var n = PILGRIM_PATH.length - 1, x = Math.max(0, Math.min(1, f)) * n, i = Math.min(n - 1, Math.floor(x)), u = x - i;
+  var a = PILGRIM_PATH[i], b = PILGRIM_PATH[i+1];
+  return {x:a[0] + (b[0]-a[0])*u, y:a[1] + (b[1]-a[1])*u, dx:b[0]-a[0]};
+}
+
+function pilgrimSceneHtml(){
+  var lit = goldenTicketUnlocked();
+  return '<div class="pixScene" id="pixScene">' +
+    '<img class="pixSceneArt" src="tiles/scene_home.png" alt="">' +
+    '<div class="churchGlow' + (lit ? ' lit' : '') + '"></div>' +
+    '<img class="pixSpark" src="tiles/spark.png" alt="">' +
+    '<div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div>' +
+    '<div class="pilgrim" id="pilgrim" role="button" aria-label="Pilgrim" onclick="pilgrimTap()"><div class="pilgrimFlip"><div class="pilgrimSprite"></div></div></div>' +
+    '<div class="pilgrimBubble" id="pilgrimBubble" onclick="pilgrimHide()"></div>' +
+  '</div>';
+}
+
+function pilgrimPlace(el, f, sign){
+  var p = pilgrimPoint(f);
+  el.style.left = ((p.x - PILGRIM_W/2) / SCENE_W * 100) + "%";
+  el.style.top = ((p.y - PILGRIM_H + 1) / SCENE_H * 100) + "%";
+  if(Math.abs(p.dx) > 0.05){
+    if(sign) pilgrimFaceLeft = (p.dx * sign < 0);
+    else if(pilgrimFaceLeft === null) pilgrimFaceLeft = (p.dx < 0);
+  }
+  var flip = el.firstChild;
+  if(flip) flip.classList.toggle("left", !!pilgrimFaceLeft);
+}
+
+function pilgrimMessages(){
+  var list = [];
+  if(goldenTicketUnlocked()) list.push(t("pilgrimTicket"));
+  else {
+    var next = MISSIONS.filter(function(m){ return !state.missions[m.id].done; })[0];
+    if(state.points === 0) list.push(t("pilgrimStart"));
+    if(next) list.push(t("pilgrimTry")(t(next.nameKey)));
+    list.push(t("pilgrimToGo")(GOLDEN_TICKET_POINTS - state.points));
+  }
+  list.push(t("pilgrimCheer1"), t("pilgrimCheer2"), t("pilgrimCheer3"));
+  return list;
+}
+
+function pilgrimSay(text){
+  var scene = document.getElementById("pixScene"), pil = document.getElementById("pilgrim"), b = document.getElementById("pilgrimBubble");
+  if(!scene || !pil || !b) return;
+  b.classList.remove("show"); b.textContent = text;
+  b.style.visibility = "hidden"; b.style.display = "block";   // measure it before showing
+  var sr = scene.getBoundingClientRect(), pr = pil.getBoundingClientRect(), bw = b.offsetWidth, bh = b.offsetHeight;
+  var cx = pr.left + pr.width / 2 - sr.left;
+  var left = Math.max(6, Math.min(sr.width - bw - 6, cx - bw / 2));
+  b.style.left = left + "px";
+  b.style.top = (pr.top - sr.top - bh - 12) + "px";
+  b.style.setProperty("--tail", Math.max(16, Math.min(bw - 16, cx - left)) + "px");
+  b.style.display = ""; b.style.visibility = "";
+  void b.offsetWidth;
+  b.classList.add("show");
+  clearTimeout(pilgrimBubbleTimer);
+  pilgrimBubbleTimer = setTimeout(pilgrimHide, 5200);
+}
+function pilgrimHide(){
+  clearTimeout(pilgrimBubbleTimer);
+  var b = document.getElementById("pilgrimBubble"); if(b) b.classList.remove("show");
+}
+
+// Tapping the pilgrim: a little hop and the next thing he has to say.
+function pilgrimTap(){
+  var el = document.getElementById("pilgrim"); if(!el) return;
+  pixClickSfx();
+  el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop");
+  setTimeout(function(){ el.classList.remove("hop"); }, 450);
+  if(el.classList.contains("walking")) return;
+  var list = pilgrimMessages();
+  pilgrimSay(list[pilgrimMsgI % list.length]);
+  pilgrimMsgI++;
+}
+
+function pilgrimArrived(el, walkedForward){
+  state.pilgrimP = pilgrimPos; saveState();
+  if(!pilgrimGreetPending || state.folderOpen) return;
+  pilgrimGreetPending = false;
+  pilgrimGreetTimer = setTimeout(function(){
+    if(!el.isConnected) return;
+    if(walkedForward && state.points > 0){ pilgrimSay(t("pilgrimNice")); return; }
+    var list = pilgrimMessages();
+    pilgrimSay(list[pilgrimMsgI % list.length]);
+    pilgrimMsgI++;
+  }, 700);
+}
+
+// Called after the Home Screen is drawn. The pilgrim stands where he was last time, then walks to the spot that matches
+// the player's points. If the screen is redrawn mid-walk (e.g. the folder opens) he carries on from where he is.
+function pilgrimInit(isNew){
+  cancelAnimationFrame(pilgrimRaf); clearTimeout(pilgrimStartTimer); clearTimeout(pilgrimGreetTimer); clearTimeout(pilgrimBubbleTimer);
+  var el = document.getElementById("pilgrim"); if(!el) return;
+  if(isNew) pilgrimGreetPending = true;
+  var target = Math.min(1, state.points / GOLDEN_TICKET_POINTS);
+  if(pilgrimPos === null) pilgrimPos = (typeof state.pilgrimP === "number") ? Math.max(0, Math.min(1, state.pilgrimP)) : target;
+  pilgrimPlace(el, pilgrimPos, 0);
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var dist = target - pilgrimPos;
+  if(Math.abs(dist) < 0.0005 || calm){
+    pilgrimPos = target; pilgrimPlace(el, pilgrimPos, 0);
+    pilgrimArrived(el, false);
+    return;
+  }
+  var sign = dist > 0 ? 1 : -1;
+  pilgrimStartTimer = setTimeout(function(){
+    if(!el.isConnected) return;
+    el.classList.add("walking");
+    var last = performance.now();
+    function step(now){
+      if(!el.isConnected) return;      // redrawn: the new drawing picks the walk up from pilgrimPos
+      var move = PILGRIM_SPEED * Math.min(0.1, (now - last) / 1000); last = now;
+      if(Math.abs(target - pilgrimPos) <= move){
+        pilgrimPos = target; pilgrimPlace(el, pilgrimPos, sign);
+        el.classList.remove("walking");
+        pilgrimArrived(el, sign > 0);
+        return;
+      }
+      pilgrimPos += sign * move; pilgrimPlace(el, pilgrimPos, sign);
+      pilgrimRaf = requestAnimationFrame(step);
+    }
+    pilgrimRaf = requestAnimationFrame(step);
+  }, 350);
+}
+
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var doneCount = MISSIONS.filter(function(m){ return state.missions[m.id].done; }).length;
@@ -1088,6 +1274,7 @@ function screenMainMenu(){
       cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")});
   return '<div class="screen pixHome pixSky pixMenu">' +
     cloudsHtml() +
+    pilgrimSceneHtml() +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
     '<div class="progressWrap">' +
       '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
@@ -2799,6 +2986,7 @@ function render(){
     var el = app.querySelector(".screen");
     if(el) el.classList.add("screen-enter");
   }
+  if(state.screen === "mainMenu") pilgrimInit(isNewScreen);
   if(state.screen === "passport"){
     var track = document.getElementById("passportTrack");
     if(track){
