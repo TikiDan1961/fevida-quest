@@ -93,10 +93,11 @@
      church scene fills the screen, the small logo and QUEST sit in the sky, and a
      white card holds the QR code and the two language buttons. The scene image
      is 125x140 pixels, drawn at the full width of the screen. */
-  .pixHome{position:relative;min-height:100dvh;margin:calc(-1 * (env(safe-area-inset-top,0px) + 18px)) -18px calc(-1 * (env(safe-area-inset-bottom,0px) + 22px));padding:calc(env(safe-area-inset-top,0px) + 14px) 0 14px;display:flex;flex-direction:column;align-items:center;
-    background:#52B043 url("tiles/scene_church.png") top center / 100% auto no-repeat;image-rendering:pixelated;font-family:"Pixelify Sans",ui-monospace,monospace;}
+  .pixHome{position:relative;min-height:100dvh;margin:calc(-1 * (env(safe-area-inset-top,0px) + 18px)) -18px calc(-1 * (env(safe-area-inset-bottom,0px) + 22px));padding:calc(env(safe-area-inset-top,0px) + 8px) 0 14px;display:flex;flex-direction:column;align-items:center;
+    /* The scene sits 34px below the top (sky colour fills the gap and grass fills below it) so QUEST has clear room above the church cross. */
+    background:url("tiles/scene_church.png") center top 34px / 100% auto no-repeat,linear-gradient(#4FB0F2 0,#4FB0F2 150px,#52B043 150px);image-rendering:pixelated;font-family:"Pixelify Sans",ui-monospace,monospace;}
   .pixLogoSmall{display:block;width:192px;height:auto;image-rendering:pixelated;}
-  .pixQuest{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:4rem;line-height:1;letter-spacing:.04em;margin:8px 0 0;color:#FFC93A;
+  .pixQuest{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:4rem;line-height:1;letter-spacing:.04em;margin:0;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 7px 0 #1b2a6b,3px 7px 0 #1b2a6b,-3px 7px 0 #1b2a6b;}
   .pixCard{width:calc(100% - 28px);max-width:420px;background:#fff;border-radius:18px;padding:14px 16px 12px;text-align:center;box-shadow:0 5px 0 rgba(0,0,0,.28);color:#1E2F7A;}
   .pixCardTitle{font-weight:700;font-size:1.5rem;letter-spacing:.03em;line-height:1.1;}
@@ -110,11 +111,13 @@
   .pixQr .br{right:0;bottom:0;border-right-width:5px;border-bottom-width:5px;border-bottom-right-radius:6px;}
   .btn.pixBtn{width:min(78%,260px);margin:0 auto 10px;padding:8px 12px 6px;font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.2;letter-spacing:.06em;border-radius:12px;border:3px solid #1E6B2B;border-bottom-width:6px;background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);box-shadow:inset 0 3px 0 rgba(255,255,255,.4);transition:none;}
   .btn.pixBtn.secondary{border-color:#1C4E9A;background:#3A93E8;}
-  .btn.pixBtn:active{transform:translateY(3px);border-bottom-width:3px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);}
+  /* Pressed: the button sinks and lights up -- a hard light ring plus a soft glow in its own colour (2026-10-19, per Dan). */
+  .btn.pixBtn:active{transform:translateY(3px);border-bottom-width:3px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 18px 8px rgba(120,255,120,.8);}
+  .btn.pixBtn.secondary:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   /* Shorter phones: shrink the card (QR 145px -> 116px, whole 4px per module) so the
      church stays visible above it. */
   @media (max-height:740px){
-    .pixQuest{font-size:3rem;margin-top:4px;}
+    .pixQuest{font-size:3rem;margin-top:0;}
     .pixCard{padding:10px 14px 6px;}
     .pixQr{width:148px;height:148px;margin:6px auto 8px;padding:12px;}
     .pixQr img{width:116px;height:116px;}
@@ -720,6 +723,34 @@ function shuffle(arr){
 
 function selectLanguage(lang){ state.lang = lang; go("welcome"); }
 
+// 8-bit button-press sound (2026-10-19, per Dan): a short two-step square-wave
+// blip made with Web Audio, so there is no sound file to load. It plays on the
+// press itself (pointerdown), not on release, and is currently wired to the two
+// language buttons -- add onpointerdown="pixPressSfx()" to any other button to
+// give it the same sound. The AudioContext is created on the first press
+// (browsers block audio until a tap) and reused after that.
+var pixAudioCtx = null;
+function pixPressSfx(){
+  try {
+    if(!pixAudioCtx) pixAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var ctx = pixAudioCtx;
+    if(ctx.state === "suspended") ctx.resume();
+    var t0 = ctx.currentTime;
+    var osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(523, t0);        // C5
+    osc.frequency.setValueAtTime(784, t0 + 0.06); // then G5
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.16, t0 + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.16);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + 0.17);
+  } catch(e){}
+}
+function pixKeySfx(ev){ if(ev.key === "Enter" || ev.key === " ") pixPressSfx(); }
+// iOS Safari only shows :active styles (the pressed glow) if the page has a touch listener.
+document.addEventListener("touchstart", function(){}, {passive:true});
+
 function screenLanguage(){
   // Pixel-art church scene, small logo + QUEST in the sky, QR code card with the
   // two language buttons (2026-10-19, per the client's reference image).
@@ -734,8 +765,8 @@ function screenLanguage(){
       '<div class="pixCardSub">ESCANEA PARA JUGAR</div>' +
       '<div class="pixQr"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i>' +
         '<img src="tiles/qr_feyvida.png" alt="QR code for feyvidaquest.org"></div>' +
-      '<button class="btn pixBtn" onclick="selectLanguage(\'en\')">' + T.en.english + '</button>' +
-      '<button class="btn pixBtn secondary" onclick="selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
+      '<button class="btn pixBtn" onpointerdown="pixPressSfx()" onkeydown="pixKeySfx(event)" onclick="selectLanguage(\'en\')">' + T.en.english + '</button>' +
+      '<button class="btn pixBtn secondary" onpointerdown="pixPressSfx()" onkeydown="pixKeySfx(event)" onclick="selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
     '</div>' +
   '</div>';
 }
