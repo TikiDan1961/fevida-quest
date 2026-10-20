@@ -122,6 +122,7 @@
   /* Pressed: the button sinks and lights up -- a hard light ring plus a soft glow in its own colour (2026-10-19, per Dan). */
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
   .btn.pixBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 18px 8px rgba(120,255,120,.8);}
+  .pixMission.pixLower .btn.pixBtn:active{transform:none;}   /* Faith Match / Faith Flash buttons glow but never move when tapped (2026-10-20, per Dan) */
   .btn.pixBtn.secondary:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   /* Welcome screen: the church-interior picture (125x270 pixels, drawn at the full screen
      width and anchored to the bottom so the pews stay under the buttons; any extra height
@@ -358,7 +359,7 @@
   .pixAnsList{display:flex;flex-direction:column;gap:10px;margin:18px 0 6px;}
   .pixAns{display:block;width:100%;box-sizing:border-box;min-height:52px;padding:8px 12px 10px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.15;letter-spacing:.03em;
     text-align:center;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
-  .pixAns:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .pixAns:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .pixAns.correct{background:#52C246;border-color:#1E6B2B;}
   .pixAns.wrong{background:#D6343A;border-color:#7E1B22;}
   .pixAns.disabled{pointer-events:none;}
@@ -639,7 +640,7 @@ var T = {
     faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
     stainedGlassName:"Stained-Glass Puzzle", chooseJoyName:"Choose Joy",
     done:"DONE",
-    ff_intro:"Get through 3 rounds of 10 questions to earn your badge! You have 3 chances.", ff_round:function(n,total){return "Round "+n+" of "+total;}, ff_roundDone:function(n){return "ROUND "+n+" COMPLETED!";}, ff_awarded:"AWARDED!",
+    ff_intro:"Get through 3 rounds of 10 questions to earn your badge! You have 8 chances.", ff_round:function(n,total){return "Round "+n+" of "+total;}, ff_roundDone:function(n){return "ROUND "+n+" COMPLETED!";}, ff_awarded:"AWARDED!",
     nextQuestion:"NEXT QUESTION", collectAward:"COLLECT AWARD", playAgain:"PLAY AGAIN", tryAgain:"TRY AGAIN",
     ff_resultsTitlePass:"Perfect Score!", ff_resultsTitlePass2:"Well Done!", ff_resultsTitleFail:"So Close!",
     ff_resultsBodyPass:"You answered all 30 questions correctly!", ff_resultsBodyPass2:"You made it through all 30 questions!",
@@ -734,7 +735,7 @@ var T = {
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
     stainedGlassName:"Rompecabezas de Vitral", chooseJoyName:"Elige la Alegría",
     done:"COMPLETADO",
-    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 3 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
+    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 8 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
     nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
     ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitlePass2:"¡Bien Hecho!", ff_resultsTitleFail:"¡Tan Cerca!",
     ff_resultsBodyPass:"¡Respondiste las 30 preguntas correctamente!", ff_resultsBodyPass2:"¡Superaste las 30 preguntas!",
@@ -1899,13 +1900,13 @@ function afterAward(){
 // Dan -- the pool is now 74 questions, so asking all of them would be a very
 // long round). PLAY AGAIN draws a fresh 10.
 var FAITH_FLASH_ROUND_SIZE = 10;
-// A game is 3 rounds of 10 (2026-10-20, per Dan): 30 different questions, none repeated, and the 3 chances below last the WHOLE game -- they are
+// A game is 3 rounds of 10 (2026-10-20, per Dan): 30 different questions, none repeated, and the chances below last the WHOLE game -- they are
 // not given back at the start of a round.
 var FAITH_FLASH_ROUNDS = 3;
 function ffRounds(s){ return Math.ceil(s.order.length / FAITH_FLASH_ROUND_SIZE); }
 function ffRound(s){ return Math.floor(s.index / FAITH_FLASH_ROUND_SIZE); }
 // Three chances, shown as hearts just like Faith Match (2026-10-20, per Dan): a wrong answer costs one, and the game ends when the last is gone.
-var FF_CHANCES = 3;
+var FF_CHANCES = 8;   // 8 chances for the whole game (2026-10-20, per Dan; it was 3)
 function ffChancesLeft(s){ return typeof s.chances === "number" ? s.chances : FF_CHANCES; }
 
 function initFaithFlash(){
