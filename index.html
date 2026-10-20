@@ -145,6 +145,11 @@
     .homeGrid .appTile .miniGrid img.spr{width:26px;height:26px;}
   }
   .appIcon{display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;}
+  /* Only the icon itself (its tile and its name) takes a tap or lights up -- not the empty space around it in its grid cell, so a tap between
+     two icons does nothing (2026-10-20, per Dan). The tile and name still pass their tap up to the icon, which does the work. */
+  .appIcon{pointer-events:none;}
+  .appIcon .appTile{pointer-events:auto;}
+  .appIcon .appName,.appIcon .appTag{pointer-events:auto;width:fit-content;max-width:100%;}
   .appTile{position:relative;width:72px;height:72px;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .appTile img.spr{width:48px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
@@ -376,6 +381,13 @@
     .pixPips{margin-bottom:6px;}
     .pixChances{margin-bottom:6px;}
     .pixMission .pixAnsList{gap:6px;margin:8px 0 2px;}
+    /* Faith Match / Faith Flash are lowered 40px, so on a short phone everything inside them is packed a little closer */
+    .pixMission.pixLower > .pixNote{margin:0 0 4px;}
+    .pixMission.pixLower .pixChances,.pixMission.pixLower .pixPips{margin-bottom:4px;}
+    .pixMission.pixLower .pixAns{min-height:40px;padding:5px 10px 7px;}
+    .pixMission.pixLower .pixPaper{padding:10px 12px;}
+    .pixMission.pixLower .pixQ{font-size:1.0625rem;}
+    .pixMission.pixLower .btn.pixBtn.pixBtnSm{height:40px;margin-bottom:6px;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
   }
   /* Word Unscramble in the same pixel style (2026-10-20, per Dan): letter slots on the card, blue letter tiles below. */
@@ -619,10 +631,10 @@ var T = {
     faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
     stainedGlassName:"Stained-Glass Puzzle", chooseJoyName:"Choose Joy",
     done:"DONE",
-    ff_intro:"Get through all 10 questions to earn your badge! You have 3 chances.",
+    ff_intro:"Get through 3 rounds of 10 questions to earn your badge! You have 3 chances.", ff_round:function(n,total){return "Round "+n+" of "+total;},
     nextQuestion:"NEXT QUESTION", collectAward:"COLLECT AWARD", playAgain:"PLAY AGAIN", tryAgain:"TRY AGAIN",
     ff_resultsTitlePass:"Perfect Score!", ff_resultsTitlePass2:"Well Done!", ff_resultsTitleFail:"So Close!",
-    ff_resultsBodyPass:"You answered all 10 questions correctly!", ff_resultsBodyPass2:"You made it through all 10 questions!",
+    ff_resultsBodyPass:"You answered all 30 questions correctly!", ff_resultsBodyPass2:"You made it through all 30 questions!",
     ff_resultsBodyFail:"Don't worry — give it another shot!",
     scoreOf:function(c,t){return "You got "+c+" out of "+t+" correct.";},
     fm_intro:"Match all the pairs on each level!",
@@ -714,10 +726,10 @@ var T = {
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
     stainedGlassName:"Rompecabezas de Vitral", chooseJoyName:"Elige la Alegría",
     done:"COMPLETADO",
-    ff_intro:"¡Supera las 10 preguntas para ganar tu insignia! Tienes 3 oportunidades.",
+    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 3 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;},
     nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
     ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitlePass2:"¡Bien Hecho!", ff_resultsTitleFail:"¡Tan Cerca!",
-    ff_resultsBodyPass:"¡Respondiste las 10 preguntas correctamente!", ff_resultsBodyPass2:"¡Superaste las 10 preguntas!",
+    ff_resultsBodyPass:"¡Respondiste las 30 preguntas correctamente!", ff_resultsBodyPass2:"¡Superaste las 30 preguntas!",
     ff_resultsBodyFail:"No te preocupes, ¡inténtalo de nuevo!",
     scoreOf:function(c,t){return "Obtuviste "+c+" de "+t+" correctas.";},
     fm_intro:"¡Empareja todos los pares en cada nivel!",
@@ -1879,12 +1891,17 @@ function afterAward(){
 // Dan -- the pool is now 74 questions, so asking all of them would be a very
 // long round). PLAY AGAIN draws a fresh 10.
 var FAITH_FLASH_ROUND_SIZE = 10;
-// Three chances, shown as hearts just like Faith Match (2026-10-20, per Dan): a wrong answer costs one, and the round ends when the last is gone.
+// A game is 3 rounds of 10 (2026-10-20, per Dan): 30 different questions, none repeated, and the 3 chances below last the WHOLE game -- they are
+// not given back at the start of a round.
+var FAITH_FLASH_ROUNDS = 3;
+function ffRounds(s){ return Math.ceil(s.order.length / FAITH_FLASH_ROUND_SIZE); }
+function ffRound(s){ return Math.floor(s.index / FAITH_FLASH_ROUND_SIZE); }
+// Three chances, shown as hearts just like Faith Match (2026-10-20, per Dan): a wrong answer costs one, and the game ends when the last is gone.
 var FF_CHANCES = 3;
 function ffChancesLeft(s){ return typeof s.chances === "number" ? s.chances : FF_CHANCES; }
 
 function initFaithFlash(){
-  var order = shuffle(FAITH_FLASH_QUESTIONS.map(function(_,i){return i;})).slice(0, FAITH_FLASH_ROUND_SIZE);
+  var order = shuffle(FAITH_FLASH_QUESTIONS.map(function(_,i){return i;})).slice(0, FAITH_FLASH_ROUND_SIZE * FAITH_FLASH_ROUNDS);   // all different
   state.session.faithFlash = {order:order, index:0, correct:0, answered:null, answerOrder:shuffle([0,1,2]), status:"playing", chances:FF_CHANCES, past:[]};
   saveState();
 }
@@ -1904,12 +1921,17 @@ function ffAnswer(choiceIdx){
   // the same sounds as Faith Match: a match, a miss, or the last chance used
   pixSfxPlay(isCorrect ? "fmMatch" : (lastChance ? "fmLast" : "fmMiss"), true);
   saveState(); render();
-  if(lastChance){
+  // After a moment to see the answer the game moves on by itself, so the player is never asked to tap NEXT QUESTION with nothing to tap it for:
+  // the results show when the last chance is lost or the last question of the game is answered, and the next round starts after the last
+  // question of a round (2026-10-20, per Dan).
+  var roundEnd = (s.index % FAITH_FLASH_ROUND_SIZE) === FAITH_FLASH_ROUND_SIZE - 1 || s.index >= s.order.length - 1;
+  if(lastChance || roundEnd){
+    var at = s.index;
     setTimeout(function(){
       var s2 = state.session.faithFlash;
-      if(!s2 || s2 !== s || s2.status !== "playing") return;   // only this round: not a new one started in the meantime
-      s2.status = "results";
-      saveState(); render();
+      if(!s2 || s2 !== s || s2.status !== "playing" || s2.index !== at) return;   // only this game and this question: not a new one started in the meantime
+      if(lastChance || s2.index >= s2.order.length - 1){ s2.status = "results"; saveState(); render(); }
+      else ffNext();
     }, 1300);
   }
 }
@@ -2022,12 +2044,14 @@ function screenFaithFlash(){
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
-    pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now"), null, s.past) +
+    '<div class="pixNote">' + t("ff_round")(ffRound(s) + 1, ffRounds(s)) + '</div>' +
+    pixPipsHtml(Math.min(FAITH_FLASH_ROUND_SIZE, s.order.length - ffRound(s) * FAITH_FLASH_ROUND_SIZE), s.index - ffRound(s) * FAITH_FLASH_ROUND_SIZE,
+      isCorrect ? "done" : (answered ? "bad" : "now"), null, (s.past || []).slice(ffRound(s) * FAITH_FLASH_ROUND_SIZE, (ffRound(s) + 1) * FAITH_FLASH_ROUND_SIZE)) +
     '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ffChancesLeft(s)), FF_CHANCES) + '</div>' +
     '<div class="pixPaper"><div class="pixQ">' + qLang.q + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
-    (answered && ffChancesLeft(s) > 0 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffNext()">' + t("nextQuestion") + '</button>' : '') +
+    (answered && ffChancesLeft(s) > 0 && (s.index % FAITH_FLASH_ROUND_SIZE) < FAITH_FLASH_ROUND_SIZE - 1 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffNext()">' + t("nextQuestion") + '</button>' : '') +
     '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ffQuit()">' + t("mainMenu") + '</button>' +
     (isCorrect ? '<div class="pixFlash"></div>' : '') +
   '</div>';
