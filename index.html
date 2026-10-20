@@ -83,6 +83,20 @@
   .lang-grid{display:flex;flex-direction:column;gap:14px;margin-top:24px;}
   .lang-btn{font-size:1.3rem;padding:22px;border-radius:18px;}
 
+  /* 8-bit look (2026-10-19, per the client's reference images), starting with the
+     language screen. Pixelify Sans (SIL Open Font License, tiles/PixelifySans-OFL.txt)
+     is bundled with the app so it works offline. It is only crisp at whole
+     multiples of 8px (16, 24, 32), so sizes below are 1rem = 16px, 1.5rem = 24px,
+     2rem = 32px. */
+  @font-face{font-family:"Pixelify Sans";src:url("tiles/PixelifySans.ttf") format("truetype");font-weight:400 700;font-style:normal;font-display:block;}
+  .pixLogo{display:block;width:min(324px,100%);height:auto;margin:0 auto 8px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
+  .pixTitle{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;letter-spacing:.02em;color:var(--gold);text-shadow:3px 3px 0 #12081f;margin:.1em 0 .15em;}
+  .pixSub{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1rem;letter-spacing:.02em;color:var(--cream);text-shadow:2px 2px 0 #12081f;margin:.2em 0;}
+  .btn.pixBtn{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.06em;border-radius:0;border:4px solid var(--gold);background:var(--magenta);color:var(--cream);text-shadow:3px 3px 0 #12081f;box-shadow:0 6px 0 #7a0f46;padding:16px 12px;margin:6px 0 10px;transition:none;}
+  .btn.pixBtn.secondary{background:var(--teal);box-shadow:0 6px 0 #076361;}
+  .btn.pixBtn:active{transform:translateY(5px);box-shadow:0 1px 0 #7a0f46;border-color:var(--gold);}
+  .btn.pixBtn.secondary:active{box-shadow:0 1px 0 #076361;}
+
   .progressWrap{margin:10px 0 18px;}
   .progressBar{background:rgba(255,255,255,.15);border:1px solid var(--gold);border-radius:20px;height:22px;overflow:hidden;}
   .progressFill{height:100%;background:linear-gradient(90deg,var(--gold),#fff6c9);transition:width .4s ease;}
@@ -682,13 +696,16 @@ function shuffle(arr){
 function selectLanguage(lang){ state.lang = lang; go("welcome"); }
 
 function screenLanguage(){
+  // 8-bit version of the Fe y Vida logo (tiles/logo_8bit.png, made from
+  // Logo\FeyVida-full-English-logo-cmyk.png) with pixel lettering (2026-10-19).
   return '<div class="screen center">' +
     '<div class="spacer"></div>' +
-    '<h1>Fe y Vida Quest</h1>' +
-    '<h2>' + T.en.chooseLanguage + ' / ' + T.es.chooseLanguage + '</h2>' +
+    '<img class="pixLogo" src="tiles/logo_8bit.png" alt="Instituto Fe y Vida, Institute for Faith &amp; Life, a Lasallian Ministry">' +
+    '<h1 class="pixTitle">Fe y Vida Quest</h1>' +
+    '<h2 class="pixSub">' + T.en.chooseLanguage + ' / ' + T.es.chooseLanguage + '</h2>' +
     '<div class="lang-grid">' +
-      '<button class="btn lang-btn" onclick="selectLanguage(\'en\')">' + T.en.english + '</button>' +
-      '<button class="btn lang-btn secondary" onclick="selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
+      '<button class="btn lang-btn pixBtn" onclick="selectLanguage(\'en\')">' + T.en.english + '</button>' +
+      '<button class="btn lang-btn pixBtn secondary" onclick="selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
     '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
