@@ -103,6 +103,11 @@
   .missionTile .lbl{font-size:.68rem;margin-top:4px;display:block;font-weight:600;}
   .missionTile .chk{font-size:.9rem;color:var(--good);}
   .passportTile{grid-column:span 3;}
+  /* Pinned exit button shown during a mission -- see exitBarHtml(). The bar
+     has no height, so it takes no room and nothing below it moves. */
+  .exitBar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);height:0;z-index:20;}
+  .exitBtn{position:absolute;top:-14px;left:-6px;min-height:40px;padding:8px 14px;border-radius:20px;border:1.5px solid var(--gold);background:rgba(42,26,58,.88);color:var(--cream);font-size:.78rem;font-weight:700;letter-spacing:.04em;cursor:pointer;}
+  .exitBtn:active{box-shadow:0 0 12px 3px var(--glow);}
   /* TEMPORARY test aid -- see tempResetHtml() */
   .tempReset{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;padding:8px;border:1px dashed rgba(255,255,255,.4);border-radius:12px;}
   .tempResetLbl{width:100%;font-size:.68rem;letter-spacing:.06em;opacity:.7;}
@@ -232,6 +237,7 @@ var T = {
     welcomeBody:"Complete faith-filled missions around the booth to earn digital badges. Finish any 5 of the 10 to unlock your Golden Ticket for a chance at swag prizes. Ready?",
     startQuest:"START YOUR QUEST", changeLanguage:"CHANGE LANGUAGE",
     mainMenu:"MAIN MENU", returnToMenu:"RETURN TO MENU", returnToMainMenu:"RETURN TO MAIN MENU",
+    exitMenu:"← MENU",
     questPoints:"Quest Points",
     passport:"Passport", showTicket:"🎟 VIEW GOLDEN TICKET",
     faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
@@ -314,6 +320,7 @@ var T = {
     welcomeBody:"Completa misiones llenas de fe en el stand para ganar insignias digitales. Termina 5 de las 10 para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
     startQuest:"COMIENZA TU AVENTURA", changeLanguage:"CAMBIAR IDIOMA",
     mainMenu:"MENÚ PRINCIPAL", returnToMenu:"VOLVER AL MENÚ", returnToMainMenu:"VOLVER AL MENÚ PRINCIPAL",
+    exitMenu:"← MENÚ",
     questPoints:"Puntos de Aventura",
     passport:"Pasaporte", showTicket:"🎟 VER BOLETO DORADO",
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
@@ -2281,6 +2288,40 @@ function screenGoldenTicket(){
 
 var lastRenderedScreen = null;
 
+// Always-visible exit (2026-10-19, per Dan): every mission already had a MAIN
+// MENU button, but it sits at the very bottom of the screen and is off-screen
+// whenever a game is taller than the phone. This small button stays pinned to
+// the top-left while a mission is being played. It is hidden on the finished
+// screens (won / lost / solved), which have their own buttons -- and where
+// quitting would throw away a win that hasn't been collected yet.
+var EXIT_SCREENS = ["faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass"];
+var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
+
+function exitBarHtml(){
+  if(EXIT_SCREENS.indexOf(state.screen) === -1) return "";
+  var sess = state.session[state.screen];
+  if(sess && EXIT_HIDDEN_STATUS.indexOf(sess.status) !== -1) return "";
+  return '<div class="exitBar"><button class="exitBtn" onclick="exitMission()" aria-label="' + t("mainMenu") + '">' + t("exitMenu") + '</button></div>';
+}
+
+// Leaves the current mission the same way its own MAIN MENU button does
+// (clears its saved game and stops any timers), then shows the Main Menu.
+function exitMission(){
+  switch(state.screen){
+    case "faithFlash": ffQuit(); break;
+    case "faithMatch": fmQuit(); break;
+    case "chooseJoy": cjQuit(); break;
+    case "followLight": flQuit(); break;
+    case "wordUnscramble": wuQuit(); break;
+    case "catchLight": clQuit(); break;
+    case "kindnessSort": ksQuit(); break;
+    case "hiddenBlessings": hbQuit(); break;
+    case "stainedGlass": pzQuit(); break;
+    default: go("mainMenu");
+  }
+}
+
 function render(){
   var app = document.getElementById("app");
   var html;
@@ -2307,7 +2348,7 @@ function render(){
   var isNewScreen = state.screen !== lastRenderedScreen;
   var enteringPassportFresh = state.screen === "passport" && isNewScreen;
   lastRenderedScreen = state.screen;
-  app.innerHTML = html;
+  app.innerHTML = exitBarHtml() + html;
   if(isNewScreen){
     var el = app.querySelector(".screen");
     if(el) el.classList.add("screen-enter");
