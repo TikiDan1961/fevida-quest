@@ -89,13 +89,38 @@
      multiples of 8px (16, 24, 32), so sizes below are 1rem = 16px, 1.5rem = 24px,
      2rem = 32px. */
   @font-face{font-family:"Pixelify Sans";src:url("tiles/PixelifySans.ttf") format("truetype");font-weight:400 700;font-style:normal;font-display:block;}
-  .pixLogo{display:block;width:min(324px,100%);height:auto;margin:0 auto 8px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
-  .pixTitle{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;letter-spacing:.02em;color:var(--gold);text-shadow:3px 3px 0 #12081f;margin:.1em 0 .15em;}
-  .pixSub{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1rem;letter-spacing:.02em;color:var(--cream);text-shadow:2px 2px 0 #12081f;margin:.2em 0;}
-  .btn.pixBtn{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.06em;border-radius:0;border:4px solid var(--gold);background:var(--magenta);color:var(--cream);text-shadow:3px 3px 0 #12081f;box-shadow:0 6px 0 #7a0f46;padding:16px 12px;margin:6px 0 10px;transition:none;}
-  .btn.pixBtn.secondary{background:var(--teal);box-shadow:0 6px 0 #076361;}
-  .btn.pixBtn:active{transform:translateY(5px);box-shadow:0 1px 0 #7a0f46;border-color:var(--gold);}
-  .btn.pixBtn.secondary:active{box-shadow:0 1px 0 #076361;}
+  /* Language screen (2026-10-19, per the client's reference image): a pixel-art
+     church scene fills the screen, the small logo and QUEST sit in the sky, and a
+     white card holds the QR code and the two language buttons. The scene image
+     is 125x140 pixels, drawn at the full width of the screen. */
+  .pixHome{position:relative;min-height:100dvh;margin:calc(-1 * (env(safe-area-inset-top,0px) + 18px)) -18px calc(-1 * (env(safe-area-inset-bottom,0px) + 22px));padding:calc(env(safe-area-inset-top,0px) + 14px) 0 14px;display:flex;flex-direction:column;align-items:center;
+    background:#52B043 url("tiles/scene_church.png") top center / 100% auto no-repeat;image-rendering:pixelated;font-family:"Pixelify Sans",ui-monospace,monospace;}
+  .pixLogoSmall{display:block;width:192px;height:auto;image-rendering:pixelated;}
+  .pixQuest{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:4rem;line-height:1;letter-spacing:.04em;margin:8px 0 0;color:#FFC93A;
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 7px 0 #1b2a6b,3px 7px 0 #1b2a6b,-3px 7px 0 #1b2a6b;}
+  .pixCard{width:calc(100% - 28px);max-width:420px;background:#fff;border-radius:18px;padding:14px 16px 12px;text-align:center;box-shadow:0 5px 0 rgba(0,0,0,.28);color:#1E2F7A;}
+  .pixCardTitle{font-weight:700;font-size:1.5rem;letter-spacing:.03em;line-height:1.1;}
+  .pixCardSub{font-weight:500;font-size:1rem;letter-spacing:.03em;color:#5666a8;margin-top:2px;}
+  .pixQr{position:relative;width:177px;height:177px;margin:10px auto 12px;padding:16px;}
+  .pixQr img{display:block;width:145px;height:145px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
+  .pixQr i{position:absolute;width:22px;height:22px;border:0 solid #4CB848;}
+  .pixQr .tl{left:0;top:0;border-left-width:5px;border-top-width:5px;border-top-left-radius:6px;}
+  .pixQr .tr{right:0;top:0;border-right-width:5px;border-top-width:5px;border-top-right-radius:6px;}
+  .pixQr .bl{left:0;bottom:0;border-left-width:5px;border-bottom-width:5px;border-bottom-left-radius:6px;}
+  .pixQr .br{right:0;bottom:0;border-right-width:5px;border-bottom-width:5px;border-bottom-right-radius:6px;}
+  .btn.pixBtn{width:min(78%,260px);margin:0 auto 10px;padding:8px 12px 6px;font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.2;letter-spacing:.06em;border-radius:12px;border:3px solid #1E6B2B;border-bottom-width:6px;background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);box-shadow:inset 0 3px 0 rgba(255,255,255,.4);transition:none;}
+  .btn.pixBtn.secondary{border-color:#1C4E9A;background:#3A93E8;}
+  .btn.pixBtn:active{transform:translateY(3px);border-bottom-width:3px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);}
+  /* Shorter phones: shrink the card (QR 145px -> 116px, whole 4px per module) so the
+     church stays visible above it. */
+  @media (max-height:740px){
+    .pixQuest{font-size:3rem;margin-top:4px;}
+    .pixCard{padding:10px 14px 6px;}
+    .pixQr{width:148px;height:148px;margin:6px auto 8px;padding:12px;}
+    .pixQr img{width:116px;height:116px;}
+    .pixQr i{width:18px;height:18px;}
+    .btn.pixBtn{margin-bottom:8px;font-size:1.25rem;padding:6px 12px 4px;}
+  }
 
   .progressWrap{margin:10px 0 18px;}
   .progressBar{background:rgba(255,255,255,.15);border:1px solid var(--gold);border-radius:20px;height:22px;overflow:hidden;}
@@ -696,18 +721,22 @@ function shuffle(arr){
 function selectLanguage(lang){ state.lang = lang; go("welcome"); }
 
 function screenLanguage(){
-  // 8-bit version of the Fe y Vida logo (tiles/logo_8bit.png, made from
-  // Logo\FeyVida-full-English-logo-cmyk.png) with pixel lettering (2026-10-19).
-  return '<div class="screen center">' +
+  // Pixel-art church scene, small logo + QUEST in the sky, QR code card with the
+  // two language buttons (2026-10-19, per the client's reference image).
+  // tiles/qr_feyvida.png encodes https://feyvidaquest.org -- it only works once
+  // that domain is registered and pointed at the Netlify site.
+  return '<div class="screen pixHome">' +
+    '<img class="pixLogoSmall" src="tiles/logo_small.png" alt="Fe y Vida">' +
+    '<h1 class="pixQuest" aria-label="Fe y Vida Quest">QUEST</h1>' +
     '<div class="spacer"></div>' +
-    '<img class="pixLogo" src="tiles/logo_8bit.png" alt="Instituto Fe y Vida, Institute for Faith &amp; Life, a Lasallian Ministry">' +
-    '<h1 class="pixTitle">Fe y Vida Quest</h1>' +
-    '<h2 class="pixSub">' + T.en.chooseLanguage + ' / ' + T.es.chooseLanguage + '</h2>' +
-    '<div class="lang-grid">' +
-      '<button class="btn lang-btn pixBtn" onclick="selectLanguage(\'en\')">' + T.en.english + '</button>' +
-      '<button class="btn lang-btn pixBtn secondary" onclick="selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
+    '<div class="pixCard">' +
+      '<div class="pixCardTitle">SCAN TO PLAY</div>' +
+      '<div class="pixCardSub">ESCANEA PARA JUGAR</div>' +
+      '<div class="pixQr"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i>' +
+        '<img src="tiles/qr_feyvida.png" alt="QR code for feyvidaquest.org"></div>' +
+      '<button class="btn pixBtn" onclick="selectLanguage(\'en\')">' + T.en.english + '</button>' +
+      '<button class="btn pixBtn secondary" onclick="selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
     '</div>' +
-    '<div class="spacer"></div>' +
   '</div>';
 }
 
