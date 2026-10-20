@@ -205,11 +205,11 @@
   @keyframes glowPulseLit{from{opacity:.45;}to{opacity:.85;}}
   .pixSpark{position:absolute;left:46.8%;top:.21%;width:5.6%;image-rendering:pixelated;animation:sparkBlink 2.6s steps(1) infinite;}
   @keyframes sparkBlink{0%{opacity:0;}55%{opacity:1;}65%{opacity:.35;}75%{opacity:1;}85%{opacity:0;}100%{opacity:0;}}
-  .pixDove{position:absolute;left:-14%;top:5%;width:12.8%;aspect-ratio:16/12;animation:doveFly 28s linear infinite;animation-delay:-3s;}
-  @keyframes doveFly{0%{left:-14%;}55%{left:112%;}100%{left:112%;}}
+  .pixDove{position:absolute;left:-18%;top:5%;width:19.2%;aspect-ratio:24/17;animation:doveFly 28s linear infinite;animation-delay:-3s;}
+  @keyframes doveFly{0%{left:-18%;}55%{left:112%;}100%{left:112%;}}
   .pixDoveBob{width:100%;height:100%;animation:doveBob 3.2s ease-in-out infinite alternate;}
   @keyframes doveBob{from{transform:translateY(-35%);}to{transform:translateY(35%);}}
-  .pixDoveSprite{width:100%;height:100%;background:url("tiles/dove.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:doveFlap .36s steps(1) infinite;}
+  .pixDoveSprite{width:100%;height:100%;background:url("tiles/dove2.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:doveFlap .36s steps(1) infinite;}
   @keyframes doveFlap{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
   .pilgrim{position:absolute;width:8.8%;aspect-ratio:11/15;z-index:2;pointer-events:auto;cursor:pointer;}
   .pilgrim::before{content:"";position:absolute;left:-60%;right:-60%;top:-40%;bottom:-15%;}
@@ -223,14 +223,15 @@
   @keyframes pilgrimBob{0%{transform:translateY(0);}50%{transform:translateY(-6.6%);}100%{transform:translateY(0);}}
   @keyframes pilgrimStep{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
   /* the dog and the cat wander about inside their own invisible areas (see PETS) */
-  .pixPet{position:absolute;z-index:1;pointer-events:none;}
+  .pixPet{position:absolute;z-index:1;pointer-events:auto;cursor:pointer;}
   /* the fence by the dog sits in its own picture, drawn over the pets, so the dog walks behind it */
   .pixFenceFront{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;z-index:2;pointer-events:none;}
   .petFlip{width:100%;height:100%;}
   .petFlip.left{transform:scaleX(-1);}
   .petSprite{width:100%;height:100%;background-size:200% 100%;background-repeat:no-repeat;image-rendering:pixelated;animation:petBreath 2.4s steps(1) infinite;}
-  .petSprite.dog{background-image:url("tiles/dog.png");}
-  .petSprite.cat{background-image:url("tiles/cat.png");}
+  .petSprite.sheep{background-image:url("tiles/sheep.png");}
+  .pixPet::before{content:"";position:absolute;left:-25%;right:-25%;top:-35%;bottom:-20%;}   /* a bigger target for a finger */
+  .pixPet.hop{animation:pilgrimHop .4s ease-out;}
   .pixPet.walking .petSprite{animation:petStep .4s steps(1) infinite,pilgrimBob .4s steps(1) infinite;}
   @keyframes petBreath{0%{transform:translateY(0);}50%{transform:translateY(-7%);}100%{transform:translateY(0);}}
   @keyframes petStep{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
@@ -240,7 +241,7 @@
   .pilgrimBubble.show{display:block;animation:bubblePop .18s ease-out;}
   .pilgrimBubble::after{content:"";position:absolute;top:100%;left:var(--tail,50%);width:9px;height:9px;margin:-6px 0 0 -7px;background:#fff;border-right:3px solid #1B1F3B;border-bottom:3px solid #1B1F3B;transform:rotate(45deg);}
   @keyframes bubblePop{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
-  @media (prefers-reduced-motion:reduce){ .pixDove{display:none;} .pixSpark{animation:none;opacity:1;} .churchGlow,.pilgrimSprite,.pilgrim.walking .pilgrimSprite,.petSprite,.pixPet.walking .petSprite{animation:none;} .pilgrim.hop{animation:none;} }
+  @media (prefers-reduced-motion:reduce){ .pixDove{display:none;} .pixSpark{animation:none;opacity:1;} .churchGlow,.pilgrimSprite,.pilgrim.walking .pilgrimSprite,.petSprite,.pixPet.walking .petSprite{animation:none;} .pilgrim.hop,.pixPet.hop{animation:none;} }
   /* Main Menu: pixel sky with slowly drifting clouds, tiles as solid cards sitting on it. The sky
      and cloud pictures are 125x270 pixels drawn at the full screen width and anchored to the bottom;
      the cloud layer is two screens wide and slides one screen-width to the left, so it loops with no jump. */
@@ -642,6 +643,7 @@ var T = {
     pathOfLightName:"Path of Light", tbdName:"TBD",
     comingSoon:"COMING SOON", comingSoonToast:"Coming soon!",
     missionsFolder:"Missions", goldenTicketLabel:"Golden Ticket",
+    sheepSays:"baaaa",
     optionsLabel:"Options", optionsTitle:"Options", sfxVolume:"Sound Effects", musicVolume:"Music",
     pilgrimStart:"Hi, I'm Pilgrim! Open Missions to start our journey.", pilgrimNice:"Great job! Let's keep walking with faith.",
     pilgrimTry:function(n){return "Try "+n+" next!";}, pilgrimToGo:function(n){return n+" more game"+(n === 1 ? "" : "s")+" to reach the church!";},
@@ -735,6 +737,7 @@ var T = {
     pathOfLightName:"Camino de Luz", tbdName:"Por definir",
     comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
     missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
+    sheepSays:"beeee",
     optionsLabel:"Opciones", optionsTitle:"Opciones", sfxVolume:"Efectos de sonido", musicVolume:"Música",
     pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.",
     pilgrimTry:function(n){return "¡Prueba "+n+"!";}, pilgrimToGo:function(n){return n === 1 ? "¡Falta 1 juego para llegar a la iglesia!" : "¡Faltan "+n+" juegos para llegar a la iglesia!";},
@@ -1151,10 +1154,11 @@ var PIX_SFX = {
   correct:{url:"sounds/sfx_correct.mp3", gain:1},
   wrong:{url:"sounds/sfx_wrong.mp3", gain:1},
   // Faith Match (2026-10-20, per Dan): sound_effect_6 = a match, _9 = a miss, _8 = the last chance used, _7 = the level-clear fanfare
+  fmFirst:{url:"sounds/sfx_fm_first.wav", gain:0.26},   // sound_effect_10: the first of the two tiles (levelled with the other Faith Match sounds)
   fmMatch:{url:"sounds/sfx_fm_match.mp3", gain:0.25},   // was 0.55: too loud next to the other sounds (2026-10-20, per Dan)
   fmMiss:{url:"sounds/sfx_fm_miss.mp3", gain:0.28},
-  fmLast:{url:"sounds/sfx_fm_last.mp3", gain:1},
-  fmFanfare:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.55}
+  fmLast:{url:"sounds/sfx_fm_last.mp3", gain:0.37},   // was 1: levelled with the match / miss sounds (2026-10-20, per Dan)
+  fmFanfare:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17}   // was 0.55: 10 dB too loud next to the others
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -1245,25 +1249,28 @@ function pixSfxPlay(name, exclusive){
   } catch(e){ return false; }
 }
 // the button sound; the old blip stands in only while the file has not arrived yet
-function pixTap(ctx){ if(!pixSfxPlay("tap") && !pixSfxBytes.tap) pixBlip(ctx); }
+function pixTap(ctx, name){
+  if(typeof name !== "string") name = "tap";                  // no name (or an event passed by mistake) = the button sound
+  if(!pixSfxPlay(name, name !== "tap") && !pixSfxBytes[name]) pixBlip(ctx);
+}
 
 var pixLastPressAt = 0, pixLastClickAt = 0;
-function pixPressSfx(){
+function pixPressSfx(name){   // name = a different sound to play in place of the button sound (see PIX_SFX)
   var now = performance.now(); if(now - pixLastPressAt < 40) return; pixLastPressAt = now;   // the page-wide listener and an inline handler can both call this
   var ctx = pixCtx(); if(!ctx) return;
   pixSfxDecodeAll();
   pixBlipPlayed = false;
   if(pixAudioStale) return;   // the engine may be dead after sleep: the click (after the fresh engine is made) plays this tap's sound
-  if(ctx.state === "running"){ pixTap(ctx); pixBlipPlayed = true; }
+  if(ctx.state === "running"){ pixTap(ctx, name); pixBlipPlayed = true; }
   else if(ctx.resume) { try { var p = ctx.resume(); if(p && p.catch) p.catch(function(){}); } catch(e){} }
 }
-function pixClickSfx(){
+function pixClickSfx(name){
   var now = performance.now(); if(now - pixLastClickAt < 40) return; pixLastClickAt = now;
   var ctx = pixCtx(); if(!ctx) return;
   pixSfxDecodeAll();
   if(pixBlipPlayed){ pixBlipPlayed = false; return; }
-  if(ctx.state === "running"){ pixTap(ctx); return; }
-  try { var p = ctx.resume(); if(p && p.then) p.then(function(){ pixTap(ctx); }).catch(function(){}); } catch(e){}
+  if(ctx.state === "running"){ pixTap(ctx, name); return; }
+  try { var p = ctx.resume(); if(p && p.then) p.then(function(){ pixTap(ctx, name); }).catch(function(){}); } catch(e){}
 }
 
 // ---- the sound engine after sleep or switching apps (2026-10-20, per Dan) -- the same fix as the Weird NJ app ----
@@ -1332,7 +1339,7 @@ document.addEventListener("touchend", pixReviveOnTap, true);
 document.addEventListener("click", pixReviveOnTap, true);
 
 // Every button, icon and tile that can be tapped makes the button sound -- including the ones with no sound wired in by hand.
-var PIX_TAP_SELECTOR = "button, [role=button], .appIcon, .matchCard, .flPad, .hbSpot";
+var PIX_TAP_SELECTOR = "button, [role=button], .appIcon, .flPad, .hbSpot";   // (Faith Match tiles call pixPressSfx / pixClickSfx themselves: see fmPress)
 function pixTapTarget(e){ var el = e.target && e.target.closest ? e.target.closest(PIX_TAP_SELECTOR) : null; return (el && !el.disabled) ? el : null; }
 document.addEventListener("pointerdown", function(e){ if(pixTapTarget(e)) pixPressSfx(); }, true);
 document.addEventListener("click", function(e){ if(pixTapTarget(e)) pixClickSfx(); }, true);
@@ -1566,15 +1573,15 @@ function pilgrimPoint(f){
   return {x:a[0] + (b[0]-a[0])*u, y:a[1] + (b[1]-a[1])*u, dx:b[0]-a[0]};
 }
 
-// The dog and the cat each wander about inside their own invisible area of the lawn (2026-10-20, per Dan): box = where their feet can go,
+// The two sheep each wander about inside their own invisible area of the lawn (2026-10-20, per Dan): box = where their feet can go,
 // in picture pixels. They walk to a random spot, stand a moment, then pick another.
 var PETS = [
-  {id:"petDog", kind:"dog", w:18, h:13, speed:10, box:{x0:66, x1:114, y0:105, y1:117}},
-  {id:"petCat", kind:"cat", w:16, h:13, speed:7,  box:{x0:30, x1:58,  y0:84,  y1:91}}   // the open grass on the left, one bend up from where the cat used to be
+  {id:"petSheep1", kind:"sheep", w:18, h:14, speed:10, box:{x0:66, x1:114, y0:105, y1:117}},
+  {id:"petSheep2", kind:"sheep", w:18, h:14, speed:7,  box:{x0:30, x1:58,  y0:84,  y1:91}}   // the open grass on the left, one bend up (the dog and the cat became white sheep, 2026-10-20, per Dan)
 ];
 var petState = {}, petsRaf = 0;   // petState keeps where each one is, so a redraw of the screen doesn't move them
 function petHtml(p){
-  return '<div class="pixPet" id="' + p.id + '" style="width:' + (p.w / SCENE_W * 100) + '%;aspect-ratio:' + p.w + '/' + p.h + '"><div class="petFlip"><div class="petSprite ' + p.kind + '"></div></div></div>';
+  return '<div class="pixPet" id="' + p.id + '" role="button" aria-label="Sheep" onclick="petTap(\'' + p.id + '\')" style="width:' + (p.w / SCENE_W * 100) + '%;aspect-ratio:' + p.w + '/' + p.h + '"><div class="petFlip"><div class="petSprite ' + p.kind + '"></div></div></div>';
 }
 function petRand(a, b){ return a + Math.random() * (b - a); }
 function petPlace(p, el){
@@ -1656,8 +1663,8 @@ function pilgrimMessages(){
   return list;
 }
 
-function pilgrimSay(text){
-  var scene = document.getElementById("pixSceneBox"), pil = document.getElementById("pilgrim"), b = document.getElementById("pilgrimBubble");
+function pilgrimSay(text, anchor, ms){   // anchor = who is talking (the pilgrim unless told otherwise), ms = how long the bubble stays
+  var scene = document.getElementById("pixSceneBox"), pil = anchor || document.getElementById("pilgrim"), b = document.getElementById("pilgrimBubble");
   if(!scene || !pil || !b) return;
   b.classList.remove("show"); b.textContent = text;
   b.style.visibility = "hidden"; b.style.display = "block";   // measure it before showing
@@ -1671,7 +1678,14 @@ function pilgrimSay(text){
   void b.offsetWidth;
   b.classList.add("show");
   clearTimeout(pilgrimBubbleTimer);
-  pilgrimBubbleTimer = setTimeout(pilgrimHide, 5200);
+  pilgrimBubbleTimer = setTimeout(pilgrimHide, ms || 5200);
+}
+// Tapping a sheep: a little hop and a "baaaa" bubble above it.
+function petTap(id){
+  var el = document.getElementById(id); if(!el) return;
+  el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop");
+  setTimeout(function(){ el.classList.remove("hop"); }, 450);
+  pilgrimSay(t("sheepSays"), el, 2200);
 }
 function pilgrimHide(){
   clearTimeout(pilgrimBubbleTimer);
@@ -2011,6 +2025,17 @@ function initFaithMatchLevel(levelIdx){
   saveState();
 }
 
+// The first tile of a pair has its own sound (sound_effect_10, 2026-10-20, per Dan) in place of the button sound. The second tile keeps the
+// button sound, then the match / miss sound (see fmFlip).
+function fmIsFirstTile(cardId){
+  var s = state.session.faithMatch;
+  if(!s || s.status !== "playing" || s.levelDone || s.celebrate || s.chances <= 0 || s.flipped.length !== 0) return false;
+  var c = s.cards[cardId];
+  return !!c && !c.matched;
+}
+function fmPress(cardId){ pixPressSfx(fmIsFirstTile(cardId) ? "fmFirst" : null); }
+function fmClick(cardId){ pixClickSfx(fmIsFirstTile(cardId) ? "fmFirst" : null); fmFlip(cardId); }
+
 function fmFlip(cardId){
   var s = state.session.faithMatch;
   if(!s || s.status !== "playing" || s.levelDone || s.celebrate || s.chances <= 0) return;
@@ -2170,7 +2195,7 @@ function screenFaithMatch(){
     // one/two blank-white frames first under the default async decoding.
     // Forcing a synchronous decode removes that flash (2026-09-30, per Dan).
     var inner = shown ? '<img src="' + c.symbol + '" alt="" decoding="sync">' : "";
-    return '<div class="' + cls + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();fmFlip(' + c.id + ')">' + inner + '</div>';
+    return '<div class="' + cls + '" onpointerdown="fmPress(' + c.id + ')" onclick="fmClick(' + c.id + ')">' + inner + '</div>';
   }).join("");
 
   return pixShell('<h2 class="pixMTitle">' + t("faithMatchName") + '</h2>' +
