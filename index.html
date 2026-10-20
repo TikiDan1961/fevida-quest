@@ -172,6 +172,12 @@
   .missionTile .lbl{font-size:.68rem;margin-top:4px;display:block;font-weight:600;}
   .missionTile .chk{font-size:.9rem;color:var(--good);}
   .passportTile{grid-column:span 3;}
+  /* coming-soon tiles on the Main Menu */
+  .missionTile.soon{opacity:.6;border-style:dashed;cursor:default;}
+  .missionTile.soon:active{box-shadow:none;}
+  .missionTile .tag{display:block;font-size:.6rem;letter-spacing:.05em;color:var(--gold);margin-top:3px;}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);transform:translateX(-50%);background:rgba(20,10,35,.94);color:var(--cream);border:2px solid var(--gold);border-radius:14px;padding:10px 20px;font-size:.95rem;font-weight:700;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;}
+  .toast.show{opacity:1;}
   /* Pinned exit button shown during a mission -- see exitBarHtml(). The bar
      has no height, so it takes no room and nothing below it moves. */
   .exitBar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);height:0;z-index:20;}
@@ -350,6 +356,10 @@ var T = {
     followLightName:"Follow the Light", wordUnscrambleName:"Word Unscramble",
     catchLightName:"Catch the Light", kindnessSortName:"Acts of Kindness",
     hiddenBlessingsName:"Hidden Blessings",
+    // names for the Main Menu's coming-soon tiles (2026-10-19, per Dan)
+    emojiStoriesName:"Emoji Bible Stories", lightCandleName:"Light a Candle", jesusTimelineName:"Life of Jesus Timeline",
+    pathOfLightName:"Path of Light", tbdName:"TBD",
+    comingSoon:"COMING SOON", comingSoonToast:"Coming soon!",
 
     fl_repeat:"REPEAT PATTERN", fl_incorrect:"INCORRECT TILE!", fl_tryAgainMsg:"TRY AGAIN",
     fl_failTitle:"So Close!", fl_failBody:"You ran out of chances — give it another try from Level 1.",
@@ -433,6 +443,9 @@ var T = {
     followLightName:"Sigue la Luz", wordUnscrambleName:"Desordena Palabras",
     catchLightName:"Atrapa la Luz", kindnessSortName:"Actos de Bondad",
     hiddenBlessingsName:"Bendiciones Escondidas",
+    emojiStoriesName:"Historias Bíblicas en Emojis", lightCandleName:"Enciende una Vela", jesusTimelineName:"Línea de Tiempo de la Vida de Jesús",
+    pathOfLightName:"Camino de Luz", tbdName:"Por definir",
+    comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
 
     fl_repeat:"REPITE EL PATRÓN", fl_incorrect:"¡FICHA INCORRECTA!", fl_tryAgainMsg:"INTÉNTALO DE NUEVO",
     fl_failTitle:"¡Tan Cerca!", fl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
@@ -868,6 +881,27 @@ function openMission(id){
   else if(id === "hiddenBlessings"){ initHiddenBlessings(); go("hiddenBlessings"); }
 }
 
+// Placeholder tiles for missions that are planned but not built yet (2026-10-19, per Dan).
+// To make one real: add it to MISSIONS, build its screen, and delete it from this list.
+var COMING_SOON_MISSIONS = [
+  {id:"emojiStories", icon:"📖", nameKey:"emojiStoriesName"},
+  {id:"lightCandle", icon:"🕯️", nameKey:"lightCandleName"},
+  {id:"jesusTimeline", icon:"⏳", nameKey:"jesusTimelineName"},
+  {id:"pathOfLight", icon:"🧭", nameKey:"pathOfLightName"},
+  {id:"tbd", icon:"❓", nameKey:"tbdName"}
+];
+
+var toastTimer = null;
+function comingSoon(){
+  var el = document.getElementById("toast");
+  if(!el){ el = document.createElement("div"); el.id = "toast"; el.className = "toast"; document.body.appendChild(el); }
+  el.textContent = t("comingSoonToast");
+  void el.offsetWidth; // let the fade-in start from hidden
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 1600);
+}
+
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var tiles = MISSIONS.map(function(m){
@@ -876,6 +910,15 @@ function screenMainMenu(){
       '<span class="ic">' + (done ? "✅" : m.icon) + '</span>' +
       '<span class="lbl">' + t(m.nameKey) + '</span>' +
       (done ? '<span class="chk">✓ ' + t("done") + '</span>' : '') +
+    '</div>';
+  }).join("");
+  // Room for 15 missions: the five tiles after the real ten are placeholders (they are NOT in
+  // MISSIONS, so they add no points, saved state or Passport pages) until each game is built.
+  tiles += COMING_SOON_MISSIONS.map(function(m){
+    return '<div class="missionTile soon" onclick="comingSoon()">' +
+      '<span class="ic">' + m.icon + '</span>' +
+      '<span class="lbl">' + t(m.nameKey) + '</span>' +
+      '<span class="tag">' + t("comingSoon") + '</span>' +
     '</div>';
   }).join("");
   tiles += '<div class="missionTile passportTile" onclick="openPassport()">' +
