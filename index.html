@@ -286,18 +286,38 @@
   .photoPreview{width:100%;border-radius:16px;border:3px solid var(--gold);margin:10px 0;object-fit:cover;max-height:340px;}
   .cameraIconBox{font-size:4rem;text-align:center;margin:18px 0;}
 
-  .passportBook{background:linear-gradient(160deg,#fff,#f1e2c4);color:var(--ink);border-radius:18px;border:4px solid var(--gold);flex:1;min-height:280px;overflow:hidden;position:relative;}
+  /* Passport in 8-bit style (2026-10-19, per Dan): pixel sky behind, a cream page with a gold inner edge, pixel badges at 4x. */
+  .pixPassport{height:100dvh;min-height:0;}
+  .passHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;}
+  .passHeadSpace{width:44px;flex:none;}
+  .passTitle{flex:1;margin:0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
+  .passClose{flex:none;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
+  .passClose:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
+  .passportBook{background:#FFF3D6;color:#1E2F7A;border:4px solid #1B1F3B;border-radius:14px;box-shadow:inset 0 0 0 4px #FFC93A,0 6px 0 rgba(20,30,90,.4);flex:1;min-height:280px;overflow:hidden;position:relative;}
   /* Width no longer fixed here (was 1100% / 11 pages) -- the track carries
      2 extra "phantom" clone slides for the wrap animation (see screenPassport),
      so both widths are set inline per-render from PASSPORT_TRACK_SLOTS instead. */
   .passportTrack{display:flex;height:100%;}
-  .passportPage{flex-shrink:0;box-sizing:border-box;padding:18px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;}
-  .passportBadge{font-size:4.5rem;margin:10px 0;}
-  .passportNav{display:flex;justify-content:space-between;align-items:center;margin:12px 0;}
-  .navArrow{font-size:2rem;background:none;border:none;color:var(--gold);cursor:pointer;padding:6px 16px;}
-  .dots{display:flex;gap:6px;justify-content:center;margin:6px 0 2px;}
-  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);}
-  .dot.active{background:var(--gold);}
+  .passportPage{flex-shrink:0;box-sizing:border-box;padding:22px 18px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;}
+  .pxNote{font-weight:600;font-size:.875rem;letter-spacing:.06em;color:#1E2F7A;opacity:.8;margin-bottom:12px;}
+  .badge8{width:192px;height:192px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
+  .badge8Locked{width:192px;height:192px;border-radius:50%;background:#C9CFDD;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 6px #AEB6C8;}
+  .badge8Locked img{width:96px;height:96px;image-rendering:pixelated;}
+  .pxBadgeName{margin-top:16px;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#1E2F7A;}
+  .pxBadgeMission{margin-top:6px;font-weight:500;font-size:1rem;color:#5666a8;}
+  .pxPhoto{width:100%;max-height:240px;border:4px solid #1B1F3B;border-radius:10px;object-fit:cover;image-rendering:auto;}
+  .passportNav{display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px;}
+  .navArrow{width:56px;height:48px;border:3px solid #1B1F3B;border-radius:12px;background:#FFC93A;color:#1B1F3B;cursor:pointer;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;padding:0 0 3px;
+    box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.45);}
+  .navArrow:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.9);}
+  .dots{display:flex;gap:6px;justify-content:center;margin:12px 0 2px;flex-wrap:wrap;}
+  .dot{width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,.55);border:2px solid #1B1F3B;box-sizing:border-box;}
+  .dot.active{background:#FFC93A;}
 
   .ticketBox{background:linear-gradient(160deg,var(--gold),#c99a2e);color:var(--ink);border-radius:18px;padding:26px 18px;text-align:center;border:3px dashed var(--ink);margin:16px 0;}
   .ticketBox .tk{font-size:3.5rem;}
@@ -2594,16 +2614,46 @@ function passportTouchEnd(ev){
   else if(dx < -40) passportNav(1);
 }
 
+// TEMPORARY test aid (2026-10-19, per Dan): while true, every Passport badge page shows its badge as
+// earned, so all ten 8-bit badges can be checked. Set to false for the real thing (then only badges
+// a player has won appear, the rest show a padlock).
+var PASSPORT_SHOW_ALL = true;
+
+// The 8-bit version of a mission's badge: tiles/badges8/b8_<name>.png (48x48 pixels, made from the
+// artwork in the Badges folder), shown at 4x.
+function badge8Src(m){ return m.badgeImg.replace("tiles/badge_", "tiles/badges8/b8_"); }
+
 function passportPageInner(page){
   if(page < MISSIONS.length){
     var m = MISSIONS[page];
-    var earned = state.missions[m.id].badge;
-    return '<p class="smallNote">' + t("missionBadge")(page+1) + '</p>' +
-      (earned ? badgeImgHtml(m, 120) : '<div class="passportBadge">❔</div>') +
-      '<p><strong>' + (earned ? t(m.themeKey) : t("badgeLocked")) + '</strong></p>';
+    var earned = PASSPORT_SHOW_ALL || state.missions[m.id].badge;
+    return '<div class="pxNote">' + t("missionBadge")(page+1) + '</div>' +
+      (earned ? '<img class="badge8" src="' + badge8Src(m) + '" alt="">'
+              : '<div class="badge8Locked"><img src="tiles/icons/ic_lock.png" alt=""></div>') +
+      '<div class="pxBadgeName">' + (earned ? t(m.themeKey) : t("badgeLocked")) + '</div>' +
+      '<div class="pxBadgeMission">' + t(m.nameKey) + '</div>';
   }
-  return '<p class="smallNote">' + t("joyousPhotoPage") + '</p>' +
-    (state.photo ? '<img class="photoPreview" src="' + state.photo + '" style="max-height:220px;">' : '<div class="passportBadge">❔</div><p>' + t("badgeLocked") + '</p>');
+  return '<div class="pxNote">' + t("joyousPhotoPage") + '</div>' +
+    (state.photo ? '<img class="photoPreview pxPhoto" src="' + state.photo + '" alt="">'
+                 : '<div class="badge8Locked"><img src="tiles/icons/ic_lock.png" alt=""></div><div class="pxBadgeName">' + t("badgeLocked") + '</div>');
+}
+
+// The X: the Passport shrinks back into its icon on the Home Screen.
+function closePassport(){
+  go("mainMenu");
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var tile = document.querySelector(".homeGrid .appIcon:nth-child(2) .appTile");
+  if(calm || !tile) return;
+  var r = tile.getBoundingClientRect(), c = tile.cloneNode(true);
+  c.className = "expandClone";
+  c.style.cssText = "left:0px;top:0px;width:" + window.innerWidth + "px;height:" + window.innerHeight + "px;border-radius:0px;background:" + tile.style.background + ";";
+  var spr = c.querySelector("img"); if(spr) spr.style.transform = "scale(8)";
+  document.body.appendChild(c);
+  void c.offsetWidth;
+  c.style.left = r.left + "px"; c.style.top = r.top + "px"; c.style.width = r.width + "px"; c.style.height = r.height + "px"; c.style.borderRadius = "16px";
+  if(spr) spr.style.transform = "scale(1)";
+  setTimeout(function(){ c.style.opacity = "0"; }, 260);
+  setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); }, 560);
 }
 
 function screenPassport(){
@@ -2620,17 +2670,22 @@ function screenPassport(){
   for(var i=0;i<PASSPORT_PAGES;i++) pagesHtml += '<div class="passportPage" ' + pageStyle + '>' + passportPageInner(i) + '</div>';
   pagesHtml += '<div class="passportPage" ' + pageStyle + '>' + passportPageInner(0) + '</div>';
 
-  return '<div class="screen">' +
-    '<h2>' + t("passportTitle") + '</h2>' +
+  // 8-bit look (2026-10-19, per Dan): the pixel sky, a cream passport page, an X in the corner.
+  return '<div class="screen pixHome pixSky pixPassport">' +
+    '<div class="pixSkyClouds"></div>' +
+    '<div class="passHeader">' +
+      '<span class="passHeadSpace"></span>' +
+      '<h2 class="passTitle">' + t("passportTitle") + '</h2>' +
+      '<button class="passClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closePassport()" aria-label="' + t("mainMenu") + '">X</button>' +
+    '</div>' +
     '<div class="passportBook" ontouchstart="passportTouchStart(event)" ontouchend="passportTouchEnd(event)">' +
       '<div class="passportTrack" id="passportTrack" style="width:' + (PASSPORT_TRACK_SLOTS*100) + '%;transform:translateX(-' + ((page+1)*100/PASSPORT_TRACK_SLOTS) + '%)">' + pagesHtml + '</div>' +
     '</div>' +
     '<div class="dots">' + dotsHtml + '</div>' +
     '<div class="passportNav">' +
-      '<button class="navArrow" onclick="passportNav(-1)">‹</button>' +
-      '<button class="navArrow" onclick="passportNav(1)">›</button>' +
+      '<button class="navArrow" onpointerdown="pixPressSfx()" onclick="passportNav(-1)" aria-label="Previous">&lt;</button>' +
+      '<button class="navArrow" onpointerdown="pixPressSfx()" onclick="passportNav(1)" aria-label="Next">&gt;</button>' +
     '</div>' +
-    '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
   '</div>';
 }
 
