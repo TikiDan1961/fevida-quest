@@ -219,6 +219,8 @@
   @keyframes pilgrimStep{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
   /* the dog and the cat wander about inside their own invisible areas (see PETS) */
   .pixPet{position:absolute;z-index:1;pointer-events:none;}
+  /* the fence by the dog sits in its own picture, drawn over the pets, so the dog walks behind it */
+  .pixFenceFront{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;z-index:2;pointer-events:none;}
   .petFlip{width:100%;height:100%;}
   .petFlip.left{transform:scaleX(-1);}
   .petSprite{width:100%;height:100%;background-size:200% 100%;background-repeat:no-repeat;image-rendering:pixelated;animation:petBreath 2.4s steps(1) infinite;}
@@ -1096,13 +1098,17 @@ function pixBlip(ctx){
 }
 // ---- sound effects (2026-10-20, per Dan) ----
 // sounds/sfx_tap.wav (a trimmed copy of sound_effect_4) is the button sound everywhere; sfx_correct / sfx_wrong (sound_effect_1 / _2)
-// are Faith Flash's answer sounds; sfx_level_clear (sound_effect_3) is Faith Match's level clear. The files are fetched when the app
+// are Faith Flash's answer sounds; sfx_fm_* (sound_effects 6-9) are Faith Match's match / miss / last-chance / level-clear fanfare. The files are fetched when the app
 // opens and decoded as soon as the first tap gives the page an audio context. Until a file is ready, taps use the old synthesized blip.
 var PIX_SFX = {
   tap:{url:"sounds/sfx_tap.wav", gain:1.6},
   correct:{url:"sounds/sfx_correct.mp3", gain:1},
   wrong:{url:"sounds/sfx_wrong.mp3", gain:1},
-  levelClear:{url:"sounds/sfx_level_clear.mp3", gain:0.9}
+  // Faith Match (2026-10-20, per Dan): sound_effect_6 = a match, _9 = a miss, _8 = the last chance used, _7 = the level-clear fanfare
+  fmMatch:{url:"sounds/sfx_fm_match.mp3", gain:0.55},
+  fmMiss:{url:"sounds/sfx_fm_miss.mp3", gain:0.55},
+  fmLast:{url:"sounds/sfx_fm_last.mp3", gain:1},
+  fmFanfare:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.55}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -1156,6 +1162,7 @@ function pixPressSfx(){
   var ctx = pixCtx(); if(!ctx) return;
   pixSfxDecodeAll();
   pixBlipPlayed = false;
+  if(pixAudioStale) return;   // the engine may be dead after sleep: the click (after the fresh engine is made) plays this tap's sound
   if(ctx.state === "running"){ pixTap(ctx); pixBlipPlayed = true; }
   else if(ctx.resume) { try { var p = ctx.resume(); if(p && p.catch) p.catch(function(){}); } catch(e){} }
 }
@@ -1167,6 +1174,66 @@ function pixClickSfx(){
   if(ctx.state === "running"){ pixTap(ctx); return; }
   try { var p = ctx.resume(); if(p && p.then) p.then(function(){ pixTap(ctx); }).catch(function(){}); } catch(e){}
 }
+
+// ---- the sound engine after sleep or switching apps (2026-10-20, per Dan) -- the same fix as the Weird NJ app ----
+// When the phone sleeps, or the app is backgrounded, iOS can leave the audio engine dead -- and it may still REPORT "running" while silent --
+// so every sound afterwards is silent. So whenever the page is hidden, loses focus, is closed or frozen, the audio context is marked stale,
+// and the first real tap afterwards replaces it with a brand-new context created INSIDE that tap (the one way iOS always allows audio to
+// start), plus a very short silent <audio> clip to wake the phone's media session. The decoded sounds are plain data and carry over. The old
+// context is kept (closing one can silence its replacement) and only the oldest are closed.
+var pixAudioStale = false, pixAudioOld = [], pixSilentWavUrl = null;
+function pixMarkAudioStale(){ if(pixAudioCtx) pixAudioStale = true; }
+function pixPlaySilentClip(){
+  try {
+    if(!pixSilentWavUrl){
+      var n = 800, bytes = new Uint8Array(44 + n), dv = new DataView(bytes.buffer);
+      var str = function(o, txt){ for(var i = 0; i < txt.length; i++) bytes[o + i] = txt.charCodeAt(i); };
+      str(0, "RIFF"); dv.setUint32(4, 36 + n, true); str(8, "WAVE"); str(12, "fmt "); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+      dv.setUint32(24, 8000, true); dv.setUint32(28, 8000, true); dv.setUint16(32, 1, true); dv.setUint16(34, 8, true); str(36, "data"); dv.setUint32(40, n, true);
+      for(var j = 0; j < n; j++) bytes[44 + j] = 128;   // 8-bit silence
+      pixSilentWavUrl = URL.createObjectURL(new Blob([bytes], {type:"audio/wav"}));
+    }
+    var el = new Audio(pixSilentWavUrl); el.setAttribute("playsinline", ""); el.volume = 0.05;
+    var pr = el.play(); if(pr && pr.catch) pr.catch(function(){});
+  } catch(e){}
+}
+function pixFreshAudio(){
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+    var old = pixAudioCtx;
+    // iOS 16.4+: ask the phone to re-evaluate the page's audio session ("playback" = plays even with the silent switch on, as before)
+    try { if(navigator.audioSession){ navigator.audioSession.type = "auto"; navigator.audioSession.type = "playback"; } } catch(e){}
+    pixAudioCtx = new AC();
+    var p = pixAudioCtx.resume(); if(p && p.catch) p.catch(function(){});
+    var silent = pixAudioCtx.createBufferSource(); silent.buffer = pixAudioCtx.createBuffer(1, 1, 22050);
+    silent.connect(pixAudioCtx.destination); silent.start(0);
+    pixPlaySilentClip();
+    if(old){ pixAudioOld.push(old); while(pixAudioOld.length > 2){ try { pixAudioOld.shift().close(); } catch(e){} } }
+    var c = pixAudioCtx, t0 = c.currentTime;
+    setTimeout(function(){ if(c === pixAudioCtx && c.currentTime <= t0 + 0.05) pixAudioStale = true; }, 500);   // clock not moving: a dead engine, replace it again on the next tap
+  } catch(e){}
+}
+document.addEventListener("visibilitychange", pixMarkAudioStale);
+window.addEventListener("pagehide", pixMarkAudioStale);
+window.addEventListener("pageshow", pixMarkAudioStale);
+window.addEventListener("blur", pixMarkAudioStale);
+window.addEventListener("focus", pixMarkAudioStale);
+document.addEventListener("freeze", pixMarkAudioStale);
+document.addEventListener("resume", pixMarkAudioStale);
+// A phone that sleeps freezes the page's timers without always saying so: if this once-a-second beat arrives much later than a second after
+// the last, the page was frozen and the audio engine can't be trusted.
+var pixAudioBeat = Date.now();
+setInterval(function(){ var now = Date.now(), gap = now - pixAudioBeat; pixAudioBeat = now; if(gap > 4000) pixMarkAudioStale(); }, 1000);
+// registered before the tap-sound listeners below, so after waking, the fresh context exists before that tap's sound plays
+function pixReviveOnTap(){
+  if(!pixAudioCtx) return;
+  var interrupted = pixAudioCtx.state === "interrupted";
+  if(!pixAudioStale && !interrupted) return;
+  pixAudioStale = false;
+  pixFreshAudio();
+}
+document.addEventListener("touchend", pixReviveOnTap, true);
+document.addEventListener("click", pixReviveOnTap, true);
 
 // Every button, icon and tile that can be tapped makes the button sound -- including the ones with no sound wired in by hand.
 var PIX_TAP_SELECTOR = "button, [role=button], .appIcon, .matchCard, .flPad, .hbSpot";
@@ -1405,8 +1472,8 @@ function pilgrimPoint(f){
 // The dog and the cat each wander about inside their own invisible area of the lawn (2026-10-20, per Dan): box = where their feet can go,
 // in picture pixels. They walk to a random spot, stand a moment, then pick another.
 var PETS = [
-  {id:"petDog", kind:"dog", w:18, h:13, speed:10, box:{x0:66, x1:100, y0:106, y1:115}},
-  {id:"petCat", kind:"cat", w:16, h:13, speed:7,  box:{x0:40, x1:62,  y0:106, y1:113}}
+  {id:"petDog", kind:"dog", w:18, h:13, speed:10, box:{x0:66, x1:114, y0:105, y1:117}},
+  {id:"petCat", kind:"cat", w:16, h:13, speed:7,  box:{x0:30, x1:58,  y0:84,  y1:91}}   // the open grass on the left, one bend up from where the cat used to be
 ];
 var petState = {}, petsRaf = 0;   // petState keeps where each one is, so a redraw of the screen doesn't move them
 function petHtml(p){
@@ -1463,6 +1530,7 @@ function pilgrimSceneHtml(extra){
     '<img class="pixSpark" src="tiles/spark.png" alt="">' +
     '<div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div>' +
     PETS.map(petHtml).join("") +
+    '<img class="pixFenceFront" src="tiles/fence_front.png" alt="">' +
     '<div class="pilgrim" id="pilgrim" role="button" aria-label="Pilgrim" onclick="pilgrimTap()"><div class="pilgrimFlip"><div class="pilgrimSprite"></div></div></div>' +
     '<div class="pilgrimBubble" id="pilgrimBubble" onclick="pilgrimHide()"></div>' +
   '</div>' + (extra || "") + '</div>';
@@ -1854,9 +1922,9 @@ function fmFlip(cardId){
   s.flipped.push(cardId);
   if(s.flipped.length === 2){
     var a = s.cards[s.flipped[0]], b = s.cards[s.flipped[1]];
-    // the second tile is tapped: sound_effect_1 for a match, sound_effect_2 for a miss (2026-10-20, per Dan). If this match
+    // the second tile is tapped: a match, a miss and the last chance used each have their own sound (2026-10-20, per Dan). If this match
     // finishes the level, the level-clear sound takes over a moment later (see fmCelebrate).
-    pixSfxPlay(a.symbol === b.symbol ? "correct" : "wrong", true);
+    pixSfxPlay(a.symbol === b.symbol ? "fmMatch" : (s.chances <= 1 ? "fmLast" : "fmMiss"), true);   // s.chances is not lowered until the miss resolves, so 1 means this miss is the last chance
     if(a.symbol === b.symbol){
       // A correct match resolves immediately -- unlike a mismatch, there's
       // no reason to pause on it to let the player study both cards before
@@ -1923,7 +1991,7 @@ function fmCelebrate(){
     if(!s2 || !(s2.levelDone || s2.celebrate) || state.screen !== "faithMatch"){ fmCelebrating = false; return; } // the player left
     s2.celebrate = true;
     saveState(); render();                     // every tile goes to normal brightness
-    pixSfxPlay("levelClear", false);           // not exclusive: the tail of the match sound is allowed to finish underneath
+    pixSfxPlay("fmFanfare", false);           // not exclusive: the tail of the match sound is allowed to finish underneath
     var step = 0, last = -1, t0 = performance.now();
     function tick(){
       var s3 = state.session.faithMatch;
