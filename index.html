@@ -121,9 +121,22 @@
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
   .btn.pixBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 18px 8px rgba(120,255,120,.8);}
   .btn.pixBtn.secondary:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  /* Welcome screen: the church-interior picture (125x270 pixels, drawn at the full screen
+     width and anchored to the bottom so the pews stay under the buttons; any extra height
+     at the top is ceiling brown). */
+  .pixChurch{padding-top:calc(env(safe-area-inset-top,0px) + 16px);
+    background:url("tiles/church_interior.png") center bottom / 100% auto no-repeat,#6B4423;}
+  .pixWelcomeCard{padding:14px 16px 14px;}
+  .pixWelTitle{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 8px;}
+  .pixWelBody{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1rem;line-height:1.35;letter-spacing:.01em;color:#2A3A78;margin:0;}
+  .btn.pixBtn.pixBtnWide{width:min(88%,320px);font-size:1.25rem;}
   /* Shorter phones: shrink the card (QR 145px -> 116px, whole 4px per module) so the
      church stays visible above it. */
   @media (max-height:740px){
+    /* welcome card: a smaller title and tighter lines so it clears the crucifix on short phones */
+    .pixWelcomeCard{padding:10px 14px;}
+    .pixWelTitle{font-size:1rem;margin-bottom:6px;}
+    .pixWelBody{line-height:1.25;}
     .pixQuest{font-size:3rem;margin-top:0;}
     .pixCard{padding:10px 14px 6px;}
     .pixQr{width:148px;height:148px;margin:6px auto 8px;padding:12px;}
@@ -801,14 +814,17 @@ function screenLanguage(){
   '</div>';
 }
 
+// Welcome screen (2026-10-19, per Dan): pixel-art church interior (tiles/church_interior.png)
+// -- the welcome card on the wall above the altar, the buttons over the pews.
 function screenWelcome(){
-  return '<div class="screen center">' +
+  return '<div class="screen pixHome pixChurch">' +
+    '<div class="pixCard pixWelcomeCard">' +
+      '<h1 class="pixWelTitle">' + t("welcomeTitle") + '</h1>' +
+      '<p class="pixWelBody">' + t("welcomeBody") + '</p>' +
+    '</div>' +
     '<div class="spacer"></div>' +
-    '<h1>' + t("welcomeTitle") + '</h1>' +
-    '<p>' + t("welcomeBody") + '</p>' +
-    '<div class="spacer"></div>' +
-    '<button class="btn gold" onclick="go(\'mainMenu\')">' + t("startQuest") + '</button>' +
-    '<button class="btn outline" onclick="go(\'language\')">' + t("changeLanguage") + '</button>' +
+    '<button class="btn pixBtn pixBtnWide" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'mainMenu\')">' + t("startQuest") + '</button>' +
+    '<button class="btn pixBtn pixBtnWide secondary" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'language\')">' + t("changeLanguage") + '</button>' +
   '</div>';
 }
 
