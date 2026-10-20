@@ -205,11 +205,11 @@
   @keyframes glowPulseLit{from{opacity:.45;}to{opacity:.85;}}
   .pixSpark{position:absolute;left:46.8%;top:.21%;width:5.6%;image-rendering:pixelated;animation:sparkBlink 2.6s steps(1) infinite;}
   @keyframes sparkBlink{0%{opacity:0;}55%{opacity:1;}65%{opacity:.35;}75%{opacity:1;}85%{opacity:0;}100%{opacity:0;}}
-  .pixDove{position:absolute;left:-18%;top:5%;width:19.2%;aspect-ratio:24/17;animation:doveFly 28s linear infinite;animation-delay:-3s;}
-  @keyframes doveFly{0%{left:-18%;}55%{left:112%;}100%{left:112%;}}
+  .pixDove{position:absolute;left:-14%;top:5%;width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-delay:-3s;}
+  @keyframes doveFly{0%{left:-14%;}55%{left:112%;}100%{left:112%;}}
   .pixDoveBob{width:100%;height:100%;animation:doveBob 3.2s ease-in-out infinite alternate;}
   @keyframes doveBob{from{transform:translateY(-35%);}to{transform:translateY(35%);}}
-  .pixDoveSprite{width:100%;height:100%;background:url("tiles/dove2.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:doveFlap .36s steps(1) infinite;}
+  .pixDoveSprite{width:100%;height:100%;background:url("tiles/dove3.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:doveFlap .36s steps(1) infinite;}
   @keyframes doveFlap{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
   .pilgrim{position:absolute;width:8.8%;aspect-ratio:11/15;z-index:2;pointer-events:auto;cursor:pointer;}
   .pilgrim::before{content:"";position:absolute;left:-60%;right:-60%;top:-40%;bottom:-15%;}
@@ -229,8 +229,9 @@
   .petFlip{width:100%;height:100%;}
   .petFlip.left{transform:scaleX(-1);}
   .petSprite{width:100%;height:100%;background-size:200% 100%;background-repeat:no-repeat;image-rendering:pixelated;animation:petBreath 2.4s steps(1) infinite;}
-  .petSprite.sheep{background-image:url("tiles/sheep.png");}
-  .pixPet::before{content:"";position:absolute;left:-25%;right:-25%;top:-35%;bottom:-20%;}   /* a bigger target for a finger */
+  .petSprite.sheepNear{background-image:url("tiles/sheep_near.png");}
+  .petSprite.sheepFar{background-image:url("tiles/sheep_far.png");}
+  .pixPet::before{content:"";position:absolute;left:-35%;right:-35%;top:-50%;bottom:-30%;}   /* a bigger target for a finger */
   .pixPet.hop{animation:pilgrimHop .4s ease-out;}
   .pixPet.walking .petSprite{animation:petStep .4s steps(1) infinite,pilgrimBob .4s steps(1) infinite;}
   @keyframes petBreath{0%{transform:translateY(0);}50%{transform:translateY(-7%);}100%{transform:translateY(0);}}
@@ -256,6 +257,15 @@
   @keyframes pixCloudDrift{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   @media (prefers-reduced-motion:reduce){ .pixSkyClouds{animation:none;} }
   .pixSky > *:not(.pixSkyClouds){position:relative;z-index:1;}
+  .pixHome.pixSky > .backBtn{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:5;width:42px;height:42px;padding:0 0 3px;display:flex;align-items:center;justify-content:center;
+    border:3px solid #1B1F3B;border-radius:12px;background:#3A93E8;cursor:pointer;box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
+  .backBtn img{width:32px;height:32px;image-rendering:pixelated;pointer-events:none;}
+  .backBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #DCEEFF,0 0 16px 6px rgba(110,190,255,.85);}
+  @media (max-width:340px){   /* keeps the title clear of the back icon on the smallest phones */
+    .pixMenu .pixMenuTitle{font-size:1.625rem;}
+    .pixHome.pixSky > .backBtn{left:10px;width:38px;height:38px;}
+    .backBtn img{width:28px;height:28px;}
+  }
   .pixMenuTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;line-height:1.1;letter-spacing:.02em;text-align:center;margin:2px 0 8px;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
   .pixMenu .progressWrap{margin:6px 0 16px;}
@@ -306,7 +316,11 @@
   .missionTile.soon{opacity:.6;border-style:dashed;cursor:default;}
   .missionTile.soon:active{box-shadow:none;}
   .missionTile .tag{display:block;font-size:.6rem;letter-spacing:.05em;color:var(--gold);margin-top:3px;}
-  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);transform:translateX(-50%);background:rgba(20,10,35,.94);color:var(--cream);border:2px solid var(--gold);border-radius:14px;padding:10px 20px;font-size:.95rem;font-weight:700;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;}
+  /* Messages ("Earn 500 Quest Points...", "Coming soon!") are drawn like the blue pixel buttons: the same frame and 8-bit lettering (2026-10-20, per Dan) */
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);transform:translateX(-50%);box-sizing:border-box;width:max-content;max-width:min(88vw,360px);text-align:center;
+    padding:10px 18px 12px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.2;letter-spacing:.04em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 4px 0 rgba(20,30,90,.25);
+    z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;}
   .toast.show{opacity:1;}
   /* Pinned exit button shown during a mission -- see exitBarHtml(). The bar
      has no height, so it takes no room and nothing below it moves. */
@@ -643,7 +657,7 @@ var T = {
     pathOfLightName:"Path of Light", tbdName:"TBD",
     comingSoon:"COMING SOON", comingSoonToast:"Coming soon!",
     missionsFolder:"Missions", goldenTicketLabel:"Golden Ticket",
-    sheepSays:"baaaa",
+    sheepSays:"baaaa", backLabel:"Back to the welcome screen",
     optionsLabel:"Options", optionsTitle:"Options", sfxVolume:"Sound Effects", musicVolume:"Music",
     pilgrimStart:"Hi, I'm Pilgrim! Open Missions to start our journey.", pilgrimNice:"Great job! Let's keep walking with faith.",
     pilgrimTry:function(n){return "Try "+n+" next!";}, pilgrimToGo:function(n){return n+" more game"+(n === 1 ? "" : "s")+" to reach the church!";},
@@ -737,7 +751,7 @@ var T = {
     pathOfLightName:"Camino de Luz", tbdName:"Por definir",
     comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
     missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
-    sheepSays:"beeee",
+    sheepSays:"beeee", backLabel:"Volver a la pantalla de bienvenida",
     optionsLabel:"Opciones", optionsTitle:"Opciones", sfxVolume:"Efectos de sonido", musicVolume:"Música",
     pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.",
     pilgrimTry:function(n){return "¡Prueba "+n+"!";}, pilgrimToGo:function(n){return n === 1 ? "¡Falta 1 juego para llegar a la iglesia!" : "¡Faltan "+n+" juegos para llegar a la iglesia!";},
@@ -1250,6 +1264,7 @@ function pixSfxPlay(name, exclusive){
 }
 // the button sound; the old blip stands in only while the file has not arrived yet
 function pixTap(ctx, name){
+  if(name === "none") return;                                  // this tap is meant to be silent (the second Faith Match tile: its match / miss sound is enough)
   if(typeof name !== "string") name = "tap";                  // no name (or an event passed by mistake) = the button sound
   if(!pixSfxPlay(name, name !== "tap") && !pixSfxBytes[name]) pixBlip(ctx);
 }
@@ -1475,7 +1490,7 @@ function toast(text){
   void el.offsetWidth; // let the fade-in start from hidden
   el.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2600);   // long enough to read the longer messages
 }
 function comingSoon(){ toast(t("comingSoonToast")); }
 function ticketLocked(){ toast(t("ticketLocked")(GOLDEN_TICKET_POINTS)); }
@@ -1576,8 +1591,8 @@ function pilgrimPoint(f){
 // The two sheep each wander about inside their own invisible area of the lawn (2026-10-20, per Dan): box = where their feet can go,
 // in picture pixels. They walk to a random spot, stand a moment, then pick another.
 var PETS = [
-  {id:"petSheep1", kind:"sheep", w:18, h:14, speed:10, box:{x0:66, x1:114, y0:105, y1:117}},
-  {id:"petSheep2", kind:"sheep", w:18, h:14, speed:7,  box:{x0:30, x1:58,  y0:84,  y1:91}}   // the open grass on the left, one bend up (the dog and the cat became white sheep, 2026-10-20, per Dan)
+  {id:"petSheep1", kind:"sheepNear", w:16, h:12, speed:10, box:{x0:66, x1:114, y0:105, y1:117}},
+  {id:"petSheep2", kind:"sheepFar", w:14, h:11, speed:7,  box:{x0:30, x1:58,  y0:84,  y1:91}}   // the open grass on the left, one bend up (the dog and the cat became white sheep, 2026-10-20, per Dan)
 ];
 var petState = {}, petsRaf = 0;   // petState keeps where each one is, so a redraw of the screen doesn't move them
 function petHtml(p){
@@ -1756,6 +1771,10 @@ function pilgrimInit(isNew){
   }, 350);
 }
 
+// The back icon (2026-10-20, per Dan): the Welcome screen is the screen before the Main Menu, and its CHANGE LANGUAGE button leads to the one
+// before that. Nothing is changed here: the score, the badges, the pilgrim and the volumes all stay exactly as they are.
+function goBackToWelcome(){ go("welcome"); }
+
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var doneCount = MISSIONS.filter(function(m){ return state.missions[m.id].done; }).length;
@@ -1770,6 +1789,7 @@ function screenMainMenu(){
     appIconHtml({onclick:"openFromIcon(this,'options')", bg:ICON_BG.options, inner:iconSpr("options"), label:t("optionsLabel")});
   return '<div class="screen pixHome pixSky pixMenu">' +
     cloudsHtml() +
+    '<button class="backBtn" onclick="goBackToWelcome()" aria-label="' + t("backLabel") + '"><img src="tiles/icons/ic_back.png" alt=""></button>' +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
     '<div class="progressWrap">' +
       '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
@@ -2025,16 +2045,24 @@ function initFaithMatchLevel(levelIdx){
   saveState();
 }
 
-// The first tile of a pair has its own sound (sound_effect_10, 2026-10-20, per Dan) in place of the button sound. The second tile keeps the
-// button sound, then the match / miss sound (see fmFlip).
+// The first tile of a pair has its own sound (sound_effect_10, 2026-10-20, per Dan) in place of the button sound. The second tile has no
+// button sound at all, just the match / miss sound (see fmFlip).
 function fmIsFirstTile(cardId){
   var s = state.session.faithMatch;
   if(!s || s.status !== "playing" || s.levelDone || s.celebrate || s.chances <= 0 || s.flipped.length !== 0) return false;
   var c = s.cards[cardId];
   return !!c && !c.matched;
 }
-function fmPress(cardId){ pixPressSfx(fmIsFirstTile(cardId) ? "fmFirst" : null); }
-function fmClick(cardId){ pixClickSfx(fmIsFirstTile(cardId) ? "fmFirst" : null); fmFlip(cardId); }
+function fmIsSecondTile(cardId){
+  var s = state.session.faithMatch;
+  if(!s || s.status !== "playing" || s.levelDone || s.celebrate || s.chances <= 0 || s.flipped.length !== 1) return false;
+  var c = s.cards[cardId];
+  return !!c && !c.matched && s.flipped.indexOf(cardId) === -1;
+}
+// first tile = sound_effect_10; second tile = silent here (fmFlip plays the match / miss sound); anything else = the button sound
+function fmSoundFor(cardId){ return fmIsFirstTile(cardId) ? "fmFirst" : (fmIsSecondTile(cardId) ? "none" : null); }
+function fmPress(cardId){ pixPressSfx(fmSoundFor(cardId)); }
+function fmClick(cardId){ pixClickSfx(fmSoundFor(cardId)); fmFlip(cardId); }
 
 function fmFlip(cardId){
   var s = state.session.faithMatch;
