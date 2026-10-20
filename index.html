@@ -126,17 +126,24 @@
      at the top is ceiling brown). */
   .pixChurch{padding-top:calc(env(safe-area-inset-top,0px) + 16px);
     background:url("tiles/church_interior.png") center bottom / 100% auto no-repeat,#6B4423;}
-  .pixWelcomeCard{padding:14px 16px 14px;}
-  .pixWelTitle{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 8px;}
-  .pixWelBody{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1rem;line-height:1.35;letter-spacing:.01em;color:#2A3A78;margin:0;}
-  .btn.pixBtn.pixBtnWide{width:min(88%,320px);font-size:1.25rem;}
+  .pixWelcomeCard{padding:18px 18px 20px;}
+  .pixWelTitle{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 10px;}
+  .pixWelBody{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1.25rem;line-height:1.3;letter-spacing:.01em;color:#2A3A78;margin:0;}
+  /* Same box as the language screen's white card (width and side padding), so the buttons land in the same place and size. */
+  .pixBtnDock{width:calc(100% - 28px);max-width:420px;padding:0 16px 12px;}
+  /* The welcome buttons carry longer words in a smaller type, but keep the language buttons' exact box (51.8px tall). */
+  .btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:51.8px;display:flex;align-items:center;justify-content:center;line-height:1;padding:0 12px 3px;}
+  .btn.pixBtn.pixBtnMd{font-size:1.25rem;}
+  .btn.pixBtn.pixBtnSm{font-size:1rem;letter-spacing:.04em;}
   /* Shorter phones: shrink the card (QR 145px -> 116px, whole 4px per module) so the
      church stays visible above it. */
   @media (max-height:740px){
     /* welcome card: a smaller title and tighter lines so it clears the crucifix on short phones */
     .pixWelcomeCard{padding:10px 14px;}
     .pixWelTitle{font-size:1rem;margin-bottom:6px;}
-    .pixWelBody{line-height:1.25;}
+    .pixWelBody{font-size:1rem;line-height:1.25;}
+    .pixBtnDock{padding:0 14px 6px;}
+    .btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:43px;padding:0 12px 2px;}
     .pixQuest{font-size:3rem;margin-top:0;}
     .pixCard{padding:10px 14px 6px;}
     .pixQr{width:148px;height:148px;margin:6px auto 8px;padding:12px;}
@@ -296,7 +303,7 @@ var T = {
     chooseLanguage:"Choose Your Language",
     english:"ENGLISH", spanish:"ESPAÑOL",
     welcomeTitle:"Welcome to Fe y Vida Quest!",
-    welcomeBody:"Complete faith-filled missions around the booth to earn digital badges. Finish any 5 of the 10 to unlock your Golden Ticket for a chance at swag prizes. Ready?",
+    welcomeBody:"Complete faith-filled missions around the booth to earn digital badges. Finish any five of the 10 to unlock your Golden Ticket for a chance at swag prizes. Ready?",
     startQuest:"START YOUR QUEST", changeLanguage:"CHANGE LANGUAGE",
     mainMenu:"MAIN MENU", returnToMenu:"RETURN TO MENU", returnToMainMenu:"RETURN TO MAIN MENU",
     exitMenu:"← MENU",
@@ -379,7 +386,7 @@ var T = {
     chooseLanguage:"Elige Tu Idioma",
     english:"INGLÉS", spanish:"ESPAÑOL",
     welcomeTitle:"¡Bienvenido a Fe y Vida Quest!",
-    welcomeBody:"Completa misiones llenas de fe en el stand para ganar insignias digitales. Termina 5 de las 10 para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
+    welcomeBody:"Completa misiones llenas de fe en el stand para ganar insignias digitales. Termina cinco de las 10 para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
     startQuest:"COMIENZA TU AVENTURA", changeLanguage:"CAMBIAR IDIOMA",
     mainMenu:"MENÚ PRINCIPAL", returnToMenu:"VOLVER AL MENÚ", returnToMainMenu:"VOLVER AL MENÚ PRINCIPAL",
     exitMenu:"← MENÚ",
@@ -817,14 +824,20 @@ function screenLanguage(){
 // Welcome screen (2026-10-19, per Dan): pixel-art church interior (tiles/church_interior.png)
 // -- the welcome card on the wall above the altar, the buttons over the pews.
 function screenWelcome(){
+  // The buttons are exactly the language screen's size and spot: same 78%-of-the-card-width button,
+  // same card-width dock at the bottom. Their words are longer than ENGLISH / ESPAÑOL, so the
+  // type is smaller when the longer label (Spanish) needs it to fit on one line.
+  var fit = Math.max(t("startQuest").length, t("changeLanguage").length) > 16 ? "pixBtnSm" : "pixBtnMd";
   return '<div class="screen pixHome pixChurch">' +
     '<div class="pixCard pixWelcomeCard">' +
       '<h1 class="pixWelTitle">' + t("welcomeTitle") + '</h1>' +
       '<p class="pixWelBody">' + t("welcomeBody") + '</p>' +
     '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn pixBtn pixBtnWide" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'mainMenu\')">' + t("startQuest") + '</button>' +
-    '<button class="btn pixBtn pixBtnWide secondary" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'language\')">' + t("changeLanguage") + '</button>' +
+    '<div class="pixBtnDock">' +
+      '<button class="btn pixBtn ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'mainMenu\')">' + t("startQuest") + '</button>' +
+      '<button class="btn pixBtn secondary ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'language\')">' + t("changeLanguage") + '</button>' +
+    '</div>' +
   '</div>';
 }
 
