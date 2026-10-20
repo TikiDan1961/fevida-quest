@@ -175,8 +175,12 @@
      the cloud layer is two screens wide and slides one screen-width to the left, so it loops with no jump. */
   .pixSky{flex:none;align-items:stretch;overflow:hidden;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 22px);
     background:url("tiles/sky_menu.png") center bottom / 100% auto no-repeat,#2F8FE8;}
+  /* Three cloud layers at different depths: small far-away clouds drift slowly, big near clouds drift fast (2026-10-20, per Dan). */
   .pixSkyClouds{position:absolute;left:0;top:0;width:200%;height:100%;z-index:0;pointer-events:none;image-rendering:pixelated;
-    background:url("tiles/clouds_menu.png") left bottom / 50% auto repeat-x;animation:pixCloudDrift 160s linear infinite;}
+    background-position:left bottom;background-size:50% auto;background-repeat:repeat-x;animation:pixCloudDrift 60s linear infinite;}
+  .pixSkyClouds.cl1{background-image:url("tiles/clouds_1.png");animation-duration:100s;}
+  .pixSkyClouds.cl2{background-image:url("tiles/clouds_2.png");animation-duration:60s;}
+  .pixSkyClouds.cl3{background-image:url("tiles/clouds_3.png");animation-duration:34s;}
   @keyframes pixCloudDrift{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   @media (prefers-reduced-motion:reduce){ .pixSkyClouds{animation:none;} }
   .pixSky > *:not(.pixSkyClouds){position:relative;z-index:1;}
@@ -989,6 +993,8 @@ var ICON_BG = {
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288"
 };
 
+function cloudsHtml(){ return '<div class="pixSkyClouds cl1"></div><div class="pixSkyClouds cl2"></div><div class="pixSkyClouds cl3"></div>'; }
+
 function iconSpr(name){ return '<img class="spr" src="tiles/icons/ic_' + name + '.png" alt="">'; }
 
 function appIconHtml(o){
@@ -1076,7 +1082,7 @@ function screenMainMenu(){
     appIconHtml({onclick:unlocked ? "openFromIcon(this,'goldenTicket')" : "ticketLocked()", bg:unlocked ? ICON_BG.goldenTicket : ICON_BG.lock,
       cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")});
   return '<div class="screen pixHome pixSky pixMenu">' +
-    '<div class="pixSkyClouds"></div>' +
+    cloudsHtml() +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
     '<div class="progressWrap">' +
       '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
@@ -2675,7 +2681,7 @@ function screenPassport(){
 
   // 8-bit look (2026-10-19, per Dan): the pixel sky, a cream passport page, an X in the corner.
   return '<div class="screen pixHome pixSky pixPassport">' +
-    '<div class="pixSkyClouds"></div>' +
+    cloudsHtml() +
     '<div class="passHeader">' +
       '<span class="passHeadSpace"></span>' +
       '<h2 class="passTitle">' + t("passportTitle") + '</h2>' +
