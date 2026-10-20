@@ -373,6 +373,8 @@
   .pixMission .matchCard:active,.pixMission .flPad:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.85);}
   .pixMission .matchCard.flipped,.pixMission .matchCard.matched,.pixMission .flPad.lit{background:#fff;}
   .pixMission .matchCard.matched{opacity:.5;filter:brightness(.7);box-shadow:none;pointer-events:none;}
+  .pixMission .matchGrid.celebrate .matchCard.matched{opacity:1;filter:none;border-color:#1B1F3B;box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);}
+  .pixMission .matchGrid.celebrate .matchCard.glow{position:relative;z-index:2;border-color:#fff;box-shadow:inset 0 0 0 2px #FFF6C0,0 0 0 3px #FFF6C0,0 0 22px 9px rgba(255,236,120,.95);}
   .pixMission .flPad.lit{box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 3px #FFF6C0,0 0 20px 8px rgba(255,236,120,.9);}
   .pixMission .flPad.disabled{pointer-events:none;}
   .pixMission .matchCard img,.pixMission .flPad img{image-rendering:pixelated;}
@@ -893,9 +895,29 @@ var matchTilesReady = false; // true once every tile below has actually finished
 // a tiny "Loading tiles..." beat until every one has resolved, instead of
 // racing the player to the first flip (2026-09-30, per Dan -- the blank-tile
 // flash was still happening intermittently after the decode-hint-only fix).
+// Keeps every tile picture alive for the whole visit (2026-10-20, per Dan -- a tapped tile sometimes showed white for a moment).
+// The preloaded pictures used to be dropped as soon as they finished loading, so a phone was free to throw the decoded
+// images away; the next card flip then had to load its picture again, and the card showed its white face meanwhile. A
+// picture that is still in use on the page is not thrown away, so each tile also sits in a tiny, invisible, off-screen holder.
+var matchTileKeepers = [];
+function keepMatchTilesAlive(){
+  if(document.getElementById("tileKeeper")) return;
+  var box = document.createElement("div");
+  box.id = "tileKeeper";
+  box.setAttribute("aria-hidden", "true");
+  box.style.cssText = "position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;";
+  MATCH_SYMBOLS.forEach(function(src){
+    var im = document.createElement("img");
+    im.alt = ""; im.decoding = "sync"; im.src = src;
+    box.appendChild(im);
+  });
+  document.body.appendChild(box);
+}
+
 function preloadMatchTiles(){
   if(matchTilesPreloaded) return;
   matchTilesPreloaded = true;
+  keepMatchTilesAlive();
   var remaining = MATCH_SYMBOLS.length;
   function tileDone(){
     remaining--;
@@ -922,14 +944,14 @@ function preloadMatchTiles(){
     };
     img.onerror = tileDone; // don't let one bad tile block the game forever
     img.src = src;
+    matchTileKeepers.push(img);
   });
 }
 var MATCH_LEVELS = [4,4,4]; // grid dimension (NxN) — 3 levels, 4x4 each (8x8 was too hard, removed 2026-09-28)
-// Brief hold on the fully-matched (dimmed) board after the last pair of a
-// level is caught, before the next level's fresh deck replaces it
-// (2026-09-30, per Dan) -- previously the level advanced instantly, so the
-// very last matched pair never visibly appeared.
-var FM_LEVEL_PAUSE_MS = 900;
+// Level clear (2026-10-20, per Dan): when the last pair of a level is matched, every tile shows at normal brightness and
+// one random tile frame at a time glows for half a second, for 3 seconds in all (6 glows) -- while the level-clear sound
+// plays once -- and then the next level starts. Replaces the old 900ms hold on the dimmed board.
+var FM_FLASH_STEPS = 6, FM_FLASH_MS = 500;
 var MATCH_CHANCES = [10,10,10]; // chances per level, matching MATCH_LEVELS (raised from 6, 2026-09-29, per Dan)
 
 function defaultState(){
@@ -1640,6 +1662,7 @@ function buildMatchDeck(dim){
 }
 
 function initFaithMatchLevel(levelIdx){
+  fmLoadLevelClearSfx();
   var dim = MATCH_LEVELS[levelIdx];
   state.missions.faithMatch.level = levelIdx;
   state.session.faithMatch = {
@@ -1651,7 +1674,7 @@ function initFaithMatchLevel(levelIdx){
 
 function fmFlip(cardId){
   var s = state.session.faithMatch;
-  if(!s || s.status !== "playing" || s.chances <= 0) return;
+  if(!s || s.status !== "playing" || s.celebrate || s.chances <= 0) return;
   if(s.flipped.length >= 2) return;
   var card = s.cards[cardId];
   if(card.matched || s.flipped.indexOf(cardId) !== -1) return;
@@ -1685,14 +1708,9 @@ function fmEvaluate(){
       if(s.level === MATCH_LEVELS.length - 1){
         s.status = "complete";
       } else {
-        var nextLevel = s.level + 1;
+        s.celebrate = true;
         saveState(); render();
-        setTimeout(function(){
-          var s2 = state.session.faithMatch;
-          if(!s2 || s2.status !== "playing") return;
-          initFaithMatchLevel(nextLevel);
-          render();
-        }, FM_LEVEL_PAUSE_MS);
+        fmCelebrate();
         return;
       }
     }
@@ -1711,6 +1729,61 @@ function fmEvaluate(){
     }
   }
   saveState(); render();
+}
+
+// ---- level clear: random glowing tile frames + the level-clear sound ----
+var fmCelebrating = false;
+var fmSfxBuffer = null, fmSfxLoading = false;
+
+// Loads and decodes sounds/sfx_level_clear.mp3 once (a short MP3 made from sound_effect_3.wav). Web Audio plays it, the same
+// way the button sounds do, so it works on phones once the player has tapped anything.
+function fmLoadLevelClearSfx(){
+  if(fmSfxBuffer || fmSfxLoading) return;
+  var ctx = pixCtx(); if(!ctx || !window.fetch) return;
+  fmSfxLoading = true;
+  fetch("sounds/sfx_level_clear.mp3").then(function(r){ return r.arrayBuffer(); }).then(function(ab){
+    ctx.decodeAudioData(ab, function(buf){ fmSfxBuffer = buf; }, function(){ fmSfxLoading = false; });
+  }).catch(function(){ fmSfxLoading = false; });
+}
+function fmPlayLevelClearSfx(){
+  var ctx = pixCtx(); if(!ctx || !fmSfxBuffer) return;
+  try {
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
+    var src = ctx.createBufferSource(), gain = ctx.createGain();
+    src.buffer = fmSfxBuffer; gain.gain.value = 0.9;
+    src.connect(gain); gain.connect(ctx.destination);
+    src.start();
+  } catch(e){}
+}
+
+// Glows one randomly chosen tile frame at a time (never the same one twice in a row), half a second each, then starts the
+// next level. Also called from render() so a reload in the middle of it picks the sequence back up.
+function fmCelebrate(){
+  if(fmCelebrating) return;
+  var s = state.session.faithMatch;
+  if(!s || !s.celebrate) return;
+  fmCelebrating = true;
+  var nextLevel = s.level + 1, step = 0, last = -1;
+  fmPlayLevelClearSfx();
+  function tick(){
+    var s2 = state.session.faithMatch;
+    if(!s2 || !s2.celebrate || state.screen !== "faithMatch"){ fmCelebrating = false; return; } // the player left
+    var cards = document.querySelectorAll(".matchGrid .matchCard");
+    for(var i = 0; i < cards.length; i++) cards[i].classList.remove("glow");
+    if(step >= FM_FLASH_STEPS){
+      fmCelebrating = false;
+      initFaithMatchLevel(nextLevel);
+      render();
+      return;
+    }
+    var idx;
+    do { idx = Math.floor(Math.random() * cards.length); } while(idx === last && cards.length > 1);
+    last = idx;
+    if(cards[idx]) cards[idx].classList.add("glow");
+    step++;
+    setTimeout(tick, FM_FLASH_MS);
+  }
+  tick();
 }
 
 function fmCollectAward(){
@@ -1775,7 +1848,7 @@ function screenFaithMatch(){
   return pixShell('<h2 class="pixMTitle">' + t("faithMatchName") + '</h2>' +
     '<div class="pixNote">' + t("fm_level")(s.level+1, MATCH_LEVELS.length) + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0,s.chances), s.maxChances || MATCH_CHANCES[s.level]) + '</div>' +
-    '<div class="matchGrid" style="grid-template-columns:repeat(' + dim + ',1fr)">' + cellsHtml + '</div>' +
+    '<div class="matchGrid' + (s.celebrate ? ' celebrate' : '') + '" style="grid-template-columns:repeat(' + dim + ',1fr)">' + cellsHtml + '</div>' +
     '<div class="spacer"></div>' +
     pixBtnHtml(t("mainMenu"), "fmQuit()", true));
 }
@@ -3149,6 +3222,7 @@ function render(){
   // time was last saved) instead of leaving the stage empty and frozen. The
   // "GET READY" countdown (clReadyRunning) gets the same treatment for a
   // reload landing mid-countdown.
+  if(state.screen === "faithMatch" && state.session.faithMatch && state.session.faithMatch.celebrate && !fmCelebrating) fmCelebrate();
   var clSession = state.session.catchLight;
   if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
     if(clSession.phase === "playing" && !clRunning) clStart();
