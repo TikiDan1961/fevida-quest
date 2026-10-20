@@ -235,8 +235,11 @@
   /* Pinned exit button shown during a mission -- see exitBarHtml(). The bar
      has no height, so it takes no room and nothing below it moves. */
   .exitBar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);height:0;z-index:20;}
-  .exitBtn{position:absolute;top:-14px;left:-6px;min-height:40px;padding:8px 14px;border-radius:20px;border:1.5px solid var(--gold);background:rgba(42,26,58,.88);color:var(--cream);font-size:.78rem;font-weight:700;letter-spacing:.04em;cursor:pointer;}
-  .exitBtn:active{box-shadow:0 0 12px 3px var(--glow);}
+  /* Same red pixel X as the Passport's close button (2026-10-19, per Dan). */
+  .exitBtn{position:absolute;top:-14px;left:-6px;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
+  .exitBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
   /* TEMPORARY test aid -- see tempResetHtml() */
   .tempReset{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;padding:8px;border:1px dashed rgba(255,255,255,.4);border-radius:12px;}
   .tempResetLbl{width:100%;font-size:.68rem;letter-spacing:.06em;opacity:.7;}
@@ -2734,7 +2737,7 @@ function exitBarHtml(){
   if(EXIT_SCREENS.indexOf(state.screen) === -1) return "";
   var sess = state.session[state.screen];
   if(sess && EXIT_HIDDEN_STATUS.indexOf(sess.status) !== -1) return "";
-  return '<div class="exitBar"><button class="exitBtn" onclick="exitMission()" aria-label="' + t("mainMenu") + '">' + t("exitMenu") + '</button></div>';
+  return '<div class="exitBar"><button class="exitBtn" onpointerdown="pixPressSfx()" onclick="pixClickSfx();exitMission()" aria-label="' + t("mainMenu") + '">X</button></div>';
 }
 
 // Leaves the current mission the same way its own MAIN MENU button does
