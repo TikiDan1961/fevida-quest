@@ -138,7 +138,12 @@
   .btn.pixBtn.pixBtnMd{font-size:1.25rem;}
   .btn.pixBtn.pixBtnSm{font-size:1rem;letter-spacing:.04em;}
   /* Home screen icons, the Missions folder and the expanding tile (2026-10-19, per Dan) */
-  .homeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 8px;margin:22px 0 10px;}
+  .homeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 2px;margin:22px 0 10px;}
+  @media (max-width:340px){
+    .homeGrid .appTile{width:62px;height:62px;}
+    .homeGrid .miniGrid{grid-template-columns:26px 26px;}
+    .homeGrid .appTile .miniGrid img.spr{width:26px;height:26px;}
+  }
   .appIcon{display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;}
   .appTile{position:relative;width:72px;height:72px;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
@@ -428,6 +433,22 @@
     .pixMission .clStage{min-height:220px;}
     .pixMission .hbScene{width:86%;margin-left:auto;margin-right:auto;}
   }
+  /* Options screen: two volume sliders on a cream card (2026-10-20, per Dan) */
+  .optCard{display:flex;flex-direction:column;gap:22px;padding:22px 18px 24px;text-align:left;}
+  .optHead{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .optIcon{width:32px;height:32px;image-rendering:pixelated;flex:none;}
+  .optLabel{flex:1;font-weight:700;font-size:1.25rem;line-height:1.1;}
+  .optValue{font-weight:700;font-size:1.25rem;min-width:3.4ch;text-align:right;}
+  .pixRange{-webkit-appearance:none;appearance:none;display:block;width:100%;height:34px;margin:0;background:transparent;cursor:pointer;touch-action:pan-y;}
+  .pixRange:focus{outline:none;}
+  .pixRange::-webkit-slider-runnable-track{height:16px;border:3px solid #1B1F3B;border-radius:9px;box-sizing:content-box;
+    background:linear-gradient(to right,#FFC93A calc(14px + (100% - 28px) * var(--p,.5)),#fff calc(14px + (100% - 28px) * var(--p,.5)));}
+  .pixRange::-moz-range-track{height:16px;border:3px solid #1B1F3B;border-radius:9px;box-sizing:content-box;
+    background:linear-gradient(to right,#FFC93A calc(14px + (100% - 28px) * var(--p,.5)),#fff calc(14px + (100% - 28px) * var(--p,.5)));}
+  .pixRange::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:28px;margin-top:-9px;border:3px solid #1B1F3B;border-radius:8px;background:#D6343A;
+    box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 3px 0 rgba(20,30,90,.4);}
+  .pixRange::-moz-range-thumb{width:22px;height:22px;border:3px solid #1B1F3B;border-radius:8px;background:#D6343A;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 3px 0 rgba(20,30,90,.4);}
+  .pixRange:active::-webkit-slider-thumb{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #FFE0DC,0 0 14px 5px rgba(255,120,110,.9);}
   .qaBox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:16px;margin:10px 0;}
   .answerBtn{
     display:block;width:100%;text-align:left;
@@ -621,6 +642,7 @@ var T = {
     pathOfLightName:"Path of Light", tbdName:"TBD",
     comingSoon:"COMING SOON", comingSoonToast:"Coming soon!",
     missionsFolder:"Missions", goldenTicketLabel:"Golden Ticket",
+    optionsLabel:"Options", optionsTitle:"Options", sfxVolume:"Sound Effects", musicVolume:"Music",
     pilgrimStart:"Hi, I'm Pilgrim! Open Missions to start our journey.", pilgrimNice:"Great job! Let's keep walking with faith.",
     pilgrimTry:function(n){return "Try "+n+" next!";}, pilgrimToGo:function(n){return n+" more game"+(n === 1 ? "" : "s")+" to reach the church!";},
     pilgrimTicket:"Your Golden Ticket is ready! Tap it to see it.",
@@ -713,6 +735,7 @@ var T = {
     pathOfLightName:"Camino de Luz", tbdName:"Por definir",
     comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
     missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
+    optionsLabel:"Opciones", optionsTitle:"Opciones", sfxVolume:"Efectos de sonido", musicVolume:"Música",
     pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.",
     pilgrimTry:function(n){return "¡Prueba "+n+"!";}, pilgrimToGo:function(n){return n === 1 ? "¡Falta 1 juego para llegar a la iglesia!" : "¡Faltan "+n+" juegos para llegar a la iglesia!";},
     pilgrimTicket:"¡Tu Boleto Dorado está listo! Tócalo para verlo.",
@@ -1006,6 +1029,8 @@ function defaultState(){
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
+    volSfx: 100,    // Options screen: sound effects volume, 0-100
+    volMusic: 40,   // music volume, 0-100 (starts low: it is only background)
     passportPage: 0
   };
 }
@@ -1082,6 +1107,27 @@ function pixCtx(){
     return pixAudioCtx;
   } catch(e){ return null; }
 }
+// ---- volume (Options screen, 2026-10-20) ----
+// Two buses (gain nodes) per audio context: "sfx" for every sound effect and "music" for the music track. A slider position 0-100 becomes a
+// gain with a squared curve, which feels even to the ear (100 = the loudness the sounds were mixed at).
+function pixVolGain(kind){
+  var v = kind === "music" ? state.volMusic : state.volSfx;
+  if(typeof v !== "number") v = kind === "music" ? 40 : 100;
+  return Math.pow(Math.max(0, Math.min(100, v)) / 100, 2);
+}
+function pixBus(ctx, kind){
+  if(!ctx.__pixBus) ctx.__pixBus = {};
+  if(!ctx.__pixBus[kind]){
+    var g = ctx.createGain(); g.gain.value = pixVolGain(kind); g.connect(ctx.destination); ctx.__pixBus[kind] = g;
+  }
+  return ctx.__pixBus[kind];
+}
+function pixApplyVolumes(){
+  var ctx = pixAudioCtx;
+  if(!ctx || !ctx.__pixBus) return;
+  Object.keys(ctx.__pixBus).forEach(function(k){ ctx.__pixBus[k].gain.value = pixVolGain(k); });
+}
+
 function pixBlip(ctx){
   try {
     var t0 = ctx.currentTime;
@@ -1092,7 +1138,7 @@ function pixBlip(ctx){
     gain.gain.setValueAtTime(0.0001, t0);
     gain.gain.exponentialRampToValueAtTime(0.2, t0 + 0.005);
     gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.16);
-    osc.connect(gain); gain.connect(ctx.destination);
+    osc.connect(gain); gain.connect(pixBus(ctx, "sfx"));
     osc.start(t0); osc.stop(t0 + 0.17);
   } catch(e){}
 }
@@ -1135,7 +1181,52 @@ function pixSfxDecode(name, whenReady){
     w.forEach(function(fn){ fn(buf); });
   }, function(){ pixSfxDecoding[name] = false; pixSfxWaiters[name] = []; });
 }
-function pixSfxDecodeAll(){ Object.keys(PIX_SFX).forEach(function(k){ pixSfxDecode(k); }); }
+function pixSfxDecodeAll(){ Object.keys(PIX_SFX).forEach(function(k){ pixSfxDecode(k); }); pixMusicDecode(); }
+
+// ---- the music track (2026-10-20, per Dan) ----
+// sounds/music_loop.wav is music_track.wav (a seamless loop) at half the sample rate, so it is 4 MB instead of 16. It stays an uncompressed WAV
+// because MP3 / AAC add a tiny gap at the ends, which would break a loop. It starts when the Main Menu is first shown and plays for the rest
+// of the visit, through the "music" bus (the Options slider). A fresh audio engine after sleep restarts it (pixMusicRestart).
+var PIX_MUSIC_URL = "sounds/music_loop.wav";
+var pixMusic = {bytes:null, buf:null, decoding:false, src:null, srcCtx:null, want:false};
+function pixMusicFetch(){
+  if(!window.fetch || pixMusic.bytes) return;
+  fetch(PIX_MUSIC_URL).then(function(r){ return r.arrayBuffer(); }).then(function(ab){
+    pixMusic.bytes = ab;
+    if(pixAudioCtx) pixMusicDecode();
+  }).catch(function(){});
+}
+function pixMusicDecode(){
+  if(pixMusic.buf || pixMusic.decoding || !pixMusic.bytes) return;
+  var ctx = pixCtx(); if(!ctx) return;
+  pixMusic.decoding = true;
+  ctx.decodeAudioData(pixMusic.bytes.slice(0), function(buf){
+    pixMusic.buf = buf; pixMusic.decoding = false;
+    pixMusicPlay();
+  }, function(){ pixMusic.decoding = false; });
+}
+function pixMusicPlay(){
+  if(!pixMusic.want || !pixMusic.buf) return;
+  var ctx = pixCtx(); if(!ctx) return;
+  if(pixMusic.src && pixMusic.srcCtx === ctx) return;            // already playing on the current engine
+  try { if(pixMusic.src) pixMusic.src.stop(); } catch(e){}
+  try {
+    var src = ctx.createBufferSource();
+    src.buffer = pixMusic.buf; src.loop = true;
+    src.connect(pixBus(ctx, "music"));
+    src.start();
+    pixMusic.src = src; pixMusic.srcCtx = ctx;
+  } catch(e){}
+}
+function pixMusicStart(){
+  pixMusic.want = true;
+  if(pixMusic.buf) pixMusicPlay(); else { pixMusicFetch(); pixMusicDecode(); }
+}
+function pixMusicRestart(){
+  try { if(pixMusic.src) pixMusic.src.stop(); } catch(e){}
+  pixMusic.src = null; pixMusic.srcCtx = null;
+  pixMusicPlay();
+}
 
 // Plays a sound once. exclusive = true stops the previous answer/level sound first, so they never pile up. Returns true if it started.
 function pixSfxPlay(name, exclusive){
@@ -1147,7 +1238,7 @@ function pixSfxPlay(name, exclusive){
     if(exclusive && pixSfxCurrent){ try { pixSfxCurrent.stop(); } catch(e){} }
     var src = ctx.createBufferSource(), gain = ctx.createGain();
     src.buffer = buf; gain.gain.value = PIX_SFX[name].gain;
-    src.connect(gain); gain.connect(ctx.destination);
+    src.connect(gain); gain.connect(pixBus(ctx, "sfx"));
     src.start();
     if(exclusive) pixSfxCurrent = src;
     return true;
@@ -1208,12 +1299,17 @@ function pixFreshAudio(){
     var silent = pixAudioCtx.createBufferSource(); silent.buffer = pixAudioCtx.createBuffer(1, 1, 22050);
     silent.connect(pixAudioCtx.destination); silent.start(0);
     pixPlaySilentClip();
+    pixMusicRestart();
     if(old){ pixAudioOld.push(old); while(pixAudioOld.length > 2){ try { pixAudioOld.shift().close(); } catch(e){} } }
     var c = pixAudioCtx, t0 = c.currentTime;
     setTimeout(function(){ if(c === pixAudioCtx && c.currentTime <= t0 + 0.05) pixAudioStale = true; }, 500);   // clock not moving: a dead engine, replace it again on the next tap
   } catch(e){}
 }
 document.addEventListener("visibilitychange", pixMarkAudioStale);
+document.addEventListener("visibilitychange", function(){
+  var c = pixAudioCtx; if(!c) return;
+  try { if(document.hidden){ if(c.suspend) c.suspend(); } else if(c.resume){ var p = c.resume(); if(p && p.catch) p.catch(function(){}); } } catch(e){}
+});
 window.addEventListener("pagehide", pixMarkAudioStale);
 window.addEventListener("pageshow", pixMarkAudioStale);
 window.addEventListener("blur", pixMarkAudioStale);
@@ -1241,6 +1337,7 @@ function pixTapTarget(e){ var el = e.target && e.target.closest ? e.target.close
 document.addEventListener("pointerdown", function(e){ if(pixTapTarget(e)) pixPressSfx(); }, true);
 document.addEventListener("click", function(e){ if(pixTapTarget(e)) pixClickSfx(); }, true);
 pixSfxFetchAll();
+pixMusicFetch();
 
 // iOS Safari only shows :active styles (the pressed glow) if the page has a touch listener.
 document.addEventListener("touchstart", function(){}, {passive:true});
@@ -1339,7 +1436,7 @@ var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
   emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", pathOfLight:"#3FA84B", tbd:"#AEB6C8",
-  passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288"
+  passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
 // Every redraw rebuilds the sky, so each cloud layer is started part-way through its drift (by how long the app has been open)
@@ -1655,7 +1752,8 @@ function screenMainMenu(){
       label:t("missionsFolder"), badge:'<span class="countBadge">' + doneCount + '/' + MISSIONS.length + '</span>'}) +
     appIconHtml({onclick:"openFromIcon(this,'passport')", bg:ICON_BG.passport, inner:iconSpr("passport"), label:t("passport")}) +
     appIconHtml({onclick:unlocked ? "openFromIcon(this,'goldenTicket')" : "ticketLocked()", bg:unlocked ? ICON_BG.goldenTicket : ICON_BG.lock,
-      cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")});
+      cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")}) +
+    appIconHtml({onclick:"openFromIcon(this,'options')", bg:ICON_BG.options, inner:iconSpr("options"), label:t("optionsLabel")});
   return '<div class="screen pixHome pixSky pixMenu">' +
     cloudsHtml() +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
@@ -2323,18 +2421,17 @@ function flLevelComplete(){
 // pipeline elsewhere, so a synthesized tone avoids needing a bespoke audio
 // file. The AudioContext is created lazily (browsers block it until a user
 // gesture) and reused rather than rebuilt on every wrong tap.
-var flAudioCtx = null;
 function flPlayFailSound(){
   try {
-    if(!flAudioCtx) flAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    var ctx = flAudioCtx;
+    var ctx = pixCtx(); if(!ctx) return;
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
     var osc = ctx.createOscillator(), gain = ctx.createGain();
     osc.type = "sawtooth";
     osc.frequency.setValueAtTime(220, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.25);
     gain.gain.setValueAtTime(0.2, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.connect(gain); gain.connect(ctx.destination);
+    osc.connect(gain); gain.connect(pixBus(ctx, "sfx"));
     osc.start(); osc.stop(ctx.currentTime + 0.3);
   } catch(e){}
 }
@@ -3245,11 +3342,11 @@ function passportPageInner(page){
                  : '<div class="badge8Locked"><img src="tiles/icons/ic_lock.png" alt=""></div><div class="pxBadgeName">' + t("badgeLocked") + '</div>');
 }
 
-// The X: the Passport shrinks back into its icon on the Home Screen.
-function closePassport(){
+// The X: the screen shrinks back into its icon on the Home Screen (n = which icon: 2 = Passport, 4 = Options).
+function closeToHome(n){
   go("mainMenu");
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var tile = document.querySelector(".homeGrid .appIcon:nth-child(2) .appTile");
+  var tile = document.querySelector(".homeGrid .appIcon:nth-child(" + n + ") .appTile");
   if(calm || !tile) return;
   var r = tile.getBoundingClientRect(), c = tile.cloneNode(true);
   c.className = "expandClone";
@@ -3261,6 +3358,45 @@ function closePassport(){
   if(spr) spr.style.transform = "scale(1)";
   setTimeout(function(){ c.style.opacity = "0"; }, 260);
   setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); }, 560);
+}
+
+// ---- Options (2026-10-20, per Dan): two volume sliders, for the sound effects and for the music ----
+function optionRow(kind, label, value){
+  var id = kind === "music" ? "Music" : "Sfx";
+  return '<div class="optRow">' +
+    '<div class="optHead"><img class="optIcon" src="tiles/icons/ic_' + (kind === "music" ? "music" : "sound") + '.png" alt="">' +
+      '<span class="optLabel">' + label + '</span><span class="optValue" id="optVal' + id + '">' + value + '%</span></div>' +
+    '<input type="range" class="pixRange" id="opt' + id + '" min="0" max="100" step="5" value="' + value + '" style="--p:' + (value / 100) + '" aria-label="' + label + '" ' +
+      'oninput="setVolume(\'' + kind + '\', this.value)" onchange="optionPreview(\'' + kind + '\')">' +
+  '</div>';
+}
+// Moving a slider changes the volume at once. It never redraws the screen (that would let go of the slider).
+function setVolume(kind, v){
+  v = Math.max(0, Math.min(100, Math.round(+v)));
+  if(kind === "music") state.volMusic = v; else state.volSfx = v;
+  saveState(); pixApplyVolumes();
+  var id = kind === "music" ? "Music" : "Sfx";
+  var val = document.getElementById("optVal" + id), inp = document.getElementById("opt" + id);
+  if(val) val.textContent = v + "%";
+  if(inp) inp.style.setProperty("--p", v / 100);
+}
+// letting go of the sound-effects slider plays a sound so the level can be heard
+function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
+
+function screenOptions(){
+  return '<div class="screen pixHome pixSky pixPassport">' +
+    cloudsHtml() +
+    '<div class="passHeader">' +
+      '<span class="passHeadSpace"></span>' +
+      '<h2 class="passTitle">' + t("optionsTitle") + '</h2>' +
+      '<button class="passClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closeToHome(4)" aria-label="' + t("mainMenu") + '">X</button>' +
+    '</div>' +
+    '<div class="pixPaper optCard">' +
+      optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 100) +
+      optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 40) +
+    '</div>' +
+    '<div class="spacer"></div>' +
+  '</div>';
 }
 
 function screenPassport(){
@@ -3283,7 +3419,7 @@ function screenPassport(){
     '<div class="passHeader">' +
       '<span class="passHeadSpace"></span>' +
       '<h2 class="passTitle">' + t("passportTitle") + '</h2>' +
-      '<button class="passClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closePassport()" aria-label="' + t("mainMenu") + '">X</button>' +
+      '<button class="passClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closeToHome(2)" aria-label="' + t("mainMenu") + '">X</button>' +
     '</div>' +
     '<div class="passportBook" ontouchstart="passportTouchStart(event)" ontouchend="passportTouchEnd(event)">' +
       '<div class="passportTrack" id="passportTrack" style="width:' + (PASSPORT_TRACK_SLOTS*100) + '%;transform:translateX(-' + ((page+1)*100/PASSPORT_TRACK_SLOTS) + '%)">' + pagesHtml + '</div>' +
@@ -3381,6 +3517,7 @@ function render(){
     case "kindnessSort": html = screenKindnessSort(); break;
     case "hiddenBlessings": html = screenHiddenBlessings(); break;
     case "passport": html = screenPassport(); break;
+    case "options": html = screenOptions(); break;
     case "goldenTicket": html = screenGoldenTicket(); break;
     default: html = screenLanguage();
   }
@@ -3392,7 +3529,7 @@ function render(){
     var el = app.querySelector(".screen");
     if(el) el.classList.add("screen-enter");
   }
-  if(state.screen === "mainMenu") pilgrimInit(isNewScreen);
+  if(state.screen === "mainMenu"){ pilgrimInit(isNewScreen); pixMusicStart(); }   // the music starts the first time the Main Menu is shown
   if(state.screen === "passport"){
     var track = document.getElementById("passportTrack");
     if(track){
