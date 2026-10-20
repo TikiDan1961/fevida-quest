@@ -94,6 +94,8 @@
      is bundled with the app so it works offline. It is only crisp at whole
      multiples of 8px (16, 24, 32), so sizes below are 1rem = 16px, 1.5rem = 24px,
      2rem = 32px. */
+  /* The pixel font's own "5" looks like an S, so a one-glyph font with a clean pixel 5 sits in front of it. */
+  @font-face{font-family:"FeYVida Five";src:url("tiles/FeYVidaFive.ttf") format("truetype");font-weight:400 700;font-style:normal;unicode-range:U+0035;font-display:block;}
   @font-face{font-family:"Pixelify Sans";src:url("tiles/PixelifySans.ttf") format("truetype");font-weight:400 700;font-style:normal;font-display:block;}
   /* Language screen (2026-10-19, per the client's reference image): a pixel-art
      church scene fills the screen, the small logo and QUEST sit in the sky, and a
@@ -101,9 +103,9 @@
      is 125x140 pixels, drawn at the full width of the screen. */
   .pixHome{position:relative;min-height:100dvh;margin:calc(-1 * (env(safe-area-inset-top,0px) + 18px)) -18px calc(-1 * (env(safe-area-inset-bottom,0px) + 22px));padding:calc(env(safe-area-inset-top,0px) + 8px) 0 14px;display:flex;flex-direction:column;align-items:center;
     /* The scene sits 34px below the top (sky colour fills the gap and grass fills below it) so QUEST has clear room above the church cross. */
-    background:url("tiles/scene_church.png") center top 34px / 100% auto no-repeat,linear-gradient(#4FB0F2 0,#4FB0F2 150px,#52B043 150px);image-rendering:pixelated;font-family:"Pixelify Sans",ui-monospace,monospace;}
+    background:url("tiles/scene_church.png") center top 34px / 100% auto no-repeat,linear-gradient(#4FB0F2 0,#4FB0F2 150px,#52B043 150px);image-rendering:pixelated;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;}
   .pixLogoSmall{display:block;width:192px;height:auto;image-rendering:pixelated;}
-  .pixQuest{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:4rem;line-height:1;letter-spacing:.04em;margin:0;color:#FFC93A;
+  .pixQuest{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:4rem;line-height:1;letter-spacing:.04em;margin:0;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 7px 0 #1b2a6b,3px 7px 0 #1b2a6b,-3px 7px 0 #1b2a6b;}
   .pixCard{width:calc(100% - 28px);max-width:420px;background:#fff;border-radius:18px;padding:14px 16px 12px;text-align:center;box-shadow:0 5px 0 rgba(0,0,0,.28);color:#1E2F7A;}
   .pixCardTitle{font-weight:700;font-size:1.5rem;letter-spacing:.03em;line-height:1.1;}
@@ -115,7 +117,7 @@
   .pixQr .tr{right:0;top:0;border-right-width:5px;border-top-width:5px;border-top-right-radius:6px;}
   .pixQr .bl{left:0;bottom:0;border-left-width:5px;border-bottom-width:5px;border-bottom-left-radius:6px;}
   .pixQr .br{right:0;bottom:0;border-right-width:5px;border-bottom-width:5px;border-bottom-right-radius:6px;}
-  .btn.pixBtn{width:min(78%,260px);margin:0 auto 10px;padding:8px 12px 6px;font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.2;letter-spacing:.06em;border-radius:12px;border:3px solid #1E6B2B;border-bottom-width:6px;background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);box-shadow:inset 0 3px 0 rgba(255,255,255,.4);transition:none;}
+  .btn.pixBtn{width:min(78%,260px);margin:0 auto 10px;padding:8px 12px 6px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.2;letter-spacing:.06em;border-radius:12px;border:3px solid #1E6B2B;border-bottom-width:6px;background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);box-shadow:inset 0 3px 0 rgba(255,255,255,.4);transition:none;}
   .btn.pixBtn.secondary{border-color:#1C4E9A;background:#3A93E8;}
   /* Pressed: the button sinks and lights up -- a hard light ring plus a soft glow in its own colour (2026-10-19, per Dan). */
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
@@ -127,14 +129,66 @@
   .pixChurch{padding-top:calc(env(safe-area-inset-top,0px) + 16px);
     background:url("tiles/church_interior.png") center bottom / 100% auto no-repeat,#6B4423;}
   .pixWelcomeCard{padding:18px 18px 20px;}
-  .pixWelTitle{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 10px;}
-  .pixWelBody{font-family:"Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1.25rem;line-height:1.3;letter-spacing:.01em;color:#2A3A78;margin:0;}
+  .pixWelTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 10px;}
+  .pixWelBody{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1.25rem;line-height:1.3;letter-spacing:.01em;color:#2A3A78;margin:0;}
   /* Same box as the language screen's white card (width and side padding), so the buttons land in the same place and size. */
   .pixBtnDock{width:calc(100% - 28px);max-width:420px;padding:0 16px 12px;}
   /* The welcome buttons carry longer words in a smaller type, but keep the language buttons' exact box (51.8px tall). */
   .btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:51.8px;display:flex;align-items:center;justify-content:center;line-height:1;padding:0 12px 3px;}
   .btn.pixBtn.pixBtnMd{font-size:1.25rem;}
   .btn.pixBtn.pixBtnSm{font-size:1rem;letter-spacing:.04em;}
+  /* Home screen icons, the Missions folder and the expanding tile (2026-10-19, per Dan) */
+  .homeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 8px;margin:22px 0 10px;}
+  .appIcon{display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;}
+  .appTile{position:relative;width:72px;height:72px;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
+  .appTile img.spr{width:48px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
+  .appIcon:active .appTile{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.9);}
+  .appName{margin-top:9px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.1;color:#fff;
+    text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
+  .appTag{margin-top:3px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.75rem;letter-spacing:.03em;color:#FFC93A;text-transform:lowercase;}
+  .appTag::first-letter{text-transform:uppercase;}
+  .miniGrid{display:grid;grid-template-columns:32px 32px;gap:0;}
+  .appTile .miniGrid img.spr{width:32px;height:32px;}
+  .countBadge{position:absolute;top:-9px;right:-12px;min-width:34px;padding:2px 6px;border-radius:12px;background:#D6343A;border:3px solid #fff;color:#fff;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
+  .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}
+  .appIcon.locked .appTile{filter:grayscale(.5) brightness(.92);}
+  .appIcon.soon .appTile{opacity:.55;}
+  .appIcon.soon .appName{opacity:.85;}
+  .appIcon.done .appTile{filter:saturate(.65);}
+  .pixHome.pixSky > .folderOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:18px;
+    background:rgba(10,20,70,.55);animation:folderFade .2s ease-out;}
+  @keyframes folderFade{from{opacity:0;}to{opacity:1;}}
+  .folderPanel{position:relative;width:100%;max-width:420px;max-height:86%;overflow-y:auto;background:#223A8C;border:4px solid #FFC93A;border-radius:22px;
+    padding:14px 12px 18px;box-shadow:0 6px 0 rgba(0,0,0,.35);transform-origin:var(--ox,50%) var(--oy,50%);animation:folderPop .24s ease-out;}
+  @keyframes folderPop{from{transform:scale(.2);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .folderTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.08em;text-transform:uppercase;color:#FFC93A;text-align:center;margin:2px 0 16px;}
+  .folderGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 6px;}
+  .folderClose{position:absolute;top:8px;right:10px;width:34px;height:34px;border:0;border-radius:10px;background:rgba(255,255,255,.15);color:#fff;font-size:1rem;cursor:pointer;}
+  .expandClone{position:fixed;z-index:100;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;
+    transition:left .28s ease-in,top .28s ease-in,width .28s ease-in,height .28s ease-in,border-radius .28s ease-in,opacity .25s ease-out;}
+  .expandClone img.spr{width:48px;height:48px;image-rendering:pixelated;transition:transform .28s ease-in;}
+  /* Main Menu: pixel sky with slowly drifting clouds, tiles as solid cards sitting on it. The sky
+     and cloud pictures are 125x270 pixels drawn at the full screen width and anchored to the bottom;
+     the cloud layer is two screens wide and slides one screen-width to the left, so it loops with no jump. */
+  .pixSky{flex:none;align-items:stretch;overflow:hidden;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 22px);
+    background:url("tiles/sky_menu.png") center bottom / 100% auto no-repeat,#2F8FE8;}
+  .pixSkyClouds{position:absolute;left:0;top:0;width:200%;height:100%;z-index:0;pointer-events:none;image-rendering:pixelated;
+    background:url("tiles/clouds_menu.png") left bottom / 50% auto repeat-x;animation:pixCloudDrift 160s linear infinite;}
+  @keyframes pixCloudDrift{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion:reduce){ .pixSkyClouds{animation:none;} }
+  .pixSky > *:not(.pixSkyClouds){position:relative;z-index:1;}
+  .pixMenuTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;line-height:1.1;letter-spacing:.02em;text-align:center;margin:2px 0 8px;color:#FFC93A;
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
+  .pixMenu .progressWrap{margin:6px 0 16px;}
+  .pixMenu .progressBar{height:24px;border:3px solid #1E2F7A;border-radius:12px;background:#fff;}
+  .pixMenu .progressFill{background:#FFC93A;}
+  .pixMenu .progressLabel{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:1rem;color:#fff;opacity:1;margin-top:6px;text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
+  .pixMenu .tempReset{background:rgba(255,255,255,.88);border-color:#1E2F7A;}
+  .pixMenu .tempResetLbl{color:#1E2F7A;opacity:1;}
+  .pixMenu .tempReset button{color:#1E2F7A;border-color:#1E2F7A;}
   /* Shorter phones: shrink the card (QR 145px -> 116px, whole 4px per module) so the
      church stays visible above it. */
   @media (max-height:740px){
@@ -360,6 +414,8 @@ var T = {
     emojiStoriesName:"Emoji Bible Stories", lightCandleName:"Light a Candle", jesusTimelineName:"Life of Jesus Timeline",
     pathOfLightName:"Path of Light", tbdName:"TBD",
     comingSoon:"COMING SOON", comingSoonToast:"Coming soon!",
+    missionsFolder:"Missions", goldenTicketLabel:"Golden Ticket",
+    ticketLocked:function(p){return "Earn "+p+" points to unlock the Golden Ticket!";},
 
     fl_repeat:"REPEAT PATTERN", fl_incorrect:"INCORRECT TILE!", fl_tryAgainMsg:"TRY AGAIN",
     fl_failTitle:"So Close!", fl_failBody:"You ran out of chances — give it another try from Level 1.",
@@ -446,6 +502,8 @@ var T = {
     emojiStoriesName:"Historias Bíblicas en Emojis", lightCandleName:"Enciende una Vela", jesusTimelineName:"Línea de Tiempo de la Vida de Jesús",
     pathOfLightName:"Camino de Luz", tbdName:"Por definir",
     comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
+    missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
+    ticketLocked:function(p){return "¡Gana "+p+" puntos para desbloquear el Boleto Dorado!";},
 
     fl_repeat:"REPITE EL PATRÓN", fl_incorrect:"¡FICHA INCORRECTA!", fl_tryAgainMsg:"INTÉNTALO DE NUEVO",
     fl_failTitle:"¡Tan Cerca!", fl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
@@ -709,6 +767,7 @@ function defaultState(){
       followLight:null, wordUnscramble:null, catchLight:null,
       kindnessSort:null, hiddenBlessings:null, stainedGlass:null },
     awardMissionId: null,
+    folderOpen: false,
     passportPage: 0
   };
 }
@@ -881,6 +940,13 @@ function openMission(id){
   else if(id === "hiddenBlessings"){ initHiddenBlessings(); go("hiddenBlessings"); }
 }
 
+/* ---------- Home Screen (the Main Menu) ---------- */
+
+// The Main Menu works like a phone's home screen (2026-10-19, per Dan): a pixel sky wallpaper with
+// app icons -- a MISSIONS folder, the Passport, and the Golden Ticket. Tapping the folder opens a
+// panel with one icon (and a name under it) for every mission; the Passport and Golden Ticket
+// grow out of their icons to fill the screen.
+
 // Placeholder tiles for missions that are planned but not built yet (2026-10-19, per Dan).
 // To make one real: add it to MISSIONS, build its screen, and delete it from this list.
 var COMING_SOON_MISSIONS = [
@@ -891,50 +957,112 @@ var COMING_SOON_MISSIONS = [
   {id:"tbd", icon:"❓", nameKey:"tbdName"}
 ];
 
+// Icon artwork is tiles/icons/ic_<id>.png (16x16 pixels, drawn at 48px); this is the colour of the
+// rounded tile behind each one.
+var ICON_BG = {
+  faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
+  followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", pathOfLight:"#3FA84B", tbd:"#AEB6C8",
+  passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288"
+};
+
+function iconSpr(name){ return '<img class="spr" src="tiles/icons/ic_' + name + '.png" alt="">'; }
+
+function appIconHtml(o){
+  return '<div class="appIcon' + (o.cls ? ' ' + o.cls : '') + '" role="button" onclick="' + o.onclick + '">' +
+    '<div class="appTile" style="background:' + o.bg + '">' + o.inner + (o.badge || '') + '</div>' +
+    '<div class="appName">' + o.label + '</div>' +
+    (o.tag ? '<div class="appTag">' + o.tag + '</div>' : '') +
+  '</div>';
+}
+
+// ---- toast (the small "Coming soon!" message) ----
 var toastTimer = null;
-function comingSoon(){
+function toast(text){
   var el = document.getElementById("toast");
   if(!el){ el = document.createElement("div"); el.id = "toast"; el.className = "toast"; document.body.appendChild(el); }
-  el.textContent = t("comingSoonToast");
+  el.textContent = text;
   void el.offsetWidth; // let the fade-in start from hidden
   el.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 1600);
+  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+}
+function comingSoon(){ toast(t("comingSoonToast")); }
+function ticketLocked(){ toast(t("ticketLocked")(GOLDEN_TICKET_POINTS)); }
+
+// ---- the Missions folder ----
+function openFolder(icon){
+  state.folderOpen = true; saveState(); render();
+  // grow the panel out of the folder icon it came from
+  var panel = document.querySelector(".folderPanel"), overlay = document.querySelector(".folderOverlay");
+  if(panel && overlay && icon){
+    var r = icon.getBoundingClientRect(), o = overlay.getBoundingClientRect();
+    panel.style.setProperty("--ox", (r.left + r.width / 2 - o.left - panel.offsetLeft) + "px");
+    panel.style.setProperty("--oy", (r.top + r.height / 2 - o.top - panel.offsetTop) + "px");
+  }
+}
+function closeFolder(){ state.folderOpen = false; saveState(); render(); }
+
+function folderHtml(){
+  if(!state.folderOpen) return "";
+  var items = MISSIONS.map(function(m){
+    var done = state.missions[m.id].done;
+    return appIconHtml({onclick:"openMission('" + m.id + "')", bg:ICON_BG[m.id], cls:done ? "done" : "", inner:iconSpr(m.id),
+      label:t(m.nameKey), badge:done ? '<span class="doneBadge">&#10003;</span>' : ""});
+  }).join("");
+  items += COMING_SOON_MISSIONS.map(function(m){
+    return appIconHtml({onclick:"comingSoon()", bg:ICON_BG[m.id], cls:"soon", inner:iconSpr(m.id), label:t(m.nameKey), tag:t("comingSoon")});
+  }).join("");
+  return '<div class="folderOverlay" onclick="closeFolder()">' +
+    '<div class="folderPanel" onclick="event.stopPropagation()">' +
+      '<button class="folderClose" onclick="closeFolder()" aria-label="Close">&#10005;</button>' +
+      '<h2 class="folderTitle">' + t("missionsFolder") + '</h2>' +
+      '<div class="folderGrid">' + items + '</div>' +
+    '</div></div>';
+}
+
+// ---- Passport / Golden Ticket: the icon's tile grows to fill the screen, then the screen appears ----
+var iconExpanding = false;
+function openFromIcon(icon, screenId){
+  if(iconExpanding) return;
+  var tile = icon.querySelector(".appTile");
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!tile || calm){ go(screenId); return; }
+  iconExpanding = true;
+  var r = tile.getBoundingClientRect(), c = tile.cloneNode(true);
+  c.className = "expandClone";
+  c.style.cssText = "left:" + r.left + "px;top:" + r.top + "px;width:" + r.width + "px;height:" + r.height + "px;background:" + tile.style.background + ";";
+  document.body.appendChild(c);
+  void c.offsetWidth;
+  c.style.left = "0px"; c.style.top = "0px"; c.style.width = window.innerWidth + "px"; c.style.height = window.innerHeight + "px"; c.style.borderRadius = "0px";
+  var spr = c.querySelector("img"); if(spr) spr.style.transform = "scale(8)";
+  setTimeout(function(){ go(screenId); }, 280);
+  setTimeout(function(){ c.style.opacity = "0"; }, 300);
+  setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); iconExpanding = false; }, 650);
 }
 
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
-  var tiles = MISSIONS.map(function(m){
-    var done = state.missions[m.id].done;
-    return '<div class="missionTile' + (done?' done':'') + '" onclick="openMission(\'' + m.id + '\')">' +
-      '<span class="ic">' + (done ? "✅" : m.icon) + '</span>' +
-      '<span class="lbl">' + t(m.nameKey) + '</span>' +
-      (done ? '<span class="chk">✓ ' + t("done") + '</span>' : '') +
-    '</div>';
-  }).join("");
-  // Room for 15 missions: the five tiles after the real ten are placeholders (they are NOT in
-  // MISSIONS, so they add no points, saved state or Passport pages) until each game is built.
-  tiles += COMING_SOON_MISSIONS.map(function(m){
-    return '<div class="missionTile soon" onclick="comingSoon()">' +
-      '<span class="ic">' + m.icon + '</span>' +
-      '<span class="lbl">' + t(m.nameKey) + '</span>' +
-      '<span class="tag">' + t("comingSoon") + '</span>' +
-    '</div>';
-  }).join("");
-  tiles += '<div class="missionTile passportTile" onclick="openPassport()">' +
-      '<span class="ic">📔</span><span class="lbl">' + t("passport") + '</span>' +
-    '</div>';
-  var ticketBtn = goldenTicketUnlocked() ? '<button class="btn gold" onclick="go(\'goldenTicket\')">' + t("showTicket") + '</button>' : "";
-  return '<div class="screen">' +
-    '<h1>Fe y Vida Quest</h1>' +
+  var doneCount = MISSIONS.filter(function(m){ return state.missions[m.id].done; }).length;
+  var unlocked = goldenTicketUnlocked();
+  var mini = ["faithFlash", "faithMatch", "beTheLight", "stainedGlass"].map(function(id){ return iconSpr(id); }).join("");
+  var icons =
+    appIconHtml({onclick:"openFolder(this)", bg:"rgba(255,255,255,.42)", cls:"folderIcon", inner:'<div class="miniGrid">' + mini + '</div>',
+      label:t("missionsFolder"), badge:'<span class="countBadge">' + doneCount + '/' + MISSIONS.length + '</span>'}) +
+    appIconHtml({onclick:"openFromIcon(this,'passport')", bg:ICON_BG.passport, inner:iconSpr("passport"), label:t("passport")}) +
+    appIconHtml({onclick:unlocked ? "openFromIcon(this,'goldenTicket')" : "ticketLocked()", bg:unlocked ? ICON_BG.goldenTicket : ICON_BG.lock,
+      cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")});
+  return '<div class="screen pixHome pixSky pixMenu">' +
+    '<div class="pixSkyClouds"></div>' +
+    '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
     '<div class="progressWrap">' +
       '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
       '<div class="progressLabel">' + state.points + ' / ' + GOLDEN_TICKET_POINTS + ' ' + t("questPoints") + '</div>' +
     '</div>' +
-    '<div class="missionGrid">' + tiles + '</div>' +
-    tempResetHtml() +
+    '<div class="homeGrid">' + icons + '</div>' +
     '<div class="spacer"></div>' +
-    ticketBtn +
+    tempResetHtml() +
+    folderHtml() +
   '</div>';
 }
 
