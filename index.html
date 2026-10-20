@@ -229,8 +229,8 @@
   .petFlip{width:100%;height:100%;}
   .petFlip.left{transform:scaleX(-1);}
   .petSprite{width:100%;height:100%;background-size:200% 100%;background-repeat:no-repeat;image-rendering:pixelated;animation:petBreath 2.4s steps(1) infinite;}
-  .petSprite.sheepNear{background-image:url("tiles/sheep_near.png");}
-  .petSprite.sheepFar{background-image:url("tiles/sheep_far.png");}
+  .petSprite.sheepNear{background-image:url("tiles/sheep_near2.png");}
+  .petSprite.sheepFar{background-image:url("tiles/sheep_far2.png");}
   .pixPet::before{content:"";position:absolute;left:-35%;right:-35%;top:-50%;bottom:-30%;}   /* a bigger target for a finger */
   .pixPet.hop{animation:pilgrimHop .4s ease-out;}
   .pixPet.walking .petSprite{animation:petStep .4s steps(1) infinite,pilgrimBob .4s steps(1) infinite;}
@@ -340,6 +340,8 @@
      missions keep their current look until they are done too. */
   .pixMission .pixMTitle{margin:6px 0 10px;padding:0 46px;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
+  /* Faith Match and Faith Flash sit 40px lower on the screen (2026-10-20, per Dan); the title is the first thing on both, so they line up */
+  .pixMission.pixLower{padding-top:calc(env(safe-area-inset-top,0px) + 58px);}
   .pixPips{display:flex;justify-content:center;gap:5px;margin:0 0 14px;}
   .pixPip{width:15px;height:15px;box-sizing:border-box;border:2px solid #1B1F3B;border-radius:3px;background:rgba(27,31,59,.35);}
   .pixPip.done{background:#FFC93A;}
@@ -371,6 +373,9 @@
     .pixQ{font-size:1.125rem;line-height:1.25;}
     .pixAnsList{gap:8px;margin:12px 0 4px;}
     .pixAns{min-height:44px;padding:6px 10px 8px;font-size:1rem;}
+    .pixPips{margin-bottom:6px;}
+    .pixChances{margin-bottom:6px;}
+    .pixMission .pixAnsList{gap:6px;margin:8px 0 2px;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
   }
   /* Word Unscramble in the same pixel style (2026-10-20, per Dan): letter slots on the card, blue letter tiles below. */
@@ -614,10 +619,10 @@ var T = {
     faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
     stainedGlassName:"Stained-Glass Puzzle", chooseJoyName:"Choose Joy",
     done:"DONE",
-    ff_intro:"Answer all 10 questions correctly to earn your badge!",
+    ff_intro:"Get through all 10 questions to earn your badge! You have 3 chances.",
     nextQuestion:"NEXT QUESTION", collectAward:"COLLECT AWARD", playAgain:"PLAY AGAIN", tryAgain:"TRY AGAIN",
-    ff_resultsTitlePass:"Perfect Score!", ff_resultsTitleFail:"So Close!",
-    ff_resultsBodyPass:"You answered all 10 questions correctly!",
+    ff_resultsTitlePass:"Perfect Score!", ff_resultsTitlePass2:"Well Done!", ff_resultsTitleFail:"So Close!",
+    ff_resultsBodyPass:"You answered all 10 questions correctly!", ff_resultsBodyPass2:"You made it through all 10 questions!",
     ff_resultsBodyFail:"Don't worry — give it another shot!",
     scoreOf:function(c,t){return "You got "+c+" out of "+t+" correct.";},
     fm_intro:"Match all the pairs on each level!",
@@ -625,7 +630,7 @@ var T = {
     fm_level:function(n,total){return "Level "+n+" of "+total;},
     chancesLeft:"Chances left:",
     fm_failTitle:"Out of Chances!",
-    fm_failBody:"Give this level another try.",
+    fm_failBody:"Not this time! You start over from Level 1.",
     fm_passTitle:"All 3 Levels Complete!",
     fm_passBody:"You matched every pair. Amazing work!",
     bl_title:"Be the Light",
@@ -709,10 +714,10 @@ var T = {
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
     stainedGlassName:"Rompecabezas de Vitral", chooseJoyName:"Elige la Alegría",
     done:"COMPLETADO",
-    ff_intro:"¡Responde las 10 preguntas correctamente para ganar tu insignia!",
+    ff_intro:"¡Supera las 10 preguntas para ganar tu insignia! Tienes 3 oportunidades.",
     nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
-    ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitleFail:"¡Tan Cerca!",
-    ff_resultsBodyPass:"¡Respondiste las 10 preguntas correctamente!",
+    ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitlePass2:"¡Bien Hecho!", ff_resultsTitleFail:"¡Tan Cerca!",
+    ff_resultsBodyPass:"¡Respondiste las 10 preguntas correctamente!", ff_resultsBodyPass2:"¡Superaste las 10 preguntas!",
     ff_resultsBodyFail:"No te preocupes, ¡inténtalo de nuevo!",
     scoreOf:function(c,t){return "Obtuviste "+c+" de "+t+" correctas.";},
     fm_intro:"¡Empareja todos los pares en cada nivel!",
@@ -720,7 +725,7 @@ var T = {
     fm_level:function(n,total){return "Nivel "+n+" de "+total;},
     chancesLeft:"Oportunidades restantes:",
     fm_failTitle:"¡Sin Oportunidades!",
-    fm_failBody:"Inténtalo de nuevo en este nivel.",
+    fm_failBody:"¡Esta vez no! Empiezas de nuevo desde el Nivel 1.",
     fm_passTitle:"¡Los 3 Niveles Completos!",
     fm_passBody:"¡Emparejaste todos los pares! Excelente trabajo.",
     bl_title:"Sé la Luz",
@@ -1160,13 +1165,11 @@ function pixBlip(ctx){
   } catch(e){}
 }
 // ---- sound effects (2026-10-20, per Dan) ----
-// sounds/sfx_tap.wav (a trimmed copy of sound_effect_4) is the button sound everywhere; sfx_correct / sfx_wrong (sound_effect_1 / _2)
-// are Faith Flash's answer sounds; sfx_fm_* (sound_effects 6-9) are Faith Match's match / miss / last-chance / level-clear fanfare. The files are fetched when the app
+// sounds/sfx_tap.wav (a trimmed copy of sound_effect_4) is the button sound everywhere; sfx_fm_* (sound_effects 6-10) are the match / miss /
+// last-chance / first-tile / level-clear sounds of Faith Match -- and Faith Flash uses the match, miss and last-chance ones for its answers. The files are fetched when the app
 // opens and decoded as soon as the first tap gives the page an audio context. Until a file is ready, taps use the old synthesized blip.
 var PIX_SFX = {
   tap:{url:"sounds/sfx_tap.wav", gain:1.6},
-  correct:{url:"sounds/sfx_correct.mp3", gain:1},
-  wrong:{url:"sounds/sfx_wrong.mp3", gain:1},
   // Faith Match (2026-10-20, per Dan): sound_effect_6 = a match, _9 = a miss, _8 = the last chance used, _7 = the level-clear fanfare
   fmFirst:{url:"sounds/sfx_fm_first.wav", gain:0.26},   // sound_effect_10: the first of the two tiles (levelled with the other Faith Match sounds)
   fmMatch:{url:"sounds/sfx_fm_match.mp3", gain:0.25},   // was 0.55: too loud next to the other sounds (2026-10-20, per Dan)
@@ -1355,7 +1358,7 @@ document.addEventListener("click", pixReviveOnTap, true);
 
 // Every button, icon and tile that can be tapped makes the button sound -- including the ones with no sound wired in by hand.
 var PIX_TAP_SELECTOR = "button, [role=button], .appIcon, .flPad, .hbSpot";   // (Faith Match tiles call pixPressSfx / pixClickSfx themselves: see fmPress)
-function pixTapTarget(e){ var el = e.target && e.target.closest ? e.target.closest(PIX_TAP_SELECTOR) : null; return (el && !el.disabled) ? el : null; }
+function pixTapTarget(e){ var el = e.target && e.target.closest ? e.target.closest(PIX_TAP_SELECTOR) : null; return (el && !el.disabled && !el.hasAttribute("data-sfx")) ? el : null; }   // data-sfx = this element plays its own sound
 document.addEventListener("pointerdown", function(e){ if(pixTapTarget(e)) pixPressSfx(); }, true);
 document.addEventListener("click", function(e){ if(pixTapTarget(e)) pixClickSfx(); }, true);
 pixSfxFetchAll();
@@ -1415,7 +1418,7 @@ function goldenTicketUnlocked(){
 function openMission(id){
   if(state.missions[id].done) return;
   if(id === "faithFlash"){ initFaithFlash(); go("faithFlash"); }
-  else if(id === "faithMatch"){ preloadMatchTiles(); initFaithMatchLevel(state.missions.faithMatch.level||0); go("faithMatch"); }
+  else if(id === "faithMatch"){ preloadMatchTiles(); initFaithMatchLevel(0); go("faithMatch"); }   // always from Level 1
   else if(id === "beTheLight"){ go("beTheLight"); }
   else if(id === "stainedGlass"){ preloadMatchTiles(); initStainedGlass(); go("stainedGlass"); }
   else if(id === "chooseJoy"){ initChooseJoy(); go("chooseJoy"); }
@@ -1591,8 +1594,8 @@ function pilgrimPoint(f){
 // The two sheep each wander about inside their own invisible area of the lawn (2026-10-20, per Dan): box = where their feet can go,
 // in picture pixels. They walk to a random spot, stand a moment, then pick another.
 var PETS = [
-  {id:"petSheep1", kind:"sheepNear", w:16, h:12, speed:10, box:{x0:66, x1:114, y0:105, y1:117}},
-  {id:"petSheep2", kind:"sheepFar", w:14, h:11, speed:7,  box:{x0:30, x1:58,  y0:84,  y1:91}}   // the open grass on the left, one bend up (the dog and the cat became white sheep, 2026-10-20, per Dan)
+  {id:"petSheep1", kind:"sheepNear", w:16, h:10, speed:10, box:{x0:66, x1:114, y0:105, y1:117}},
+  {id:"petSheep2", kind:"sheepFar", w:14, h:9, speed:7,  box:{x0:30, x1:58,  y0:84,  y1:91}}   // the open grass on the left, one bend up (the dog and the cat became white sheep, 2026-10-20, per Dan)
 ];
 var petState = {}, petsRaf = 0;   // petState keeps where each one is, so a redraw of the screen doesn't move them
 function petHtml(p){
@@ -1876,10 +1879,13 @@ function afterAward(){
 // Dan -- the pool is now 74 questions, so asking all of them would be a very
 // long round). PLAY AGAIN draws a fresh 10.
 var FAITH_FLASH_ROUND_SIZE = 10;
+// Three chances, shown as hearts just like Faith Match (2026-10-20, per Dan): a wrong answer costs one, and the round ends when the last is gone.
+var FF_CHANCES = 3;
+function ffChancesLeft(s){ return typeof s.chances === "number" ? s.chances : FF_CHANCES; }
 
 function initFaithFlash(){
   var order = shuffle(FAITH_FLASH_QUESTIONS.map(function(_,i){return i;})).slice(0, FAITH_FLASH_ROUND_SIZE);
-  state.session.faithFlash = {order:order, index:0, correct:0, answered:null, answerOrder:shuffle([0,1,2]), status:"playing"};
+  state.session.faithFlash = {order:order, index:0, correct:0, answered:null, answerOrder:shuffle([0,1,2]), status:"playing", chances:FF_CHANCES, past:[]};
   saveState();
 }
 
@@ -1890,18 +1896,26 @@ function ffAnswer(choiceIdx){
   var actualIdx = s.answerOrder[choiceIdx];
   s.answered = choiceIdx;
   var isCorrect = actualIdx === q.correct;
+  if(!s.past) s.past = [];
+  s.past[s.index] = isCorrect ? "done" : "bad";
   if(isCorrect) s.correct++;
-  pixSfxPlay(isCorrect ? "correct" : "wrong", true);
+  else s.chances = ffChancesLeft(s) - 1;
+  var lastChance = !isCorrect && s.chances <= 0;
+  // the same sounds as Faith Match: a match, a miss, or the last chance used
+  pixSfxPlay(isCorrect ? "fmMatch" : (lastChance ? "fmLast" : "fmMiss"), true);
   saveState(); render();
-  if(!isCorrect){
+  if(lastChance){
     setTimeout(function(){
       var s2 = state.session.faithFlash;
-      if(!s2 || s2.status !== "playing") return;
+      if(!s2 || s2 !== s || s2.status !== "playing") return;   // only this round: not a new one started in the meantime
       s2.status = "results";
       saveState(); render();
     }, 1300);
   }
 }
+// The answer buttons make no button sound of their own: the answer's own sound is the one you hear.
+function ffPress(){ pixPressSfx("none"); }
+function ffClickAnswer(i){ pixClickSfx("none"); ffAnswer(i); }
 
 function ffNext(){
   var s = state.session.faithFlash;
@@ -1925,7 +1939,7 @@ function ffPlayAgain(){ initFaithFlash(); go("faithFlash"); }
 function missionById(id){ return MISSIONS.filter(function(m){ return m.id === id; })[0]; }
 
 // the sky, the clouds and whatever the screen holds
-function pixShell(inner){ return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() + inner + '</div>'; }
+function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
 
 // a pixel button with the glow and the press sound; secondary = the blue one
 function pixBtnHtml(label, js, secondary){
@@ -1942,7 +1956,7 @@ function pixResultHtml(nameKey, o){
       '<div class="pixResTitle">' + o.title + '</div>' +
       '<p class="pixResBody">' + o.body + '</p>' +
     '</div>' +
-    '<div class="spacer"></div>' + o.buttons);
+    '<div class="spacer"></div>' + o.buttons, o.cls);
 }
 
 // a mission's pixel icon on its coloured tile, big, for the cream cards
@@ -1950,11 +1964,12 @@ function pixBigTileHtml(id){ return '<div class="pixBigTile" style="background:'
 
 // A row of pixel squares showing progress through a mission: gold = done, white = this one, red = the one that ended the round.
 // mark is "done", "bad" or "now" for the square at `index`.
-function pixPipsHtml(total, index, mark, label){
+function pixPipsHtml(total, index, mark, label, past){   // past = optional list saying how each earlier question went ("done" or "bad")
   var h = "";
   for(var i = 0; i < total; i++){
     var c = "pixPip";
-    if(i < index || (i === index && mark === "done")) c += " done";
+    if(i < index) c += (past && past[i] === "bad") ? " bad" : " done";
+    else if(i === index && mark === "done") c += " done";
     else if(i === index) c += (mark === "bad" ? " bad" : " now");
     h += '<div class="' + c + '"></div>';
   }
@@ -1968,13 +1983,14 @@ function screenFaithFlash(){
   var press = ' onpointerdown="pixPressSfx()" ';
 
   if(s.status === "results"){
-    var pass = s.correct === s.order.length;
-    return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+    var pass = ffChancesLeft(s) > 0;                 // got through all the questions with a chance to spare
+    var perfect = pass && s.correct === s.order.length;
+    return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
       '<div class="pixPaper">' +
         (pass ? '<img class="pixResBadge" src="tiles/badges8/b8_faith.png" alt="">' : '') +
-        '<div class="pixResTitle">' + (pass ? t("ff_resultsTitlePass") : t("ff_resultsTitleFail")) + '</div>' +
-        '<p class="pixResBody">' + (pass ? t("ff_resultsBodyPass") : t("ff_resultsBodyFail")) + '</p>' +
+        '<div class="pixResTitle">' + (perfect ? t("ff_resultsTitlePass") : (pass ? t("ff_resultsTitlePass2") : t("ff_resultsTitleFail"))) + '</div>' +
+        '<p class="pixResBody">' + (perfect ? t("ff_resultsBodyPass") : (pass ? t("ff_resultsBodyPass2") : t("ff_resultsBodyFail"))) + '</p>' +
         // Denominator is how many questions were actually ANSWERED (s.index+1
         // -- s.index is still the failed question's own 0-based index when a
         // wrong answer ends the round early, since ffAnswer never advances it),
@@ -2001,16 +2017,17 @@ function screenFaithFlash(){
       if(actualIdx === q.correct) cls += " correct";
       else if(displayedI === s.answered) cls += " wrong";
     }
-    return '<button class="' + cls + '"' + press + 'onclick="pixClickSfx();ffAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
+    return '<button class="' + cls + '" data-sfx="own" onpointerdown="ffPress()" onclick="ffClickAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
   }).join("");
 
-  return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+  return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
-    pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now")) +
+    pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now"), null, s.past) +
+    '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ffChancesLeft(s)), FF_CHANCES) + '</div>' +
     '<div class="pixPaper"><div class="pixQ">' + qLang.q + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
-    (answered && isCorrect ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffNext()">' + t("nextQuestion") + '</button>' : '') +
+    (answered && ffChancesLeft(s) > 0 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffNext()">' + t("nextQuestion") + '</button>' : '') +
     '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ffQuit()">' + t("mainMenu") + '</button>' +
     (isCorrect ? '<div class="pixFlash"></div>' : '') +
   '</div>';
@@ -2174,9 +2191,10 @@ function fmCollectAward(){
   grantMission("faithMatch");
 }
 
+// A level that is not finished sends the player back to Level 1 (2026-10-20, per Dan): running out of chances, and also leaving Faith Match
+// part-way through. (A page reload in the middle of a level still resumes that level, since the game is saved.)
 function fmTryAgain(){
-  var level = state.missions.faithMatch.level;
-  initFaithMatchLevel(level);
+  initFaithMatchLevel(0);
   go("faithMatch");
 }
 
@@ -2197,18 +2215,18 @@ function screenFaithMatch(){
     // Guaranteed brief in practice (preload starts at app boot), but this is
     // what actually prevents the blank-white-tile flash: no card can be
     // flipped until every tile image has genuinely finished loading.
-    return pixShell('<div class="spacer"></div><div class="pixPaper"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
+    return pixShell('<div class="spacer"></div><div class="pixPaper"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>', "pixLower");
   }
   var s = state.session.faithMatch;
-  if(!s){ initFaithMatchLevel(state.missions.faithMatch.level||0); s = state.session.faithMatch; }
+  if(!s){ initFaithMatchLevel(0); s = state.session.faithMatch; }
 
   if(s.status === "failed"){
-    return pixResultHtml("faithMatchName", {title:t("fm_failTitle"), body:t("fm_failBody"),
+    return pixResultHtml("faithMatchName", {cls:"pixLower", title:t("fm_failTitle"), body:t("fm_failBody"),
       buttons:pixBtnHtml(t("tryAgain"), "fmTryAgain()") + pixBtnHtml(t("mainMenu"), "fmQuit()", true)});
   }
 
   if(s.status === "complete"){
-    return pixResultHtml("faithMatchName", {title:t("fm_passTitle"), body:t("fm_passBody"), badge:"faithMatch",
+    return pixResultHtml("faithMatchName", {cls:"pixLower", title:t("fm_passTitle"), body:t("fm_passBody"), badge:"faithMatch",
       buttons:pixBtnHtml(t("collectAward"), "fmCollectAward()") + pixBtnHtml(t("mainMenu"), "fmQuit()", true)});
   }
 
@@ -2231,7 +2249,7 @@ function screenFaithMatch(){
     '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0,s.chances), s.maxChances || MATCH_CHANCES[s.level]) + '</div>' +
     '<div class="matchGrid' + (s.celebrate ? ' celebrate' : '') + '" style="grid-template-columns:repeat(' + dim + ',1fr)">' + cellsHtml + '</div>' +
     '<div class="spacer"></div>' +
-    pixBtnHtml(t("mainMenu"), "fmQuit()", true));
+    pixBtnHtml(t("mainMenu"), "fmQuit()", true), "pixLower");
 }
 
 /* ---------- Be the Light ---------- */
