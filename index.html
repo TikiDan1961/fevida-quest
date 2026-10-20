@@ -18,6 +18,12 @@
     --good:#2E9E4F;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  /* This is a game, not a document: tapping or holding a button, tile or text must
+     never highlight it as if it were being copied, and a long press must not open
+     the iOS copy/save-image bubble (2026-10-19, per Dan). */
+  #app{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+  #app img{-webkit-user-drag:none;user-drag:none;}
+  button{touch-action:manipulation;}
   html,body{margin:0;padding:0;height:100%;overflow:hidden;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
