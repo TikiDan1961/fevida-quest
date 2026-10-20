@@ -328,6 +328,25 @@
     .pixAns{min-height:44px;padding:6px 10px 8px;font-size:1rem;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
   }
+  /* Word Unscramble in the same pixel style (2026-10-20, per Dan): letter slots on the card, blue letter tiles below. */
+  .pixWuIntro{margin:0 0 14px;font-weight:600;font-size:1.0625rem;line-height:1.3;}
+  .pixWuRow{display:flex;gap:4px;justify-content:center;flex-wrap:nowrap;}
+  .pixSlot{flex:1 1 0;min-width:0;max-width:38px;height:46px;box-sizing:border-box;border:3px solid #1B1F3B;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;color:#1E2F7A;box-shadow:inset 0 3px 0 rgba(30,47,122,.12);}
+  .pixSlot.filled{background:#FFC93A;}
+  .pixWuRow.correct .pixSlot{background:#52C246;border-color:#1E6B2B;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);}
+  .pixWuRow.wrong .pixSlot{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
+  .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:20px 0 6px;}
+  .pixTile{width:46px;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
+    color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
+  .pixTile:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .pixTile.used{pointer-events:none;background:rgba(27,31,59,.22);border-color:rgba(27,31,59,.4);color:transparent;text-shadow:none;box-shadow:none;}
+  @media (max-height:640px){
+    .pixWuIntro{margin-bottom:10px;font-size:1rem;}
+    .pixSlot{height:40px;}
+    .pixTray{margin-top:14px;}
+    .pixTile{height:46px;}
+  }
   .qaBox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:16px;margin:10px 0;}
   .answerBtn{
     display:block;width:100%;text-align:left;
@@ -1444,6 +1463,19 @@ function ffCollectAward(){
 
 function ffPlayAgain(){ initFaithFlash(); go("faithFlash"); }
 
+// A row of pixel squares showing progress through a mission: gold = done, white = this one, red = the one that ended the round.
+// mark is "done", "bad" or "now" for the square at `index`.
+function pixPipsHtml(total, index, mark){
+  var h = "";
+  for(var i = 0; i < total; i++){
+    var c = "pixPip";
+    if(i < index || (i === index && mark === "done")) c += " done";
+    else if(i === index) c += (mark === "bad" ? " bad" : " now");
+    h += '<div class="' + c + '"></div>';
+  }
+  return '<div class="pixPips" role="img" aria-label="' + (index+1) + ' / ' + total + '">' + h + '</div>';
+}
+
 function screenFaithFlash(){
   var s = state.session.faithFlash;
   if(!s){ initFaithFlash(); s = state.session.faithFlash; }
@@ -1487,18 +1519,9 @@ function screenFaithFlash(){
     return '<button class="' + cls + '"' + press + 'onclick="pixClickSfx();ffAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
   }).join("");
 
-  // one pixel square per question: gold = answered right, white = this one, red = the one that ended the round
-  var pips = "";
-  for(var i = 0; i < s.order.length; i++){
-    var pc = "pixPip";
-    if(i < s.index || (i === s.index && isCorrect)) pc += " done";
-    else if(i === s.index) pc += answered ? " bad" : " now";
-    pips += '<div class="' + pc + '"></div>';
-  }
-
   return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
-    '<div class="pixPips" role="img" aria-label="' + (s.index+1) + ' / ' + s.order.length + '">' + pips + '</div>' +
+    pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now")) +
     '<div class="pixPaper"><div class="pixQ">' + qLang.q + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
@@ -2087,36 +2110,45 @@ function wuQuit(){ state.session.wordUnscramble = null; go("mainMenu"); }
 function screenWordUnscramble(){
   var s = state.session.wordUnscramble;
   if(!s){ initWordUnscramble(); s = state.session.wordUnscramble; }
+  var press = ' onpointerdown="pixPressSfx()" ';
 
   if(s.status === "results"){
-    return '<div class="screen center">' +
-      '<h1>' + t("wu_passTitle") + '</h1>' +
-      '<p>' + t("wu_passBody") + '</p>' +
+    var wm = MISSIONS.filter(function(m){ return m.id === "wordUnscramble"; })[0];
+    return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+      '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
+      '<div class="pixPaper">' +
+        '<img class="pixResBadge" src="' + badge8Src(wm) + '" alt="">' +
+        '<div class="pixResTitle">' + t("wu_passTitle") + '</div>' +
+        '<p class="pixResBody">' + t("wu_passBody") + '</p>' +
+      '</div>' +
       '<div class="spacer"></div>' +
-      '<button class="btn gold" onclick="wuCollectAward()">' + t("collectAward") + '</button>' +
+      '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();wuCollectAward()">' + t("collectAward") + '</button>' +
     '</div>';
   }
 
-  var rowCls = "wuAnswerRow" + (s.feedback ? " " + s.feedback : "");
+  var rowCls = "pixWuRow" + (s.feedback ? " " + s.feedback : "");
   var slotsHtml = "";
   for(var i=0;i<s.word.length;i++){
     var filled = i < s.picked.length;
-    slotsHtml += '<div class="wuSlot' + (filled?' filled':'') + '">' + (filled ? s.letters[s.picked[i]] : "") + '</div>';
+    slotsHtml += '<div class="pixSlot' + (filled?' filled':'') + '">' + (filled ? s.letters[s.picked[i]] : "") + '</div>';
   }
   var trayHtml = s.letters.map(function(ch, pos){
     var used = s.picked.indexOf(pos) !== -1;
-    return '<div class="wuTile' + (used?' used':'') + '" onclick="wuPick(' + pos + ')">' + ch + '</div>';
+    return '<button class="pixTile' + (used?' used':'') + '"' + press + 'onclick="pixClickSfx();wuPick(' + pos + ')">' + ch + '</button>';
   }).join("");
 
-  return '<div class="screen">' +
-    '<h2>' + t("wordUnscrambleName") + '</h2>' +
-    '<p class="smallNote">' + t("wu_word")(s.index+1, s.order.length) + '</p>' +
-    '<p class="center">' + t("wu_intro") + '</p>' +
-    '<div class="' + rowCls + '">' + slotsHtml + '</div>' +
-    '<div class="wuTray">' + trayHtml + '</div>' +
+  return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+    '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
+    pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now") +
+    '<div class="pixPaper">' +
+      '<p class="pixWuIntro">' + t("wu_intro") + '</p>' +
+      '<div class="' + rowCls + '">' + slotsHtml + '</div>' +
+    '</div>' +
+    '<div class="pixTray">' + trayHtml + '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn outline" onclick="wuClear()">' + t("clearWord") + '</button>' +
-    '<button class="btn outline" onclick="wuQuit()">' + t("mainMenu") + '</button>' +
+    '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();wuClear()">' + t("clearWord") + '</button>' +
+    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();wuQuit()">' + t("mainMenu") + '</button>' +
+    (s.feedback === "correct" ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
 
