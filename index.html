@@ -370,7 +370,7 @@
   .pixMission .matchGrid{margin:10px 0;}
   .pixMission .matchCard,.pixMission .flPad{aspect-ratio:1/1;border-radius:8px;border:3px solid #1B1F3B;background:#3A5BD0 url("tiles/card_back.png") center / 100% 100% no-repeat;image-rendering:pixelated;
     box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:none;}
-  .pixMission .matchCard:active,.pixMission .flPad:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.85);}
+  .pixMission .matchCard:active,.pixMission .flPad:active{transform:none;box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.85);}
   .pixMission .matchCard.flipped,.pixMission .matchCard.matched,.pixMission .flPad.lit{background:#fff;}
   .pixMission .matchCard.matched{opacity:.5;filter:brightness(.7);box-shadow:none;pointer-events:none;}
   .pixMission .matchGrid.celebrate .matchCard.matched{opacity:1;filter:none;border-color:#1B1F3B;box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);}
@@ -952,6 +952,9 @@ var MATCH_LEVELS = [4,4,4]; // grid dimension (NxN) — 3 levels, 4x4 each (8x8 
 // one random tile frame at a time glows for a tenth of a second, for 3 seconds in all (30 glows) -- while the level-clear
 // sound plays once -- and then the next level starts. (First built at half a second per glow; sped up the same day.)
 var FM_FLASH_MS = 100, FM_FLASH_STEPS = Math.round(3000 / FM_FLASH_MS);
+// A beat between the last match and the fanfare (2026-10-20, per Dan), so the match sound finishes first instead of being cut
+// off by the fanfare. The tiles stay as they were until the fanfare and the flashing start.
+var FM_FANFARE_DELAY_MS = 1000;
 var MATCH_CHANCES = [10,10,10]; // chances per level, matching MATCH_LEVELS (raised from 6, 2026-09-29, per Dan)
 
 function defaultState(){
@@ -1743,7 +1746,7 @@ function initFaithMatchLevel(levelIdx){
 
 function fmFlip(cardId){
   var s = state.session.faithMatch;
-  if(!s || s.status !== "playing" || s.celebrate || s.chances <= 0) return;
+  if(!s || s.status !== "playing" || s.levelDone || s.celebrate || s.chances <= 0) return;
   if(s.flipped.length >= 2) return;
   var card = s.cards[cardId];
   if(card.matched || s.flipped.indexOf(cardId) !== -1) return;
@@ -1780,7 +1783,7 @@ function fmEvaluate(){
       if(s.level === MATCH_LEVELS.length - 1){
         s.status = "complete";
       } else {
-        s.celebrate = true;
+        s.levelDone = true;
         saveState(); render();
         fmCelebrate();
         return;
@@ -1811,29 +1814,37 @@ var fmCelebrating = false;
 function fmCelebrate(){
   if(fmCelebrating) return;
   var s = state.session.faithMatch;
-  if(!s || !s.celebrate) return;
+  if(!s || !(s.levelDone || s.celebrate)) return;
   fmCelebrating = true;
-  var nextLevel = s.level + 1, step = 0, last = -1, t0 = performance.now();
-  pixSfxPlay("levelClear", true);
-  function tick(){
+  var nextLevel = s.level + 1;
+  function begin(){
     var s2 = state.session.faithMatch;
-    if(!s2 || !s2.celebrate || state.screen !== "faithMatch"){ fmCelebrating = false; return; } // the player left
-    var cards = document.querySelectorAll(".matchGrid .matchCard");
-    for(var i = 0; i < cards.length; i++) cards[i].classList.remove("glow");
-    if(step >= FM_FLASH_STEPS){
-      fmCelebrating = false;
-      initFaithMatchLevel(nextLevel);
-      render();
-      return;
+    if(!s2 || !(s2.levelDone || s2.celebrate) || state.screen !== "faithMatch"){ fmCelebrating = false; return; } // the player left
+    s2.celebrate = true;
+    saveState(); render();                     // every tile goes to normal brightness
+    pixSfxPlay("levelClear", false);           // not exclusive: the tail of the match sound is allowed to finish underneath
+    var step = 0, last = -1, t0 = performance.now();
+    function tick(){
+      var s3 = state.session.faithMatch;
+      if(!s3 || !s3.celebrate || state.screen !== "faithMatch"){ fmCelebrating = false; return; }
+      var cards = document.querySelectorAll(".matchGrid .matchCard");
+      for(var i = 0; i < cards.length; i++) cards[i].classList.remove("glow");
+      if(step >= FM_FLASH_STEPS){
+        fmCelebrating = false;
+        initFaithMatchLevel(nextLevel);
+        render();
+        return;
+      }
+      var idx;
+      do { idx = Math.floor(Math.random() * cards.length); } while(idx === last && cards.length > 1);
+      last = idx;
+      if(cards[idx]) cards[idx].classList.add("glow");
+      step++;
+      setTimeout(tick, Math.max(0, t0 + step * FM_FLASH_MS - performance.now()));
     }
-    var idx;
-    do { idx = Math.floor(Math.random() * cards.length); } while(idx === last && cards.length > 1);
-    last = idx;
-    if(cards[idx]) cards[idx].classList.add("glow");
-    step++;
-    setTimeout(tick, Math.max(0, t0 + step * FM_FLASH_MS - performance.now()));
+    tick();
   }
-  tick();
+  setTimeout(begin, s.celebrate ? 0 : FM_FANFARE_DELAY_MS);   // after a reload mid-celebration there is no second pause
 }
 
 function fmCollectAward(){
@@ -3272,7 +3283,7 @@ function render(){
   // time was last saved) instead of leaving the stage empty and frozen. The
   // "GET READY" countdown (clReadyRunning) gets the same treatment for a
   // reload landing mid-countdown.
-  if(state.screen === "faithMatch" && state.session.faithMatch && state.session.faithMatch.celebrate && !fmCelebrating) fmCelebrate();
+  if(state.screen === "faithMatch" && state.session.faithMatch && (state.session.faithMatch.levelDone || state.session.faithMatch.celebrate) && !fmCelebrating) fmCelebrate();
   var clSession = state.session.catchLight;
   if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
     if(clSession.phase === "playing" && !clRunning) clStart();
