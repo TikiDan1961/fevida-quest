@@ -290,6 +290,44 @@
   .tempResetLbl{width:100%;font-size:.68rem;letter-spacing:.06em;opacity:.7;}
   .tempReset button{background:transparent;color:var(--cream);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:6px 8px;font-size:.72rem;cursor:pointer;}
 
+  /* Pixel-style mission screens (2026-10-20, per Dan) -- Faith Flash first. Same sky and clouds as the Home Screen, a cream pixel card,
+     and answer buttons built like the language buttons (glow + press sound). Everything is scoped to .pixMission so the other
+     missions keep their current look until they are done too. */
+  .pixMission .pixMTitle{margin:6px 0 10px;padding:0 46px;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
+  .pixPips{display:flex;justify-content:center;gap:5px;margin:0 0 14px;}
+  .pixPip{width:15px;height:15px;box-sizing:border-box;border:2px solid #1B1F3B;border-radius:3px;background:rgba(27,31,59,.35);}
+  .pixPip.done{background:#FFC93A;}
+  .pixPip.now{background:#fff;}
+  .pixPip.bad{background:#D6343A;}
+  .pixPaper{background:#FFF3D6;color:#1E2F7A;border:4px solid #1B1F3B;border-radius:14px;box-shadow:inset 0 0 0 4px #FFC93A,0 6px 0 rgba(20,30,90,.4);padding:20px 18px;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;text-align:center;}
+  .pixQ{font-weight:600;font-size:1.25rem;line-height:1.3;}
+  .pixAnsList{display:flex;flex-direction:column;gap:10px;margin:18px 0 6px;}
+  .pixAns{display:block;width:100%;box-sizing:border-box;min-height:52px;padding:8px 12px 10px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.15;letter-spacing:.03em;
+    text-align:center;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
+  .pixAns:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .pixAns.correct{background:#52C246;border-color:#1E6B2B;}
+  .pixAns.wrong{background:#D6343A;border-color:#7E1B22;}
+  .pixAns.disabled{pointer-events:none;}
+  .pixAns.disabled:not(.correct):not(.wrong){filter:saturate(.45) brightness(.85);}
+  .pixResBadge{display:block;width:144px;height:144px;margin:0 auto 10px;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
+  .pixResTitle{font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:.02em;}
+  .pixResBody{margin:10px 0 0;font-weight:500;font-size:1.0625rem;line-height:1.3;color:#3d4d96;}
+  .pixScore{margin-top:12px;font-weight:700;font-size:1.25rem;color:#1E2F7A;}
+  .pixMission .btn.pixBtn{flex:none;}
+  .pixFlash{position:fixed;left:0;top:0;right:0;bottom:0;z-index:40;background:#fff;pointer-events:none;animation:pixFlash .3s steps(3) forwards;}
+  @keyframes pixFlash{from{opacity:.8;}to{opacity:0;}}
+  @media (prefers-reduced-motion:reduce){ .pixFlash{display:none;} }
+  @media (max-height:640px){
+    .pixMission .pixMTitle{margin:2px 0 6px;}
+    .pixPips{margin-bottom:10px;}
+    .pixPaper{padding:12px 12px;}
+    .pixQ{font-size:1.125rem;line-height:1.25;}
+    .pixAnsList{gap:8px;margin:12px 0 4px;}
+    .pixAns{min-height:44px;padding:6px 10px 8px;font-size:1rem;}
+    .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
+  }
   .qaBox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:16px;margin:10px 0;}
   .answerBtn{
     display:block;width:100%;text-align:left;
@@ -1410,51 +1448,63 @@ function screenFaithFlash(){
   var s = state.session.faithFlash;
   if(!s){ initFaithFlash(); s = state.session.faithFlash; }
   var lang = state.lang || "en";
+  var press = ' onpointerdown="pixPressSfx()" ';
 
   if(s.status === "results"){
     var pass = s.correct === s.order.length;
-    return '<div class="screen center">' +
-      '<h1>' + (pass ? t("ff_resultsTitlePass") : t("ff_resultsTitleFail")) + '</h1>' +
-      '<p>' + (pass ? t("ff_resultsBodyPass") : t("ff_resultsBodyFail")) + '</p>' +
-      // Denominator is how many questions were actually ANSWERED (s.index+1
-      // -- s.index is still the failed question's own 0-based index when a
-      // wrong answer ends the round early, since ffAnswer never advances it),
-      // not the full 10-question deck -- a fail on question 5 should read
-      // "4 out of 5", not "4 out of 10" (2026-09-29, per Dan). On an actual
-      // pass this is equivalent to s.order.length anyway (all 10 attempted).
-      '<p class="center"><strong>' + t("scoreOf")(s.correct, s.index+1) + '</strong></p>' +
+    return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+      '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
+      '<div class="pixPaper">' +
+        (pass ? '<img class="pixResBadge" src="tiles/badges8/b8_faith.png" alt="">' : '') +
+        '<div class="pixResTitle">' + (pass ? t("ff_resultsTitlePass") : t("ff_resultsTitleFail")) + '</div>' +
+        '<p class="pixResBody">' + (pass ? t("ff_resultsBodyPass") : t("ff_resultsBodyFail")) + '</p>' +
+        // Denominator is how many questions were actually ANSWERED (s.index+1
+        // -- s.index is still the failed question's own 0-based index when a
+        // wrong answer ends the round early, since ffAnswer never advances it),
+        // not the full 10-question deck -- a fail on question 5 should read
+        // "4 out of 5", not "4 out of 10" (2026-09-29, per Dan). On an actual
+        // pass this is equivalent to s.order.length anyway (all 10 attempted).
+        '<div class="pixScore">' + t("scoreOf")(s.correct, s.index+1) + '</div>' +
+      '</div>' +
       '<div class="spacer"></div>' +
-      (pass ? '<button class="btn gold" onclick="ffCollectAward()">' + t("collectAward") + '</button>'
-            : '<button class="btn gold" onclick="ffPlayAgain()">' + t("playAgain") + '</button>') +
-      '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
+      (pass ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffCollectAward()">' + t("collectAward") + '</button>'
+            : '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffPlayAgain()">' + t("playAgain") + '</button>') +
+      '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
     '</div>';
   }
 
   var q = FAITH_FLASH_QUESTIONS[s.order[s.index]];
   var qLang = q[lang];
   var answered = s.answered !== null;
+  var isCorrect = answered && s.answerOrder[s.answered] === q.correct;
   var answersHtml = s.answerOrder.map(function(actualIdx, displayedI){
-    var cls = "answerBtn";
+    var cls = "pixAns";
     if(answered){
       cls += " disabled";
       if(actualIdx === q.correct) cls += " correct";
       else if(displayedI === s.answered) cls += " wrong";
     }
-    return '<button class="' + cls + '" onclick="ffAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
+    return '<button class="' + cls + '"' + press + 'onclick="pixClickSfx();ffAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
   }).join("");
 
-  var isCorrect = answered && s.answerOrder[s.answered] === q.correct;
+  // one pixel square per question: gold = answered right, white = this one, red = the one that ended the round
+  var pips = "";
+  for(var i = 0; i < s.order.length; i++){
+    var pc = "pixPip";
+    if(i < s.index || (i === s.index && isCorrect)) pc += " done";
+    else if(i === s.index) pc += answered ? " bad" : " now";
+    pips += '<div class="' + pc + '"></div>';
+  }
 
-  return '<div class="screen">' +
-    '<h2>' + t("faithFlashName") + '</h2>' +
-    '<p class="smallNote">' + (s.index+1) + ' / ' + s.order.length + '</p>' +
-    '<div class="qaBox">' +
-      '<p><strong>' + qLang.q + '</strong></p>' +
-      answersHtml +
-    '</div>' +
+  return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+    '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
+    '<div class="pixPips" role="img" aria-label="' + (s.index+1) + ' / ' + s.order.length + '">' + pips + '</div>' +
+    '<div class="pixPaper"><div class="pixQ">' + qLang.q + '</div></div>' +
+    '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
-    (answered && isCorrect ? '<button class="btn gold" onclick="ffNext()">' + t("nextQuestion") + '</button>' : '') +
-    '<button class="btn outline" onclick="ffQuit()">' + t("mainMenu") + '</button>' +
+    (answered && isCorrect ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffNext()">' + t("nextQuestion") + '</button>' : '') +
+    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ffQuit()">' + t("mainMenu") + '</button>' +
+    (isCorrect ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
 
