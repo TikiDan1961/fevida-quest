@@ -176,18 +176,28 @@
     transition:left .28s ease-in,top .28s ease-in,width .28s ease-in,height .28s ease-in,border-radius .28s ease-in,opacity .25s ease-out;}
   .expandClone img.spr{width:48px;height:48px;image-rendering:pixelated;transition:transform .28s ease-in;}
   /* Pilgrim scene on the Home Screen (2026-10-20, per Dan): a hill with a church, a winding path and a little pilgrim who walks
-     toward the church as the player earns Quest Points. The scene picture is 125x100 pixels, drawn at the full screen width and
-     anchored to the bottom; everything on it is placed in percentages so it scales with the picture. */
-  .pixHome.pixSky > .pixScene{position:absolute;left:0;right:0;bottom:0;width:auto;aspect-ratio:125/100;z-index:auto;pointer-events:none;}
+     toward the church as the player earns Quest Points. The scene picture is 125x106 pixels, drawn at the full screen width; everything on it is placed in percentages so it scales with the picture. */
+  /* The scene sits right under the icons (2026-10-20, per Dan) and a lawn fills the space below it, down to the bottom of the screen.
+     Both run edge to edge (the negative side margins cancel the sky's 18px padding), at the same picture scale, so they join with no seam:
+     the path leaves the bottom of scene_home.png and carries straight on down through lawn.png. */
+  .pixHome.pixSky > .pixScene{position:relative;flex:none;width:calc(100% + 36px);margin:4px -18px 0;aspect-ratio:125/106;z-index:auto;pointer-events:none;}
+  .pixHome.pixSky > .pixLawn{flex:1 1 auto;min-height:0;margin:-1px -18px calc(-1 * (env(safe-area-inset-bottom,0px) + 22px));padding:8px 18px calc(env(safe-area-inset-bottom,0px) + 22px);
+    background:#52B043 url("tiles/lawn.png") center top / 100% auto repeat-y;image-rendering:pixelated;display:flex;flex-direction:column;justify-content:flex-end;}
+  /* the temporary reset box floats over the bottom of the lawn so it never pushes the layout (small phones would scroll) */
+  .pixLawn .tempReset{position:absolute;left:18px;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);margin:0;z-index:3;}
+  @media (max-height:600px){
+    .pixMenu .homeGrid{margin:14px 0 0;}
+    .pixHome.pixSky > .pixScene{margin-top:0;}
+  }
   .pixSceneArt{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;}
-  .churchGlow{position:absolute;left:43.2%;top:30%;width:12.8%;aspect-ratio:1;border-radius:50%;
+  .churchGlow{position:absolute;left:43.2%;top:28.3%;width:12.8%;aspect-ratio:1;border-radius:50%;
     background:radial-gradient(circle,rgba(255,226,120,.9) 0,rgba(255,226,120,0) 68%);opacity:.3;animation:glowPulse 2.6s ease-in-out infinite alternate;}
   .churchGlow.lit{transform:scale(1.35);opacity:.6;animation-name:glowPulseLit;}
   @keyframes glowPulse{from{opacity:.2;}to{opacity:.6;}}
   @keyframes glowPulseLit{from{opacity:.45;}to{opacity:.85;}}
-  .pixSpark{position:absolute;left:46.8%;top:.5%;width:5.6%;image-rendering:pixelated;animation:sparkBlink 2.6s steps(1) infinite;}
+  .pixSpark{position:absolute;left:46.8%;top:.47%;width:5.6%;image-rendering:pixelated;animation:sparkBlink 2.6s steps(1) infinite;}
   @keyframes sparkBlink{0%{opacity:0;}55%{opacity:1;}65%{opacity:.35;}75%{opacity:1;}85%{opacity:0;}100%{opacity:0;}}
-  .pixDove{position:absolute;left:-14%;top:12%;width:12.8%;aspect-ratio:16/12;animation:doveFly 28s linear infinite;animation-delay:-3s;}
+  .pixDove{position:absolute;left:-14%;top:11.3%;width:12.8%;aspect-ratio:16/12;animation:doveFly 28s linear infinite;animation-delay:-3s;}
   @keyframes doveFly{0%{left:-14%;}55%{left:112%;}100%{left:112%;}}
   .pixDoveBob{width:100%;height:100%;animation:doveBob 3.2s ease-in-out infinite alternate;}
   @keyframes doveBob{from{transform:translateY(-35%);}to{transform:translateY(35%);}}
@@ -1335,9 +1345,9 @@ function openFromIcon(icon, screenId){
 
 /* ---------- Pilgrim scene on the Home Screen (2026-10-20, per Dan) ---------- */
 
-// The picture is tiles/scene_home.png (125x100 pixels). PILGRIM_PATH is the winding path drawn in it, as
+// The picture is tiles/scene_home.png (125x106 pixels). PILGRIM_PATH is the winding path drawn in it, as
 // 65 points spaced evenly along its length, from the bottom of the hill (0) to the church door (1).
-var SCENE_W = 125, SCENE_H = 100, PILGRIM_W = 11, PILGRIM_H = 15;
+var SCENE_W = 125, SCENE_H = 106, PILGRIM_W = 11, PILGRIM_H = 15;
 var PILGRIM_PATH = [[18.0,99.0],[22.1,98.6],[26.1,98.2],[30.2,97.8],[34.2,97.4],[38.3,96.9],[42.3,96.5],[46.4,96.1],[50.4,95.6],[54.4,95.1],[58.5,94.5],[62.5,94.0],[66.6,93.5],[70.6,93.0],[74.6,92.4],[78.7,91.9],[82.7,91.2],[86.7,90.6],[90.7,89.8],[94.7,88.8],[98.5,87.4],[101.9,85.3],[101.1,82.0],[97.2,80.6],[93.3,79.7],[89.3,78.9],[85.3,78.2],[81.3,77.5],[77.2,76.9],[73.2,76.2],[69.2,75.6],[65.2,75.0],[61.1,74.5],[57.1,74.0],[53.0,73.5],[49.0,73.0],[45.0,72.5],[40.9,71.9],[36.9,71.2],[32.9,70.3],[29.1,69.0],[26.6,66.4],[30.2,64.6],[34.1,63.6],[38.1,62.7],[42.1,62.0],[46.1,61.3],[50.2,60.7],[54.2,60.2],[58.3,59.8],[62.3,59.4],[66.4,59.1],[70.4,58.7],[74.5,58.3],[78.5,57.9],[82.6,57.3],[86.5,56.2],[87.8,53.3],[84.4,51.3],[80.4,50.2],[76.5,49.3],[72.5,48.5],[68.5,47.5],[64.8,45.9],[62.0,43.0]];
 var PILGRIM_LEN = (function(){ var n = 0; for(var i=1;i<PILGRIM_PATH.length;i++) n += Math.hypot(PILGRIM_PATH[i][0]-PILGRIM_PATH[i-1][0], PILGRIM_PATH[i][1]-PILGRIM_PATH[i-1][1]); return n; })();
 var PILGRIM_SPEED = 24 / PILGRIM_LEN;   // 24 picture pixels a second, as a fraction of the whole path
@@ -1487,15 +1497,14 @@ function screenMainMenu(){
       cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")});
   return '<div class="screen pixHome pixSky pixMenu">' +
     cloudsHtml() +
-    pilgrimSceneHtml() +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
     '<div class="progressWrap">' +
       '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
       '<div class="progressLabel">' + state.points + ' / ' + GOLDEN_TICKET_POINTS + ' ' + t("questPoints") + '</div>' +
     '</div>' +
     '<div class="homeGrid">' + icons + '</div>' +
-    '<div class="spacer"></div>' +
-    tempResetHtml() +
+    pilgrimSceneHtml() +
+    '<div class="pixLawn">' + tempResetHtml() + '</div>' +
     folderHtml() +
   '</div>';
 }
