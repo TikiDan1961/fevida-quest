@@ -373,6 +373,18 @@
   .pixBigHeart{display:block;width:88px;height:80px;margin:16px auto 12px;image-rendering:pixelated;animation:pixHeartIn .45s steps(4) both;}
   @keyframes pixHeartIn{from{transform:scale(.3);opacity:0;}to{transform:scale(1);opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .pixBigHeart{animation:none;} }
+  /* Path of Light */
+  .plBoard{display:grid;gap:3px;width:min(100%,300px);box-sizing:border-box;margin:6px auto;padding:6px;background:#1B1F3B;border-radius:12px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
+  .plCell{aspect-ratio:1/1;position:relative;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:6px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .plCell.rock{background:#2B3F8C;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35),inset 0 3px 0 rgba(255,255,255,.14);cursor:default;}
+  .plCell.stone{background:#FFF3D6;box-shadow:inset 0 0 0 2px #FFC93A;cursor:pointer;}
+  .plCell.stone.trail{background:#FFE08A;}
+  .plCell.shake{background:#D6343A;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35);animation:tlShake .4s steps(4);}
+  .plCell img{position:absolute;image-rendering:pixelated;pointer-events:none;}
+  .plCell .plCross{width:74%;height:74%;}
+  .plCell .plLight{width:96%;height:96%;animation:plGlow 1s steps(2) infinite alternate;}
+  @keyframes plGlow{from{transform:scale(.92);}to{transform:scale(1);}}
+  @media (prefers-reduced-motion:reduce){ .plCell.shake,.plCell .plLight{animation:none;} }
   /* Emoji Bible Stories */
   .pixEmoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:3rem;line-height:1.15;letter-spacing:.06em;}
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
@@ -442,6 +454,7 @@
     .pixMission.pixLower .pixQ{font-size:1.0625rem;}
     .pixMission.pixLower .btn.pixBtn.pixBtnSm{height:40px;margin-bottom:6px;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
+    .plBoard{width:min(100%,262px);margin:4px auto;}
     .pixEmoji{font-size:2.4rem;line-height:1.05;}
     .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
     .tlSlots{gap:2px;margin:4px 0;}
@@ -732,7 +745,7 @@ var T = {
     themeFaith:"Faith", themeLove:"God's Love", themeLight:"Be a Light to the World",
     themeUnity:"Unity", themeHope:"Hope",
     themeHoliness:"Holiness", themeGrace:"Grace", themeSalvation:"Salvation",
-    themeForgiveness:"Forgiveness", themeMercy:"Mercy", themePrayer:"Prayer", themeScripture:"Scripture", themeDiscipleship:"Discipleship",
+    themeForgiveness:"Forgiveness", themeMercy:"Mercy", themePrayer:"Prayer", themeScripture:"Scripture", themeDiscipleship:"Discipleship", themePerseverance:"Perseverance",
 
     followLightName:"Follow the Light", wordUnscrambleName:"Word Unscramble",
     catchLightName:"Catch the Light", kindnessSortName:"Acts of Kindness",
@@ -774,6 +787,9 @@ var T = {
     hb_intro:"Look closely — find all 6 hidden blessings tucked into the scene!",
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
+    pl_intro:"Guide the light to the cross. Tap a glowing stone next to the light, and don't tap the rocks!",
+    pl_failTitle:"So Close!", pl_failBody:"You ran out of chances. Try again with new mazes!",
+    pl_passTitle:"Path Finder!", pl_passBody:"You guided the light through every maze!",
     eb_intro:"Guess the Bible story from the emojis.", eb_story:function(n,total){return "Story "+n+" of "+total;}, eb_next:"NEXT STORY",
     eb_failTitle:"So Close!", eb_failBody:"You ran out of chances. Try again with a new set of stories!",
     eb_passTitle:"Bible Story Pro!", eb_passBody:"You guessed the Bible stories from the emojis!",
@@ -842,7 +858,7 @@ var T = {
     themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé Luz para el Mundo",
     themeUnity:"Unidad", themeHope:"Esperanza",
     themeHoliness:"Santidad", themeGrace:"Gracia", themeSalvation:"Salvación",
-    themeForgiveness:"Perdón", themeMercy:"Misericordia", themePrayer:"Oración", themeScripture:"Escrituras", themeDiscipleship:"Discipulado",
+    themeForgiveness:"Perdón", themeMercy:"Misericordia", themePrayer:"Oración", themeScripture:"Escrituras", themeDiscipleship:"Discipulado", themePerseverance:"Perseverancia",
 
     followLightName:"Sigue la Luz", wordUnscrambleName:"Desordena Palabras",
     catchLightName:"Atrapa la Luz", kindnessSortName:"Actos de Bondad",
@@ -883,6 +899,9 @@ var T = {
     hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
+    pl_intro:"Guía la luz hasta la cruz. Toca una piedra brillante junto a la luz, ¡y no toques las rocas!",
+    pl_failTitle:"¡Tan Cerca!", pl_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con nuevos laberintos!",
+    pl_passTitle:"¡Buscador de Caminos!", pl_passBody:"¡Guiaste la luz por todos los laberintos!",
     eb_intro:"Adivina la historia bíblica con los emojis.", eb_story:function(n,total){return "Historia "+n+" de "+total;}, eb_next:"SIGUIENTE HISTORIA",
     eb_failTitle:"¡Tan Cerca!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
     eb_passTitle:"¡Experto en Historias Bíblicas!", eb_passBody:"¡Adivinaste las historias bíblicas con los emojis!",
@@ -938,7 +957,10 @@ var MISSIONS = [
   // Emoji Bible Stories and Life of Jesus Timeline (2026-10-21, per Dan). Also borrowing badges until their own art is drawn: Scripture reuses the
   // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges8/b8_...) later.
   {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
-  {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_salvation.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"}
+  {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_salvation.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"},
+  // Path of Light (2026-10-21, per Dan): built as a TAP maze instead of the drag maze in the design document. Borrows the Hope (anchor) badge
+  // until a Perseverance badge is drawn: add tiles/badge_perseverance.png and tiles/badges8/b8_perseverance.png, then change badgeImg here.
+  {id:"pathOfLight", icon:"🧭", badgeImg:"tiles/badge_hope.png", nameKey:"pathOfLightName", themeKey:"themePerseverance"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1162,12 +1184,13 @@ function defaultState(){
       hiddenBlessings: {done:false, badge:false},
       lightCandle: {done:false, badge:false},
       emojiStories: {done:false, badge:false},
-      jesusTimeline: {done:false, badge:false}
+      jesusTimeline: {done:false, badge:false},
+      pathOfLight: {done:false, badge:false}
     },
     photo: null,
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, pathOfLight:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -1555,6 +1578,7 @@ function openMission(id){
   else if(id === "lightCandle"){ initLightCandle(); go("lightCandle"); }
   else if(id === "emojiStories"){ initEmojiStories(); go("emojiStories"); }
   else if(id === "jesusTimeline"){ initJesusTimeline(); go("jesusTimeline"); }
+  else if(id === "pathOfLight"){ initPathOfLight(); go("pathOfLight"); }
 }
 
 /* ---------- Home Screen (the Main Menu) ---------- */
@@ -1567,7 +1591,6 @@ function openMission(id){
 // Placeholder tiles for missions that are planned but not built yet (2026-10-19, per Dan).
 // To make one real: add it to MISSIONS, build its screen, and delete it from this list.
 var COMING_SOON_MISSIONS = [
-  {id:"pathOfLight", icon:"🧭", nameKey:"pathOfLightName"},
   {id:"tbd", icon:"❓", nameKey:"tbdName"},
   // three more placeholders (2026-10-20, per Dan) for the games that will replace the missions that are not games; art = which icon picture to use
   {id:"tbd2", art:"tbd", icon:"❓", nameKey:"tbdName"},
@@ -3655,6 +3678,159 @@ function screenJesusTimeline(){
   '</div>';
 }
 
+/* ---------- Path of Light ---------- */
+
+// Path of Light (2026-10-21, per Dan: "build a version so I can play it"). A TAP maze: the whole maze is in view -- glowing stones are the way,
+// dark rocks are walls -- and the player taps the glowing stone next to the light to walk it from the top-left corner to the cross in the
+// bottom-right. Tapping a rock next to the light costs a chance (5 shared across 3 mazes of 5x5, 6x6 and 7x7). Walking into a dead end is free:
+// tap the stone behind to step back. Every maze has exactly one route (and a few dead-end branches), made fresh each game and saved in the game.
+var PL_CHANCES = 5;
+var PL_SIZES = [5, 6, 7];
+
+function plNeighbors(n, i){
+  var r = Math.floor(i / n), c = i % n, a = [];
+  if(r > 0) a.push(i - n);
+  if(r < n - 1) a.push(i + n);
+  if(c > 0) a.push(i - 1);
+  if(c < n - 1) a.push(i + 1);
+  return a;
+}
+// returns {n, cells} where cells is a string of 0 (rock) and 1 (stone), cell 0 = start (top-left), the last cell = the cross
+function plMakeMaze(n){
+  var goal = n * n - 1, minLen = Math.round(n * n * 0.45);
+  for(var attempt = 0; attempt < 400; attempt++){
+    if(attempt === 150 || attempt === 300) minLen -= 2;              // if long routes are hard to find, settle for a shorter one
+    var open = [], k;
+    for(k = 0; k < n * n; k++) open.push(false);
+    var path = [0], calls = 0;
+    open[0] = true;
+    // a stone may only be added next to exactly one existing stone: that keeps every route unique (no loops)
+    var openCount = function(j){ var c = 0, nb = plNeighbors(n, j); for(var x = 0; x < nb.length; x++) if(open[nb[x]]) c++; return c; };
+    var dfs = function(i){
+      if(++calls > 4000) return false;
+      if(i === goal) return path.length >= minLen;
+      var nb = shuffle(plNeighbors(n, i));
+      for(var q = 0; q < nb.length; q++){
+        var j = nb[q];
+        if(open[j] || openCount(j) !== 1) continue;
+        if(j === goal && path.length + 1 < minLen) continue;
+        open[j] = true; path.push(j);
+        if(dfs(j)) return true;
+        open[j] = false; path.pop();
+      }
+      return false;
+    };
+    if(!dfs(0)) continue;
+    // dead-end branches off the route
+    var made = 0, want = n;
+    for(var t = 0; t < 80 && made < want; t++){
+      var openList = [];
+      for(k = 0; k < n * n; k++) if(open[k] && k !== goal) openList.push(k);
+      var base = openList[Math.floor(Math.random() * openList.length)];
+      var cand = shuffle(plNeighbors(n, base)).filter(function(j){ return !open[j] && openCount(j) === 1; });
+      if(!cand.length) continue;
+      var cur = cand[0];
+      open[cur] = true; made++;
+      var len = 1 + Math.floor(Math.random() * 3);
+      while(--len > 0){
+        var nx = shuffle(plNeighbors(n, cur)).filter(function(j){ return !open[j] && openCount(j) === 1; })[0];
+        if(nx === undefined) break;
+        open[nx] = true; cur = nx;
+      }
+    }
+    return {n:n, cells:open.map(function(b){ return b ? "1" : "0"; }).join("")};
+  }
+  // (never reached in practice) a plain winding fallback
+  var cells = "", z;
+  for(z = 0; z < n * n; z++) cells += (Math.floor(z / n) % 2 === 0 || (Math.floor(z / n) % 4 === 1 && z % n === n - 1) || (Math.floor(z / n) % 4 === 3 && z % n === 0)) ? "1" : "0";
+  return {n:n, cells:cells};
+}
+
+function initPathOfLight(){
+  state.session.pathOfLight = {levels:PL_SIZES.map(plMakeMaze), level:0, pos:0, trail:[0], chances:PL_CHANCES, shake:null, busy:false, status:"playing"};
+  saveState();
+}
+function plChancesLeft(s){ return typeof s.chances === "number" ? s.chances : PL_CHANCES; }
+function plTap(i){
+  var s = state.session.pathOfLight;
+  if(!s || s.status !== "playing" || s.busy || s.shake !== null) return;
+  var lv = s.levels[s.level], n = lv.n;
+  if(i === s.pos || plNeighbors(n, s.pos).indexOf(i) === -1) return;   // only the squares next to the light react
+  if(lv.cells.charAt(i) === "1"){
+    if(s.trail.length > 1 && s.trail[s.trail.length - 2] === i) s.trail.pop(); else s.trail.push(i);   // stepping back along the trail is free
+    s.pos = i;
+    if(i === n * n - 1){
+      s.busy = true;
+      pixSfxPlay("fmMatch", true);
+      saveState(); render();
+      setTimeout(function(){
+        var s2 = state.session.pathOfLight;
+        if(!s2 || s2 !== s || s2.status !== "playing") return;
+        if(s2.level >= s2.levels.length - 1){ s2.status = "passed"; }
+        else { s2.level++; s2.pos = 0; s2.trail = [0]; s2.busy = false; }
+        saveState(); render();
+      }, 900);
+    } else {
+      pixSfxPlay("fmFirst", true);
+      saveState(); render();
+    }
+    return;
+  }
+  // a rock
+  s.chances = plChancesLeft(s) - 1;
+  var lastChance = s.chances <= 0;
+  s.shake = i;
+  if(lastChance) s.busy = true;
+  pixSfxPlay(lastChance ? "fmLast" : "fmMiss", true);
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.pathOfLight;
+    if(!s2 || s2 !== s || s2.status !== "playing") return;
+    s2.shake = null;
+    if(lastChance) s2.status = "failed";
+    saveState(); render();
+  }, lastChance ? 1300 : 450);
+}
+function plTryAgain(){ initPathOfLight(); render(); }
+function plCollectAward(){ state.session.pathOfLight = null; grantMission("pathOfLight"); }
+function plQuit(){ state.session.pathOfLight = null; go("mainMenu"); }
+
+function screenPathOfLight(){
+  var s = state.session.pathOfLight;
+  if(!s){ initPathOfLight(); s = state.session.pathOfLight; }
+
+  if(s.status === "failed"){
+    return pixResultHtml("pathOfLightName", {cls:"pixLower", title:t("pl_failTitle"), body:t("pl_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "plTryAgain()") + pixBtnHtml(t("mainMenu"), "plQuit()", true)});
+  }
+  if(s.status === "passed"){
+    return pixResultHtml("pathOfLightName", {cls:"pixLower", title:t("pl_passTitle"), body:t("pl_passBody"), badge:"pathOfLight",
+      buttons:pixBtnHtml(t("collectAward"), "plCollectAward()") + pixBtnHtml(t("mainMenu"), "plQuit()", true)});
+  }
+
+  var lv = s.levels[s.level], n = lv.n, goal = n * n - 1;
+  var cellsHtml = "";
+  for(var i = 0; i < n * n; i++){
+    var stone = lv.cells.charAt(i) === "1";
+    var cls = "plCell " + (stone ? "stone" : "rock");
+    if(stone && s.trail.indexOf(i) !== -1) cls += " trail";
+    if(s.shake === i) cls += " shake";
+    var inner = "";
+    if(i === goal) inner += '<img class="plCross" src="tiles/pl_cross.png" alt="">';
+    if(i === s.pos) inner += '<img class="plLight" src="tiles/pl_light.png" alt="">';
+    cellsHtml += '<button class="' + cls + '" data-sfx="own" onclick="plTap(' + i + ')">' + inner + '</button>';
+  }
+
+  return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
+    '<h2 class="pixMTitle">' + t("pathOfLightName") + '</h2>' +
+    '<div class="pixNote">' + t("pl_intro") + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.level + 1, s.levels.length) + '</span>' + chancesHeartsHtml(Math.max(0, plChancesLeft(s)), PL_CHANCES) + '</div>' +
+    '<div class="plBoard" style="grid-template-columns:repeat(' + n + ',1fr)">' + cellsHtml + '</div>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();plQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
 /* ---------- Stained-Glass Puzzle ---------- */
 
 // Replaced Service Sprint (2026-10-19, per Dan), then turned from a sliding
@@ -4078,7 +4254,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","pathOfLight"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
 
 function exitBarHtml(){
@@ -4103,6 +4279,7 @@ function exitMission(){
     case "lightCandle": lcQuit(); break;
     case "emojiStories": ebQuit(); break;
     case "jesusTimeline": tlQuit(); break;
+    case "pathOfLight": plQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -4130,6 +4307,7 @@ function render(){
     case "lightCandle": html = screenLightCandle(); break;
     case "emojiStories": html = screenEmojiStories(); break;
     case "jesusTimeline": html = screenJesusTimeline(); break;
+    case "pathOfLight": html = screenPathOfLight(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
     case "goldenTicket": html = screenGoldenTicket(); break;
