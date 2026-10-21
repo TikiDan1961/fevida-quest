@@ -373,23 +373,16 @@
   .pixBigHeart{display:block;width:88px;height:80px;margin:16px auto 12px;image-rendering:pixelated;animation:pixHeartIn .45s steps(4) both;}
   @keyframes pixHeartIn{from{transform:scale(.3);opacity:0;}to{transform:scale(1);opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .pixBigHeart{animation:none;} }
-  /* Path of Light */
-  .plBoard{display:grid;gap:2px;width:min(100%,340px);box-sizing:border-box;margin:6px auto;padding:4px;background:#1B1F3B;border-radius:12px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
-  .plCell{aspect-ratio:1/1;position:relative;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:5px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-  .plCell.hid{background:#FFF3D6;box-shadow:inset 0 0 0 2px #FFC93A;cursor:pointer;}
-  .plCell.hid:active{box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 2px #FFF6C0,0 0 12px 5px rgba(255,236,120,.85);}
-  .plCell.clue{background:#CFE8FF;box-shadow:inset 0 0 0 2px #7FC0FF;cursor:default;}
-  .plCell.bomb{background:#7E1B22;box-shadow:inset 0 0 0 2px #D6343A;cursor:default;}
-  .plCell.cross{background:#FFE08A;box-shadow:inset 0 0 0 2px #FFC93A,0 0 14px 5px rgba(255,236,120,.95);cursor:default;}
-  .plCell img{position:absolute;image-rendering:pixelated;pointer-events:none;}
-  .plCell .plArrow{width:80%;height:80%;}
-  .plCell .plBomb{width:72%;height:auto;}
-  .plCell .plCross{width:76%;height:76%;}
-  .plCell .plBoom{width:150%;height:150%;z-index:3;animation:plBoom .6s steps(5) both;}
-  @keyframes plBoom{0%{transform:scale(.2);}40%{transform:scale(1.15);}100%{transform:scale(.95);}}
-  .plNum{position:absolute;right:2px;bottom:0;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;line-height:1;color:#fff;
-    text-shadow:1px 0 #1b2a6b,-1px 0 #1b2a6b,0 1px #1b2a6b,0 -1px #1b2a6b;pointer-events:none;}
-  @media (prefers-reduced-motion:reduce){ .plCell .plBoom{animation:none;} }
+  /* Light the Windows: dark panes are the same stained-glass picture, dimmed */
+  .lwBoard{display:grid;gap:3px;width:min(100%,300px);box-sizing:border-box;margin:6px auto;padding:5px;background:#1B1F3B;border-radius:12px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
+  .lwCell{aspect-ratio:1/1;padding:0;border:0;border-radius:4px;background-size:100% 100%;background-color:#2B3F8C;image-rendering:pixelated;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
+    transition:none;}
+  .lwCell.on{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 0 10px 2px rgba(255,236,120,.65);position:relative;z-index:1;}
+  .lwCell.off{filter:brightness(.26) saturate(.55);}
+  .lwCell:active{box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #FFF6C0,0 0 14px 5px rgba(255,236,120,.9);}
+  .lwBoard.win .lwCell{animation:lwWin .3s steps(2) 3;}
+  @keyframes lwWin{0%{filter:brightness(1);}50%{filter:brightness(1.7);}100%{filter:brightness(1);}}
+  @media (prefers-reduced-motion:reduce){ .lwBoard.win .lwCell{animation:none;} }
   /* Emoji Bible Stories */
   .pixEmoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:3rem;line-height:1.15;letter-spacing:.06em;}
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
@@ -459,8 +452,7 @@
     .pixMission.pixLower .pixQ{font-size:1.0625rem;}
     .pixMission.pixLower .btn.pixBtn.pixBtnSm{height:40px;margin-bottom:6px;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
-    .plBoard{margin:4px auto;}
-    .plNum{font-size:.75rem;}
+    .lwBoard{width:min(100%,234px);margin:4px auto;}
     .pixEmoji{font-size:2.4rem;line-height:1.05;}
     .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
     .tlSlots{gap:2px;margin:4px 0;}
@@ -793,9 +785,9 @@ var T = {
     hb_intro:"Look closely — find all 6 hidden blessings tucked into the scene!",
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
-    pl_intro:"Find the cross! Arrows show the direction, numbers show the distance, bombs cost a chance.",
-    pl_failTitle:"So Close!", pl_failBody:"You ran out of chances. Try again from Level 1!",
-    pl_passTitle:"Cross Finder!", pl_passBody:"You found the cross on every level!",
+    lightWindowsName:"Light the Windows", themeLightOfChrist:"Light of Christ",
+    lw_intro:"Tap a pane to flip it and the panes touching it. Light every pane to finish the window!", lw_moves:function(n){return "Moves: "+n;}, lw_reset:"RESET WINDOW",
+    lw_passTitle:"Windows Aglow!", lw_passBody:"You lit every stained-glass window!",
     eb_intro:"Guess the Bible story from the emojis.", eb_story:function(n,total){return "Story "+n+" of "+total;}, eb_next:"NEXT STORY",
     eb_failTitle:"So Close!", eb_failBody:"You ran out of chances. Try again with a new set of stories!",
     eb_passTitle:"Bible Story Pro!", eb_passBody:"You guessed the Bible stories from the emojis!",
@@ -905,9 +897,9 @@ var T = {
     hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
-    pl_intro:"¡Encuentra la cruz! Flechas: dirección. Números: distancia. Bombas: pierdes una oportunidad.",
-    pl_failTitle:"¡Tan Cerca!", pl_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo desde el Nivel 1!",
-    pl_passTitle:"¡Buscador de la Cruz!", pl_passBody:"¡Encontraste la cruz en todos los niveles!",
+    lightWindowsName:"Ilumina los Vitrales", themeLightOfChrist:"Luz de Cristo",
+    lw_intro:"Toca un vitral para cambiarlo a él y a los que lo tocan. ¡Ilumina todos para terminar la ventana!", lw_moves:function(n){return "Movimientos: "+n;}, lw_reset:"REINICIAR VENTANA",
+    lw_passTitle:"¡Ventanas Encendidas!", lw_passBody:"¡Iluminaste todos los vitrales!",
     eb_intro:"Adivina la historia bíblica con los emojis.", eb_story:function(n,total){return "Historia "+n+" de "+total;}, eb_next:"SIGUIENTE HISTORIA",
     eb_failTitle:"¡Tan Cerca!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
     eb_passTitle:"¡Experto en Historias Bíblicas!", eb_passBody:"¡Adivinaste las historias bíblicas con los emojis!",
@@ -964,9 +956,9 @@ var MISSIONS = [
   // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges8/b8_...) later.
   {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
   {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_salvation.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"},
-  // Path of Light (2026-10-21, per Dan): built as a TAP maze instead of the drag maze in the design document. Borrows the Hope (anchor) badge
-  // until a Perseverance badge is drawn: add tiles/badge_perseverance.png and tiles/badges8/b8_perseverance.png, then change badgeImg here.
-  {id:"pathOfLight", icon:"🧭", badgeImg:"tiles/badge_hope.png", nameKey:"pathOfLightName", themeKey:"themePerseverance"}
+  // Light the Windows (2026-10-21, per Dan) replaced Path of Light, which was not fun. Borrows the Hope (anchor) badge until its own is drawn:
+  // add tiles/badge_windows.png and tiles/badges8/b8_windows.png, then change badgeImg here.
+  {id:"lightWindows", icon:"💡", badgeImg:"tiles/badge_hope.png", nameKey:"lightWindowsName", themeKey:"themeLightOfChrist"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1191,12 +1183,12 @@ function defaultState(){
       lightCandle: {done:false, badge:false},
       emojiStories: {done:false, badge:false},
       jesusTimeline: {done:false, badge:false},
-      pathOfLight: {done:false, badge:false}
+      lightWindows: {done:false, badge:false}
     },
     photo: null,
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, pathOfLight:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, lightWindows:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -1230,7 +1222,7 @@ function loadState(){
     });
     // A tab saved by an earlier build may still be on the retired Service
     // Sprint screen (replaced by Stained-Glass Puzzle, 2026-10-19).
-    if(merged.screen === "serviceSprint") merged.screen = "mainMenu";
+    if(merged.screen === "serviceSprint" || merged.screen === "pathOfLight") merged.screen = "mainMenu";
     return merged;
   }catch(e){ return defaultState(); }
 }
@@ -1584,7 +1576,7 @@ function openMission(id){
   else if(id === "lightCandle"){ initLightCandle(); go("lightCandle"); }
   else if(id === "emojiStories"){ initEmojiStories(); go("emojiStories"); }
   else if(id === "jesusTimeline"){ initJesusTimeline(); go("jesusTimeline"); }
-  else if(id === "pathOfLight"){ initPathOfLight(); go("pathOfLight"); }
+  else if(id === "lightWindows"){ initLightWindows(); go("lightWindows"); }
 }
 
 /* ---------- Home Screen (the Main Menu) ---------- */
@@ -1609,7 +1601,7 @@ var COMING_SOON_MISSIONS = [
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
-  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", pathOfLight:"#3FA84B", tbd:"#AEB6C8",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", lightWindows:"#26305F", tbd:"#AEB6C8",
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
@@ -3684,114 +3676,93 @@ function screenJesusTimeline(){
   '</div>';
 }
 
-/* ---------- Path of Light ---------- */
+/* ---------- Light the Windows ---------- */
 
-// Path of Light (2026-10-21, per Dan -- rebuilt as a clue hunt; the first version was a tap maze). An 8 x 8 board with a cross hidden under one
-// square. Tapping a square shows a clue: an ARROW toward the cross (8 directions), sometimes a NUMBER too (how many squares away the cross is,
-// counted as rings: 2 means it is somewhere on the square ring 2 squares out), or a BOMB (the square blows up and costs a chance), or the CROSS
-// itself, which ends the level. 4 levels, 3 chances on each level (the chances are filled again for every level). Losing all 3 chances on a level
-// ends the game; TRY AGAIN starts over from Level 1 with new boards, like Faith Match. More bombs and fewer numbers on each level.
-var PL_N = 8;
-var PL_CHANCES = 3;
-var PL_LEVELS = [{bombs:4, nums:0.7}, {bombs:6, nums:0.55}, {bombs:8, nums:0.4}, {bombs:10, nums:0.3}];   // bombs on the board, chance a clue square also shows a number
-var PL_DIRS = ["E", "NE", "N", "NW", "W", "SW", "S", "SE"];
+// Light the Windows (2026-10-21, per Dan -- replaces Path of Light). A 5 x 5 stained-glass window where some panes are dark. Tapping a pane flips
+// it and the four panes touching it (lit <-> dark); the goal is to light every pane. Three windows, each harder. There are no chances: it cannot
+// be failed. Every window is made by starting fully lit and flipping a few random panes, so it can always be solved, in no more moves than that
+// number of panes (3, 5, then 8). RESET puts the window back the way it started.
+var LW_N = 5;
+var LW_LEVELS = [3, 5, 8];
 
-function plMakeBoard(cfg){
-  var total = PL_N * PL_N, all = [], i;
-  for(i = 0; i < total; i++) all.push(i);
-  all = shuffle(all);
-  var nums = [];
-  for(i = 0; i < total; i++) nums.push(Math.random() < cfg.nums);
-  return {cross:all[0], bombs:all.slice(1, 1 + cfg.bombs), nums:nums};
+function lwFlip(cells, i){
+  var n = LW_N, r = Math.floor(i / n), c = i % n;
+  var hit = [i];
+  if(r > 0) hit.push(i - n);
+  if(r < n - 1) hit.push(i + n);
+  if(c > 0) hit.push(i - 1);
+  if(c < n - 1) hit.push(i + 1);
+  for(var k = 0; k < hit.length; k++) cells[hit[k]] = cells[hit[k]] ? 0 : 1;
 }
-// the clue for a square: the compass direction of the cross from it (the nearest of 8) and the ring number (the larger of the row and column gaps)
-function plClue(i, cross){
-  var dx = (cross % PL_N) - (i % PL_N), dy = Math.floor(cross / PL_N) - Math.floor(i / PL_N);
-  var k = Math.round(Math.atan2(-dy, dx) * 180 / Math.PI / 45);
-  return {dir:PL_DIRS[((k % 8) + 8) % 8], dist:Math.max(Math.abs(dx), Math.abs(dy))};
+function lwMakeWindow(taps){
+  var all = [], i;
+  for(i = 0; i < LW_N * LW_N; i++) all.push(i);
+  for(;;){
+    var cells = [];
+    for(i = 0; i < LW_N * LW_N; i++) cells.push(1);
+    shuffle(all).slice(0, taps).forEach(function(t){ lwFlip(cells, t); });
+    if(cells.indexOf(0) !== -1) return cells;       // never start already lit
+  }
 }
-
-function initPathOfLight(){
-  state.session.pathOfLight = {boards:PL_LEVELS.map(plMakeBoard), level:0, revealed:{}, chances:PL_CHANCES, boomAt:null, busy:false, status:"playing"};
+function initLightWindows(){
+  var start = LW_LEVELS.map(lwMakeWindow);
+  state.session.lightWindows = {start:start, cells:start[0].slice(), level:0, moves:0, busy:false, status:"playing"};
   saveState();
 }
-function plChancesLeft(s){ return typeof s.chances === "number" ? s.chances : PL_CHANCES; }
-// the squares make their own sounds, not the button sound
-function plTap(i){
-  var s = state.session.pathOfLight;
-  if(!s || s.status !== "playing" || s.busy || s.revealed[i]) return;
-  var board = s.boards[s.level];
-  if(i === board.cross){
-    s.revealed[i] = "cross"; s.busy = true;
-    pixSfxPlay("fmMatch", true);
+function lwTap(i){
+  var s = state.session.lightWindows;
+  if(!s || s.status !== "playing" || s.busy) return;
+  lwFlip(s.cells, i); s.moves++;
+  if(s.cells.indexOf(0) === -1){
+    s.busy = true;
+    var lastWindow = s.level >= s.start.length - 1;
+    pixSfxPlay(lastWindow ? "fmFanfare" : "fmMatch", true);
     saveState(); render();
     setTimeout(function(){
-      var s2 = state.session.pathOfLight;
+      var s2 = state.session.lightWindows;
       if(!s2 || s2 !== s || s2.status !== "playing") return;
-      if(s2.level >= s2.boards.length - 1){ s2.status = "passed"; }
-      else { s2.level++; s2.revealed = {}; s2.chances = PL_CHANCES; s2.busy = false; }
+      if(lastWindow){ s2.status = "passed"; }
+      else { s2.level++; s2.cells = s2.start[s2.level].slice(); s2.moves = 0; s2.busy = false; }
       saveState(); render();
-    }, 900);
+    }, lastWindow ? 1300 : 900);
     return;
   }
-  if(board.bombs.indexOf(i) !== -1){
-    s.revealed[i] = "bomb"; s.chances = plChancesLeft(s) - 1; s.boomAt = i;
-    var lastChance = s.chances <= 0;
-    if(lastChance) s.busy = true;
-    pixSfxPlay(lastChance ? "fmLast" : "fmMiss", true);
-    saveState(); render();
-    setTimeout(function(){
-      var s2 = state.session.pathOfLight;
-      if(!s2 || s2 !== s || s2.status !== "playing") return;
-      s2.boomAt = null;
-      if(lastChance) s2.status = "failed";
-      saveState(); render();
-    }, lastChance ? 1300 : 600);
-    return;
-  }
-  s.revealed[i] = "clue";
   pixSfxPlay("fmFirst", true);
   saveState(); render();
 }
-function plTryAgain(){ initPathOfLight(); render(); }
-function plCollectAward(){ state.session.pathOfLight = null; grantMission("pathOfLight"); }
-function plQuit(){ state.session.pathOfLight = null; go("mainMenu"); }
+function lwReset(){
+  var s = state.session.lightWindows;
+  if(!s || s.status !== "playing" || s.busy) return;
+  s.cells = s.start[s.level].slice(); s.moves = 0;
+  saveState(); render();
+}
+function lwCollectAward(){ state.session.lightWindows = null; grantMission("lightWindows"); }
+function lwQuit(){ state.session.lightWindows = null; go("mainMenu"); }
 
-function screenPathOfLight(){
-  var s = state.session.pathOfLight;
-  if(!s){ initPathOfLight(); s = state.session.pathOfLight; }
+function screenLightWindows(){
+  var s = state.session.lightWindows;
+  if(!s){ initLightWindows(); s = state.session.lightWindows; }
 
-  if(s.status === "failed"){
-    return pixResultHtml("pathOfLightName", {cls:"pixLower", title:t("pl_failTitle"), body:t("pl_failBody"),
-      buttons:pixBtnHtml(t("tryAgain"), "plTryAgain()") + pixBtnHtml(t("mainMenu"), "plQuit()", true)});
-  }
   if(s.status === "passed"){
-    return pixResultHtml("pathOfLightName", {cls:"pixLower", title:t("pl_passTitle"), body:t("pl_passBody"), badge:"pathOfLight",
-      buttons:pixBtnHtml(t("collectAward"), "plCollectAward()") + pixBtnHtml(t("mainMenu"), "plQuit()", true)});
+    return pixResultHtml("lightWindowsName", {cls:"pixLower", title:t("lw_passTitle"), body:t("lw_passBody"), badge:"lightWindows",
+      buttons:pixBtnHtml(t("collectAward"), "lwCollectAward()") + pixBtnHtml(t("mainMenu"), "lwQuit()", true)});
   }
 
-  var board = s.boards[s.level];
   var cellsHtml = "";
-  for(var i = 0; i < PL_N * PL_N; i++){
-    var kind = s.revealed[i], cls = "plCell " + (kind || "hid"), inner = "";
-    if(kind === "clue"){
-      var clue = plClue(i, board.cross);
-      inner = '<img class="plArrow" src="tiles/pl_arrow_' + clue.dir + '.png" alt="">' + (board.nums[i] ? '<span class="plNum">' + clue.dist + '</span>' : '');
-    } else if(kind === "bomb"){
-      inner = s.boomAt === i ? '<img class="plBoom" src="tiles/pl_boom.png" alt="">' : '<img class="plBomb" src="tiles/pl_bomb.png" alt="">';
-    } else if(kind === "cross"){
-      inner = '<img class="plCross" src="tiles/pl_cross.png" alt="">';
-    }
-    cellsHtml += '<button class="' + cls + '" data-sfx="own" onclick="plTap(' + i + ')">' + inner + '</button>';
+  for(var i = 0; i < LW_N * LW_N; i++){
+    var pic = ("0" + ((i * 3 + s.level * 5) % 16)).slice(-2);     // a different stained-glass picture for each pane
+    cellsHtml += '<button class="lwCell ' + (s.cells[i] ? 'on' : 'off') + '" data-sfx="own" style="background-image:url(tiles/faith_tile8_' + pic + '.png)" onclick="lwTap(' + i + ')"></button>';
   }
+  var won = s.cells.indexOf(0) === -1;
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
-    '<h2 class="pixMTitle">' + t("pathOfLightName") + '</h2>' +
-    '<div class="pixNote">' + t("pl_intro") + '</div>' +
-    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.level + 1, s.boards.length) + '</span>' + chancesHeartsHtml(Math.max(0, plChancesLeft(s)), PL_CHANCES) + '</div>' +
-    '<div class="plBoard" style="grid-template-columns:repeat(' + PL_N + ',1fr)">' + cellsHtml + '</div>' +
+    '<h2 class="pixMTitle">' + t("lightWindowsName") + '</h2>' +
+    '<div class="pixNote">' + t("lw_intro") + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.level + 1, s.start.length) + '</span><span class="pixNote">' + t("lw_moves")(s.moves) + '</span></div>' +
+    '<div class="lwBoard' + (won ? ' win' : '') + '" style="grid-template-columns:repeat(' + LW_N + ',1fr)">' + cellsHtml + '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();plQuit()">' + t("mainMenu") + '</button>' +
+    pixBtnHtml(t("lw_reset"), "lwReset()") +
+    '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();lwQuit()">' + t("mainMenu") + '</button>' +
   '</div>';
 }
 
@@ -4218,7 +4189,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","pathOfLight"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","lightWindows"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
 
 function exitBarHtml(){
@@ -4243,7 +4214,7 @@ function exitMission(){
     case "lightCandle": lcQuit(); break;
     case "emojiStories": ebQuit(); break;
     case "jesusTimeline": tlQuit(); break;
-    case "pathOfLight": plQuit(); break;
+    case "lightWindows": lwQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -4271,7 +4242,7 @@ function render(){
     case "lightCandle": html = screenLightCandle(); break;
     case "emojiStories": html = screenEmojiStories(); break;
     case "jesusTimeline": html = screenJesusTimeline(); break;
-    case "pathOfLight": html = screenPathOfLight(); break;
+    case "lightWindows": html = screenLightWindows(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
     case "goldenTicket": html = screenGoldenTicket(); break;
