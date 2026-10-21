@@ -374,17 +374,22 @@
   @keyframes pixHeartIn{from{transform:scale(.3);opacity:0;}to{transform:scale(1);opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .pixBigHeart{animation:none;} }
   /* Path of Light */
-  .plBoard{display:grid;gap:3px;width:min(100%,300px);box-sizing:border-box;margin:6px auto;padding:6px;background:#1B1F3B;border-radius:12px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
-  .plCell{aspect-ratio:1/1;position:relative;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:6px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-  .plCell.rock{background:#2B3F8C;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35),inset 0 3px 0 rgba(255,255,255,.14);cursor:default;}
-  .plCell.stone{background:#FFF3D6;box-shadow:inset 0 0 0 2px #FFC93A;cursor:pointer;}
-  .plCell.stone.trail{background:#FFE08A;}
-  .plCell.shake{background:#D6343A;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35);animation:tlShake .4s steps(4);}
+  .plBoard{display:grid;gap:2px;width:min(100%,340px);box-sizing:border-box;margin:6px auto;padding:4px;background:#1B1F3B;border-radius:12px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
+  .plCell{aspect-ratio:1/1;position:relative;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:5px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .plCell.hid{background:#FFF3D6;box-shadow:inset 0 0 0 2px #FFC93A;cursor:pointer;}
+  .plCell.hid:active{box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 2px #FFF6C0,0 0 12px 5px rgba(255,236,120,.85);}
+  .plCell.clue{background:#CFE8FF;box-shadow:inset 0 0 0 2px #7FC0FF;cursor:default;}
+  .plCell.bomb{background:#7E1B22;box-shadow:inset 0 0 0 2px #D6343A;cursor:default;}
+  .plCell.cross{background:#FFE08A;box-shadow:inset 0 0 0 2px #FFC93A,0 0 14px 5px rgba(255,236,120,.95);cursor:default;}
   .plCell img{position:absolute;image-rendering:pixelated;pointer-events:none;}
-  .plCell .plCross{width:74%;height:74%;}
-  .plCell .plLight{width:96%;height:96%;animation:plGlow 1s steps(2) infinite alternate;}
-  @keyframes plGlow{from{transform:scale(.92);}to{transform:scale(1);}}
-  @media (prefers-reduced-motion:reduce){ .plCell.shake,.plCell .plLight{animation:none;} }
+  .plCell .plArrow{width:80%;height:80%;}
+  .plCell .plBomb{width:72%;height:auto;}
+  .plCell .plCross{width:76%;height:76%;}
+  .plCell .plBoom{width:150%;height:150%;z-index:3;animation:plBoom .6s steps(5) both;}
+  @keyframes plBoom{0%{transform:scale(.2);}40%{transform:scale(1.15);}100%{transform:scale(.95);}}
+  .plNum{position:absolute;right:2px;bottom:0;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;line-height:1;color:#fff;
+    text-shadow:1px 0 #1b2a6b,-1px 0 #1b2a6b,0 1px #1b2a6b,0 -1px #1b2a6b;pointer-events:none;}
+  @media (prefers-reduced-motion:reduce){ .plCell .plBoom{animation:none;} }
   /* Emoji Bible Stories */
   .pixEmoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:3rem;line-height:1.15;letter-spacing:.06em;}
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
@@ -454,7 +459,8 @@
     .pixMission.pixLower .pixQ{font-size:1.0625rem;}
     .pixMission.pixLower .btn.pixBtn.pixBtnSm{height:40px;margin-bottom:6px;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
-    .plBoard{width:min(100%,262px);margin:4px auto;}
+    .plBoard{margin:4px auto;}
+    .plNum{font-size:.75rem;}
     .pixEmoji{font-size:2.4rem;line-height:1.05;}
     .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
     .tlSlots{gap:2px;margin:4px 0;}
@@ -787,9 +793,9 @@ var T = {
     hb_intro:"Look closely — find all 6 hidden blessings tucked into the scene!",
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
-    pl_intro:"Guide the light to the cross. Tap a glowing stone next to the light, and don't tap the rocks!",
-    pl_failTitle:"So Close!", pl_failBody:"You ran out of chances. Try again with new mazes!",
-    pl_passTitle:"Path Finder!", pl_passBody:"You guided the light through every maze!",
+    pl_intro:"Find the cross! Arrows show the direction, numbers show the distance, bombs cost a chance.",
+    pl_failTitle:"So Close!", pl_failBody:"You ran out of chances. Try again from Level 1!",
+    pl_passTitle:"Cross Finder!", pl_passBody:"You found the cross on every level!",
     eb_intro:"Guess the Bible story from the emojis.", eb_story:function(n,total){return "Story "+n+" of "+total;}, eb_next:"NEXT STORY",
     eb_failTitle:"So Close!", eb_failBody:"You ran out of chances. Try again with a new set of stories!",
     eb_passTitle:"Bible Story Pro!", eb_passBody:"You guessed the Bible stories from the emojis!",
@@ -899,9 +905,9 @@ var T = {
     hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
-    pl_intro:"Guía la luz hasta la cruz. Toca una piedra brillante junto a la luz, ¡y no toques las rocas!",
-    pl_failTitle:"¡Tan Cerca!", pl_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con nuevos laberintos!",
-    pl_passTitle:"¡Buscador de Caminos!", pl_passBody:"¡Guiaste la luz por todos los laberintos!",
+    pl_intro:"¡Encuentra la cruz! Flechas: dirección. Números: distancia. Bombas: pierdes una oportunidad.",
+    pl_failTitle:"¡Tan Cerca!", pl_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo desde el Nivel 1!",
+    pl_passTitle:"¡Buscador de la Cruz!", pl_passBody:"¡Encontraste la cruz en todos los niveles!",
     eb_intro:"Adivina la historia bíblica con los emojis.", eb_story:function(n,total){return "Historia "+n+" de "+total;}, eb_next:"SIGUIENTE HISTORIA",
     eb_failTitle:"¡Tan Cerca!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
     eb_passTitle:"¡Experto en Historias Bíblicas!", eb_passBody:"¡Adivinaste las historias bíblicas con los emojis!",
@@ -3680,116 +3686,72 @@ function screenJesusTimeline(){
 
 /* ---------- Path of Light ---------- */
 
-// Path of Light (2026-10-21, per Dan: "build a version so I can play it"). A TAP maze: the whole maze is in view -- glowing stones are the way,
-// dark rocks are walls -- and the player taps the glowing stone next to the light to walk it from the top-left corner to the cross in the
-// bottom-right. Tapping a rock next to the light costs a chance (5 shared across 3 mazes of 5x5, 6x6 and 7x7). Walking into a dead end is free:
-// tap the stone behind to step back. Every maze has exactly one route (and a few dead-end branches), made fresh each game and saved in the game.
-var PL_CHANCES = 5;
-var PL_SIZES = [5, 6, 7];
+// Path of Light (2026-10-21, per Dan -- rebuilt as a clue hunt; the first version was a tap maze). An 8 x 8 board with a cross hidden under one
+// square. Tapping a square shows a clue: an ARROW toward the cross (8 directions), sometimes a NUMBER too (how many squares away the cross is,
+// counted as rings: 2 means it is somewhere on the square ring 2 squares out), or a BOMB (the square blows up and costs a chance), or the CROSS
+// itself, which ends the level. 4 levels, 3 chances on each level (the chances are filled again for every level). Losing all 3 chances on a level
+// ends the game; TRY AGAIN starts over from Level 1 with new boards, like Faith Match. More bombs and fewer numbers on each level.
+var PL_N = 8;
+var PL_CHANCES = 3;
+var PL_LEVELS = [{bombs:4, nums:0.7}, {bombs:6, nums:0.55}, {bombs:8, nums:0.4}, {bombs:10, nums:0.3}];   // bombs on the board, chance a clue square also shows a number
+var PL_DIRS = ["E", "NE", "N", "NW", "W", "SW", "S", "SE"];
 
-function plNeighbors(n, i){
-  var r = Math.floor(i / n), c = i % n, a = [];
-  if(r > 0) a.push(i - n);
-  if(r < n - 1) a.push(i + n);
-  if(c > 0) a.push(i - 1);
-  if(c < n - 1) a.push(i + 1);
-  return a;
+function plMakeBoard(cfg){
+  var total = PL_N * PL_N, all = [], i;
+  for(i = 0; i < total; i++) all.push(i);
+  all = shuffle(all);
+  var nums = [];
+  for(i = 0; i < total; i++) nums.push(Math.random() < cfg.nums);
+  return {cross:all[0], bombs:all.slice(1, 1 + cfg.bombs), nums:nums};
 }
-// returns {n, cells} where cells is a string of 0 (rock) and 1 (stone), cell 0 = start (top-left), the last cell = the cross
-function plMakeMaze(n){
-  var goal = n * n - 1, minLen = Math.round(n * n * 0.45);
-  for(var attempt = 0; attempt < 400; attempt++){
-    if(attempt === 150 || attempt === 300) minLen -= 2;              // if long routes are hard to find, settle for a shorter one
-    var open = [], k;
-    for(k = 0; k < n * n; k++) open.push(false);
-    var path = [0], calls = 0;
-    open[0] = true;
-    // a stone may only be added next to exactly one existing stone: that keeps every route unique (no loops)
-    var openCount = function(j){ var c = 0, nb = plNeighbors(n, j); for(var x = 0; x < nb.length; x++) if(open[nb[x]]) c++; return c; };
-    var dfs = function(i){
-      if(++calls > 4000) return false;
-      if(i === goal) return path.length >= minLen;
-      var nb = shuffle(plNeighbors(n, i));
-      for(var q = 0; q < nb.length; q++){
-        var j = nb[q];
-        if(open[j] || openCount(j) !== 1) continue;
-        if(j === goal && path.length + 1 < minLen) continue;
-        open[j] = true; path.push(j);
-        if(dfs(j)) return true;
-        open[j] = false; path.pop();
-      }
-      return false;
-    };
-    if(!dfs(0)) continue;
-    // dead-end branches off the route
-    var made = 0, want = n;
-    for(var t = 0; t < 80 && made < want; t++){
-      var openList = [];
-      for(k = 0; k < n * n; k++) if(open[k] && k !== goal) openList.push(k);
-      var base = openList[Math.floor(Math.random() * openList.length)];
-      var cand = shuffle(plNeighbors(n, base)).filter(function(j){ return !open[j] && openCount(j) === 1; });
-      if(!cand.length) continue;
-      var cur = cand[0];
-      open[cur] = true; made++;
-      var len = 1 + Math.floor(Math.random() * 3);
-      while(--len > 0){
-        var nx = shuffle(plNeighbors(n, cur)).filter(function(j){ return !open[j] && openCount(j) === 1; })[0];
-        if(nx === undefined) break;
-        open[nx] = true; cur = nx;
-      }
-    }
-    return {n:n, cells:open.map(function(b){ return b ? "1" : "0"; }).join("")};
-  }
-  // (never reached in practice) a plain winding fallback
-  var cells = "", z;
-  for(z = 0; z < n * n; z++) cells += (Math.floor(z / n) % 2 === 0 || (Math.floor(z / n) % 4 === 1 && z % n === n - 1) || (Math.floor(z / n) % 4 === 3 && z % n === 0)) ? "1" : "0";
-  return {n:n, cells:cells};
+// the clue for a square: the compass direction of the cross from it (the nearest of 8) and the ring number (the larger of the row and column gaps)
+function plClue(i, cross){
+  var dx = (cross % PL_N) - (i % PL_N), dy = Math.floor(cross / PL_N) - Math.floor(i / PL_N);
+  var k = Math.round(Math.atan2(-dy, dx) * 180 / Math.PI / 45);
+  return {dir:PL_DIRS[((k % 8) + 8) % 8], dist:Math.max(Math.abs(dx), Math.abs(dy))};
 }
 
 function initPathOfLight(){
-  state.session.pathOfLight = {levels:PL_SIZES.map(plMakeMaze), level:0, pos:0, trail:[0], chances:PL_CHANCES, shake:null, busy:false, status:"playing"};
+  state.session.pathOfLight = {boards:PL_LEVELS.map(plMakeBoard), level:0, revealed:{}, chances:PL_CHANCES, boomAt:null, busy:false, status:"playing"};
   saveState();
 }
 function plChancesLeft(s){ return typeof s.chances === "number" ? s.chances : PL_CHANCES; }
+// the squares make their own sounds, not the button sound
 function plTap(i){
   var s = state.session.pathOfLight;
-  if(!s || s.status !== "playing" || s.busy || s.shake !== null) return;
-  var lv = s.levels[s.level], n = lv.n;
-  if(i === s.pos || plNeighbors(n, s.pos).indexOf(i) === -1) return;   // only the squares next to the light react
-  if(lv.cells.charAt(i) === "1"){
-    if(s.trail.length > 1 && s.trail[s.trail.length - 2] === i) s.trail.pop(); else s.trail.push(i);   // stepping back along the trail is free
-    s.pos = i;
-    if(i === n * n - 1){
-      s.busy = true;
-      pixSfxPlay("fmMatch", true);
+  if(!s || s.status !== "playing" || s.busy || s.revealed[i]) return;
+  var board = s.boards[s.level];
+  if(i === board.cross){
+    s.revealed[i] = "cross"; s.busy = true;
+    pixSfxPlay("fmMatch", true);
+    saveState(); render();
+    setTimeout(function(){
+      var s2 = state.session.pathOfLight;
+      if(!s2 || s2 !== s || s2.status !== "playing") return;
+      if(s2.level >= s2.boards.length - 1){ s2.status = "passed"; }
+      else { s2.level++; s2.revealed = {}; s2.chances = PL_CHANCES; s2.busy = false; }
       saveState(); render();
-      setTimeout(function(){
-        var s2 = state.session.pathOfLight;
-        if(!s2 || s2 !== s || s2.status !== "playing") return;
-        if(s2.level >= s2.levels.length - 1){ s2.status = "passed"; }
-        else { s2.level++; s2.pos = 0; s2.trail = [0]; s2.busy = false; }
-        saveState(); render();
-      }, 900);
-    } else {
-      pixSfxPlay("fmFirst", true);
-      saveState(); render();
-    }
+    }, 900);
     return;
   }
-  // a rock
-  s.chances = plChancesLeft(s) - 1;
-  var lastChance = s.chances <= 0;
-  s.shake = i;
-  if(lastChance) s.busy = true;
-  pixSfxPlay(lastChance ? "fmLast" : "fmMiss", true);
-  saveState(); render();
-  setTimeout(function(){
-    var s2 = state.session.pathOfLight;
-    if(!s2 || s2 !== s || s2.status !== "playing") return;
-    s2.shake = null;
-    if(lastChance) s2.status = "failed";
+  if(board.bombs.indexOf(i) !== -1){
+    s.revealed[i] = "bomb"; s.chances = plChancesLeft(s) - 1; s.boomAt = i;
+    var lastChance = s.chances <= 0;
+    if(lastChance) s.busy = true;
+    pixSfxPlay(lastChance ? "fmLast" : "fmMiss", true);
     saveState(); render();
-  }, lastChance ? 1300 : 450);
+    setTimeout(function(){
+      var s2 = state.session.pathOfLight;
+      if(!s2 || s2 !== s || s2.status !== "playing") return;
+      s2.boomAt = null;
+      if(lastChance) s2.status = "failed";
+      saveState(); render();
+    }, lastChance ? 1300 : 600);
+    return;
+  }
+  s.revealed[i] = "clue";
+  pixSfxPlay("fmFirst", true);
+  saveState(); render();
 }
 function plTryAgain(){ initPathOfLight(); render(); }
 function plCollectAward(){ state.session.pathOfLight = null; grantMission("pathOfLight"); }
@@ -3808,24 +3770,26 @@ function screenPathOfLight(){
       buttons:pixBtnHtml(t("collectAward"), "plCollectAward()") + pixBtnHtml(t("mainMenu"), "plQuit()", true)});
   }
 
-  var lv = s.levels[s.level], n = lv.n, goal = n * n - 1;
+  var board = s.boards[s.level];
   var cellsHtml = "";
-  for(var i = 0; i < n * n; i++){
-    var stone = lv.cells.charAt(i) === "1";
-    var cls = "plCell " + (stone ? "stone" : "rock");
-    if(stone && s.trail.indexOf(i) !== -1) cls += " trail";
-    if(s.shake === i) cls += " shake";
-    var inner = "";
-    if(i === goal) inner += '<img class="plCross" src="tiles/pl_cross.png" alt="">';
-    if(i === s.pos) inner += '<img class="plLight" src="tiles/pl_light.png" alt="">';
+  for(var i = 0; i < PL_N * PL_N; i++){
+    var kind = s.revealed[i], cls = "plCell " + (kind || "hid"), inner = "";
+    if(kind === "clue"){
+      var clue = plClue(i, board.cross);
+      inner = '<img class="plArrow" src="tiles/pl_arrow_' + clue.dir + '.png" alt="">' + (board.nums[i] ? '<span class="plNum">' + clue.dist + '</span>' : '');
+    } else if(kind === "bomb"){
+      inner = s.boomAt === i ? '<img class="plBoom" src="tiles/pl_boom.png" alt="">' : '<img class="plBomb" src="tiles/pl_bomb.png" alt="">';
+    } else if(kind === "cross"){
+      inner = '<img class="plCross" src="tiles/pl_cross.png" alt="">';
+    }
     cellsHtml += '<button class="' + cls + '" data-sfx="own" onclick="plTap(' + i + ')">' + inner + '</button>';
   }
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("pathOfLightName") + '</h2>' +
     '<div class="pixNote">' + t("pl_intro") + '</div>' +
-    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.level + 1, s.levels.length) + '</span>' + chancesHeartsHtml(Math.max(0, plChancesLeft(s)), PL_CHANCES) + '</div>' +
-    '<div class="plBoard" style="grid-template-columns:repeat(' + n + ',1fr)">' + cellsHtml + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.level + 1, s.boards.length) + '</span>' + chancesHeartsHtml(Math.max(0, plChancesLeft(s)), PL_CHANCES) + '</div>' +
+    '<div class="plBoard" style="grid-template-columns:repeat(' + PL_N + ',1fr)">' + cellsHtml + '</div>' +
     '<div class="spacer"></div>' +
     '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();plQuit()">' + t("mainMenu") + '</button>' +
   '</div>';
