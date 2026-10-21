@@ -640,7 +640,7 @@ var T = {
     faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
     stainedGlassName:"Stained-Glass Puzzle", chooseJoyName:"Choose Joy",
     done:"DONE",
-    ff_intro:"Get through 3 rounds of 10 questions to earn your badge! You have 8 chances.", ff_round:function(n,total){return "Round "+n+" of "+total;}, ff_roundDone:function(n){return "ROUND "+n+" COMPLETED!";}, ff_awarded:"AWARDED!",
+    ff_intro:"Get through 3 rounds of 10 questions to earn your badge! You have 5 chances.", ff_round:function(n,total){return "Round "+n+" of "+total;}, ff_roundDone:function(n){return "ROUND "+n+" COMPLETED!";}, ff_awarded:"AWARDED!",
     nextQuestion:"NEXT QUESTION", collectAward:"COLLECT AWARD", playAgain:"PLAY AGAIN", tryAgain:"TRY AGAIN",
     ff_resultsTitlePass:"Perfect Score!", ff_resultsTitlePass2:"Well Done!", ff_resultsTitleFail:"So Close!",
     ff_resultsBodyPass:"You answered all 30 questions correctly!", ff_resultsBodyPass2:"You made it through all 30 questions!",
@@ -735,7 +735,7 @@ var T = {
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
     stainedGlassName:"Rompecabezas de Vitral", chooseJoyName:"Elige la Alegría",
     done:"COMPLETADO",
-    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 8 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
+    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 5 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
     nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
     ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitlePass2:"¡Bien Hecho!", ff_resultsTitleFail:"¡Tan Cerca!",
     ff_resultsBodyPass:"¡Respondiste las 30 preguntas correctamente!", ff_resultsBodyPass2:"¡Superaste las 30 preguntas!",
@@ -1906,7 +1906,7 @@ var FAITH_FLASH_ROUNDS = 3;
 function ffRounds(s){ return Math.ceil(s.order.length / FAITH_FLASH_ROUND_SIZE); }
 function ffRound(s){ return Math.floor(s.index / FAITH_FLASH_ROUND_SIZE); }
 // Three chances, shown as hearts just like Faith Match (2026-10-20, per Dan): a wrong answer costs one, and the game ends when the last is gone.
-var FF_CHANCES = 8;   // 8 chances for the whole game (2026-10-20, per Dan; it was 3)
+var FF_CHANCES = 5;   // 5 chances for the whole game (2026-10-21, per Dan; it was 3, then 8)
 function ffChancesLeft(s){ return typeof s.chances === "number" ? s.chances : FF_CHANCES; }
 
 function initFaithFlash(){
