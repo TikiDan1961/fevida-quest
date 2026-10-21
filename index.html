@@ -351,6 +351,7 @@
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
   /* Faith Match and Faith Flash sit 40px lower on the screen (2026-10-20, per Dan); the title is the first thing on both, so they line up */
   .pixMission.pixLower{padding-top:calc(env(safe-area-inset-top,0px) + 58px);}
+  .pixMission.pixLower .pixMTitle{padding:0 8px;}   /* lowered screens start below the red X, so a long title (Historias Bíblicas en Emojis) may use the full width */
   .pixPips{display:flex;justify-content:center;gap:5px;margin:0 0 14px;}
   .pixPip{width:15px;height:15px;box-sizing:border-box;border:2px solid #1B1F3B;border-radius:3px;background:rgba(27,31,59,.35);}
   .pixPip.done{background:#FFC93A;}
@@ -372,6 +373,49 @@
   .pixBigHeart{display:block;width:88px;height:80px;margin:16px auto 12px;image-rendering:pixelated;animation:pixHeartIn .45s steps(4) both;}
   @keyframes pixHeartIn{from{transform:scale(.3);opacity:0;}to{transform:scale(1);opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .pixBigHeart{animation:none;} }
+  /* Emoji Bible Stories */
+  .pixEmoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:3rem;line-height:1.15;letter-spacing:.06em;}
+  .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
+  .pixRef.shown{color:#1E6B2B;font-weight:700;}
+  /* Life of Jesus Timeline */
+  .tlSlots{display:flex;flex-direction:column;gap:4px;margin:6px 0;}
+  .tlSlot{display:flex;align-items:center;gap:8px;height:34px;box-sizing:border-box;padding:0 8px;border:3px solid #1B1F3B;border-radius:8px;background:rgba(255,255,255,.35);
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;color:#1E2F7A;}
+  .tlSlot.placed{background:#FFF3D6;box-shadow:inset 0 0 0 2px #FFC93A;}
+  .tlNum{flex:none;width:20px;height:20px;border-radius:4px;background:#1B1F3B;color:#fff;display:grid;place-items:center;font-size:.8rem;}
+  .tlTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tlIcon{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;margin-right:6px;}
+  .tlCards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+  .tlCard{display:flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:4px 6px 8px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;
+    line-height:1.1;letter-spacing:.02em;text-align:center;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;
+    box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
+  .tlCard .tlIcon{margin:0;font-size:1.1rem;}
+  .tlCard:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .tlCard.shake{background:#D6343A;border-color:#7E1B22;animation:tlShake .4s steps(4);}
+  @keyframes tlShake{0%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-3px);}100%{transform:translateX(0);}}
+  @media (prefers-reduced-motion:reduce){ .tlCard.shake{animation:none;} }
+  /* Light a Candle: --u = the size of one pixel of the candle art */
+  .lcZone{--u:5px;position:relative;width:calc(44 * var(--u));height:calc(48 * var(--u));margin:6px auto;touch-action:none;user-select:none;-webkit-user-select:none;
+    -webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;cursor:pointer;}
+  .lcZone.lit{cursor:default;}
+  .lcRing{position:absolute;left:0;top:calc(2 * var(--u));width:calc(44 * var(--u));height:calc(44 * var(--u));border-radius:50%;
+    background:conic-gradient(#FFC93A calc(var(--rp) * 360deg), rgba(27,31,59,.45) 0);
+    -webkit-mask:radial-gradient(circle closest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));mask:radial-gradient(circle closest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));}
+  .lcGlow{position:absolute;left:calc(5 * var(--u));top:calc(-4 * var(--u));width:calc(34 * var(--u));height:calc(34 * var(--u));border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle, rgba(255,226,120,.95), rgba(255,201,58,0) 68%);opacity:calc(var(--p) * .85);}
+  .lcCandleImg{position:absolute;left:calc(10 * var(--u));top:calc(14 * var(--u));width:calc(24 * var(--u));height:calc(32 * var(--u));image-rendering:pixelated;pointer-events:none;}
+  .lcFlame{position:absolute;left:calc(15.5 * var(--u));top:calc(2 * var(--u));width:calc(9 * var(--u));height:calc(13 * var(--u));background:url("tiles/flame.png") 0 0 / 200% 100% no-repeat;
+    image-rendering:pixelated;transform:scale(0);transform-origin:50% 100%;pointer-events:none;animation:lcFlick .5s steps(1) infinite;}
+  @keyframes lcFlick{0%{background-position:0 0;}50%{background-position:100% 0;}}
+  .lcZone.lit .lcGlow{animation:lcPulse 1.6s steps(4) infinite alternate;}
+  @keyframes lcPulse{from{opacity:.7;}to{opacity:1;}}
+  @media (prefers-reduced-motion:reduce){ .lcFlame,.lcZone.lit .lcGlow{animation:none;} }
+  .lcGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 4px;}
+  .lcIntent{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:84px;padding:8px 6px 10px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;
+    font-size:1rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;
+    box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
+  .lcIntent img{width:36px;height:36px;image-rendering:pixelated;}
+  .lcIntent:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .pixResBadge{display:block;width:144px;height:144px;margin:0 auto 10px;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
   .pixResTitle{font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:.02em;}
   .pixResBody{margin:10px 0 0;font-weight:500;font-size:1.0625rem;line-height:1.3;color:#3d4d96;}
@@ -398,6 +442,17 @@
     .pixMission.pixLower .pixQ{font-size:1.0625rem;}
     .pixMission.pixLower .btn.pixBtn.pixBtnSm{height:40px;margin-bottom:6px;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
+    .pixEmoji{font-size:2.4rem;line-height:1.05;}
+    .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
+    .tlSlots{gap:2px;margin:4px 0;}
+    .tlSlot{height:26px;font-size:.8125rem;}
+    .tlNum{width:18px;height:18px;font-size:.75rem;}
+    .tlCards{gap:6px;}
+    .tlCard{min-height:44px;font-size:.8125rem;}
+    .lcZone{--u:3.6px;margin:2px auto;}
+    .lcGrid{gap:8px;margin:6px 0 2px;}
+    .lcIntent{min-height:70px;padding:6px 4px 8px;font-size:.9375rem;gap:4px;}
+    .lcIntent img{width:30px;height:30px;}
     .pixRoundDone{padding:16px 12px;}
     .pixRoundDone .pixResTitle{font-size:1.5rem;}
     .pixBigHeart{width:66px;height:60px;margin:10px auto 8px;}
@@ -677,7 +732,7 @@ var T = {
     themeFaith:"Faith", themeLove:"God's Love", themeLight:"Be a Light to the World",
     themeUnity:"Unity", themeHope:"Hope",
     themeHoliness:"Holiness", themeGrace:"Grace", themeSalvation:"Salvation",
-    themeForgiveness:"Forgiveness", themeMercy:"Mercy",
+    themeForgiveness:"Forgiveness", themeMercy:"Mercy", themePrayer:"Prayer", themeScripture:"Scripture", themeDiscipleship:"Discipleship",
 
     followLightName:"Follow the Light", wordUnscrambleName:"Word Unscramble",
     catchLightName:"Catch the Light", kindnessSortName:"Acts of Kindness",
@@ -719,6 +774,21 @@ var T = {
     hb_intro:"Look closely — find all 6 hidden blessings tucked into the scene!",
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
+    eb_intro:"Guess the Bible story from the emojis.", eb_story:function(n,total){return "Story "+n+" of "+total;}, eb_next:"NEXT STORY",
+    eb_failTitle:"So Close!", eb_failBody:"You ran out of chances. Try again with a new set of stories!",
+    eb_passTitle:"Bible Story Pro!", eb_passBody:"You guessed the Bible stories from the emojis!",
+    tl_intro:"Tap the events in the order they happened, from first to last.", tl_round:function(n,total){return "Round "+n+" of "+total;},
+    tl_failTitle:"So Close!", tl_failBody:"You ran out of chances. Try again with new events!",
+    tl_passTitle:"Timeline Master!", tl_passBody:"You put the life of Jesus in order!",
+    lc_intro:"Take a quiet moment. Choose who or what you are praying for.", lc_for:function(n){return "Praying for: "+n;}, lc_hold:"Press and hold to light it.", lc_amen:"AMEN",
+    lc_passTitle:"A Light Is Lit!", lc_passBody:"Thank you for taking a quiet moment to pray.",
+    lc_int_family:"Family", lc_int_friends:"Friends", lc_int_peace:"Peace", lc_int_thanks:"Thanks", lc_int_healing:"Healing", lc_int_courage:"Courage",
+    lc_pray_family:"Lord, bless and protect my family. Help us love each other as you love us.",
+    lc_pray_friends:"Lord, thank you for my friends. Help me be a good friend and stay close to those who need me.",
+    lc_pray_peace:"Lord, bring peace to our hearts, our homes and our world. Help me be a peacemaker.",
+    lc_pray_thanks:"Thank you, Lord, for every blessing in my life, big and small. Help me never forget it.",
+    lc_pray_healing:"Lord, be near to everyone who is hurting in body or heart. Bring them your comfort and healing.",
+    lc_pray_courage:"Lord, give me courage to do what is right, even when it is hard. Stay with me and make me brave.",
 
     pz_intro:"Drag each piece into the frame to rebuild the picture. It snaps into place when it fits.",
     pz_round:function(n,total){return "Level "+n+" of "+total;},
@@ -772,7 +842,7 @@ var T = {
     themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé Luz para el Mundo",
     themeUnity:"Unidad", themeHope:"Esperanza",
     themeHoliness:"Santidad", themeGrace:"Gracia", themeSalvation:"Salvación",
-    themeForgiveness:"Perdón", themeMercy:"Misericordia",
+    themeForgiveness:"Perdón", themeMercy:"Misericordia", themePrayer:"Oración", themeScripture:"Escrituras", themeDiscipleship:"Discipulado",
 
     followLightName:"Sigue la Luz", wordUnscrambleName:"Desordena Palabras",
     catchLightName:"Atrapa la Luz", kindnessSortName:"Actos de Bondad",
@@ -813,6 +883,21 @@ var T = {
     hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
+    eb_intro:"Adivina la historia bíblica con los emojis.", eb_story:function(n,total){return "Historia "+n+" de "+total;}, eb_next:"SIGUIENTE HISTORIA",
+    eb_failTitle:"¡Tan Cerca!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
+    eb_passTitle:"¡Experto en Historias Bíblicas!", eb_passBody:"¡Adivinaste las historias bíblicas con los emojis!",
+    tl_intro:"Toca los eventos en el orden en que ocurrieron, del primero al último.", tl_round:function(n,total){return "Ronda "+n+" de "+total;},
+    tl_failTitle:"¡Tan Cerca!", tl_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otros eventos!",
+    tl_passTitle:"¡Maestro de la Línea de Tiempo!", tl_passBody:"¡Pusiste en orden la vida de Jesús!",
+    lc_intro:"Tómate un momento de calma. Elige por quién o por qué estás orando.", lc_for:function(n){return "Orando por: "+n;}, lc_hold:"Mantén presionado para encenderla.", lc_amen:"AMÉN",
+    lc_passTitle:"¡Una Luz Encendida!", lc_passBody:"Gracias por tomarte un momento de calma para orar.",
+    lc_int_family:"Familia", lc_int_friends:"Amigos", lc_int_peace:"Paz", lc_int_thanks:"Gracias", lc_int_healing:"Sanación", lc_int_courage:"Valentía",
+    lc_pray_family:"Señor, bendice y protege a mi familia. Ayúdanos a amarnos unos a otros como tú nos amas.",
+    lc_pray_friends:"Señor, gracias por mis amigos. Ayúdame a ser un buen amigo y a estar cerca de quienes me necesitan.",
+    lc_pray_peace:"Señor, trae paz a nuestros corazones, a nuestros hogares y a nuestro mundo. Ayúdame a ser un pacificador.",
+    lc_pray_thanks:"Gracias, Señor, por cada bendición de mi vida, grande y pequeña. Ayúdame a no olvidarla nunca.",
+    lc_pray_healing:"Señor, acompaña a todos los que sufren en el cuerpo o en el corazón. Dales tu consuelo y tu sanación.",
+    lc_pray_courage:"Señor, dame valentía para hacer lo correcto, aunque sea difícil. Quédate conmigo y hazme valiente.",
 
     pz_intro:"Arrastra cada pieza al marco para armar la imagen. Encaja en su lugar cuando coincide.",
     pz_round:function(n,total){return "Nivel "+n+" de "+total;},
@@ -846,7 +931,14 @@ var MISSIONS = [
   {id:"wordUnscramble", icon:"🔤", badgeImg:"tiles/badge_grace.png", nameKey:"wordUnscrambleName", themeKey:"themeGrace"},
   {id:"catchLight", icon:"✨", badgeImg:"tiles/badge_salvation.png", nameKey:"catchLightName", themeKey:"themeSalvation"},
   {id:"kindnessSort", icon:"🤲", badgeImg:"tiles/badge_forgiveness.png", nameKey:"kindnessSortName", themeKey:"themeForgiveness"},
-  {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"}
+  {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"},
+  // Light a Candle (2026-10-21, per Dan: start on the new missions). Its own Prayer badge is not drawn yet, so it borrows the Light to the
+  // World badge until Dan's art arrives: add tiles/badge_prayer.png and tiles/badges8/b8_prayer.png, then change badgeImg here.
+  {id:"lightCandle", icon:"🕯️", badgeImg:"tiles/badge_light.png", nameKey:"lightCandleName", themeKey:"themePrayer"},
+  // Emoji Bible Stories and Life of Jesus Timeline (2026-10-21, per Dan). Also borrowing badges until their own art is drawn: Scripture reuses the
+  // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges8/b8_...) later.
+  {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
+  {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_salvation.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1067,12 +1159,15 @@ function defaultState(){
       wordUnscramble: {done:false, badge:false},
       catchLight: {done:false, badge:false},
       kindnessSort: {done:false, badge:false},
-      hiddenBlessings: {done:false, badge:false}
+      hiddenBlessings: {done:false, badge:false},
+      lightCandle: {done:false, badge:false},
+      emojiStories: {done:false, badge:false},
+      jesusTimeline: {done:false, badge:false}
     },
     photo: null,
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -1457,6 +1552,9 @@ function openMission(id){
   else if(id === "catchLight"){ initCatchLight(); go("catchLight"); }
   else if(id === "kindnessSort"){ initKindnessSort(); go("kindnessSort"); }
   else if(id === "hiddenBlessings"){ initHiddenBlessings(); go("hiddenBlessings"); }
+  else if(id === "lightCandle"){ initLightCandle(); go("lightCandle"); }
+  else if(id === "emojiStories"){ initEmojiStories(); go("emojiStories"); }
+  else if(id === "jesusTimeline"){ initJesusTimeline(); go("jesusTimeline"); }
 }
 
 /* ---------- Home Screen (the Main Menu) ---------- */
@@ -1469,9 +1567,6 @@ function openMission(id){
 // Placeholder tiles for missions that are planned but not built yet (2026-10-19, per Dan).
 // To make one real: add it to MISSIONS, build its screen, and delete it from this list.
 var COMING_SOON_MISSIONS = [
-  {id:"emojiStories", icon:"📖", nameKey:"emojiStoriesName"},
-  {id:"lightCandle", icon:"🕯️", nameKey:"lightCandleName"},
-  {id:"jesusTimeline", icon:"⏳", nameKey:"jesusTimelineName"},
   {id:"pathOfLight", icon:"🧭", nameKey:"pathOfLightName"},
   {id:"tbd", icon:"❓", nameKey:"tbdName"},
   // three more placeholders (2026-10-20, per Dan) for the games that will replace the missions that are not games; art = which icon picture to use
@@ -1587,7 +1682,7 @@ var pilgrimPath = PILGRIM_PATH_FULL, pilgrimSpeed = 24 / 800;   // speed: 24 pic
 // Be the Light and Choose Joy, and the planned Light a Candle -- don't move him. There will be 15 games in all; the ones not built
 // yet are the grey icons in the Missions folder.
 var PILGRIM_GAMES_TOTAL = 15;
-var PILGRIM_NON_GAMES = ["beTheLight", "chooseJoy"];
+var PILGRIM_NON_GAMES = ["beTheLight", "chooseJoy", "lightCandle"];
 function pilgrimGamesDone(){
   return MISSIONS.filter(function(m){ return PILGRIM_NON_GAMES.indexOf(m.id) === -1 && state.missions[m.id].done; }).length;
 }
@@ -3207,6 +3302,359 @@ function screenHiddenBlessings(){
     pixBtnHtml(t("mainMenu"), "hbQuit()", true));
 }
 
+/* ---------- Light a Candle ---------- */
+
+// Light a Candle (2026-10-21, per Dan: start on the new missions; spec = Five New Missions Design, mission 13). A quiet mission that cannot be
+// failed: pick who or what you are praying for, press and hold the candle for 3 seconds to light it, read a short prayer, tap AMEN.
+// Nothing the player picks is sent anywhere; the intention only chooses the prayer text. The prayers are drafts for the client to approve.
+var LC_INTENTIONS = ["family", "friends", "peace", "thanks", "healing", "courage"];
+var LC_HOLD_MS = 3000;       // holding this long lights the candle
+var LC_RELEASE_MS = 900;     // after an early lift the ring empties again in this time
+var lcProgress = 0, lcHolding = false, lcLast = 0, lcRaf = 0;
+
+function initLightCandle(){
+  state.session.lightCandle = {status:"playing", phase:"choose", intention:null};
+  lcProgress = 0; lcHolding = false;
+  saveState();
+}
+function lcChoose(i){
+  var s = state.session.lightCandle;
+  if(!s || s.phase !== "choose") return;
+  s.intention = i; s.phase = "hold";
+  lcProgress = 0; lcHolding = false;
+  saveState(); render();
+}
+
+// draws the ring, the flame and the glow for the current hold progress (0 to 1); the flame and ring grow in steps, 8-bit style
+function lcPaint(){
+  var zone = document.getElementById("lcCandle");
+  if(!zone) return;
+  var s = state.session.lightCandle;
+  var lit = !!(s && s.phase === "lit");
+  var p = lit ? 1 : lcProgress;
+  zone.style.setProperty("--p", p.toFixed(3));
+  zone.style.setProperty("--rp", (Math.floor(p * 24) / 24).toFixed(4));
+  var flame = zone.querySelector(".lcFlame");
+  if(flame) flame.style.transform = p <= 0 ? "scale(0)" : "scale(" + (0.2 + 0.8 * Math.ceil(p * 5) / 5).toFixed(2) + ")";
+}
+function lcLoop(now){
+  lcRaf = 0;
+  var s = state.session.lightCandle;
+  if(!s || state.screen !== "lightCandle" || s.phase !== "hold"){ lcHolding = false; lcProgress = 0; return; }
+  var dt = Math.min(100, now - (lcLast || now)); lcLast = now;
+  lcProgress += (lcHolding ? dt / LC_HOLD_MS : -dt / LC_RELEASE_MS);
+  if(lcProgress >= 1){ lcProgress = 1; lcPaint(); lcLit(); return; }
+  if(lcProgress <= 0){ lcProgress = 0; lcPaint(); if(!lcHolding){ lcLast = 0; return; } }
+  lcPaint();
+  lcRaf = requestAnimationFrame(lcLoop);
+}
+function lcStartLoop(){ if(!lcRaf){ lcLast = 0; lcRaf = requestAnimationFrame(lcLoop); } }
+function lcDown(e){
+  var s = state.session.lightCandle;
+  if(!s || s.phase !== "hold" || lcHolding) return;
+  if(e && e.preventDefault) e.preventDefault();
+  if(e && e.pointerId !== undefined && e.currentTarget && e.currentTarget.setPointerCapture){ try { e.currentTarget.setPointerCapture(e.pointerId); } catch(x){} }
+  lcHolding = true;
+  lcStartLoop();
+}
+function lcUp(){ if(!lcHolding) return; lcHolding = false; lcStartLoop(); }   // the loop then empties the ring
+function lcLit(){
+  var s = state.session.lightCandle;
+  if(!s) return;
+  lcHolding = false; lcProgress = 1;
+  s.phase = "lit";
+  saveState();
+  try { if(navigator.vibrate) navigator.vibrate(60); } catch(e){}      // phones without vibration (iPhone) just skip it
+  pixSfxPlay("fmMatch", false);
+  render();
+}
+function lcAmen(){
+  var s = state.session.lightCandle;
+  if(!s || s.phase !== "lit") return;
+  s.status = "results"; saveState(); render();
+}
+function lcCollectAward(){ state.session.lightCandle = null; grantMission("lightCandle"); }
+function lcQuit(){ lcHolding = false; lcProgress = 0; state.session.lightCandle = null; go("mainMenu"); }
+
+// holding works with the space bar too, and letting go of the screen for any reason (another app, a call, a rotation) lets the flame fall back
+document.addEventListener("keydown", function(e){
+  var s = state.session.lightCandle;
+  if(e.code === "Space" && state.screen === "lightCandle" && s && s.phase === "hold"){ e.preventDefault(); if(!e.repeat) lcDown(null); }
+});
+document.addEventListener("keyup", function(e){ if(e.code === "Space") lcUp(); });
+window.addEventListener("blur", lcUp);
+document.addEventListener("visibilitychange", function(){ if(document.hidden) lcUp(); });
+
+function lcCandleHtml(lit){
+  return '<div class="lcZone' + (lit ? ' lit' : '') + '" id="lcCandle" style="--p:' + (lit ? 1 : 0) + ';--rp:' + (lit ? 1 : 0) + '"' +
+    (lit ? '' : ' onpointerdown="lcDown(event)" onpointerup="lcUp()" onpointercancel="lcUp()" onlostpointercapture="lcUp()"') + ' oncontextmenu="return false">' +
+    '<div class="lcGlow"></div><div class="lcRing"></div>' +
+    '<img class="lcCandleImg" src="tiles/candle.png" alt="" draggable="false">' +
+    '<div class="lcFlame"' + (lit ? ' style="transform:scale(1)"' : '') + '></div>' +
+  '</div>';
+}
+
+function screenLightCandle(){
+  var s = state.session.lightCandle;
+  if(!s){ initLightCandle(); s = state.session.lightCandle; }
+
+  if(s.status === "results"){
+    return pixResultHtml("lightCandleName", {cls:"pixLower", title:t("lc_passTitle"), body:t("lc_passBody"), badge:"lightCandle",
+      buttons:pixBtnHtml(t("collectAward"), "lcCollectAward()")});
+  }
+
+  var head = '<h2 class="pixMTitle">' + t("lightCandleName") + '</h2>';
+  if(s.phase === "choose"){
+    var btns = LC_INTENTIONS.map(function(key, i){
+      return '<button class="lcIntent" onpointerdown="pixPressSfx()" onclick="pixClickSfx();lcChoose(' + i + ')">' +
+        '<img src="tiles/icons/lc_' + key + '.png" alt="">' + t("lc_int_" + key) + '</button>';
+    }).join("");
+    return pixShell(head + '<div class="pixNote">' + t("lc_intro") + '</div>' +
+      '<div class="lcGrid">' + btns + '</div>' +
+      '<div class="spacer"></div>' + pixBtnHtml(t("mainMenu"), "lcQuit()", true), "pixLower");
+  }
+  var key = LC_INTENTIONS[s.intention] || LC_INTENTIONS[0];
+  if(s.phase === "hold"){
+    return pixShell(head + '<div class="pixNote">' + t("lc_for")(t("lc_int_" + key)) + '</div>' +
+      lcCandleHtml(false) +
+      '<div class="pixNote">' + t("lc_hold") + '</div>' +
+      '<div class="spacer"></div>' + pixBtnHtml(t("mainMenu"), "lcQuit()", true), "pixLower");
+  }
+  return pixShell(head + lcCandleHtml(true) +
+    '<div class="pixPaper"><div class="pixQ">' + t("lc_pray_" + key) + '</div></div>' +
+    '<div class="spacer"></div>' + pixBtnHtml(t("lc_amen"), "lcAmen()") +
+    pixBtnHtml(t("mainMenu"), "lcQuit()", true), "pixLower");
+}
+
+/* ---------- Emoji Bible Stories ---------- */
+
+// Emoji Bible Stories (2026-10-21, per Dan; spec = Five New Missions Design, mission 12, but with 5 chances, not 3, to match Faith Flash). A
+// string of emojis stands for a Bible story: pick its title out of three. 8 stories a round, drawn from 12; every wrong pick costs a chance.
+// The stories, clues, references and Spanish titles are drafts for the client to approve. The clues stay in widely supported emoji so they
+// look right on older phones and on Windows.
+var EB_CHANCES = 5;
+var EB_ROUND_SIZE = 8;
+var EMOJI_STORIES = [
+  {emoji:"🌧️🚢🐘🌈", en:{t:"Noah's Ark", r:"Genesis 6 to 9"}, es:{t:"El Arca de Noé", r:"Génesis 6 a 9"}},
+  {emoji:"🐋🌊🙏", en:{t:"Jonah and the Whale", r:"Jonah 1 to 2"}, es:{t:"Jonás y la Ballena", r:"Jonás 1 a 2"}},
+  {emoji:"👦🎯👹", en:{t:"David and Goliath", r:"1 Samuel 17"}, es:{t:"David y Goliat", r:"1 Samuel 17"}},
+  {emoji:"🌍☀️🌙🌱", en:{t:"Creation", r:"Genesis 1"}, es:{t:"La Creación", r:"Génesis 1"}},
+  {emoji:"🍎🐍🌳", en:{t:"Adam, Eve and the Serpent", r:"Genesis 3"}, es:{t:"Adán, Eva y la Serpiente", r:"Génesis 3"}},
+  {emoji:"🦁🙏👴", en:{t:"Daniel in the Lions' Den", r:"Daniel 6"}, es:{t:"Daniel en el Foso de los Leones", r:"Daniel 6"}},
+  {emoji:"🔥🌿👣", en:{t:"The Burning Bush", r:"Exodus 3"}, es:{t:"La Zarza Ardiente", r:"Éxodo 3"}},
+  {emoji:"⭐👶🐑", en:{t:"Birth of Jesus", r:"Luke 2"}, es:{t:"El Nacimiento de Jesús", r:"Lucas 2"}},
+  {emoji:"🍞🐟👥", en:{t:"Feeding the 5,000", r:"John 6"}, es:{t:"Jesús Alimenta a los 5,000", r:"Juan 6"}},
+  {emoji:"🌊🚶⛵", en:{t:"Jesus Walks on Water", r:"Matthew 14"}, es:{t:"Jesús Camina sobre el Agua", r:"Mateo 14"}},
+  {emoji:"💰🐖🏠", en:{t:"The Prodigal Son", r:"Luke 15"}, es:{t:"El Hijo Pródigo", r:"Lucas 15"}},
+  {emoji:"👼✝️🌅", en:{t:"The Resurrection", r:"Matthew 28"}, es:{t:"La Resurrección", r:"Mateo 28"}}
+];
+
+function initEmojiStories(){
+  var all = EMOJI_STORIES.map(function(_, i){ return i; });
+  var order = shuffle(all).slice(0, EB_ROUND_SIZE);
+  // each question: the right story plus two others, in a random order -- a fresh draw every game
+  var choices = order.map(function(story){
+    var others = shuffle(all.filter(function(i){ return i !== story; })).slice(0, 2);
+    return shuffle([story].concat(others));
+  });
+  state.session.emojiStories = {order:order, choices:choices, index:0, answered:null, chances:EB_CHANCES, correct:0, past:[], status:"playing"};
+  saveState();
+}
+function ebChancesLeft(s){ return typeof s.chances === "number" ? s.chances : EB_CHANCES; }
+// The answer buttons make no button sound of their own: the answer's own sound is the one you hear (the same ones as Faith Flash).
+function ebPress(){ pixPressSfx("none"); }
+function ebClickAnswer(i){ pixClickSfx("none"); ebAnswer(i); }
+function ebAnswer(i){
+  var s = state.session.emojiStories;
+  if(!s || s.status !== "playing" || s.answered !== null) return;
+  var ok = s.choices[s.index][i] === s.order[s.index];
+  s.answered = i;
+  s.past[s.index] = ok ? "done" : "bad";
+  if(ok) s.correct++; else s.chances = ebChancesLeft(s) - 1;
+  var lastChance = !ok && s.chances <= 0;
+  pixSfxPlay(ok ? "fmMatch" : (lastChance ? "fmLast" : "fmMiss"), true);
+  saveState(); render();
+  // after the last story, or the last chance, the results come by themselves after a moment
+  if(lastChance || s.index >= s.order.length - 1){
+    var at = s.index;
+    setTimeout(function(){
+      var s2 = state.session.emojiStories;
+      if(!s2 || s2 !== s || s2.status !== "playing" || s2.index !== at) return;
+      s2.status = lastChance ? "failed" : "passed";
+      saveState(); render();
+    }, 1300);
+  }
+}
+function ebNext(){
+  var s = state.session.emojiStories;
+  if(!s || s.status !== "playing" || s.answered === null || ebChancesLeft(s) <= 0 || s.index >= s.order.length - 1) return;
+  s.index++; s.answered = null; saveState(); render();
+}
+function ebTryAgain(){ initEmojiStories(); render(); }
+function ebCollectAward(){ state.session.emojiStories = null; grantMission("emojiStories"); }
+function ebQuit(){ state.session.emojiStories = null; go("mainMenu"); }
+
+function screenEmojiStories(){
+  var s = state.session.emojiStories;
+  if(!s){ initEmojiStories(); s = state.session.emojiStories; }
+  var lang = state.lang || "en";
+  var press = ' onpointerdown="pixPressSfx()" ';
+
+  if(s.status === "failed"){
+    return pixResultHtml("emojiStoriesName", {cls:"pixLower", title:t("eb_failTitle"), body:t("eb_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "ebTryAgain()") + pixBtnHtml(t("mainMenu"), "ebQuit()", true)});
+  }
+  if(s.status === "passed"){
+    return pixResultHtml("emojiStoriesName", {cls:"pixLower", title:t("eb_passTitle"), body:t("eb_passBody"), badge:"emojiStories",
+      buttons:pixBtnHtml(t("collectAward"), "ebCollectAward()") + pixBtnHtml(t("mainMenu"), "ebQuit()", true)});
+  }
+
+  var storyIdx = s.order[s.index], story = EMOJI_STORIES[storyIdx];
+  var answered = s.answered !== null;
+  var isCorrect = answered && s.choices[s.index][s.answered] === storyIdx;
+  var answersHtml = s.choices[s.index].map(function(idx, di){
+    var cls = "pixAns";
+    if(answered){
+      cls += " disabled";
+      if(idx === storyIdx) cls += " correct";
+      else if(di === s.answered) cls += " wrong";
+    }
+    return '<button class="' + cls + '" data-sfx="own" onpointerdown="ebPress()" onclick="ebClickAnswer(' + di + ')">' + EMOJI_STORIES[idx][lang].t + '</button>';
+  }).join("");
+  var hint = answered ? story[lang].t + ' · ' + story[lang].r : t("eb_intro");
+
+  return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
+    '<h2 class="pixMTitle">' + t("emojiStoriesName") + '</h2>' +
+    '<div class="pixNote">' + t("eb_story")(s.index + 1, s.order.length) + '</div>' +
+    pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now"), null, s.past) +
+    '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ebChancesLeft(s)), EB_CHANCES) + '</div>' +
+    '<div class="pixPaper"><div class="pixEmoji">' + story.emoji + '</div><div class="pixRef' + (answered ? ' shown' : '') + '">' + hint + '</div></div>' +
+    '<div class="pixAnsList">' + answersHtml + '</div>' +
+    '<div class="spacer"></div>' +
+    (answered && ebChancesLeft(s) > 0 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ebNext()">' + t("eb_next") + '</button>' : '') +
+    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ebQuit()">' + t("mainMenu") + '</button>' +
+    (isCorrect ? '<div class="pixFlash"></div>' : '') +
+  '</div>';
+}
+
+/* ---------- Life of Jesus Timeline ---------- */
+
+// Life of Jesus Timeline (2026-10-21, per Dan; spec = Five New Missions Design, mission 14). Tap five events in the order they happened, for two
+// rounds, each from a different set. A wrong tap costs a chance (5 shared across both rounds, to match the other missions -- the spec said 3;
+// change TL_CHANCES to go back). The events, the order inside each set and the Spanish names are drafts for the client to approve.
+var TL_CHANCES = 5;
+var TL_EVENTS = {
+  birth:{icon:"👶", en:"Birth in Bethlehem", es:"Nacimiento en Belén"},
+  baptism:{icon:"💧", en:"Baptism in the Jordan", es:"Bautismo en el Jordán"},
+  feeding:{icon:"🍞", en:"Feeding of the 5,000", es:"Multiplicación de los Panes"},
+  supper:{icon:"🍷", en:"The Last Supper", es:"La Última Cena"},
+  resurrection:{icon:"🌅", en:"The Resurrection", es:"La Resurrección"},
+  annunciation:{icon:"👼", en:"The Annunciation", es:"La Anunciación"},
+  temple:{icon:"🏛️", en:"Found in the Temple", es:"Hallado en el Templo"},
+  cana:{icon:"💒", en:"Wedding at Cana", es:"Las Bodas de Caná"},
+  lazarus:{icon:"⚰️", en:"Raising of Lazarus", es:"Resurrección de Lázaro"},
+  palm:{icon:"🌴", en:"Palm Sunday", es:"El Domingo de Ramos"},
+  cross:{icon:"✝️", en:"The Crucifixion", es:"La Crucifixión"},
+  ascension:{icon:"☁️", en:"The Ascension", es:"La Ascensión"},
+  sermon:{icon:"⛰️", en:"Sermon on the Mount", es:"El Sermón del Monte"},
+  transfig:{icon:"✨", en:"The Transfiguration", es:"La Transfiguración"}
+};
+// every set is listed in the correct order, first to last
+var TL_SETS = [
+  ["birth", "baptism", "feeding", "supper", "resurrection"],
+  ["annunciation", "birth", "temple", "baptism", "cana"],
+  ["cana", "lazarus", "palm", "cross", "ascension"],
+  ["baptism", "sermon", "transfig", "supper", "cross"]
+];
+
+function tlStartRound(s){
+  s.deck = shuffle(TL_SETS[s.sets[s.round]]);
+  s.placed = []; s.shake = null; s.busy = false;
+}
+function initJesusTimeline(){
+  var sets = shuffle([0, 1, 2, 3]).slice(0, 2);
+  var s = {sets:sets, round:0, deck:[], placed:[], chances:TL_CHANCES, shake:null, busy:false, status:"playing"};
+  tlStartRound(s);
+  state.session.jesusTimeline = s;
+  saveState();
+}
+function tlChancesLeft(s){ return typeof s.chances === "number" ? s.chances : TL_CHANCES; }
+function tlPress(){ pixPressSfx("none"); }
+function tlTap(id){
+  var s = state.session.jesusTimeline;
+  if(!s || s.status !== "playing" || s.busy || s.shake) return;     // a shaking card, or a round that is finishing, ignores taps
+  if(s.placed.indexOf(id) !== -1) return;
+  var set = TL_SETS[s.sets[s.round]];
+  pixClickSfx("none");
+  if(id === set[s.placed.length]){
+    s.placed.push(id);
+    pixSfxPlay("fmMatch", true);
+    if(s.placed.length >= set.length){
+      s.busy = true; saveState(); render();
+      setTimeout(function(){
+        var s2 = state.session.jesusTimeline;
+        if(!s2 || s2 !== s || s2.status !== "playing") return;
+        if(s2.round >= s2.sets.length - 1){ s2.status = "passed"; saveState(); render(); }
+        else { s2.round++; tlStartRound(s2); saveState(); render(); }
+      }, 900);
+    } else { saveState(); render(); }
+    return;
+  }
+  s.chances = tlChancesLeft(s) - 1;
+  var lastChance = s.chances <= 0;
+  s.shake = id;
+  pixSfxPlay(lastChance ? "fmLast" : "fmMiss", true);
+  if(lastChance) s.busy = true;
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.jesusTimeline;
+    if(!s2 || s2 !== s || s2.status !== "playing") return;
+    s2.shake = null;
+    if(lastChance){ s2.status = "failed"; }
+    saveState(); render();
+  }, lastChance ? 1300 : 450);
+}
+function tlTryAgain(){ initJesusTimeline(); render(); }
+function tlCollectAward(){ state.session.jesusTimeline = null; grantMission("jesusTimeline"); }
+function tlQuit(){ state.session.jesusTimeline = null; go("mainMenu"); }
+
+function screenJesusTimeline(){
+  var s = state.session.jesusTimeline;
+  if(!s){ initJesusTimeline(); s = state.session.jesusTimeline; }
+  var lang = state.lang || "en";
+  var press = ' onpointerdown="pixPressSfx()" ';
+
+  if(s.status === "failed"){
+    return pixResultHtml("jesusTimelineName", {cls:"pixLower", title:t("tl_failTitle"), body:t("tl_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "tlTryAgain()") + pixBtnHtml(t("mainMenu"), "tlQuit()", true)});
+  }
+  if(s.status === "passed"){
+    return pixResultHtml("jesusTimelineName", {cls:"pixLower", title:t("tl_passTitle"), body:t("tl_passBody"), badge:"jesusTimeline",
+      buttons:pixBtnHtml(t("collectAward"), "tlCollectAward()") + pixBtnHtml(t("mainMenu"), "tlQuit()", true)});
+  }
+
+  var set = TL_SETS[s.sets[s.round]];
+  var slotsHtml = set.map(function(_, i){
+    var id = s.placed[i];
+    return '<div class="tlSlot' + (id ? ' placed' : '') + '"><span class="tlNum">' + (i + 1) + '</span>' +
+      (id ? '<span class="tlTxt"><span class="tlIcon">' + TL_EVENTS[id].icon + '</span>' + TL_EVENTS[id][lang] + '</span>' : '') + '</div>';
+  }).join("");
+  var cardsHtml = s.deck.filter(function(id){ return s.placed.indexOf(id) === -1; }).map(function(id){
+    return '<button class="tlCard' + (s.shake === id ? ' shake' : '') + '" data-sfx="own" onpointerdown="tlPress()" onclick="tlTap(\'' + id + '\')">' +
+      '<span class="tlIcon">' + TL_EVENTS[id].icon + '</span>' + TL_EVENTS[id][lang] + '</button>';
+  }).join("");
+
+  return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
+    '<h2 class="pixMTitle">' + t("jesusTimelineName") + '</h2>' +
+    '<div class="pixNote">' + t("tl_intro") + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("tl_round")(s.round + 1, s.sets.length) + '</span>' + chancesHeartsHtml(Math.max(0, tlChancesLeft(s)), TL_CHANCES) + '</div>' +
+    '<div class="tlSlots">' + slotsHtml + '</div>' +
+    '<div class="tlCards">' + cardsHtml + '</div>' +
+    '<div class="spacer"></div>' +
+    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();tlQuit()">' + t("mainMenu") + '</button>' +
+  '</div>';
+}
+
 /* ---------- Stained-Glass Puzzle ---------- */
 
 // Replaced Service Sprint (2026-10-19, per Dan), then turned from a sliding
@@ -3630,7 +4078,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
 
 function exitBarHtml(){
@@ -3652,6 +4100,9 @@ function exitMission(){
     case "catchLight": clQuit(); break;
     case "kindnessSort": ksQuit(); break;
     case "hiddenBlessings": hbQuit(); break;
+    case "lightCandle": lcQuit(); break;
+    case "emojiStories": ebQuit(); break;
+    case "jesusTimeline": tlQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -3676,6 +4127,9 @@ function render(){
     case "catchLight": html = screenCatchLight(); break;
     case "kindnessSort": html = screenKindnessSort(); break;
     case "hiddenBlessings": html = screenHiddenBlessings(); break;
+    case "lightCandle": html = screenLightCandle(); break;
+    case "emojiStories": html = screenEmojiStories(); break;
+    case "jesusTimeline": html = screenJesusTimeline(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
     case "goldenTicket": html = screenGoldenTicket(); break;
@@ -3751,6 +4205,7 @@ function render(){
   // reload landing mid-countdown.
   if(state.screen === "faithMatch" && state.session.faithMatch && (state.session.faithMatch.levelDone || state.session.faithMatch.celebrate) && !fmCelebrating) fmCelebrate();
   if(state.screen === "faithFlash" && state.session.faithFlash && state.session.faithFlash.interlude && !ffInterludeRunning) ffInterlude();
+  if(state.screen === "lightCandle") lcPaint();
   var clSession = state.session.catchLight;
   if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
     if(clSession.phase === "playing" && !clRunning) clStart();
