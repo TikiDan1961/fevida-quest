@@ -373,16 +373,33 @@
   .pixBigHeart{display:block;width:88px;height:80px;margin:16px auto 12px;image-rendering:pixelated;animation:pixHeartIn .45s steps(4) both;}
   @keyframes pixHeartIn{from{transform:scale(.3);opacity:0;}to{transform:scale(1);opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .pixBigHeart{animation:none;} }
-  /* Light the Windows: dark panes are the same stained-glass picture, dimmed */
-  .lwBoard{display:grid;gap:3px;width:min(100%,300px);box-sizing:border-box;margin:6px auto;padding:5px;background:#1B1F3B;border-radius:12px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
-  .lwCell{aspect-ratio:1/1;padding:0;border:0;border-radius:4px;background-size:100% 100%;background-color:#2B3F8C;image-rendering:pixelated;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
-    transition:none;}
-  .lwCell.on{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 0 10px 2px rgba(255,236,120,.65);position:relative;z-index:1;}
-  .lwCell.off{filter:brightness(.26) saturate(.55);}
-  .lwCell:active{box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #FFF6C0,0 0 14px 5px rgba(255,236,120,.9);}
-  .lwBoard.win .lwCell{animation:lwWin .3s steps(2) 3;}
-  @keyframes lwWin{0%{filter:brightness(1);}50%{filter:brightness(1.7);}100%{filter:brightness(1);}}
-  @media (prefers-reduced-motion:reduce){ .lwBoard.win .lwCell{animation:none;} }
+  /* Sacred Sudoku: stained-glass pictures instead of numbers */
+  .sdBar{display:flex;align-items:center;justify-content:space-between;margin:2px 6px 0;}
+  .sdBar .pixNote{margin:0;}
+  .sdHint{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    padding:5px 12px 8px;background:#52C246;border:3px solid #1E6B2B;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
+  .sdHint:disabled{filter:saturate(.3) brightness(.85);cursor:default;}
+  .sdHint:not(:disabled):active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 16px 6px rgba(120,255,120,.8);}
+  .sdBoard{display:grid;gap:3px;width:min(100%,300px);box-sizing:border-box;margin:8px auto 6px;padding:3px;background:#1B1F3B;border-radius:10px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
+  .sdCell{aspect-ratio:1/1;position:relative;padding:0;border:0;border-radius:3px;background:#FFF3D6 center / 100% 100% no-repeat;image-rendering:pixelated;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;box-shadow:inset 0 0 0 2px #FFC93A;}
+  .sdCell.given{box-shadow:inset 0 0 0 2px #1B1F3B;cursor:default;}
+  .sdCell.hint{box-shadow:inset 0 0 0 3px #52C246;cursor:default;}
+  .sdCell.mine{box-shadow:inset 0 0 0 2px #3A93E8;}
+  .sdCell.clash::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(214,52,58,.5);box-shadow:inset 0 0 0 2px #D6343A;pointer-events:none;border-radius:3px;}
+  .sdCell.sel{z-index:2;box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #fff,0 0 12px 5px rgba(110,190,255,.9);}
+  /* the gold lines between boxes: a 3px strip drawn in the gap to the right of / below the last square of each box */
+  .sdCell.bR::after,.sdCell.bB::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;background-repeat:no-repeat;}
+  .sdCell.bR::after{right:-3px;top:-3px;background-image:linear-gradient(#FFC93A,#FFC93A);background-position:right top;background-size:3px 100%;}
+  .sdCell.bB::after{bottom:-3px;background-image:linear-gradient(#FFC93A,#FFC93A);background-position:left bottom;background-size:100% 3px;}
+  .sdCell.bR.bB::after{right:-3px;bottom:-3px;top:0;background-image:linear-gradient(#FFC93A,#FFC93A),linear-gradient(#FFC93A,#FFC93A);background-position:right top,left bottom;background-size:3px 100%,100% 3px;}
+  .sdBoard.win .sdCell{animation:sdWin .3s steps(2) 3;}
+  @keyframes sdWin{0%{filter:brightness(1);}50%{filter:brightness(1.6);}100%{filter:brightness(1);}}
+  .sdPal{display:flex;gap:6px;justify-content:center;margin:6px 0 2px;}
+  .sdPick{width:42px;height:42px;padding:0;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:8px;background:#FFF3D6 center / 100% 100% no-repeat;image-rendering:pixelated;cursor:pointer;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
+  .sdPick:active{box-shadow:0 0 0 3px #DCEEFF,0 0 14px 5px rgba(110,190,255,.85);}
+  @media (prefers-reduced-motion:reduce){ .sdBoard.win .sdCell{animation:none;} }
   /* Emoji Bible Stories */
   .pixEmoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:3rem;line-height:1.15;letter-spacing:.06em;}
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
@@ -452,7 +469,9 @@
     .pixMission.pixLower .pixQ{font-size:1.0625rem;}
     .pixMission.pixLower .btn.pixBtn.pixBtnSm{height:40px;margin-bottom:6px;}
     .pixResBadge{width:96px;height:96px;margin-bottom:6px;}
-    .lwBoard{width:min(100%,234px);margin:4px auto;}
+    .sdBoard{width:min(100%,236px);margin:4px auto 2px;}
+    .sdPick{width:36px;height:36px;}
+    .sdPal{gap:5px;margin:4px 0 0;}
     .pixEmoji{font-size:2.4rem;line-height:1.05;}
     .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
     .tlSlots{gap:2px;margin:4px 0;}
@@ -785,9 +804,9 @@ var T = {
     hb_intro:"Look closely — find all 6 hidden blessings tucked into the scene!",
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
-    lightWindowsName:"Light the Windows", themeLightOfChrist:"Light of Christ",
-    lw_intro:"Tap a pane to flip it and the panes touching it. Light every pane to finish the window!", lw_moves:function(n){return "Moves: "+n;}, lw_reset:"RESET WINDOW",
-    lw_passTitle:"Windows Aglow!", lw_passBody:"You lit every stained-glass window!",
+    sudokuName:"Sacred Sudoku", themeWisdom:"Wisdom",
+    sd_intro:"Tap a square, then a picture. Each picture goes once in every row, column and box.", sd_hint:function(n){return "HINT ("+n+")";}, sd_erase:"Erase",
+    sd_passTitle:"Puzzle Master!", sd_passBody:"You solved every stained-glass puzzle!",
     eb_intro:"Guess the Bible story from the emojis.", eb_story:function(n,total){return "Story "+n+" of "+total;}, eb_next:"NEXT STORY",
     eb_failTitle:"So Close!", eb_failBody:"You ran out of chances. Try again with a new set of stories!",
     eb_passTitle:"Bible Story Pro!", eb_passBody:"You guessed the Bible stories from the emojis!",
@@ -897,9 +916,9 @@ var T = {
     hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
-    lightWindowsName:"Ilumina los Vitrales", themeLightOfChrist:"Luz de Cristo",
-    lw_intro:"Toca un vitral para cambiarlo a él y a los que lo tocan. ¡Ilumina todos para terminar la ventana!", lw_moves:function(n){return "Movimientos: "+n;}, lw_reset:"REINICIAR VENTANA",
-    lw_passTitle:"¡Ventanas Encendidas!", lw_passBody:"¡Iluminaste todos los vitrales!",
+    sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
+    sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
+    sd_passTitle:"¡Maestro de Rompecabezas!", sd_passBody:"¡Resolviste todos los rompecabezas de vitral!",
     eb_intro:"Adivina la historia bíblica con los emojis.", eb_story:function(n,total){return "Historia "+n+" de "+total;}, eb_next:"SIGUIENTE HISTORIA",
     eb_failTitle:"¡Tan Cerca!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
     eb_passTitle:"¡Experto en Historias Bíblicas!", eb_passBody:"¡Adivinaste las historias bíblicas con los emojis!",
@@ -956,9 +975,9 @@ var MISSIONS = [
   // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges8/b8_...) later.
   {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
   {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_salvation.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"},
-  // Light the Windows (2026-10-21, per Dan) replaced Path of Light, which was not fun. Borrows the Hope (anchor) badge until its own is drawn:
-  // add tiles/badge_windows.png and tiles/badges8/b8_windows.png, then change badgeImg here.
-  {id:"lightWindows", icon:"💡", badgeImg:"tiles/badge_hope.png", nameKey:"lightWindowsName", themeKey:"themeLightOfChrist"}
+  // Sacred Sudoku (2026-10-21, per Dan) replaced Light the Windows, whose tap order was too hard to see (which had replaced Path of Light). Borrows the
+  // Hope (anchor) badge until its own is drawn: add tiles/badge_wisdom.png and tiles/badges8/b8_wisdom.png, then change badgeImg here.
+  {id:"sacredSudoku", icon:"🔢", badgeImg:"tiles/badge_hope.png", nameKey:"sudokuName", themeKey:"themeWisdom"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1183,12 +1202,12 @@ function defaultState(){
       lightCandle: {done:false, badge:false},
       emojiStories: {done:false, badge:false},
       jesusTimeline: {done:false, badge:false},
-      lightWindows: {done:false, badge:false}
+      sacredSudoku: {done:false, badge:false}
     },
     photo: null,
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, lightWindows:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -1222,7 +1241,7 @@ function loadState(){
     });
     // A tab saved by an earlier build may still be on the retired Service
     // Sprint screen (replaced by Stained-Glass Puzzle, 2026-10-19).
-    if(merged.screen === "serviceSprint" || merged.screen === "pathOfLight") merged.screen = "mainMenu";
+    if(merged.screen === "serviceSprint" || merged.screen === "pathOfLight" || merged.screen === "lightWindows") merged.screen = "mainMenu";
     return merged;
   }catch(e){ return defaultState(); }
 }
@@ -1576,7 +1595,7 @@ function openMission(id){
   else if(id === "lightCandle"){ initLightCandle(); go("lightCandle"); }
   else if(id === "emojiStories"){ initEmojiStories(); go("emojiStories"); }
   else if(id === "jesusTimeline"){ initJesusTimeline(); go("jesusTimeline"); }
-  else if(id === "lightWindows"){ initLightWindows(); go("lightWindows"); }
+  else if(id === "sacredSudoku"){ initSacredSudoku(); go("sacredSudoku"); }
 }
 
 /* ---------- Home Screen (the Main Menu) ---------- */
@@ -1601,7 +1620,7 @@ var COMING_SOON_MISSIONS = [
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
-  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", lightWindows:"#26305F", tbd:"#AEB6C8",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", tbd:"#AEB6C8",
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
@@ -3676,93 +3695,195 @@ function screenJesusTimeline(){
   '</div>';
 }
 
-/* ---------- Light the Windows ---------- */
+/* ---------- Sacred Sudoku ---------- */
 
-// Light the Windows (2026-10-21, per Dan -- replaces Path of Light). A 5 x 5 stained-glass window where some panes are dark. Tapping a pane flips
-// it and the four panes touching it (lit <-> dark); the goal is to light every pane. Three windows, each harder. There are no chances: it cannot
-// be failed. Every window is made by starting fully lit and flipping a few random panes, so it can always be solved, in no more moves than that
-// number of panes (3, 5, then 8). RESET puts the window back the way it started.
-var LW_N = 5;
-var LW_LEVELS = [3, 5, 8];
+// Sacred Sudoku (2026-10-21, per Dan -- replaces Light the Windows). Sudoku with stained-glass pictures instead of numbers: fill the grid so every
+// picture appears once in each row, each column and each box. Three puzzles: 4 x 4 (many pictures given), 4 x 4 (fewer given) and 6 x 6 (boxes
+// 2 rows by 3 columns). It cannot be failed. Squares that break the rule glow red. Three hints per puzzle fill in one correct square. Every
+// puzzle is made fresh and has exactly one solution. The pictures are six of the Faith Match pictures that look most different from each other.
+var SD_PICS = [9, 14, 8, 5, 10, 7];          // faith_tile8_NN: dove, Sacred Heart, crucifix, Lamb of God, chalice, Chi-Rho
+var SD_LEVELS = [
+  {n:4, br:2, bc:2, givens:8},
+  {n:4, br:2, bc:2, givens:5},
+  {n:6, br:2, bc:3, givens:15}
+];
+var SD_HINTS = 3;
 
-function lwFlip(cells, i){
-  var n = LW_N, r = Math.floor(i / n), c = i % n;
-  var hit = [i];
-  if(r > 0) hit.push(i - n);
-  if(r < n - 1) hit.push(i + n);
-  if(c > 0) hit.push(i - 1);
-  if(c < n - 1) hit.push(i + 1);
-  for(var k = 0; k < hit.length; k++) cells[hit[k]] = cells[hit[k]] ? 0 : 1;
+function sdCanPlace(grid, n, br, bc, pos, v){
+  var r = Math.floor(pos / n), c = pos % n, i;
+  for(i = 0; i < n; i++){ if(grid[r * n + i] === v || grid[i * n + c] === v) return false; }
+  var r0 = r - r % br, c0 = c - c % bc;
+  for(var rr = 0; rr < br; rr++) for(var cc = 0; cc < bc; cc++) if(grid[(r0 + rr) * n + c0 + cc] === v) return false;
+  return true;
 }
-function lwMakeWindow(taps){
-  var all = [], i;
-  for(i = 0; i < LW_N * LW_N; i++) all.push(i);
-  for(;;){
-    var cells = [];
-    for(i = 0; i < LW_N * LW_N; i++) cells.push(1);
-    shuffle(all).slice(0, taps).forEach(function(t){ lwFlip(cells, t); });
-    if(cells.indexOf(0) !== -1) return cells;       // never start already lit
+// counts the solutions (stops at limit), always trying the square with the fewest choices first
+function sdCountSolutions(grid, n, br, bc, limit){
+  var count = 0;
+  function rec(){
+    var best = -1, bestOpts = null, pos, v;
+    for(pos = 0; pos < n * n; pos++){
+      if(grid[pos] !== 0) continue;
+      var opts = [];
+      for(v = 1; v <= n; v++) if(sdCanPlace(grid, n, br, bc, pos, v)) opts.push(v);
+      if(opts.length === 0) return;
+      if(best < 0 || opts.length < bestOpts.length){ best = pos; bestOpts = opts; }
+      if(opts.length === 1) break;
+    }
+    if(best < 0){ count++; return; }
+    for(var k = 0; k < bestOpts.length; k++){
+      grid[best] = bestOpts[k]; rec(); grid[best] = 0;
+      if(count >= limit) return;
+    }
   }
+  rec();
+  return count;
 }
-function initLightWindows(){
-  var start = LW_LEVELS.map(lwMakeWindow);
-  state.session.lightWindows = {start:start, cells:start[0].slice(), level:0, moves:0, busy:false, status:"playing"};
+function sdRandomSolution(n, br, bc){
+  var grid = [], i;
+  for(i = 0; i < n * n; i++) grid.push(0);
+  var vals = [];
+  for(i = 1; i <= n; i++) vals.push(i);
+  function fill(pos){
+    if(pos === n * n) return true;
+    var order = shuffle(vals);
+    for(var k = 0; k < order.length; k++){
+      if(sdCanPlace(grid, n, br, bc, pos, order[k])){
+        grid[pos] = order[k];
+        if(fill(pos + 1)) return true;
+        grid[pos] = 0;
+      }
+    }
+    return false;
+  }
+  fill(0);
+  return grid;
+}
+// takes pictures away one at a time, keeping the puzzle at exactly one solution, until about `givens` are left
+function sdMakePuzzle(cfg){
+  var n = cfg.n, sol = sdRandomSolution(n, cfg.br, cfg.bc), puz = sol.slice(), left = n * n, order = [], i;
+  for(i = 0; i < n * n; i++) order.push(i);
+  order = shuffle(order);
+  for(i = 0; i < order.length && left > cfg.givens; i++){
+    var saved = puz[order[i]];
+    puz[order[i]] = 0;
+    if(sdCountSolutions(puz.slice(), n, cfg.br, cfg.bc, 2) !== 1) puz[order[i]] = saved; else left--;
+  }
+  return {n:n, br:cfg.br, bc:cfg.bc, sol:sol, puz:puz, syms:shuffle(SD_PICS).slice(0, n)};
+}
+
+function sdFirstEmpty(cells){ for(var i = 0; i < cells.length; i++) if(cells[i] === 0) return i; return null; }
+function initSacredSudoku(){
+  var levels = SD_LEVELS.map(sdMakePuzzle);
+  state.session.sacredSudoku = {levels:levels, level:0, cells:levels[0].puz.slice(), hinted:[], sel:sdFirstEmpty(levels[0].puz), hints:SD_HINTS, busy:false, status:"playing"};
   saveState();
 }
-function lwTap(i){
-  var s = state.session.lightWindows;
-  if(!s || s.status !== "playing" || s.busy) return;
-  lwFlip(s.cells, i); s.moves++;
-  if(s.cells.indexOf(0) === -1){
-    s.busy = true;
-    var lastWindow = s.level >= s.start.length - 1;
-    pixSfxPlay(lastWindow ? "fmFanfare" : "fmMatch", true);
-    saveState(); render();
-    setTimeout(function(){
-      var s2 = state.session.lightWindows;
-      if(!s2 || s2 !== s || s2.status !== "playing") return;
-      if(lastWindow){ s2.status = "passed"; }
-      else { s2.level++; s2.cells = s2.start[s2.level].slice(); s2.moves = 0; s2.busy = false; }
-      saveState(); render();
-    }, lastWindow ? 1300 : 900);
-    return;
+// which squares break the rule: the same picture twice in a row, column or box
+function sdClashes(cells, lv){
+  var n = lv.n, bad = {};
+  for(var a = 0; a < n * n; a++){
+    if(!cells[a]) continue;
+    for(var b2 = a + 1; b2 < n * n; b2++){
+      if(cells[b2] !== cells[a]) continue;
+      var ra = Math.floor(a / n), ca = a % n, rb = Math.floor(b2 / n), cb = b2 % n;
+      if(ra === rb || ca === cb || (Math.floor(ra / lv.br) === Math.floor(rb / lv.br) && Math.floor(ca / lv.bc) === Math.floor(cb / lv.bc))){ bad[a] = true; bad[b2] = true; }
+    }
   }
-  pixSfxPlay("fmFirst", true);
-  saveState(); render();
+  return bad;
 }
-function lwReset(){
-  var s = state.session.lightWindows;
+function sdSelect(i){
+  var s = state.session.sacredSudoku;
   if(!s || s.status !== "playing" || s.busy) return;
-  s.cells = s.start[s.level].slice(); s.moves = 0;
+  var lv = s.levels[s.level];
+  if(lv.puz[i] !== 0 || s.hinted.indexOf(i) !== -1) return;          // the starting pictures and hinted squares are fixed
+  s.sel = i; saveState(); render();
+}
+function sdPlace(v){
+  var s = state.session.sacredSudoku;
+  if(!s || s.status !== "playing" || s.busy || s.sel === null) return;
+  var lv = s.levels[s.level];
+  s.cells[s.sel] = v;
+  var clash = v !== 0 && sdClashes(s.cells, lv)[s.sel];
+  var done = s.cells.every(function(x, i){ return x === lv.sol[i]; });
+  if(done){ sdFinishPuzzle(s); return; }
+  pixSfxPlay(clash ? "fmMiss" : "fmFirst", true);
   saveState(); render();
 }
-function lwCollectAward(){ state.session.lightWindows = null; grantMission("lightWindows"); }
-function lwQuit(){ state.session.lightWindows = null; go("mainMenu"); }
+function sdHint(){
+  var s = state.session.sacredSudoku;
+  if(!s || s.status !== "playing" || s.busy || s.hints <= 0) return;
+  var lv = s.levels[s.level];
+  var wrong = [];
+  for(var i = 0; i < s.cells.length; i++) if(s.cells[i] !== lv.sol[i]) wrong.push(i);
+  if(!wrong.length) return;
+  var target = (s.sel !== null && wrong.indexOf(s.sel) !== -1) ? s.sel : wrong[Math.floor(Math.random() * wrong.length)];
+  s.cells[target] = lv.sol[target]; s.hinted.push(target); s.hints--;
+  s.sel = null;
+  var done = s.cells.every(function(x, k){ return x === lv.sol[k]; });
+  if(done){ sdFinishPuzzle(s); return; }
+  var nextEmpty = null;
+  for(var k = 0; k < s.cells.length; k++) if(s.cells[k] !== lv.sol[k] && lv.puz[k] === 0){ nextEmpty = k; break; }
+  s.sel = nextEmpty;
+  pixSfxPlay("fmMatch", true);
+  saveState(); render();
+}
+function sdFinishPuzzle(s){
+  s.busy = true; s.sel = null;
+  var last = s.level >= s.levels.length - 1;
+  pixSfxPlay(last ? "fmFanfare" : "fmMatch", true);
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.sacredSudoku;
+    if(!s2 || s2 !== s || s2.status !== "playing") return;
+    if(last){ s2.status = "passed"; }
+    else {
+      s2.level++; var nl = s2.levels[s2.level];
+      s2.cells = nl.puz.slice(); s2.hinted = []; s2.hints = SD_HINTS; s2.sel = sdFirstEmpty(nl.puz); s2.busy = false;
+    }
+    saveState(); render();
+  }, last ? 1300 : 1000);
+}
+function sdCollectAward(){ state.session.sacredSudoku = null; grantMission("sacredSudoku"); }
+function sdQuit(){ state.session.sacredSudoku = null; go("mainMenu"); }
 
-function screenLightWindows(){
-  var s = state.session.lightWindows;
-  if(!s){ initLightWindows(); s = state.session.lightWindows; }
+function sdPicUrl(lv, v){ return 'tiles/faith_tile8_' + ("0" + lv.syms[v - 1]).slice(-2) + '.png'; }
+
+function screenSacredSudoku(){
+  var s = state.session.sacredSudoku;
+  if(!s){ initSacredSudoku(); s = state.session.sacredSudoku; }
 
   if(s.status === "passed"){
-    return pixResultHtml("lightWindowsName", {cls:"pixLower", title:t("lw_passTitle"), body:t("lw_passBody"), badge:"lightWindows",
-      buttons:pixBtnHtml(t("collectAward"), "lwCollectAward()") + pixBtnHtml(t("mainMenu"), "lwQuit()", true)});
+    return pixResultHtml("sudokuName", {cls:"pixLower", title:t("sd_passTitle"), body:t("sd_passBody"), badge:"sacredSudoku",
+      buttons:pixBtnHtml(t("collectAward"), "sdCollectAward()") + pixBtnHtml(t("mainMenu"), "sdQuit()", true)});
   }
 
+  var lv = s.levels[s.level], n = lv.n;
+  var bad = sdClashes(s.cells, lv);
   var cellsHtml = "";
-  for(var i = 0; i < LW_N * LW_N; i++){
-    var pic = ("0" + ((i * 3 + s.level * 5) % 16)).slice(-2);     // a different stained-glass picture for each pane
-    cellsHtml += '<button class="lwCell ' + (s.cells[i] ? 'on' : 'off') + '" data-sfx="own" style="background-image:url(tiles/faith_tile8_' + pic + '.png)" onclick="lwTap(' + i + ')"></button>';
+  for(var i = 0; i < n * n; i++){
+    var v = s.cells[i], r = Math.floor(i / n), c = i % n;
+    var cls = "sdCell";
+    if(lv.puz[i] !== 0) cls += " given"; else if(s.hinted.indexOf(i) !== -1) cls += " hint"; else if(v) cls += " mine";
+    if(bad[i]) cls += " clash";
+    if(s.sel === i) cls += " sel";
+    if(c % lv.bc === lv.bc - 1 && c !== n - 1) cls += " bR";
+    if(r % lv.br === lv.br - 1 && r !== n - 1) cls += " bB";
+    var fixed = lv.puz[i] !== 0 || s.hinted.indexOf(i) !== -1;
+    cellsHtml += '<button class="' + cls + '" data-sfx="own"' + (v ? ' style="background-image:url(' + sdPicUrl(lv, v) + ')"' : '') + (fixed ? '' : ' onclick="sdSelect(' + i + ')"') + '></button>';
   }
-  var won = s.cells.indexOf(0) === -1;
+  var palHtml = "";
+  for(var k = 1; k <= n; k++) palHtml += '<button class="sdPick" data-sfx="own" style="background-image:url(' + sdPicUrl(lv, k) + ')" onclick="sdPlace(' + k + ')"></button>';
+  palHtml += '<button class="sdPick sdErase" data-sfx="own" onclick="sdPlace(0)" aria-label="' + t("sd_erase") + '">&#10005;</button>';
+  var won = s.busy;
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
-    '<h2 class="pixMTitle">' + t("lightWindowsName") + '</h2>' +
-    '<div class="pixNote">' + t("lw_intro") + '</div>' +
-    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.level + 1, s.start.length) + '</span><span class="pixNote">' + t("lw_moves")(s.moves) + '</span></div>' +
-    '<div class="lwBoard' + (won ? ' win' : '') + '" style="grid-template-columns:repeat(' + LW_N + ',1fr)">' + cellsHtml + '</div>' +
+    '<h2 class="pixMTitle">' + t("sudokuName") + '</h2>' +
+    '<div class="pixNote">' + t("sd_intro") + '</div>' +
+    '<div class="sdBar"><span class="pixNote">' + t("fm_level")(s.level + 1, s.levels.length) + '</span>' +
+      '<button class="sdHint" data-sfx="own"' + (s.hints > 0 && !won ? '' : ' disabled') + ' onclick="sdHint()">' + t("sd_hint")(s.hints) + '</button></div>' +
+    '<div class="sdBoard' + (won ? ' win' : '') + '" style="grid-template-columns:repeat(' + n + ',1fr)">' + cellsHtml + '</div>' +
+    '<div class="sdPal">' + palHtml + '</div>' +
     '<div class="spacer"></div>' +
-    pixBtnHtml(t("lw_reset"), "lwReset()") +
-    '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();lwQuit()">' + t("mainMenu") + '</button>' +
+    '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();sdQuit()">' + t("mainMenu") + '</button>' +
   '</div>';
 }
 
@@ -4189,7 +4310,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","lightWindows"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
 
 function exitBarHtml(){
@@ -4214,7 +4335,7 @@ function exitMission(){
     case "lightCandle": lcQuit(); break;
     case "emojiStories": ebQuit(); break;
     case "jesusTimeline": tlQuit(); break;
-    case "lightWindows": lwQuit(); break;
+    case "sacredSudoku": sdQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -4242,7 +4363,7 @@ function render(){
     case "lightCandle": html = screenLightCandle(); break;
     case "emojiStories": html = screenEmojiStories(); break;
     case "jesusTimeline": html = screenJesusTimeline(); break;
-    case "lightWindows": html = screenLightWindows(); break;
+    case "sacredSudoku": html = screenSacredSudoku(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
     case "goldenTicket": html = screenGoldenTicket(); break;
