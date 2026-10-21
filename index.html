@@ -149,8 +149,11 @@
   /* Only the icon itself (its tile and its name) takes a tap or lights up -- not the empty space around it in its grid cell, so a tap between
      two icons does nothing (2026-10-20, per Dan). The tile and name still pass their tap up to the icon, which does the work. */
   .appIcon{pointer-events:none;}
-  .appIcon .appTile{pointer-events:auto;}
-  .appIcon .appName,.appIcon .appTag{pointer-events:auto;width:fit-content;max-width:100%;}
+  /* Narrower still (2026-10-21, per Dan): only the middle of the tile takes the tap -- 12px in from each edge, about the size of the picture --
+     and the name under it takes none. A tap near the edge of a tile, or on its name, does nothing. */
+  .appIcon .appTile{pointer-events:none;}
+  .appIcon .appTile::before{content:"";position:absolute;left:12px;top:12px;right:12px;bottom:12px;pointer-events:auto;}
+  @media (max-width:340px){ .appIcon .appTile::before{left:10px;top:10px;right:10px;bottom:10px;} }
   .appTile{position:relative;width:72px;height:72px;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .appTile img.spr{width:48px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
@@ -471,6 +474,7 @@
     .pixCountdown{font-size:4rem;margin:8px 0;}
     .pixMission .matchGrid{margin:6px 0;}
     .pixMission .flMsg{margin-top:4px;}
+    .pixMission.pixLower .flGrid{width:88%;margin:8px auto 6px;gap:8px;}   /* Follow the Light is lowered too, and its longer instruction needs 3 lines */
     .pixMission .clStage{min-height:220px;}
     .pixMission .hbScene{width:86%;margin-left:auto;margin-right:auto;}
   }
@@ -691,7 +695,7 @@ var T = {
     pilgrimCheer1:"Let your light shine!", pilgrimCheer2:"Walk with faith!", pilgrimCheer3:"Keep going, friend!",
     ticketLocked:function(p){return "Earn "+p+" points to unlock the Golden Ticket!";},
 
-    fl_repeat:"REPEAT PATTERN", fl_incorrect:"INCORRECT TILE!", fl_tryAgainMsg:"TRY AGAIN",
+    fl_repeat:"REPEAT THE SAME PATTERN BY TAPPING ON THE TILES IN THE SAME ORDER", fl_incorrect:"INCORRECT TILE!", fl_tryAgainMsg:"TRY AGAIN",
     fl_failTitle:"So Close!", fl_failBody:"You ran out of chances — give it another try from Level 1.",
     fl_passTitle:"Amazing Memory!", fl_passBody:"You repeated every pattern across all 8 levels!",
 
@@ -785,7 +789,7 @@ var T = {
     pilgrimCheer1:"¡Deja brillar tu luz!", pilgrimCheer2:"¡Camina con fe!", pilgrimCheer3:"¡Sigue adelante, amigo!",
     ticketLocked:function(p){return "¡Gana "+p+" puntos para desbloquear el Boleto Dorado!";},
 
-    fl_repeat:"REPITE EL PATRÓN", fl_incorrect:"¡FICHA INCORRECTA!", fl_tryAgainMsg:"INTÉNTALO DE NUEVO",
+    fl_repeat:"REPITE EL MISMO PATRÓN TOCANDO LAS FICHAS EN EL MISMO ORDEN", fl_incorrect:"¡FICHA INCORRECTA!", fl_tryAgainMsg:"INTÉNTALO DE NUEVO",
     fl_failTitle:"¡Tan Cerca!", fl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
     fl_passTitle:"¡Memoria Increíble!", fl_passBody:"¡Repetiste cada patrón en los 8 niveles!",
 
@@ -2603,11 +2607,11 @@ function screenFollowLight(){
   if(!s){ initFollowLightRun(); s = state.session.followLight; flStartLevel(); }
 
   if(s.status === "failed"){
-    return pixResultHtml("followLightName", {title:t("fl_failTitle"), body:t("fl_failBody"),
+    return pixResultHtml("followLightName", {cls:"pixLower", title:t("fl_failTitle"), body:t("fl_failBody"),
       buttons:pixBtnHtml(t("tryAgain"), "flTryAgain()") + pixBtnHtml(t("mainMenu"), "flQuit()", true)});
   }
   if(s.status === "complete"){
-    return pixResultHtml("followLightName", {title:t("fl_passTitle"), body:t("fl_passBody"), badge:"followLight",
+    return pixResultHtml("followLightName", {cls:"pixLower", title:t("fl_passTitle"), body:t("fl_passBody"), badge:"followLight",
       buttons:pixBtnHtml(t("collectAward"), "flCollectAward()") + pixBtnHtml(t("mainMenu"), "flQuit()", true)});
   }
 
@@ -2629,7 +2633,7 @@ function screenFollowLight(){
     '<div class="flGrid">' + tilesHtml + '</div>' +
     '<p class="' + msgCls + '">' + msg + '</p>' +
     '<div class="spacer"></div>' +
-    pixBtnHtml(t("mainMenu"), "flQuit()", true));
+    pixBtnHtml(t("mainMenu"), "flQuit()", true), "pixLower");   // lowered like Faith Flash (2026-10-21, per Dan)
 }
 
 /* ---------- Word Unscramble ---------- */
@@ -2726,7 +2730,7 @@ function screenWordUnscramble(){
 
   if(s.status === "results"){
     var wm = MISSIONS.filter(function(m){ return m.id === "wordUnscramble"; })[0];
-    return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+    return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
       '<div class="pixPaper">' +
         '<img class="pixResBadge" src="' + badge8Src(wm) + '" alt="">' +
@@ -2749,7 +2753,7 @@ function screenWordUnscramble(){
     return '<button class="pixTile' + (used?' used':'') + '"' + press + 'onclick="pixClickSfx();wuPick(' + pos + ')">' + ch + '</button>';
   }).join("");
 
-  return '<div class="screen pixHome pixSky pixMission">' + cloudsHtml() +
+  return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
     pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now") +
     '<div class="pixPaper">' +
