@@ -378,6 +378,7 @@
   .sdBar .pixNote{margin:0;}
   .sdHint{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     padding:5px 12px 8px;background:#52C246;border:3px solid #1E6B2B;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
+  .sdHint{white-space:nowrap;}
   .sdHint:disabled{filter:saturate(.3) brightness(.85);cursor:default;}
   .sdHint:not(:disabled):active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 16px 6px rgba(120,255,120,.8);}
   .sdBoard{display:grid;gap:4px;width:min(100%,300px);box-sizing:border-box;margin:8px auto 6px;padding:4px;background:#1B1F3B;border-radius:6px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
@@ -395,6 +396,12 @@
   /* the glowing square frame of the finish celebration: the same look as a Faith Match tile frame */
   .sdBoard .sdCell.glow{position:relative;z-index:2;box-shadow:inset 0 0 0 2px #FFF6C0,0 0 0 3px #FFF6C0,0 0 22px 9px rgba(255,236,120,.95);}
   .sdPal{display:flex;gap:6px;justify-content:center;margin:6px 0 2px;}
+  .sdPal.two{flex-wrap:wrap;max-width:250px;margin-left:auto;margin-right:auto;}      /* 9 pictures and the eraser: two rows of five */
+  .sdBig .sdBoard{width:min(100%,330px);}
+  .sdBig .sdIntro{display:none;}                                   /* by level 4 the rules are known: the room goes to the board */
+  .sdBig .btn.pixBtn.pixBtnSm{height:40px;margin-bottom:6px;}      /* a compact MAIN MENU that stays on screen */
+  .sdBig .sdPick{width:38px;height:38px;}
+  .sdBig .sdCell{background-size:92% 92%;}
   .sdPick{width:42px;height:42px;padding:0;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:8px;background:#FFFDED center / 82% 82% no-repeat;image-rendering:pixelated;cursor:pointer;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
   .sdPick:active{box-shadow:0 0 0 3px #DCEEFF,0 0 14px 5px rgba(110,190,255,.85);}
@@ -470,6 +477,9 @@
     .sdBoard{width:min(100%,236px);margin:4px auto 2px;}
     .sdPick{width:36px;height:36px;}
     .sdPal{gap:5px;margin:4px 0 0;}
+    .sdPal.two{max-width:212px;}
+    .sdBig .sdBoard{width:min(100%,276px);margin:3px auto 0;}
+    .sdBig .sdPick{width:34px;height:34px;}
     .pixEmoji{font-size:2.4rem;line-height:1.05;}
     .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
     .tlSlots{gap:2px;margin:4px 0;}
@@ -1514,11 +1524,16 @@ setInterval(function(){ var now = Date.now(), gap = now - pixAudioBeat; pixAudio
 function pixReviveOnTap(){
   if(!pixAudioCtx) return;
   var interrupted = pixAudioCtx.state === "interrupted";
-  if(!pixAudioStale && !interrupted) return;
+  if(!pixAudioStale && !interrupted){
+    // a healthy engine that has been put to sleep (suspended) is woken by any tap, including taps on things that make their own sound
+    if(pixAudioCtx.state === "suspended"){ try { var rp = pixAudioCtx.resume(); if(rp && rp.catch) rp.catch(function(){}); } catch(e){} }
+    return;
+  }
   pixAudioStale = false;
   pixFreshAudio();
 }
 document.addEventListener("touchend", pixReviveOnTap, true);
+document.addEventListener("pointerup", pixReviveOnTap, true);
 document.addEventListener("click", pixReviveOnTap, true);
 
 // Every button, icon and tile that can be tapped makes the button sound -- including the ones with no sound wired in by hand.
@@ -2659,6 +2674,7 @@ function flPlayPattern(){
 var FL_TONES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
 function flPlayTone(tileIdx, ms){
   try {
+    if(pixAudioStale) pixReviveOnTap();          // first tap after coming back from another app: wake the sound engine before the note
     var ctx = pixCtx(); if(!ctx) return;
     if(ctx.state !== "running" && ctx.resume) ctx.resume();
     var now = ctx.currentTime, len = (ms || 350) / 1000;
@@ -3822,11 +3838,12 @@ function screenJesusTimeline(){
 // picture appears once in each row, each column and each box. Three puzzles of different sizes: 4 x 4, 5 x 5 (no boxes) and 6 x 6 (boxes
 // 2 rows by 3 columns). It cannot be failed. Squares that break the rule glow red. Three hints per puzzle fill in one correct square. Every
 // puzzle is made fresh and has exactly one solution. The pictures are six of the Faith Match pictures that look most different from each other.
-var SD_PICS = [9, 14, 8, 5, 10, 7];          // faith_tile8_NN: dove, Sacred Heart, crucifix, Lamb of God, chalice, Chi-Rho
+var SD_PICS = [9, 14, 8, 5, 10, 7, 4, 2, 12];   // faith_tile8_NN: dove, Sacred Heart, crucifix, Lamb of God, chalice, Chi-Rho, bread and fish, Mary, angel (the 9 x 9 level uses all nine)
 var SD_LEVELS = [
   {n:4, br:2, bc:2, givens:8},                  // 4 x 4, four 2 x 2 boxes
   {n:5, br:1, bc:1, box:false, givens:12},      // 5 x 5: 5 cannot be cut into boxes, so only rows and columns count (br = bc = 1 switches the box rule off)
-  {n:6, br:2, bc:3, givens:15}                  // 6 x 6, six boxes of 2 rows by 3 columns
+  {n:6, br:2, bc:3, givens:15},                 // 6 x 6, six boxes of 2 rows by 3 columns
+  {n:9, br:3, bc:3, givens:34}                  // 9 x 9, nine boxes of 3 x 3 (2026-10-22, per Dan)
 ];
 var SD_HINTS = 3;
 
@@ -3928,6 +3945,35 @@ function sdPlace(v){
   if(done){ sdFinishPuzzle(s); return; }
   pixSfxPlay(clash ? "fmMiss" : "fmFirst", true);
   saveState(); render();
+  // A picture that breaks the rule glows red, and after 2 seconds the player's pictures that are still breaking it clear themselves, so there is
+  // no need to tap the X (2026-10-22, per Dan). The starting pictures and hinted pictures are never cleared.
+  if(clash){
+    var level = s.level;
+    setTimeout(function(){
+      var s2 = state.session.sacredSudoku;
+      if(!s2 || s2 !== s || s2.level !== level || s2.done || s2.status !== "playing") return;
+      var lv2 = s2.levels[s2.level], bad = sdClashes(s2.cells, lv2), changed = false;
+      for(var i = 0; i < s2.cells.length; i++){
+        if(bad[i] && lv2.puz[i] === 0 && s2.hinted.indexOf(i) === -1 && s2.cells[i] !== 0){ s2.cells[i] = 0; changed = true; }
+      }
+      if(changed){ saveState(); render(); }
+    }, 2000);
+  }
+}
+// CLEAR takes every picture the player has put on the board off again; the starting pictures and hinted ones stay
+function sdClearAll(){
+  var s = state.session.sacredSudoku;
+  if(!s || s.status !== "playing" || s.busy) return;
+  var lv = s.levels[s.level];
+  for(var i = 0; i < s.cells.length; i++){
+    if(lv.puz[i] === 0 && s.hinted.indexOf(i) === -1) s.cells[i] = 0;
+  }
+  s.sel = sdFirstEmptyPlayable(s);
+  saveState(); render();
+}
+function sdFirstEmptyPlayable(s){
+  for(var i = 0; i < s.cells.length; i++) if(s.cells[i] === 0) return i;
+  return null;
 }
 function sdHint(){
   var s = state.session.sacredSudoku;
@@ -4030,13 +4076,15 @@ function screenSacredSudoku(){
   palHtml += '<button class="sdPick sdErase" data-sfx="own" onclick="sdPlace(0)" aria-label="' + t("sd_erase") + '">&#10005;</button>';
   var won = s.busy;
 
-  return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
+  return '<div class="screen pixHome pixSky pixMission pixLower' + (n >= 9 ? ' sdBig' : '') + '">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("sudokuName") + '</h2>' +
-    '<div class="pixNote">' + t(boxed ? "sd_intro" : "sd_intro2") + '</div>' +
-    '<div class="sdBar"><span class="pixNote">' + t("fm_level")(s.level + 1, s.levels.length) + '</span>' +
+    '<div class="pixNote sdIntro">' + t(boxed ? "sd_intro" : "sd_intro2") + '</div>' +
+    '<div class="wuBar">' +
+      '<button class="sdHint skip"' + (won ? ' disabled' : '') + ' onclick="sdClearAll()">' + t("clearWord") + '</button>' +
+      '<span class="pixNote">' + t("fm_level")(s.level + 1, s.levels.length) + '</span>' +
       '<button class="sdHint" data-sfx="own"' + (s.hints > 0 && !won ? '' : ' disabled') + ' onclick="sdHint()">' + t("sd_hint")(s.hints) + '</button></div>' +
     '<div class="sdBoard" style="grid-template-columns:repeat(' + (n / lc) + ',1fr)">' + boxesHtml + '</div>' +
-    '<div class="sdPal">' + palHtml + '</div>' +
+    '<div class="sdPal' + (n >= 9 ? ' two' : '') + '">' + palHtml + '</div>' +
     '<div class="spacer"></div>' +
     '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();sdQuit()">' + t("mainMenu") + '</button>' +
   '</div>';
