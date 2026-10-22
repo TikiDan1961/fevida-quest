@@ -494,8 +494,8 @@
   .pixSlot.filled{background:#FFC93A;}
   .pixWuRow.correct .pixSlot{background:#52C246;border-color:#1E6B2B;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);}
   .pixWuRow.wrong .pixSlot{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
-  .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:20px 0 6px;}
-  .pixTile{width:46px;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
+  .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;margin:20px 0 6px;}   /* one row, even for 6 letters: the tiles shrink a little to fit */
+  .pixTile{flex:1 1 0;min-width:0;max-width:46px;width:auto;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
     color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .pixTile:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .pixTile.used{pointer-events:none;background:rgba(27,31,59,.22);border-color:rgba(27,31,59,.4);color:transparent;text-shadow:none;box-shadow:none;}
@@ -783,9 +783,9 @@ var T = {
     fl_failTitle:"So Close!", fl_failBody:"You ran out of chances — give it another try from Level 1.",
     fl_passTitle:"Amazing Memory!", fl_passBody:"You repeated every pattern across all 8 levels!",
 
-    wu_intro:"Tap the letters in order to unscramble each word. Solve all 5 to win!",
+    wu_intro:"Tap the letters in order to unscramble each word. Finish all 3 levels to win!",
     wu_word:function(n,total){return "Word "+n+" of "+total;},
-    wu_passTitle:"Word Master!", wu_passBody:"You unscrambled all 5 words!",
+    wu_passTitle:"Word Master!", wu_passBody:"You unscrambled all 15 words!",
     clearWord:"CLEAR",
 
     cl_intro:"Slide the hands left and right to catch the falling lights! Miss too many and you'll start over — you get 3 chances across all 4 levels.",
@@ -895,9 +895,9 @@ var T = {
     fl_failTitle:"¡Tan Cerca!", fl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
     fl_passTitle:"¡Memoria Increíble!", fl_passBody:"¡Repetiste cada patrón en los 8 niveles!",
 
-    wu_intro:"Toca las letras en orden para descifrar cada palabra. ¡Resuelve las 5 para ganar!",
+    wu_intro:"Toca las letras en orden para descifrar cada palabra. ¡Termina los 3 niveles para ganar!",
     wu_word:function(n,total){return "Palabra "+n+" de "+total;},
-    wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Descifraste las 5 palabras!",
+    wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Descifraste las 15 palabras!",
     clearWord:"BORRAR",
 
     cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 3 oportunidades en los 4 niveles.",
@@ -2634,6 +2634,7 @@ function flPlayPattern(){
       return;
     }
     s2.showingIndex = s2.pattern[step];
+    flPlayTone(s2.pattern[step], FL_SHOW_ON_MS * 0.8);
     saveState(); render();
     setTimeout(function(){
       var s3 = state.session.followLight;
@@ -2647,10 +2648,31 @@ function flPlayPattern(){
   showNext();
 }
 
+// Every tile has its own note (2026-10-21, per Dan): a chip-style square-wave beep, heard when the tile lights up in the pattern and again when the
+// player taps it correctly. The nine notes are a major pentatonic scale (C D E G A, then up an octave), so any order of tiles sounds pleasant.
+var FL_TONES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+function flPlayTone(tileIdx, ms){
+  try {
+    var ctx = pixCtx(); if(!ctx) return;
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
+    var now = ctx.currentTime, len = (ms || 350) / 1000;
+    var osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(FL_TONES[tileIdx % FL_TONES.length], now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.16, now + 0.01);          // a hard, quick start
+    gain.gain.setValueAtTime(0.16, now + len * 0.55);
+    gain.gain.linearRampToValueAtTime(0.0001, now + len);         // then a short fade
+    osc.connect(gain); gain.connect(pixBus(ctx, "sfx"));
+    osc.start(now); osc.stop(now + len + 0.02);
+  } catch(e){}
+}
+
 function flTileTap(tileIdx){
   var s = state.session.followLight;
   if(!s || s.phase !== "input") return;
   if(tileIdx !== s.pattern[s.playerIndex]){ flWrongTap(); return; }
+  flPlayTone(tileIdx, 320);
   s.showingIndex = tileIdx;
   saveState(); render();
   setTimeout(function(){
@@ -2758,7 +2780,7 @@ function screenFollowLight(){
     var lit = s.showingIndex === i;
     var cls = "flPad" + (lit ? " lit" : "") + (s.phase !== "input" ? " disabled" : "");
     var inner = lit ? '<img src="' + src + '" alt="" decoding="sync">' : "";
-    return '<div class="' + cls + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();flTileTap(' + i + ')">' + inner + '</div>';
+    return '<div class="' + cls + '" data-sfx="own" onpointerdown="flTileTap(' + i + ')">' + inner + '</div>';
   }).join("");
 
   return pixShell('<h2 class="pixMTitle">' + t("followLightName") + '</h2>' +
@@ -2776,9 +2798,16 @@ function screenFollowLight(){
 // rather than forcing an EN word's exact meaning into an awkward ES fit).
 // TODO(Dan): swap in different/NCYC-specific words any time — nothing else
 // needs to change.
+// Three levels of 5 words (2026-10-21, per Dan): level 1 has 4-letter words, level 2 has 5-letter words and level 3 has 6-letter words. No
+// accented letters, so every letter tile is a plain letter.
+var WU_LEVELS = 3;
 var WORD_UNSCRAMBLE_WORDS = {
-  en: ["HOPE","GRACE","MERCY","FAITH","TRUST"],
-  es: ["FE","PAZ","AMOR","GRACIA","ESPERANZA"]
+  en: [["HOPE","LOVE","PRAY","HOLY","SOUL"],
+       ["GRACE","MERCY","FAITH","TRUST","PEACE"],
+       ["SPIRIT","PRAYER","GOSPEL","HEAVEN","CHURCH"]],
+  es: [["AMOR","CRUZ","VIDA","DIOS","ALMA"],
+       ["CIELO","SANTO","ALTAR","FELIZ","PADRE"],
+       ["GRACIA","CRISTO","BIBLIA","VIRGEN","ALABAR"]]
 };
 
 function wuScrambleWord(word){
@@ -2790,7 +2819,7 @@ function wuScrambleWord(word){
 
 function wuSetupWord(s){
   var lang = state.lang || "en";
-  var word = WORD_UNSCRAMBLE_WORDS[lang][s.order[s.index]];
+  var word = WORD_UNSCRAMBLE_WORDS[lang][s.level || 0][s.order[s.index]];
   s.word = word;
   s.letters = wuScrambleWord(word);
   s.picked = [];
@@ -2799,8 +2828,8 @@ function wuSetupWord(s){
 
 function initWordUnscramble(){
   var lang = state.lang || "en";
-  var order = shuffle(WORD_UNSCRAMBLE_WORDS[lang].map(function(_,i){return i;}));
-  var s = {order:order, index:0, status:"playing"};
+  var order = shuffle(WORD_UNSCRAMBLE_WORDS[lang][0].map(function(_,i){return i;}));
+  var s = {level:0, order:order, index:0, status:"playing"};
   wuSetupWord(s);
   state.session.wordUnscramble = s;
   saveState();
@@ -2823,8 +2852,17 @@ function wuPick(letterPos){
         var s2 = state.session.wordUnscramble;
         if(!s2) return;
         if(s2.index >= s2.order.length - 1){
-          s2.status = "results";
-          saveState(); render();
+          if((s2.level || 0) >= WU_LEVELS - 1){
+            s2.status = "results";
+            saveState(); render();
+          } else {                                   // the next level: longer words
+            var lang2 = state.lang || "en";
+            s2.level = (s2.level || 0) + 1;
+            s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
+            s2.index = 0;
+            wuSetupWord(s2);
+            saveState(); render();
+          }
         } else {
           s2.index++;
           wuSetupWord(s2);
@@ -2889,6 +2927,7 @@ function screenWordUnscramble(){
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
+    '<div class="pixNote">' + t("fm_level")((s.level || 0) + 1, WU_LEVELS) + '</div>' +
     pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now") +
     '<div class="pixPaper">' +
       '<p class="pixWuIntro">' + t("wu_intro") + '</p>' +
