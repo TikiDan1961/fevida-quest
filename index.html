@@ -1835,12 +1835,12 @@ function petsInit(){
 function pilgrimSceneHtml(extra){
   var lit = goldenTicketUnlocked();
   return '<div class="pixScene" id="pixScene"><div class="pixSceneBox" id="pixSceneBox">' +
-    '<img class="pixSceneArt" src="tiles/scene_world2.png" alt="">' +
+    '<img class="pixSceneArt" src="tiles/scene_world3.png" alt="">' +
     '<div class="churchGlow' + (lit ? ' lit' : '') + '"></div>' +
     '<img class="pixSpark" src="tiles/spark.png" alt="">' +
     '<div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div>' +
     PETS.map(petHtml).join("") +
-    '<img class="pixFenceFront" src="tiles/fence_front2.png" alt="">' +
+    '<img class="pixFenceFront" src="tiles/fence_front3.png" alt="">' +
     '<div class="pilgrim" id="pilgrim" role="button" aria-label="Pilgrim" onclick="pilgrimTap()"><div class="pilgrimFlip"><div class="pilgrimSprite"></div></div></div>' +
     '<div class="pilgrimBubble" id="pilgrimBubble" onclick="pilgrimHide()"></div>' +
   '</div>' + (extra || "") + '</div>';
