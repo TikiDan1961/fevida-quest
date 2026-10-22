@@ -2025,17 +2025,13 @@ function grantMission(id, missionState){
   go("award");
 }
 
+// The Mission Completed screen in the 8-bit look (2026-10-22, per Dan): the pixel sky, the mission's name, and a cream card with the badge, the
+// "Mission Complete!" message and what was won, like the other result screens.
 function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
-  return '<div class="screen center">' +
-    '<div class="spacer"></div>' +
-    badgeImgHtml(m, 150) +
-    '<h1>' + t("awardTitle") + '</h1>' +
-    '<p>' + t("awardBody")(100, t(m.themeKey)) + '</p>' +
-    '<div class="spacer"></div>' +
-    '<button class="btn gold" onclick="afterAward()">' + t("returnToMainMenu") + '</button>' +
-  '</div>';
+  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:t("awardBody")(100, t(m.themeKey)), badge:m.id,
+    buttons:pixBtnHtml(t("returnToMainMenu"), "afterAward()")});
 }
 
 function afterAward(){
