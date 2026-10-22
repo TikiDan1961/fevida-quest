@@ -3945,18 +3945,18 @@ function sdPlace(v){
   if(done){ sdFinishPuzzle(s); return; }
   pixSfxPlay(clash ? "fmMiss" : "fmFirst", true);
   saveState(); render();
-  // A picture that breaks the rule glows red, and after 2 seconds the player's pictures that are still breaking it clear themselves, so there is
-  // no need to tap the X (2026-10-22, per Dan). The starting pictures and hinted pictures are never cleared.
+  // A picture that breaks the rule glows red, and after 2 seconds that picture -- the one just placed, which caused the red -- clears itself, so
+  // there is no need to tap the X (2026-10-22, per Dan). Other red squares are left alone, and the starting and hinted pictures never clear.
   if(clash){
-    var level = s.level;
+    var level = s.level, pos = s.sel;
     setTimeout(function(){
       var s2 = state.session.sacredSudoku;
       if(!s2 || s2 !== s || s2.level !== level || s2.done || s2.status !== "playing") return;
-      var lv2 = s2.levels[s2.level], bad = sdClashes(s2.cells, lv2), changed = false;
-      for(var i = 0; i < s2.cells.length; i++){
-        if(bad[i] && lv2.puz[i] === 0 && s2.hinted.indexOf(i) === -1 && s2.cells[i] !== 0){ s2.cells[i] = 0; changed = true; }
-      }
-      if(changed){ saveState(); render(); }
+      var lv2 = s2.levels[s2.level];
+      if(s2.cells[pos] !== v || lv2.puz[pos] !== 0 || s2.hinted.indexOf(pos) !== -1) return;   // it has been changed or cleared already
+      if(!sdClashes(s2.cells, lv2)[pos]) return;                                                // it is no longer breaking the rule
+      s2.cells[pos] = 0;
+      saveState(); render();
     }, 2000);
   }
 }
