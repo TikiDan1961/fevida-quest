@@ -1360,7 +1360,10 @@ var PIX_SFX = {
   fmMatch:{url:"sounds/sfx_fm_match.mp3", gain:0.25},   // was 0.55: too loud next to the other sounds (2026-10-20, per Dan)
   fmMiss:{url:"sounds/sfx_fm_miss.mp3", gain:0.28},
   fmLast:{url:"sounds/sfx_fm_last.mp3", gain:0.37},   // was 1: levelled with the match / miss sounds (2026-10-20, per Dan)
-  fmFanfare:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17}   // was 0.55: 10 dB too loud next to the others
+  fmFanfare:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17},   // was 0.55: 10 dB too loud next to the others
+  // the ROUND X COMPLETED! sound in Faith Flash (2026-10-22, per Dan): the whole of sound_effect_3.wav from the Non 8-Bit Sounds folder (both phrases,
+  // 7.2 s, a short fade at the end). The Faith Match fanfare above is only its first phrase. Same loudness setting as the fanfare: it is the same recording.
+  ffRound:{url:"sounds/sfx_ff_round.mp3", gain:0.17}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -2118,8 +2121,8 @@ function ffClickAnswer(i){
   pixClickSfx("none"); ffAnswer(i);
 }
 
-// ROUND X COMPLETED! (2026-10-20, per Dan): the question and answers go away and one 8-bit frame says the round is done, with the level-clear
-// fanfare from Faith Match. After 2 seconds, if a chance has been lost, a big heart is AWARDED! in the same frame and gives one back. The next
+// ROUND X COMPLETED! (2026-10-20, per Dan): the question and answers go away and one 8-bit frame says the round is done, with sound_effect_3
+// (sounds/sfx_ff_round.mp3). After 2 seconds, if a chance has been lost, a big heart is AWARDED! in the same frame and gives one back. The next
 // round starts once the fanfare is over. render() calls ffInterlude() so a reload in the middle of it picks the sequence back up.
 var FF_INTERLUDE_AWARD_MS = 2000;
 var ffInterludeRunning = false;
@@ -2142,9 +2145,9 @@ function ffInterlude(){
     ffNext();
   }
   if(s.interlude.phase === "award"){ setTimeout(finish, 1200); return; }   // reloaded after the heart was given: just let it be seen, then go on
-  var buf = pixSfxBuf.fmFanfare;
-  var fanfareMs = (buf ? buf.duration * 1000 : 3400) + 250;
-  pixSfxPlay("fmFanfare", false);
+  var buf = pixSfxBuf.ffRound;
+  var fanfareMs = (buf ? buf.duration * 1000 : 7200) + 250;       // the next round starts when the sound is over
+  pixSfxPlay("ffRound", false);
   setTimeout(function(){
     if(!alive()){ ffInterludeRunning = false; return; }
     var award = ffChancesLeft(s) < FF_CHANCES;
