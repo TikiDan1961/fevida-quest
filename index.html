@@ -380,23 +380,20 @@
     padding:5px 12px 8px;background:#52C246;border:3px solid #1E6B2B;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .sdHint:disabled{filter:saturate(.3) brightness(.85);cursor:default;}
   .sdHint:not(:disabled):active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 16px 6px rgba(120,255,120,.8);}
-  .sdBoard{display:grid;gap:3px;width:min(100%,300px);box-sizing:border-box;margin:8px auto 6px;padding:3px;background:#1B1F3B;border-radius:10px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
-  .sdCell{aspect-ratio:1/1;position:relative;padding:0;border:0;border-radius:3px;background:#FFF3D6 center / 100% 100% no-repeat;image-rendering:pixelated;cursor:pointer;
-    -webkit-tap-highlight-color:transparent;touch-action:manipulation;box-shadow:inset 0 0 0 2px #FFC93A;}
-  .sdCell.given{box-shadow:inset 0 0 0 2px #1B1F3B;cursor:default;}
-  .sdCell.hint{box-shadow:inset 0 0 0 3px #52C246;cursor:default;}
-  .sdCell.mine{box-shadow:inset 0 0 0 2px #3A93E8;}
-  .sdCell.clash::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(214,52,58,.5);box-shadow:inset 0 0 0 2px #D6343A;pointer-events:none;border-radius:3px;}
-  .sdCell.sel{z-index:2;box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #fff,0 0 12px 5px rgba(110,190,255,.9);}
-  /* the gold lines between boxes: a 3px strip drawn in the gap to the right of / below the last square of each box */
-  .sdCell.bR::after,.sdCell.bB::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;background-repeat:no-repeat;}
-  .sdCell.bR::after{right:-3px;top:-3px;background-image:linear-gradient(#FFC93A,#FFC93A);background-position:right top;background-size:3px 100%;}
-  .sdCell.bB::after{bottom:-3px;background-image:linear-gradient(#FFC93A,#FFC93A);background-position:left bottom;background-size:100% 3px;}
-  .sdCell.bR.bB::after{right:-3px;bottom:-3px;top:0;background-image:linear-gradient(#FFC93A,#FFC93A),linear-gradient(#FFC93A,#FFC93A);background-position:right top,left bottom;background-size:3px 100%,100% 3px;}
+  .sdBoard{display:grid;gap:4px;width:min(100%,300px);box-sizing:border-box;margin:8px auto 6px;padding:4px;background:#1B1F3B;border-radius:6px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
+  .sdBox{display:grid;gap:2px;}
+  .sdCell{aspect-ratio:1/1;position:relative;padding:0;border:0;border-radius:0;background:#FFFDED center / 82% 82% no-repeat;image-rendering:pixelated;cursor:pointer;   /* the picture sits a little inside the square, on the picture's own cream, so its edges never touch the lines */
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .sdCell::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;}
+  .sdCell.mine::before{background:rgba(58,147,232,.22);}
+  .sdCell.hint::before{background:rgba(82,194,70,.3);}
+  .sdCell.clash::before{background:rgba(214,52,58,.5);}
+  .sdCell.sel{z-index:2;box-shadow:0 0 0 3px #fff,0 0 12px 5px rgba(110,190,255,.9);}
+  .sdCell:not([onclick]){cursor:default;}
   .sdBoard.win .sdCell{animation:sdWin .3s steps(2) 3;}
   @keyframes sdWin{0%{filter:brightness(1);}50%{filter:brightness(1.6);}100%{filter:brightness(1);}}
   .sdPal{display:flex;gap:6px;justify-content:center;margin:6px 0 2px;}
-  .sdPick{width:42px;height:42px;padding:0;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:8px;background:#FFF3D6 center / 100% 100% no-repeat;image-rendering:pixelated;cursor:pointer;
+  .sdPick{width:42px;height:42px;padding:0;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:8px;background:#FFFDED center / 82% 82% no-repeat;image-rendering:pixelated;cursor:pointer;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
   .sdPick:active{box-shadow:0 0 0 3px #DCEEFF,0 0 14px 5px rgba(110,190,255,.85);}
   @media (prefers-reduced-motion:reduce){ .sdBoard.win .sdCell{animation:none;} }
@@ -805,7 +802,7 @@ var T = {
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
     sudokuName:"Sacred Sudoku", themeWisdom:"Wisdom",
-    sd_intro:"Tap a square, then a picture. Each picture goes once in every row, column and box.", sd_hint:function(n){return "HINT ("+n+")";}, sd_erase:"Erase",
+    sd_intro:"Tap a square, then a picture. Each picture goes once in every row, column and box.", sd_intro2:"Tap a square, then a picture. Each picture goes once in every row and column.", sd_hint:function(n){return "HINT ("+n+")";}, sd_erase:"Erase",
     sd_passTitle:"Puzzle Master!", sd_passBody:"You solved every stained-glass puzzle!",
     eb_intro:"Guess the Bible story from the emojis.", eb_story:function(n,total){return "Story "+n+" of "+total;}, eb_next:"NEXT STORY",
     eb_failTitle:"So Close!", eb_failBody:"You ran out of chances. Try again with a new set of stories!",
@@ -917,7 +914,7 @@ var T = {
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
     sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
-    sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
+    sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_intro2:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila y columna.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
     sd_passTitle:"¡Maestro de Rompecabezas!", sd_passBody:"¡Resolviste todos los rompecabezas de vitral!",
     eb_intro:"Adivina la historia bíblica con los emojis.", eb_story:function(n,total){return "Historia "+n+" de "+total;}, eb_next:"SIGUIENTE HISTORIA",
     eb_failTitle:"¡Tan Cerca!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
@@ -3698,14 +3695,14 @@ function screenJesusTimeline(){
 /* ---------- Sacred Sudoku ---------- */
 
 // Sacred Sudoku (2026-10-21, per Dan -- replaces Light the Windows). Sudoku with stained-glass pictures instead of numbers: fill the grid so every
-// picture appears once in each row, each column and each box. Three puzzles: 4 x 4 (many pictures given), 4 x 4 (fewer given) and 6 x 6 (boxes
+// picture appears once in each row, each column and each box. Three puzzles of different sizes: 4 x 4, 5 x 5 (no boxes) and 6 x 6 (boxes
 // 2 rows by 3 columns). It cannot be failed. Squares that break the rule glow red. Three hints per puzzle fill in one correct square. Every
 // puzzle is made fresh and has exactly one solution. The pictures are six of the Faith Match pictures that look most different from each other.
 var SD_PICS = [9, 14, 8, 5, 10, 7];          // faith_tile8_NN: dove, Sacred Heart, crucifix, Lamb of God, chalice, Chi-Rho
 var SD_LEVELS = [
-  {n:4, br:2, bc:2, givens:8},
-  {n:4, br:2, bc:2, givens:5},
-  {n:6, br:2, bc:3, givens:15}
+  {n:4, br:2, bc:2, givens:8},                  // 4 x 4, four 2 x 2 boxes
+  {n:5, br:1, bc:1, box:false, givens:12},      // 5 x 5: 5 cannot be cut into boxes, so only rows and columns count (br = bc = 1 switches the box rule off)
+  {n:6, br:2, bc:3, givens:15}                  // 6 x 6, six boxes of 2 rows by 3 columns
 ];
 var SD_HINTS = 3;
 
@@ -3768,7 +3765,7 @@ function sdMakePuzzle(cfg){
     puz[order[i]] = 0;
     if(sdCountSolutions(puz.slice(), n, cfg.br, cfg.bc, 2) !== 1) puz[order[i]] = saved; else left--;
   }
-  return {n:n, br:cfg.br, bc:cfg.bc, sol:sol, puz:puz, syms:shuffle(SD_PICS).slice(0, n)};
+  return {n:n, br:cfg.br, bc:cfg.bc, box:cfg.box !== false, sol:sol, puz:puz, syms:shuffle(SD_PICS).slice(0, n)};
 }
 
 function sdFirstEmpty(cells){ for(var i = 0; i < cells.length; i++) if(cells[i] === 0) return i; return null; }
@@ -3858,17 +3855,20 @@ function screenSacredSudoku(){
 
   var lv = s.levels[s.level], n = lv.n;
   var bad = sdClashes(s.cells, lv);
-  var cellsHtml = "";
-  for(var i = 0; i < n * n; i++){
-    var v = s.cells[i], r = Math.floor(i / n), c = i % n;
-    var cls = "sdCell";
-    if(lv.puz[i] !== 0) cls += " given"; else if(s.hinted.indexOf(i) !== -1) cls += " hint"; else if(v) cls += " mine";
-    if(bad[i]) cls += " clash";
-    if(s.sel === i) cls += " sel";
-    if(c % lv.bc === lv.bc - 1 && c !== n - 1) cls += " bR";
-    if(r % lv.br === lv.br - 1 && r !== n - 1) cls += " bB";
-    var fixed = lv.puz[i] !== 0 || s.hinted.indexOf(i) !== -1;
-    cellsHtml += '<button class="' + cls + '" data-sfx="own"' + (v ? ' style="background-image:url(' + sdPicUrl(lv, v) + ')"' : '') + (fixed ? '' : ' onclick="sdSelect(' + i + ')"') + '></button>';
+  // The board is a grid of boxes and each box is a grid of squares: 2px lines between squares, 4px lines between boxes and around the edge
+  // (a level with no boxes is one big box).
+  var boxed = lv.box !== false, lr = boxed ? lv.br : n, lc = boxed ? lv.bc : n, boxesHtml = "";
+  for(var r0 = 0; r0 < n; r0 += lr) for(var c0 = 0; c0 < n; c0 += lc){
+    var inner = "";
+    for(var rr = 0; rr < lr; rr++) for(var cc = 0; cc < lc; cc++){
+      var i = (r0 + rr) * n + c0 + cc, v = s.cells[i], cls = "sdCell";
+      if(lv.puz[i] === 0 && s.hinted.indexOf(i) !== -1) cls += " hint"; else if(lv.puz[i] === 0 && v) cls += " mine";
+      if(bad[i]) cls += " clash";
+      if(s.sel === i) cls += " sel";
+      var fixed = lv.puz[i] !== 0 || s.hinted.indexOf(i) !== -1;
+      inner += '<button class="' + cls + '" data-sfx="own"' + (v ? ' style="background-image:url(' + sdPicUrl(lv, v) + ')"' : '') + (fixed ? '' : ' onclick="sdSelect(' + i + ')"') + '></button>';
+    }
+    boxesHtml += '<div class="sdBox" style="grid-template-columns:repeat(' + lc + ',1fr)">' + inner + '</div>';
   }
   var palHtml = "";
   for(var k = 1; k <= n; k++) palHtml += '<button class="sdPick" data-sfx="own" style="background-image:url(' + sdPicUrl(lv, k) + ')" onclick="sdPlace(' + k + ')"></button>';
@@ -3877,10 +3877,10 @@ function screenSacredSudoku(){
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("sudokuName") + '</h2>' +
-    '<div class="pixNote">' + t("sd_intro") + '</div>' +
+    '<div class="pixNote">' + t(boxed ? "sd_intro" : "sd_intro2") + '</div>' +
     '<div class="sdBar"><span class="pixNote">' + t("fm_level")(s.level + 1, s.levels.length) + '</span>' +
       '<button class="sdHint" data-sfx="own"' + (s.hints > 0 && !won ? '' : ' disabled') + ' onclick="sdHint()">' + t("sd_hint")(s.hints) + '</button></div>' +
-    '<div class="sdBoard' + (won ? ' win' : '') + '" style="grid-template-columns:repeat(' + n + ',1fr)">' + cellsHtml + '</div>' +
+    '<div class="sdBoard' + (won ? ' win' : '') + '" style="grid-template-columns:repeat(' + (n / lc) + ',1fr)">' + boxesHtml + '</div>' +
     '<div class="sdPal">' + palHtml + '</div>' +
     '<div class="spacer"></div>' +
     '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();sdQuit()">' + t("mainMenu") + '</button>' +
