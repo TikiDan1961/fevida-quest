@@ -246,6 +246,7 @@
   .pixPet.walking .petSprite{animation:petStep .4s steps(1) infinite,pilgrimBob .4s steps(1) infinite;}
   @keyframes petBreath{0%{transform:translateY(0);}50%{transform:translateY(-7%);}100%{transform:translateY(0);}}
   @keyframes petStep{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
+  .pixMenu.pilgrimBusy .homeGrid,.pixMenu.pilgrimBusy .backBtn,.pixMenu.pilgrimBusy .pilgrim,.pixMenu.pilgrimBusy .pixPet,.pixMenu.pilgrimBusy .tempReset{pointer-events:none;}   /* while the pilgrim talks and walks after a badge */
   .pilgrimBubble{position:absolute;z-index:3;display:none;box-sizing:border-box;max-width:80%;padding:8px 12px;background:#fff;color:#1E2F7A;border:3px solid #1B1F3B;border-radius:10px;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.25;text-align:center;box-shadow:0 3px 0 rgba(20,30,90,.35);
     pointer-events:auto;cursor:pointer;transform-origin:var(--tail,50%) 100%;}
@@ -463,6 +464,7 @@
     box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .lcIntent img{width:36px;height:36px;image-rendering:pixelated;}
   .lcIntent:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .pixMission .pixResMid{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}
   .pixResBadge{display:block;width:144px;height:144px;margin:0 auto 10px;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
   .pixResTitle{font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:.02em;}
   .pixResBody{margin:10px 0 0;font-weight:500;font-size:1.0625rem;line-height:1.3;color:#3d4d96;}
@@ -831,7 +833,7 @@ var T = {
     missionsFolder:"Missions", goldenTicketLabel:"Golden Ticket",
     sheepSays:"baaaa", backLabel:"Back to the welcome screen",
     optionsLabel:"Options", optionsTitle:"Options", sfxVolume:"Sound Effects", musicVolume:"Music",
-    pilgrimStart:"Hi, I'm Pilgrim! Open Missions to start our journey.", pilgrimNice:"Great job! Let's keep walking with faith.",
+    pilgrimStart:"Hi, I'm Pilgrim! Open Missions to start our journey.", pilgrimNice:"Great job! Let's keep walking with faith.", pilgrimGreat:"Great job!", pilgrimTryAnother:function(n){return "Try another mission: "+n+"!";},
     pilgrimTry:function(n){return "Try "+n+" next!";}, pilgrimToGo:function(n){return n+" more game"+(n === 1 ? "" : "s")+" to reach the church!";},
     pilgrimTicket:"Your Golden Ticket is ready! Tap it to see it.",
     pilgrimCheer1:"Let your light shine!", pilgrimCheer2:"Walk with faith!", pilgrimCheer3:"Keep going, friend!",
@@ -959,7 +961,7 @@ var T = {
     missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
     sheepSays:"beeee", backLabel:"Volver a la pantalla de bienvenida",
     optionsLabel:"Opciones", optionsTitle:"Opciones", sfxVolume:"Efectos de sonido", musicVolume:"Música",
-    pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.",
+    pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.", pilgrimGreat:"¡Buen trabajo!", pilgrimTryAnother:function(n){return "¡Prueba otra misión: "+n+"!";},
     pilgrimTry:function(n){return "¡Prueba "+n+"!";}, pilgrimToGo:function(n){return n === 1 ? "¡Falta 1 juego para llegar a la iglesia!" : "¡Faltan "+n+" juegos para llegar a la iglesia!";},
     pilgrimTicket:"¡Tu Boleto Dorado está listo! Tócalo para verlo.",
     pilgrimCheer1:"¡Deja brillar tu luz!", pilgrimCheer2:"¡Camina con fe!", pilgrimCheer3:"¡Sigue adelante, amigo!",
@@ -1980,8 +1982,23 @@ function pilgrimTap(){
   pilgrimMsgI++;
 }
 
+// After a badge is collected (2026-10-22, per Dan) the Main Menu opens with the Missions window closed, and the pilgrim first says "Great job!", then walks
+// to his next spot (nothing on the screen can be tapped while he does), and on arriving he suggests a mission that is not done yet. null = not in that
+// sequence; "great" = about to speak; "walk" = walking.
+var pilgrimAward = null;
+function pilgrimBusy(el, on){ var scr = el && el.closest(".screen"); if(scr) scr.classList.toggle("pilgrimBusy", on); }
 function pilgrimArrived(el, walkedForward){
   state.pilgrimP = pilgrimPos; saveState();
+  if(pilgrimAward){
+    pilgrimAward = null; pilgrimGreetPending = false;
+    pilgrimBusy(el, false);                                   // he has arrived: the icons can be tapped again
+    pilgrimGreetTimer = setTimeout(function(){
+      if(!el.isConnected) return;
+      var next = MISSIONS.filter(function(m){ return !state.missions[m.id].done; })[0];
+      pilgrimSay(next ? t("pilgrimTryAnother")(t(next.nameKey)) : t("pilgrimCheer1"), null, 6500);
+    }, 500);
+    return;
+  }
   if(!pilgrimGreetPending || state.folderOpen) return;
   pilgrimGreetPending = false;
   pilgrimGreetTimer = setTimeout(function(){
@@ -2005,6 +2022,17 @@ function pilgrimInit(isNew){
   if(pilgrimPos === null) pilgrimPos = (typeof state.pilgrimP === "number") ? Math.max(0, Math.min(1, state.pilgrimP)) : target;
   pilgrimPlace(el, pilgrimPos, 0);
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var dist = target - pilgrimPos;
+  if(pilgrimAward) pilgrimBusy(el, true);                  // nothing can be tapped until he has arrived
+  if(pilgrimAward === "great"){
+    pilgrimGreetTimer = setTimeout(function(){ if(el.isConnected) pilgrimSay(t("pilgrimGreat"), null, 1800); }, 600);
+    pilgrimStartTimer = setTimeout(function(){ if(!el.isConnected) return; pilgrimAward = "walk"; pilgrimWalk(el, target, calm); }, 2700);
+    return;
+  }
+  pilgrimWalk(el, target, calm);
+}
+
+function pilgrimWalk(el, target, calm){
   var dist = target - pilgrimPos;
   if(Math.abs(dist) < 0.0005 || calm){
     pilgrimPos = target; pilgrimPlace(el, pilgrimPos, 0);
@@ -2114,6 +2142,8 @@ function screenAward(){
 
 function afterAward(){
   state.awardMissionId = null;
+  state.folderOpen = false;          // the Missions window is closed, so the player can watch the pilgrim (2026-10-22, per Dan)
+  pilgrimAward = "great";            // see pilgrimArrived
   // Auto-advance to the Golden Ticket screen only the ONE time a mission
   // completion actually crosses the unlock threshold (2026-09-29, per Dan's
   // 5-of-10 change) — every mission is worth exactly 100 pts, so "this
@@ -2183,8 +2213,8 @@ function ffAnswer(choiceIdx){
     setTimeout(function(){
       var s2 = state.session.faithFlash;
       if(!s2 || s2 !== s || s2.status !== "playing" || s2.index !== at) return;   // only this game and this question: not a new one started in the meantime
-      if(lastChance || s2.index >= s2.order.length - 1){ s2.status = "results"; saveState(); render(); }
-      else ffRoundDone();
+      if(lastChance){ s2.status = "results"; saveState(); render(); }
+      else ffRoundDone();                 // also after the last round: ROUND 3 COMPLETED! shows, and ffNext then goes on to the results (2026-10-22, per Dan)
     }, 1300);
   }
 }
@@ -2306,13 +2336,13 @@ function pixBtnHtml(label, js, secondary){
 // o = {title, body, badge: mission id or nothing, buttons}
 function pixResultHtml(nameKey, o){
   var m = o.badge ? missionById(o.badge) : null;
+  // the window is centred in the room between the game's name and the buttons (2026-10-22, per Dan)
   return pixShell('<h2 class="pixMTitle">' + t(nameKey) + '</h2>' +
-    '<div class="pixPaper">' +
-      (m ? '<img class="pixResBadge" src="' + badge8Src(m) + '" alt="">' : '') +
+    '<div class="pixResMid"><div class="pixPaper">' +
+      (m ? '<img class="pixResBadge" src="' + badge8Src(m) + '" alt="" decoding="sync">' : '') +
       '<div class="pixResTitle">' + o.title + '</div>' +
       '<p class="pixResBody">' + o.body + '</p>' +
-    '</div>' +
-    '<div class="spacer"></div>' + o.buttons, o.cls);
+    '</div></div>' + o.buttons, o.cls);
 }
 
 // a mission's pixel icon on its coloured tile, big, for the cream cards
@@ -2343,8 +2373,8 @@ function screenFaithFlash(){
     var perfect = pass && s.correct === s.order.length;
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
-      '<div class="pixPaper">' +
-        (pass ? '<img class="pixResBadge" src="tiles/badges96/b96_faith.png" alt="">' : '') +
+      '<div class="pixResMid"><div class="pixPaper">' +
+        (pass ? '<img class="pixResBadge" src="tiles/badges96/b96_faith.png" alt="" decoding="sync">' : '') +
         '<div class="pixResTitle">' + (perfect ? t("ff_resultsTitlePass") : (pass ? t("ff_resultsTitlePass2") : t("ff_resultsTitleFail"))) + '</div>' +
         '<p class="pixResBody">' + (perfect ? t("ff_resultsBodyPass") : (pass ? t("ff_resultsBodyPass2") : t("ff_resultsBodyFail"))) + '</p>' +
         // Denominator is how many questions were actually ANSWERED (s.index+1
@@ -2354,9 +2384,8 @@ function screenFaithFlash(){
         // "4 out of 5", not "4 out of 10" (2026-09-29, per Dan). On an actual
         // pass this is equivalent to s.order.length anyway (all 10 attempted).
         '<div class="pixScore">' + t("scoreOf")(s.correct, s.index+1) + '</div>' +
-      '</div>' +
-      '<div class="spacer"></div>' +
-      (pass ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffCollectAward()">' + t("collectAward") + '</button>'
+      '</div></div>' +
+      (pass ?'<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffCollectAward()">' + t("collectAward") + '</button>'
             : '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffPlayAgain()">' + t("playAgain") + '</button>') +
       '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
     '</div>';
@@ -2503,7 +2532,8 @@ function fmEvaluate(){
     var allMatched = s.cards.every(function(c){ return c.matched; });
     if(allMatched){
       if(s.level === MATCH_LEVELS.length - 1){
-        s.status = "complete";
+        // the last level: ROUND X COMPLETED! shows before the results (2026-10-22, per Dan); fmInterlude then sets the status to "complete"
+        s.interlude = {n: s.level + 1, phase: "msg", award: false, final: true};
       } else {
         s.levelDone = true;
         saveState(); render();
@@ -2577,7 +2607,10 @@ function fmCelebrate(){
 function fmInterlude(){
   pixRoundRun("faithMatch", function(){ return state.session.faithMatch; },
     function(s){ if(s.chances < (s.maxChances || MATCH_CHANCES[s.level])){ s.chances++; return true; } return false; },
-    function(s){ initFaithMatchLevel(s.interlude.next); render(); });
+    function(s){
+      if(s.interlude.final){ s.interlude = null; s.status = "complete"; saveState(); render(); return; }
+      initFaithMatchLevel(s.interlude.next); render();
+    });
 }
 
 function fmCollectAward(){
@@ -2931,21 +2964,22 @@ function flWrongTap(){
 function flLevelComplete(){
   var s = state.session.followLight;
   s.showingIndex = -1;
-  if(s.level >= FL_LEVELS.length - 1){
-    s.status = "complete";
-    saveState(); render();
-    return;
-  }
-  // After the last tile has flashed, ROUND X COMPLETED! shows before the next level (2026-10-22, per Dan); see flInterlude.
+  // After the last tile has flashed, ROUND X COMPLETED! shows before the next level, and before the results after the last one (2026-10-22, per Dan);
+  // see flInterlude.
   s.phase = "levelComplete";
-  s.interlude = {n: s.level + 1, phase: "msg", award: false, next: s.level + 1};
+  s.interlude = {n: s.level + 1, phase: "msg", award: false, next: s.level + 1, final: s.level >= FL_LEVELS.length - 1};
   saveState(); render();
 }
 // the round-complete screen: a chance used so far is AWARDED! back (the chances are shared by all the levels)
 function flInterlude(){
   pixRoundRun("followLight", function(){ return state.session.followLight; },
     function(s){ if(s.chances < s.maxChances){ s.chances++; return true; } return false; },
-    function(s){ var next = s.interlude.next; s.interlude = null; flSetupLevel(next); render(); flStartLevel(); });
+    function(s){
+      var next = s.interlude.next, last = s.interlude.final;
+      s.interlude = null;
+      if(last){ s.status = "complete"; saveState(); render(); return; }
+      flSetupLevel(next); render(); flStartLevel();
+    });
 }
 
 // Simple Web Audio beep for a wrong tap — this app has no sound-asset
@@ -3128,13 +3162,9 @@ function wuHint(){
 }
 function wuAdvance(s2){
   if(s2.index >= s2.order.length - 1){
-    if((s2.level || 0) >= WU_LEVELS - 1){
-      s2.status = "results";
-      saveState(); render();
-    } else {                                   // ROUND X COMPLETED! (the message alone: no chances here) before the next level (2026-10-22, per Dan)
-      s2.interlude = {n: (s2.level || 0) + 1, phase: "msg", award: false};
-      saveState(); render();
-    }
+    // ROUND X COMPLETED! (the message alone: no chances here) before the next level, and before the results after the last one (2026-10-22, per Dan)
+    s2.interlude = {n: (s2.level || 0) + 1, phase: "msg", award: false, final: (s2.level || 0) >= WU_LEVELS - 1};
+    saveState(); render();
   } else {
     s2.index++;
     wuSetupWord(s2);
@@ -3144,6 +3174,7 @@ function wuAdvance(s2){
 function wuInterlude(){
   pixRoundRun("wordUnscramble", function(){ return state.session.wordUnscramble; }, null, function(s2){
     var lang2 = state.lang || "en";                // the next level: longer words, and 3 fresh hints
+    if(s2.interlude.final){ s2.interlude = null; s2.status = "results"; saveState(); render(); return; }
     s2.interlude = null;
     s2.level = (s2.level || 0) + 1;
     s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
@@ -3207,12 +3238,11 @@ function screenWordUnscramble(){
     var wm = MISSIONS.filter(function(m){ return m.id === "wordUnscramble"; })[0];
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
-      '<div class="pixPaper">' +
-        '<img class="pixResBadge" src="' + badge8Src(wm) + '" alt="">' +
+      '<div class="pixResMid"><div class="pixPaper">' +
+        '<img class="pixResBadge" src="' + badge8Src(wm) + '" alt="" decoding="sync">' +
         '<div class="pixResTitle">' + t("wu_passTitle") + '</div>' +
         '<p class="pixResBody">' + t("wu_passBody") + '</p>' +
-      '</div>' +
-      '<div class="spacer"></div>' +
+      '</div></div>' +
       '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();wuCollectAward()">' + t("collectAward") + '</button>' +
     '</div>';
   }
@@ -3468,7 +3498,7 @@ function clCheckLevelComplete(){
   var s = state.session.catchLight;
   if(!s || s.status !== "playing") return;
   if(s.resolvedInLevel < CL_LEVELS[s.level].count) return;
-  if(s.level >= CL_LEVELS.length - 1){ clEndRound("win"); return; }
+  // (the last level goes through the round-complete screen too, then on to the results: see clInterlude)
   // Stop the live spawn/tick loop for the "GET READY" beat between levels —
   // clBeginLevel() (at the end of clRunReadyCountdown) restarts it once the
   // countdown finishes, via the same render()-hook every other entry point
@@ -3480,7 +3510,7 @@ function clCheckLevelComplete(){
     if(!s2 || s2.status !== "playing") return;
     // ROUND X COMPLETED! shows before the next level's GET READY (2026-10-22, per Dan); see clInterlude
     s2.phase = "roundDone";
-    s2.interlude = {n: s2.level + 1, phase: "msg", award: false};
+    s2.interlude = {n: s2.level + 1, phase: "msg", award: false, final: s2.level >= CL_LEVELS.length - 1};
     saveState(); render();
   }, CL_LEVEL_PAUSE_MS);
 }
@@ -3489,6 +3519,7 @@ function clInterlude(){
   pixRoundRun("catchLight", function(){ return state.session.catchLight; },
     function(s){ if(s.misses > 0){ s.misses--; return true; } return false; },
     function(s){
+      if(s.interlude.final){ s.interlude = null; s.status = "passed"; saveState(); render(); return; }
       s.interlude = null;
       s.level++;
       s.spawnedInLevel = 0; s.resolvedInLevel = 0; s.caughtInLevel = 0;
@@ -4532,18 +4563,20 @@ function pzAdvance(){
   pzAdvancing = false;
   var s = state.session.stainedGlass;
   if(!s || s.status !== "solved") return;
-  if(s.round >= PZ_LEVELS.length - 1){
-    s.status = "passed";
-  } else {
-    // ROUND X COMPLETED! (the message alone: this game has no chances) shows after the finished picture, before the next round (2026-10-22, per Dan)
-    s.interlude = {n: s.round + 1, phase: "msg", award: false};
-  }
+  // ROUND X COMPLETED! (the message alone: this game has no chances) shows after the finished picture, before the next round and before the
+  // results after the last one (2026-10-22, per Dan)
+  s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= PZ_LEVELS.length - 1};
   saveState();
   if(state.screen === "stainedGlass") render();
 }
 function pzInterlude(){
   pixRoundRun("stainedGlass", function(){ return state.session.stainedGlass; }, null,
-    function(s){ s.interlude = null; s.round++; s.placed = []; s.status = "playing"; saveState(); render(); });
+    function(s){
+      var last = s.interlude.final;
+      s.interlude = null;
+      if(last) s.status = "passed"; else { s.round++; s.placed = []; s.status = "playing"; }
+      saveState(); render();
+    });
 }
 
 function pzCollectAward(){ state.session.stainedGlass = null; grantMission("stainedGlass"); }
@@ -4955,6 +4988,8 @@ render();
 // (matchTilesPreloaded guards it) so that call is now just a harmless no-op
 // safety net for the rare case someone reaches it before this finishes.
 preloadMatchTiles();
+// The badge pictures are fetched at boot too (2026-10-22, per Dan): the badge on a results screen showed a beat late, with a blank space where it goes.
+var badgePreload = MISSIONS.map(function(m){ var img = new Image(); img.src = badge8Src(m); return img; });
 </script>
 </body>
 </html>
