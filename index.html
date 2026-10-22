@@ -1286,7 +1286,7 @@ function defaultState(){
     folderOpen: false,
     pilgrimP: null,
     volSfx: 45,     // Options screen: sound effects volume, 0-100 (starts at 45, per Dan 2026-10-20)
-    volMusic: 100,  // music volume, 0-100: it starts at the top of the slider (the slider's 100% is a quiet background level, 2026-10-22)
+    volMusic: 60,   // music volume, 0-100: it starts at 60 (2026-10-22, per Dan; the slider's 100% is a quiet background level)
     musicScale: 2,  // marks a game saved with the new music slider
     passportPage: 0,
     introMission: null   // the game whose instruction screen is showing
@@ -1319,7 +1319,7 @@ function loadState(){
     // Sprint screen (replaced by Stained-Glass Puzzle, 2026-10-19).
     if(merged.screen === "serviceSprint" || merged.screen === "pathOfLight" || merged.screen === "lightWindows") merged.screen = "mainMenu";
     // a tab saved before the music slider was rescaled would sound far too quiet at its old setting: it starts at the top of the new slider
-    if(!parsed.musicScale){ merged.volMusic = 100; merged.musicScale = 2; }
+    if(!parsed.musicScale){ merged.volMusic = 60; merged.musicScale = 2; }
     return merged;
   }catch(e){ return defaultState(); }
 }
@@ -1374,7 +1374,7 @@ function pixCtx(){
 var PIX_MUSIC_MAX = 0.04;     // = 0.2 squared
 function pixVolGain(kind){
   var v = kind === "music" ? state.volMusic : state.volSfx;
-  if(typeof v !== "number") v = kind === "music" ? 100 : 45;
+  if(typeof v !== "number") v = kind === "music" ? 60 : 45;
   var g = Math.pow(Math.max(0, Math.min(100, v)) / 100, 2);
   return kind === "music" ? g * PIX_MUSIC_MAX : g;
 }
@@ -4716,7 +4716,7 @@ function screenOptions(){
     '</div>' +
     '<div class="pixPaper optCard">' +
       optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
-      optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 100) +
+      optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
@@ -4856,10 +4856,13 @@ function render(){
   var isNewScreen = state.screen !== lastRenderedScreen;
   var enteringPassportFresh = state.screen === "passport" && isNewScreen;
   lastRenderedScreen = state.screen;
+  var wasSky = !!app.querySelector(".screen.pixSky");     // the screen being replaced was a sky screen
   app.innerHTML = exitBarHtml() + html;
   if(isNewScreen){
     var el = app.querySelector(".screen");
-    if(el) el.classList.add("screen-enter");
+    // No fade between two sky screens (2026-10-22, per Dan): the fade starts from see-through, which showed the dark purple page behind it as a
+    // black flash between START MISSION and the game. Screens with other backgrounds still fade in.
+    if(el && !(wasSky && el.classList.contains("pixSky"))) el.classList.add("screen-enter");
   }
   if(state.screen === "mainMenu"){ pilgrimInit(isNewScreen); pixMusicStart(); }   // the music starts the first time the Main Menu is shown
   if(state.screen === "passport"){
