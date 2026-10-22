@@ -392,13 +392,12 @@
   .sdCell.sel{box-shadow:inset 0 0 0 3px #3A93E8;}
   .sdCell.sel:not(.clash)::before{background:rgba(110,190,255,.5);}
   .sdCell:not([onclick]){cursor:default;}
-  .sdBoard.win .sdCell{animation:sdWin .3s steps(2) 3;}
-  @keyframes sdWin{0%{filter:brightness(1);}50%{filter:brightness(1.6);}100%{filter:brightness(1);}}
+  /* the glowing square frame of the finish celebration: the same look as a Faith Match tile frame */
+  .sdBoard .sdCell.glow{position:relative;z-index:2;box-shadow:inset 0 0 0 2px #FFF6C0,0 0 0 3px #FFF6C0,0 0 22px 9px rgba(255,236,120,.95);}
   .sdPal{display:flex;gap:6px;justify-content:center;margin:6px 0 2px;}
   .sdPick{width:42px;height:42px;padding:0;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:8px;background:#FFFDED center / 82% 82% no-repeat;image-rendering:pixelated;cursor:pointer;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
   .sdPick:active{box-shadow:0 0 0 3px #DCEEFF,0 0 14px 5px rgba(110,190,255,.85);}
-  @media (prefers-reduced-motion:reduce){ .sdBoard.win .sdCell{animation:none;} }
   /* Emoji Bible Stories */
   .pixEmoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:3rem;line-height:1.15;letter-spacing:.06em;}
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
@@ -492,6 +491,8 @@
   .pixSlot{flex:1 1 0;min-width:0;max-width:38px;height:46px;box-sizing:border-box;border:3px solid #1B1F3B;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;color:#1E2F7A;box-shadow:inset 0 3px 0 rgba(30,47,122,.12);}
   .pixSlot.filled{background:#FFC93A;}
+  .pixSlot[role=button]{cursor:pointer;}
+  .pixSlot.hinted{background:#7FD36F;border-color:#1E6B2B;}
   .pixWuRow.correct .pixSlot{background:#52C246;border-color:#1E6B2B;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);}
   .pixWuRow.wrong .pixSlot{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
   .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;margin:20px 0 6px;}   /* one row, even for 6 letters: the tiles shrink a little to fit */
@@ -2822,73 +2823,125 @@ function wuSetupWord(s){
   var word = WORD_UNSCRAMBLE_WORDS[lang][s.level || 0][s.order[s.index]];
   s.word = word;
   s.letters = wuScrambleWord(word);
-  s.picked = [];
+  s.slots = [];                       // slots[i] = which letter tile sits in square i, or null
+  for(var i = 0; i < word.length; i++) s.slots.push(null);
+  s.hinted = [];                      // squares filled by a hint: they are right, and they stay
   s.feedback = null; // "correct" | "wrong" | null, transient
 }
+
+// 3 hints on every level (2026-10-21, per Dan): a hint puts one correct letter into its own square and locks it there.
+var WU_HINTS = 3;
 
 function initWordUnscramble(){
   var lang = state.lang || "en";
   var order = shuffle(WORD_UNSCRAMBLE_WORDS[lang][0].map(function(_,i){return i;}));
-  var s = {level:0, order:order, index:0, status:"playing"};
+  var s = {level:0, order:order, index:0, hints:WU_HINTS, status:"playing"};
   wuSetupWord(s);
   state.session.wordUnscramble = s;
   saveState();
 }
+// a game saved by an earlier build has a list of picked letters instead of squares: turn it into squares
+function wuEnsure(s){
+  if(!s || Array.isArray(s.slots)) return;
+  s.slots = [];
+  for(var i = 0; i < s.word.length; i++) s.slots.push(s.picked && i < s.picked.length ? s.picked[i] : null);
+  s.hinted = [];
+  if(typeof s.hints !== "number") s.hints = WU_HINTS;
+}
+function wuFirstEmpty(s){
+  for(var i = 0; i < s.slots.length; i++) if(s.slots[i] === null) return i;
+  return -1;
+}
 
 // No fail state, per spec — this is a puzzle, not a knowledge/reflex test.
-// A wrong full attempt just shakes and clears for another try.
+// A wrong full attempt just shakes and clears for another try (letters placed by a hint stay).
 function wuPick(letterPos){
   var s = state.session.wordUnscramble;
   if(!s || s.feedback) return;
-  if(s.picked.indexOf(letterPos) !== -1) return;
-  if(s.picked.length >= s.word.length) return;
-  s.picked.push(letterPos);
-  if(s.picked.length === s.word.length){
-    var guess = s.picked.map(function(p){ return s.letters[p]; }).join("");
-    if(guess === s.word){
-      s.feedback = "correct";
-      saveState(); render();
-      setTimeout(function(){
-        var s2 = state.session.wordUnscramble;
-        if(!s2) return;
-        if(s2.index >= s2.order.length - 1){
-          if((s2.level || 0) >= WU_LEVELS - 1){
-            s2.status = "results";
-            saveState(); render();
-          } else {                                   // the next level: longer words
-            var lang2 = state.lang || "en";
-            s2.level = (s2.level || 0) + 1;
-            s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
-            s2.index = 0;
-            wuSetupWord(s2);
-            saveState(); render();
-          }
-        } else {
-          s2.index++;
+  wuEnsure(s);
+  if(s.slots.indexOf(letterPos) !== -1) return;
+  var e = wuFirstEmpty(s);
+  if(e < 0) return;
+  s.slots[e] = letterPos;
+  if(wuFirstEmpty(s) < 0) wuCheck(s); else { saveState(); render(); }
+}
+// tapping a letter that has been placed sends it back to the row of letters (not one placed by a hint)
+function wuUnplace(i){
+  var s = state.session.wordUnscramble;
+  if(!s || s.feedback) return;
+  wuEnsure(s);
+  if(s.slots[i] === null || s.hinted.indexOf(i) !== -1) return;
+  s.slots[i] = null;
+  saveState(); render();
+}
+function wuHint(){
+  var s = state.session.wordUnscramble;
+  if(!s || s.feedback || s.status !== "playing") return;
+  wuEnsure(s);
+  if(s.hints <= 0) return;
+  var k = -1, i, p;
+  for(i = 0; i < s.word.length; i++){
+    if(s.hinted.indexOf(i) === -1 && (s.slots[i] === null || s.letters[s.slots[i]] !== s.word.charAt(i))){ k = i; break; }   // the first square that is not right yet
+  }
+  if(k < 0) return;
+  var ch = s.word.charAt(k), pos = -1;
+  s.slots[k] = null;                                                  // a wrong letter in that square goes back to the row
+  for(p = 0; p < s.letters.length && pos < 0; p++) if(s.letters[p] === ch && s.slots.indexOf(p) === -1) pos = p;
+  for(p = 0; p < s.letters.length && pos < 0; p++){                  // otherwise take that letter from another square it was wrongly sitting in
+    if(s.letters[p] !== ch) continue;
+    var j = s.slots.indexOf(p);
+    if(j !== -1 && s.hinted.indexOf(j) === -1){ s.slots[j] = null; pos = p; }
+  }
+  if(pos < 0) return;
+  s.slots[k] = pos; s.hinted.push(k); s.hints--;
+  if(wuFirstEmpty(s) < 0) wuCheck(s); else { saveState(); render(); }
+}
+// every square is full: right, and on to the next word; wrong, and the squares clear for another try
+function wuCheck(s){
+  var guess = s.slots.map(function(pos){ return s.letters[pos]; }).join("");
+  if(guess === s.word){
+    s.feedback = "correct";
+    saveState(); render();
+    setTimeout(function(){
+      var s2 = state.session.wordUnscramble;
+      if(!s2) return;
+      if(s2.index >= s2.order.length - 1){
+        if((s2.level || 0) >= WU_LEVELS - 1){
+          s2.status = "results";
+          saveState(); render();
+        } else {                                   // the next level: longer words, and 3 fresh hints
+          var lang2 = state.lang || "en";
+          s2.level = (s2.level || 0) + 1;
+          s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
+          s2.index = 0;
+          s2.hints = WU_HINTS;
           wuSetupWord(s2);
           saveState(); render();
         }
-      }, 900);
-    } else {
-      s.feedback = "wrong";
-      saveState(); render();
-      setTimeout(function(){
-        var s2 = state.session.wordUnscramble;
-        if(!s2) return;
-        s2.picked = [];
-        s2.feedback = null;
+      } else {
+        s2.index++;
+        wuSetupWord(s2);
         saveState(); render();
-      }, 900);
-    }
+      }
+    }, 900);
   } else {
+    s.feedback = "wrong";
     saveState(); render();
+    setTimeout(function(){
+      var s2 = state.session.wordUnscramble;
+      if(!s2) return;
+      for(var i = 0; i < s2.slots.length; i++) if(s2.hinted.indexOf(i) === -1) s2.slots[i] = null;
+      s2.feedback = null;
+      saveState(); render();
+    }, 900);
   }
 }
 
 function wuClear(){
   var s = state.session.wordUnscramble;
   if(!s || s.feedback) return;
-  s.picked = [];
+  wuEnsure(s);
+  for(var i = 0; i < s.slots.length; i++) if(s.hinted.indexOf(i) === -1) s.slots[i] = null;
   saveState(); render();
 }
 
@@ -2914,20 +2967,23 @@ function screenWordUnscramble(){
     '</div>';
   }
 
+  wuEnsure(s);
   var rowCls = "pixWuRow" + (s.feedback ? " " + s.feedback : "");
   var slotsHtml = "";
   for(var i=0;i<s.word.length;i++){
-    var filled = i < s.picked.length;
-    slotsHtml += '<div class="pixSlot' + (filled?' filled':'') + '">' + (filled ? s.letters[s.picked[i]] : "") + '</div>';
+    var filled = s.slots[i] !== null, hinted = s.hinted.indexOf(i) !== -1;
+    var tappable = filled && !hinted && !s.feedback;      // a placed letter goes back to the row when it is tapped
+    slotsHtml += '<div class="pixSlot' + (filled?' filled':'') + (hinted?' hinted':'') + '"' + (tappable ? ' role="button" onclick="wuUnplace(' + i + ')"' : '') + '>' + (filled ? s.letters[s.slots[i]] : "") + '</div>';
   }
   var trayHtml = s.letters.map(function(ch, pos){
-    var used = s.picked.indexOf(pos) !== -1;
+    var used = s.slots.indexOf(pos) !== -1;
     return '<button class="pixTile' + (used?' used':'') + '"' + press + 'onclick="pixClickSfx();wuPick(' + pos + ')">' + ch + '</button>';
   }).join("");
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
-    '<div class="pixNote">' + t("fm_level")((s.level || 0) + 1, WU_LEVELS) + '</div>' +
+    '<div class="sdBar"><span class="pixNote">' + t("fm_level")((s.level || 0) + 1, WU_LEVELS) + '</span>' +
+      '<button class="sdHint"' + (s.hints > 0 && !s.feedback ? '' : ' disabled') + ' onclick="wuHint()">' + t("sd_hint")(s.hints) + '</button></div>' +
     pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now") +
     '<div class="pixPaper">' +
       '<p class="pixWuIntro">' + t("wu_intro") + '</p>' +
@@ -3864,21 +3920,52 @@ function sdHint(){
   pixSfxPlay("fmMatch", true);
   saveState(); render();
 }
+// Finishing a puzzle celebrates exactly like finishing a Faith Match level (2026-10-21, per Dan): the picture that completes the grid makes the
+// match sound, the grid stays at normal brightness for a beat, then the Faith Match fanfare plays while ONE random square frame at a time
+// glows (never the same square twice in a row, a tenth of a second each, for 3 seconds), and then the next puzzle (or the result) comes.
+// render() calls sdCelebrate(), so a reload in the middle of it picks the sequence back up.
+var sdCelebrating = false;
 function sdFinishPuzzle(s){
-  s.busy = true; s.sel = null;
-  var last = s.level >= s.levels.length - 1;
-  pixSfxPlay(last ? "fmFanfare" : "fmMatch", true);
+  s.busy = true; s.sel = null; s.done = true;
+  pixSfxPlay("fmMatch", true);                 // the last picture, like the last pair of tiles
   saveState(); render();
-  setTimeout(function(){
-    var s2 = state.session.sacredSudoku;
-    if(!s2 || s2 !== s || s2.status !== "playing") return;
-    if(last){ s2.status = "passed"; }
-    else {
-      s2.level++; var nl = s2.levels[s2.level];
-      s2.cells = nl.puz.slice(); s2.hinted = []; s2.hints = SD_HINTS; s2.sel = sdFirstEmpty(nl.puz); s2.busy = false;
+}
+function sdCelebrate(){
+  if(sdCelebrating) return;
+  var s = state.session.sacredSudoku;
+  if(!s || !s.done) return;
+  sdCelebrating = true;
+  function alive(){ return state.session.sacredSudoku === s && s.done && state.screen === "sacredSudoku"; }   // the player has not left
+  function begin(){
+    if(!alive()){ sdCelebrating = false; return; }
+    s.celebrate = true; saveState();
+    pixSfxPlay("fmFanfare", false);
+    var step = 0, last = -1, t0 = performance.now();
+    function tick(){
+      if(!alive()){ sdCelebrating = false; return; }
+      var cells = document.querySelectorAll(".sdBoard .sdCell");
+      for(var i = 0; i < cells.length; i++) cells[i].classList.remove("glow");
+      if(step >= FM_FLASH_STEPS){ sdCelebrating = false; sdNextPuzzle(s); return; }
+      var idx;
+      do { idx = Math.floor(Math.random() * cells.length); } while(idx === last && cells.length > 1);
+      last = idx;
+      if(cells[idx]) cells[idx].classList.add("glow");
+      step++;
+      setTimeout(tick, Math.max(0, t0 + step * FM_FLASH_MS - performance.now()));
     }
-    saveState(); render();
-  }, last ? 1300 : 1000);
+    tick();
+  }
+  setTimeout(begin, s.celebrate ? 0 : FM_FANFARE_DELAY_MS);   // after a reload mid-celebration there is no second pause
+}
+function sdNextPuzzle(s){
+  if(state.session.sacredSudoku !== s || s.status !== "playing") return;
+  s.done = false; s.celebrate = false;
+  if(s.level >= s.levels.length - 1){ s.status = "passed"; }
+  else {
+    s.level++; var nl = s.levels[s.level];
+    s.cells = nl.puz.slice(); s.hinted = []; s.hints = SD_HINTS; s.sel = sdFirstEmpty(nl.puz); s.busy = false;
+  }
+  saveState(); render();
 }
 function sdCollectAward(){ state.session.sacredSudoku = null; grantMission("sacredSudoku"); }
 function sdQuit(){ state.session.sacredSudoku = null; go("mainMenu"); }
@@ -3921,7 +4008,7 @@ function screenSacredSudoku(){
     '<div class="pixNote">' + t(boxed ? "sd_intro" : "sd_intro2") + '</div>' +
     '<div class="sdBar"><span class="pixNote">' + t("fm_level")(s.level + 1, s.levels.length) + '</span>' +
       '<button class="sdHint" data-sfx="own"' + (s.hints > 0 && !won ? '' : ' disabled') + ' onclick="sdHint()">' + t("sd_hint")(s.hints) + '</button></div>' +
-    '<div class="sdBoard' + (won ? ' win' : '') + '" style="grid-template-columns:repeat(' + (n / lc) + ',1fr)">' + boxesHtml + '</div>' +
+    '<div class="sdBoard" style="grid-template-columns:repeat(' + (n / lc) + ',1fr)">' + boxesHtml + '</div>' +
     '<div class="sdPal">' + palHtml + '</div>' +
     '<div class="spacer"></div>' +
     '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();sdQuit()">' + t("mainMenu") + '</button>' +
@@ -4481,6 +4568,7 @@ function render(){
   if(state.screen === "faithMatch" && state.session.faithMatch && (state.session.faithMatch.levelDone || state.session.faithMatch.celebrate) && !fmCelebrating) fmCelebrate();
   if(state.screen === "faithFlash" && state.session.faithFlash && state.session.faithFlash.interlude && !ffInterludeRunning) ffInterlude();
   if(state.screen === "lightCandle") lcPaint();
+  if(state.screen === "sacredSudoku" && state.session.sacredSudoku && state.session.sacredSudoku.done && !sdCelebrating) sdCelebrate();
   var clSession = state.session.catchLight;
   if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
     if(clSession.phase === "playing" && !clRunning) clStart();
