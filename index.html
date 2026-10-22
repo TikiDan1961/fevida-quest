@@ -984,14 +984,14 @@ var MISSIONS = [
   {id:"kindnessSort", icon:"🤲", badgeImg:"tiles/badge_forgiveness.png", nameKey:"kindnessSortName", themeKey:"themeForgiveness"},
   {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"},
   // Light a Candle (2026-10-21, per Dan: start on the new missions). Its own Prayer badge is not drawn yet, so it borrows the Light to the
-  // World badge until Dan's art arrives: add tiles/badge_prayer.png and tiles/badges8/b8_prayer.png, then change badgeImg here.
+  // World badge until Dan's art arrives: add tiles/badge_prayer.png and tiles/badges96/b96_prayer.png, then change badgeImg here.
   {id:"lightCandle", icon:"🕯️", badgeImg:"tiles/badge_light.png", nameKey:"lightCandleName", themeKey:"themePrayer"},
   // Emoji Bible Stories and Life of Jesus Timeline (2026-10-21, per Dan). Also borrowing badges until their own art is drawn: Scripture reuses the
-  // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges8/b8_...) later.
+  // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges96/b96_...) later.
   {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
   {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_salvation.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"},
   // Sacred Sudoku (2026-10-21, per Dan) replaced Light the Windows, whose tap order was too hard to see (which had replaced Path of Light). Borrows the
-  // Hope (anchor) badge until its own is drawn: add tiles/badge_wisdom.png and tiles/badges8/b8_wisdom.png, then change badgeImg here.
+  // Hope (anchor) badge until its own is drawn: add tiles/badge_wisdom.png and tiles/badges96/b96_wisdom.png, then change badgeImg here.
   {id:"sacredSudoku", icon:"🔢", badgeImg:"tiles/badge_hope.png", nameKey:"sudokuName", themeKey:"themeWisdom"}
 ];
 
@@ -2217,7 +2217,7 @@ function screenFaithFlash(){
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
       '<div class="pixPaper">' +
-        (pass ? '<img class="pixResBadge" src="tiles/badges8/b8_faith.png" alt="">' : '') +
+        (pass ? '<img class="pixResBadge" src="tiles/badges96/b96_faith.png" alt="">' : '') +
         '<div class="pixResTitle">' + (perfect ? t("ff_resultsTitlePass") : (pass ? t("ff_resultsTitlePass2") : t("ff_resultsTitleFail"))) + '</div>' +
         '<p class="pixResBody">' + (perfect ? t("ff_resultsBodyPass") : (pass ? t("ff_resultsBodyPass2") : t("ff_resultsBodyFail"))) + '</p>' +
         // Denominator is how many questions were actually ANSWERED (s.index+1
@@ -4366,9 +4366,9 @@ function passportTouchEnd(ev){
 // a player has won appear, the rest show a padlock).
 var PASSPORT_SHOW_ALL = true;
 
-// The 8-bit version of a mission's badge: tiles/badges8/b8_<name>.png (48x48 pixels, made from the
-// artwork in the Badges folder), shown at 4x.
-function badge8Src(m){ return m.badgeImg.replace("tiles/badge_", "tiles/badges8/b8_"); }
+// The pixel-art version of a mission's badge: tiles/badges96/b96_<name>.png (96x96 pixels and 48 colours, made from the artwork in the
+// Badges folder; finer than the first 48x48 set, 2026-10-22, per Dan, so the pictures are easier to make out), shown at 2x.
+function badge8Src(m){ return m.badgeImg.replace("tiles/badge_", "tiles/badges96/b96_"); }
 
 function passportPageInner(page){
   if(page < MISSIONS.length){
