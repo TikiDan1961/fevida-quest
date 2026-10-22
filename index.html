@@ -580,7 +580,7 @@
     .pixMission .flMsg{margin-top:4px;}
     .pixMission.pixLower .flGrid{width:88%;margin:8px auto 6px;gap:8px;}   /* Follow the Light is lowered too, and its longer instruction needs 3 lines */
     .pixMission .clStage{min-height:220px;}
-    .pixMission .hbScene{width:86%;margin-left:auto;margin-right:auto;}
+    .pixMission .hbScene{width:82%;margin-left:auto;margin-right:auto;}
   }
   /* Options screen: two volume sliders on a cream card (2026-10-20, per Dan) */
   .optCard{display:flex;flex-direction:column;gap:22px;padding:22px 18px 24px;text-align:left;}
@@ -2179,7 +2179,9 @@ function ffPlayAgain(){ initFaithFlash(); go("faithFlash"); }
 function missionById(id){ return MISSIONS.filter(function(m){ return m.id === id; })[0]; }
 
 // the sky, the clouds and whatever the screen holds
-function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
+// Every mission screen sits lowered, so every mission's name is at the same height as Faith Match's (2026-10-22, per Dan). A screen that has no room
+// for that on a small phone is lowered only on taller phones (pass "pixHigh").
+function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission pixLower' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
 
 // a pixel button with the glow and the press sound; secondary = the blue one
 function pixBtnHtml(label, js, secondary){
@@ -2333,8 +2335,24 @@ function fmIsSecondTile(cardId){
 }
 // first tile = sound_effect_10; second tile = silent here (fmFlip plays the match / miss sound); anything else = the button sound
 function fmSoundFor(cardId){ return fmIsFirstTile(cardId) ? "fmFirst" : (fmIsSecondTile(cardId) ? "none" : null); }
-function fmPress(cardId){ pixPressSfx(fmSoundFor(cardId)); }
-function fmClick(cardId){ pixClickSfx(fmSoundFor(cardId)); fmFlip(cardId); }
+// A tile turns over the moment the finger touches it, together with its sound (2026-10-22, per Dan) -- before, it waited for the finger to lift.
+// The click that follows only does the work a keyboard press needs (event.detail is 0 then), or plays the tile's sound late if the sound engine
+// could not start on the touch itself (a phone's first tap): the sound is remembered from the touch, so it is the one for that moment.
+var fmPendingSfx;
+function fmDown(cardId){
+  var name = fmSoundFor(cardId);                  // chosen before the flip changes the state: first tile, second tile or neither
+  fmPendingSfx = name;
+  if(pixAudioStale) pixReviveOnTap();             // the first touch after coming back from another app wakes the sound engine first
+  pixPressSfx(name);
+  fmFlip(cardId);
+}
+function fmClick(cardId, ev){
+  var keyboard = ev && ev.detail === 0;
+  var name = (!keyboard && fmPendingSfx !== undefined) ? fmPendingSfx : fmSoundFor(cardId);
+  fmPendingSfx = undefined;
+  pixClickSfx(name);
+  if(keyboard) fmFlip(cardId);
+}
 
 function fmFlip(cardId){
   var s = state.session.faithMatch;
@@ -2496,7 +2514,7 @@ function screenFaithMatch(){
     // one/two blank-white frames first under the default async decoding.
     // Forcing a synchronous decode removes that flash (2026-09-30, per Dan).
     var inner = shown ? '<img src="' + c.symbol + '" alt="" decoding="sync">' : "";
-    return '<div class="' + cls + '" onpointerdown="fmPress(' + c.id + ')" onclick="fmClick(' + c.id + ')">' + inner + '</div>';
+    return '<div class="' + cls + '" onpointerdown="fmDown(' + c.id + ')" onclick="fmClick(' + c.id + ', event)">' + inner + '</div>';
   }).join("");
 
   return pixShell('<h2 class="pixMTitle">' + t("faithMatchName") + '</h2>' +
