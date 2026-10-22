@@ -128,7 +128,7 @@
      width and anchored to the bottom so the pews stay under the buttons; any extra height
      at the top is ceiling brown). */
   .pixChurch{padding-top:calc(env(safe-area-inset-top,0px) + 16px);
-    background:url("tiles/church_interior.png") center bottom / 100% auto no-repeat,#6B4423;}
+    background:url("tiles/church_interior2.png") center bottom / 100% auto no-repeat,#6B4423;}
   .pixWelcomeCard{padding:18px 18px 20px;}
   .pixWelTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 10px;}
   .pixWelBody{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1.25rem;line-height:1.3;letter-spacing:.01em;color:#2A3A78;margin:0;}
@@ -143,7 +143,7 @@
   @media (max-width:340px){
     .homeGrid .appTile{width:62px;height:62px;}
     .homeGrid .miniGrid{grid-template-columns:26px 26px;}
-    .homeGrid .appTile .miniGrid img.spr{width:26px;height:26px;}
+    .homeGrid .appTile .miniGrid img.spr{width:26px;height:26px;image-rendering:auto;}
   }
   .appIcon{display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;}
   /* Only the icon itself (its tile and its name) takes a tap or lights up -- not the empty space around it in its grid cell, so a tap between
@@ -163,7 +163,7 @@
   .appTag{margin-top:3px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.75rem;letter-spacing:.03em;color:#FFC93A;text-transform:lowercase;}
   .appTag::first-letter{text-transform:uppercase;}
   .miniGrid{display:grid;grid-template-columns:32px 32px;gap:0;}
-  .appTile .miniGrid img.spr{width:32px;height:32px;}
+  .appTile .miniGrid img.spr{width:32px;height:32px;image-rendering:auto;}
   .countBadge{position:absolute;top:-9px;right:-12px;min-width:34px;padding:2px 6px;border-radius:12px;background:#D6343A;border:3px solid #fff;color:#fff;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
   .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
@@ -268,7 +268,7 @@
   .pixSky > *:not(.pixSkyClouds){position:relative;z-index:1;}
   .pixHome.pixSky > .backBtn{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:5;width:42px;height:42px;padding:0 0 3px;display:flex;align-items:center;justify-content:center;
     border:3px solid #1B1F3B;border-radius:12px;background:#3A93E8;cursor:pointer;box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
-  .backBtn img{width:32px;height:32px;image-rendering:pixelated;pointer-events:none;}
+  .backBtn img{width:32px;height:32px;image-rendering:auto;pointer-events:none;}
   .backBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #DCEEFF,0 0 16px 6px rgba(110,190,255,.85);}
   @media (max-width:340px){   /* keeps the title clear of the back icon on the smallest phones */
     .pixMenu .pixMenuTitle{font-size:1.625rem;}
@@ -406,7 +406,8 @@
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
   .sdPick:active{box-shadow:0 0 0 3px #DCEEFF,0 0 14px 5px rgba(110,190,255,.85);}
   /* Emoji Bible Stories */
-  .pixEmoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:3rem;line-height:1.15;letter-spacing:.06em;}
+  .pixEmoji{display:flex;justify-content:center;align-items:center;gap:6px;min-height:48px;}   /* the clues are pixel pictures (24 x 24, shown at 2x), the same on every phone */
+  .pixEmoji img{width:48px;height:48px;image-rendering:pixelated;}
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
   .pixRef.shown{color:#1E6B2B;font-weight:700;}
   /* Life of Jesus Timeline */
@@ -436,7 +437,7 @@
   .lcGlow{position:absolute;left:calc(5 * var(--u));top:calc(-4 * var(--u));width:calc(34 * var(--u));height:calc(34 * var(--u));border-radius:50%;pointer-events:none;
     background:radial-gradient(circle, rgba(255,226,120,.95), rgba(255,201,58,0) 68%);opacity:calc(var(--p) * .85);}
   .lcCandleImg{position:absolute;left:calc(10 * var(--u));top:calc(14 * var(--u));width:calc(24 * var(--u));height:calc(32 * var(--u));image-rendering:pixelated;pointer-events:none;}
-  .lcFlame{position:absolute;left:calc(15.5 * var(--u));top:calc(2 * var(--u));width:calc(9 * var(--u));height:calc(13 * var(--u));background:url("tiles/flame.png") 0 0 / 200% 100% no-repeat;
+  .lcFlame{position:absolute;left:calc(17.5 * var(--u));top:calc(2 * var(--u));width:calc(9 * var(--u));height:calc(13 * var(--u));background:url("tiles/flame.png") 0 0 / 200% 100% no-repeat;
     image-rendering:pixelated;transform:scale(0);transform-origin:50% 100%;pointer-events:none;animation:lcFlick .5s steps(1) infinite;}
   @keyframes lcFlick{0%{background-position:0 0;}50%{background-position:100% 0;}}
   .lcZone.lit .lcGlow{animation:lcPulse 1.6s steps(4) infinite alternate;}
@@ -480,7 +481,8 @@
     .sdPal.two{max-width:212px;}
     .sdBig .sdBoard{width:min(100%,276px);margin:3px auto 0;}
     .sdBig .sdPick{width:34px;height:34px;}
-    .pixEmoji{font-size:2.4rem;line-height:1.05;}
+    .pixEmoji{min-height:36px;gap:5px;}
+    .pixEmoji img{width:36px;height:36px;}
     .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
     .tlSlots{gap:2px;margin:4px 0;}
     .tlSlot{height:26px;font-size:.8125rem;}
@@ -532,7 +534,7 @@
   .pixHearts{display:inline-flex;gap:2px;vertical-align:middle;}
   .pixHearts img{width:22px;height:20px;image-rendering:pixelated;}
   .pixBigTile{width:112px;height:112px;margin:0 auto 12px;border:3px solid #1B1F3B;border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
-  .pixBigTile img{width:80px;height:80px;image-rendering:pixelated;}
+  .pixBigTile img{width:96px;height:96px;image-rendering:pixelated;}
   .pixResBody.pixFirst{margin-top:0;}
   .pixPhoto{display:block;width:100%;max-height:300px;object-fit:cover;border:3px solid #1B1F3B;border-radius:8px;}
   .pixKindRow{display:flex;gap:10px;margin:0 0 10px;}
@@ -556,7 +558,7 @@
   .pixMission .flMsg{min-height:1.3em;margin-top:8px;}
   .pixMission .clStage{position:relative;flex:1;min-height:260px;margin:8px 0 14px;background:#1E2F7A url("tiles/stars_tile.png") 0 0 / 96px 96px;image-rendering:pixelated;
     border:4px solid #1B1F3B;border-radius:14px;box-shadow:inset 0 0 0 4px #FFC93A,0 6px 0 rgba(20,30,90,.4);overflow:hidden;touch-action:none;}
-  .pixMission .clIcon{position:absolute;top:-50px;width:32px;height:32px;background:url("tiles/icons/ic_catchLight.png") center / 100% 100% no-repeat;image-rendering:pixelated;user-select:none;pointer-events:none;}
+  .pixMission .clIcon{position:absolute;top:-50px;width:32px;height:32px;background:url("tiles/icons48/ic_catchLight.png") center / 100% 100% no-repeat;image-rendering:auto;user-select:none;pointer-events:none;}
   .pixMission .clHands{position:absolute;bottom:8px;width:56px;height:32px;background:url("tiles/hands.png") center / 100% 100% no-repeat;image-rendering:pixelated;transform:translateX(-50%);user-select:none;pointer-events:none;}
   .pixMission .hbScene{position:relative;flex:none;width:100%;aspect-ratio:125/145;min-height:0;margin:6px 0 12px;box-sizing:border-box;background:#8C6B3C url("tiles/hb_scene.png") center / 100% 100% no-repeat;image-rendering:pixelated;
     border:4px solid #1B1F3B;border-radius:12px;box-shadow:0 6px 0 rgba(20,30,90,.4);overflow:hidden;}
@@ -569,7 +571,7 @@
   @media (max-height:640px){
     .pixHearts img{width:18px;height:16px;}
     .pixBigTile{width:88px;height:88px;margin-bottom:8px;}
-    .pixBigTile img{width:64px;height:64px;}
+    .pixBigTile img{width:64px;height:64px;image-rendering:auto;}
     .pixPhoto{max-height:220px;}
     .pixCountdown{font-size:4rem;margin:8px 0;}
     .pixMission .matchGrid{margin:6px 0;}
@@ -581,7 +583,7 @@
   /* Options screen: two volume sliders on a cream card (2026-10-20, per Dan) */
   .optCard{display:flex;flex-direction:column;gap:22px;padding:22px 18px 24px;text-align:left;}
   .optHead{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .optIcon{width:32px;height:32px;image-rendering:pixelated;flex:none;}
+  .optIcon{width:32px;height:32px;image-rendering:auto;flex:none;}
   .optLabel{flex:1;font-weight:700;font-size:1.25rem;line-height:1.1;}
   .optValue{font-weight:700;font-size:1.25rem;min-width:3.4ch;text-align:right;}
   .pixRange{-webkit-appearance:none;appearance:none;display:block;width:100%;height:34px;margin:0;background:transparent;cursor:pointer;touch-action:pan-y;}
@@ -1227,7 +1229,8 @@ function defaultState(){
     folderOpen: false,
     pilgrimP: null,
     volSfx: 45,     // Options screen: sound effects volume, 0-100 (starts at 45, per Dan 2026-10-20)
-    volMusic: 10,   // music volume, 0-100 (starts at 10: it is only background)
+    volMusic: 100,  // music volume, 0-100: it starts at the top of the slider (the slider's 100% is a quiet background level, 2026-10-22)
+    musicScale: 2,  // marks a game saved with the new music slider
     passportPage: 0
   };
 }
@@ -1257,6 +1260,8 @@ function loadState(){
     // A tab saved by an earlier build may still be on the retired Service
     // Sprint screen (replaced by Stained-Glass Puzzle, 2026-10-19).
     if(merged.screen === "serviceSprint" || merged.screen === "pathOfLight" || merged.screen === "lightWindows") merged.screen = "mainMenu";
+    // a tab saved before the music slider was rescaled would sound far too quiet at its old setting: it starts at the top of the new slider
+    if(!parsed.musicScale){ merged.volMusic = 100; merged.musicScale = 2; }
     return merged;
   }catch(e){ return defaultState(); }
 }
@@ -1307,10 +1312,13 @@ function pixCtx(){
 // ---- volume (Options screen, 2026-10-20) ----
 // Two buses (gain nodes) per audio context: "sfx" for every sound effect and "music" for the music track. A slider position 0-100 becomes a
 // gain with a squared curve, which feels even to the ear (100 = the loudness the sounds were mixed at).
+// The music slider's 100% is the loudness the slider's 20% used to give (2026-10-22, per Dan), so the whole slider now lives in the useful range.
+var PIX_MUSIC_MAX = 0.04;     // = 0.2 squared
 function pixVolGain(kind){
   var v = kind === "music" ? state.volMusic : state.volSfx;
-  if(typeof v !== "number") v = kind === "music" ? 10 : 45;
-  return Math.pow(Math.max(0, Math.min(100, v)) / 100, 2);
+  if(typeof v !== "number") v = kind === "music" ? 100 : 45;
+  var g = Math.pow(Math.max(0, Math.min(100, v)) / 100, 2);
+  return kind === "music" ? g * PIX_MUSIC_MAX : g;
 }
 function pixBus(ctx, kind){
   if(!ctx.__pixBus) ctx.__pixBus = {};
@@ -1635,7 +1643,7 @@ var COMING_SOON_MISSIONS = [
   {id:"tbd4", art:"tbd", icon:"❓", nameKey:"tbdName"}
 ];
 
-// Icon artwork is tiles/icons/ic_<id>.png (16x16 pixels, drawn at 48px); this is the colour of the
+// Icon artwork is tiles/icons48/ic_<id>.png (48x48 pixels: the 16x16 originals in tiles/icons, smoothed at the corners, 2026-10-22, per Dan); this is the colour of the
 // rounded tile behind each one.
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
@@ -1654,7 +1662,7 @@ function cloudsHtml(){
   return layer("cl1", 100) + layer("cl2", 60) + layer("cl3", 34);
 }
 
-function iconSpr(name){ return '<img class="spr" src="tiles/icons/ic_' + name + '.png" alt="">'; }
+function iconSpr(name){ return '<img class="spr" src="tiles/icons48/ic_' + name + '.png" alt="">'; }
 
 function appIconHtml(o){
   return '<div class="appIcon' + (o.cls ? ' ' + o.cls : '') + '" role="button" onclick="' + o.onclick + '">' +
@@ -1827,12 +1835,12 @@ function petsInit(){
 function pilgrimSceneHtml(extra){
   var lit = goldenTicketUnlocked();
   return '<div class="pixScene" id="pixScene"><div class="pixSceneBox" id="pixSceneBox">' +
-    '<img class="pixSceneArt" src="tiles/scene_world.png" alt="">' +
+    '<img class="pixSceneArt" src="tiles/scene_world2.png" alt="">' +
     '<div class="churchGlow' + (lit ? ' lit' : '') + '"></div>' +
     '<img class="pixSpark" src="tiles/spark.png" alt="">' +
     '<div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div>' +
     PETS.map(petHtml).join("") +
-    '<img class="pixFenceFront" src="tiles/fence_front.png" alt="">' +
+    '<img class="pixFenceFront" src="tiles/fence_front2.png" alt="">' +
     '<div class="pilgrim" id="pilgrim" role="button" aria-label="Pilgrim" onclick="pilgrimTap()"><div class="pilgrimFlip"><div class="pilgrimSprite"></div></div></div>' +
     '<div class="pilgrimBubble" id="pilgrimBubble" onclick="pilgrimHide()"></div>' +
   '</div>' + (extra || "") + '</div>';
@@ -1972,7 +1980,7 @@ function screenMainMenu(){
     appIconHtml({onclick:"openFromIcon(this,'options')", bg:ICON_BG.options, inner:iconSpr("options"), label:t("optionsLabel")});
   return '<div class="screen pixHome pixSky pixMenu">' +
     cloudsHtml() +
-    '<button class="backBtn" onclick="goBackToWelcome()" aria-label="' + t("backLabel") + '"><img src="tiles/icons/ic_back.png" alt=""></button>' +
+    '<button class="backBtn" onclick="goBackToWelcome()" aria-label="' + t("backLabel") + '"><img src="tiles/icons48/ic_back.png" alt=""></button>' +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
     '<div class="progressWrap">' +
       '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
@@ -2185,7 +2193,7 @@ function pixResultHtml(nameKey, o){
 }
 
 // a mission's pixel icon on its coloured tile, big, for the cream cards
-function pixBigTileHtml(id){ return '<div class="pixBigTile" style="background:' + ICON_BG[id] + '"><img src="tiles/icons/ic_' + id + '.png" alt=""></div>'; }
+function pixBigTileHtml(id){ return '<div class="pixBigTile" style="background:' + ICON_BG[id] + '"><img src="tiles/icons48/ic_' + id + '.png" alt=""></div>'; }
 
 // A row of pixel squares showing progress through a mission: gold = done, white = this one, red = the one that ended the round.
 // mark is "done", "bad" or "now" for the square at `index`.
@@ -2609,8 +2617,7 @@ function initFollowLightRun(){
 function flSetupLevel(levelIdx){
   var s = state.session.followLight;
   var patternLen = FL_LEVELS[levelIdx];
-  var pattern = [];
-  for(var i=0;i<patternLen;i++) pattern.push(Math.floor(Math.random()*FL_GRID_TILES));
+  var pattern = FL_HYMNS[FL_LEVEL_HYMN[levelIdx % FL_LEVEL_HYMN.length]].notes.slice(0, patternLen);
   s.level = levelIdx;
   s.tiles = shuffle(MATCH_SYMBOLS).slice(0, FL_GRID_TILES);
   s.pattern = pattern;
@@ -2667,22 +2674,33 @@ function flPlayPattern(){
 
 // Every tile has its own note (2026-10-21, per Dan): a chip-style square-wave beep, heard when the tile lights up in the pattern and again when the
 // player taps it correctly. The nine notes are a major pentatonic scale (C D E G A, then up an octave), so any order of tiles sounds pleasant.
-var FL_TONES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+var FL_TONES = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 587.33];     // C D E F G A B C D: tile 0 is the lowest note, tile 8 the highest
+// Each level plays the first notes of a famous hymn (2026-10-22, per Dan): as many notes as the level's pattern is long. A note is a tile number.
+var FL_HYMNS = [
+  {name:"Joy to the World",      notes:[7, 6, 5, 4, 3, 2, 1, 0]},                 // C B A G F E D C
+  {name:"Silent Night",          notes:[4, 5, 4, 2, 4, 5, 4, 2, 1, 1]},          // G A G E  G A G E  D D
+  {name:"Amazing Grace",         notes:[1, 4, 6, 4, 6, 5, 4, 2]},                  // D G B G B A G E
+  {name:"Ode to Joy (Joyful, Joyful, We Adore Thee)", notes:[2, 2, 3, 4, 4, 3, 2, 1, 0, 0]}   // E E F G G F E D C C
+];
+var FL_LEVEL_HYMN = [0, 1, 2, 3, 0, 2, 1, 3];     // which hymn each of the 8 levels plays (levels 5 to 8 play more notes of hymns heard before)
+// a bell: a struck note whose overtones fade at different speeds (the high ones quickly), rung an octave above the tile's note
 function flPlayTone(tileIdx, ms){
   try {
     if(pixAudioStale) pixReviveOnTap();          // first tap after coming back from another app: wake the sound engine before the note
     var ctx = pixCtx(); if(!ctx) return;
     if(ctx.state !== "running" && ctx.resume) ctx.resume();
-    var now = ctx.currentTime, len = (ms || 350) / 1000;
-    var osc = ctx.createOscillator(), gain = ctx.createGain();
-    osc.type = "square";
-    osc.frequency.setValueAtTime(FL_TONES[tileIdx % FL_TONES.length], now);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.16, now + 0.01);          // a hard, quick start
-    gain.gain.setValueAtTime(0.16, now + len * 0.55);
-    gain.gain.linearRampToValueAtTime(0.0001, now + len);         // then a short fade
-    osc.connect(gain); gain.connect(pixBus(ctx, "sfx"));
-    osc.start(now); osc.stop(now + len + 0.02);
+    var now = ctx.currentTime, f = FL_TONES[tileIdx % FL_TONES.length] * 2;
+    var parts = [[1, 0.18, 1.7], [2.0, 0.08, 1.1], [2.76, 0.06, 0.65], [4.07, 0.03, 0.4], [5.43, 0.02, 0.25]];   // [pitch ratio, loudness, how long it rings in seconds]
+    for(var k = 0; k < parts.length; k++){
+      var osc = ctx.createOscillator(), gain = ctx.createGain(), part = parts[k];
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f * part[0], now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(part[1], now + 0.004);                 // the strike
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + part[2]);           // the ring fading away
+      osc.connect(gain); gain.connect(pixBus(ctx, "sfx"));
+      osc.start(now); osc.stop(now + part[2] + 0.05);
+    }
   } catch(e){}
 }
 
@@ -2691,15 +2709,20 @@ function flTileTap(tileIdx){
   if(!s || s.phase !== "input") return;
   if(tileIdx !== s.pattern[s.playerIndex]){ flWrongTap(); return; }
   flPlayTone(tileIdx, 320);
+  // The step is counted at once. (Before, it was counted when the tile's flash ended, 0.4 s later, so a quick second tap was compared with the
+  // note that had just been played and counted as a miss: 2026-10-22, per Dan.)
+  s.playerIndex++;
+  var done = s.playerIndex >= s.pattern.length;
   s.showingIndex = tileIdx;
+  s.tapStamp = (s.tapStamp || 0) + 1;
+  var stamp = s.tapStamp;
+  if(done) s.phase = "tapped";                      // no more taps while the last tile flashes
   saveState(); render();
   setTimeout(function(){
     var s2 = state.session.followLight;
-    if(!s2 || s2.phase !== "input") return;
-    s2.showingIndex = -1;
-    s2.playerIndex++;
-    if(s2.playerIndex >= s2.pattern.length){ flLevelComplete(); return; }
-    saveState(); render();
+    if(!s2 || s2.status !== "playing") return;
+    if(done){ flLevelComplete(); return; }
+    if(s2.tapStamp === stamp && s2.phase === "input"){ s2.showingIndex = -1; saveState(); render(); }   // only the latest tap puts the light out
   }, FL_TAP_FLASH_MS);
 }
 
@@ -3603,23 +3626,23 @@ function screenLightCandle(){
 
 // Emoji Bible Stories (2026-10-21, per Dan; spec = Five New Missions Design, mission 12, but with 5 chances, not 3, to match Faith Flash). A
 // string of emojis stands for a Bible story: pick its title out of three. 8 stories a round, drawn from 12; every wrong pick costs a chance.
-// The stories, clues, references and Spanish titles are drafts for the client to approve. The clues stay in widely supported emoji so they
-// look right on older phones and on Windows.
+// The stories, clues, references and Spanish titles are drafts for the client to approve. The clues are pixel-art pictures (tiles/emoji/e_<name>.png,
+// 24 x 24: 2026-10-22, per Dan), made from the emoji and pixelized, so they look the same on every phone; pics lists them in order.
 var EB_CHANCES = 5;
 var EB_ROUND_SIZE = 8;
 var EMOJI_STORIES = [
-  {emoji:"🌧️🚢🐘🌈", en:{t:"Noah's Ark", r:"Genesis 6 to 9"}, es:{t:"El Arca de Noé", r:"Génesis 6 a 9"}},
-  {emoji:"🐋🌊🙏", en:{t:"Jonah and the Whale", r:"Jonah 1 to 2"}, es:{t:"Jonás y la Ballena", r:"Jonás 1 a 2"}},
-  {emoji:"👦🎯👹", en:{t:"David and Goliath", r:"1 Samuel 17"}, es:{t:"David y Goliat", r:"1 Samuel 17"}},
-  {emoji:"🌍☀️🌙🌱", en:{t:"Creation", r:"Genesis 1"}, es:{t:"La Creación", r:"Génesis 1"}},
-  {emoji:"🍎🐍🌳", en:{t:"Adam, Eve and the Serpent", r:"Genesis 3"}, es:{t:"Adán, Eva y la Serpiente", r:"Génesis 3"}},
-  {emoji:"🦁🙏👴", en:{t:"Daniel in the Lions' Den", r:"Daniel 6"}, es:{t:"Daniel en el Foso de los Leones", r:"Daniel 6"}},
-  {emoji:"🔥🌿👣", en:{t:"The Burning Bush", r:"Exodus 3"}, es:{t:"La Zarza Ardiente", r:"Éxodo 3"}},
-  {emoji:"⭐👶🐑", en:{t:"Birth of Jesus", r:"Luke 2"}, es:{t:"El Nacimiento de Jesús", r:"Lucas 2"}},
-  {emoji:"🍞🐟👥", en:{t:"Feeding the 5,000", r:"John 6"}, es:{t:"Jesús Alimenta a los 5,000", r:"Juan 6"}},
-  {emoji:"🌊🚶⛵", en:{t:"Jesus Walks on Water", r:"Matthew 14"}, es:{t:"Jesús Camina sobre el Agua", r:"Mateo 14"}},
-  {emoji:"💰🐖🏠", en:{t:"The Prodigal Son", r:"Luke 15"}, es:{t:"El Hijo Pródigo", r:"Lucas 15"}},
-  {emoji:"👼✝️🌅", en:{t:"The Resurrection", r:"Matthew 28"}, es:{t:"La Resurrección", r:"Mateo 28"}}
+  {pics:["rain","ship","elephant","rainbow"], en:{t:"Noah's Ark", r:"Genesis 6 to 9"}, es:{t:"El Arca de Noé", r:"Génesis 6 a 9"}},
+  {pics:["whale","wave","pray"], en:{t:"Jonah and the Whale", r:"Jonah 1 to 2"}, es:{t:"Jonás y la Ballena", r:"Jonás 1 a 2"}},
+  {pics:["boy","target","ogre"], en:{t:"David and Goliath", r:"1 Samuel 17"}, es:{t:"David y Goliat", r:"1 Samuel 17"}},
+  {pics:["earth","sun","moon","seedling"], en:{t:"Creation", r:"Genesis 1"}, es:{t:"La Creación", r:"Génesis 1"}},
+  {pics:["apple","snake","tree"], en:{t:"Adam, Eve and the Serpent", r:"Genesis 3"}, es:{t:"Adán, Eva y la Serpiente", r:"Génesis 3"}},
+  {pics:["lion","pray","oldman"], en:{t:"Daniel in the Lions' Den", r:"Daniel 6"}, es:{t:"Daniel en el Foso de los Leones", r:"Daniel 6"}},
+  {pics:["fire","herb","feet"], en:{t:"The Burning Bush", r:"Exodus 3"}, es:{t:"La Zarza Ardiente", r:"Éxodo 3"}},
+  {pics:["star","baby","sheep"], en:{t:"Birth of Jesus", r:"Luke 2"}, es:{t:"El Nacimiento de Jesús", r:"Lucas 2"}},
+  {pics:["bread","fish","people"], en:{t:"Feeding the 5,000", r:"John 6"}, es:{t:"Jesús Alimenta a los 5,000", r:"Juan 6"}},
+  {pics:["wave","walk","sailboat"], en:{t:"Jesus Walks on Water", r:"Matthew 14"}, es:{t:"Jesús Camina sobre el Agua", r:"Mateo 14"}},
+  {pics:["moneybag","pig","house"], en:{t:"The Prodigal Son", r:"Luke 15"}, es:{t:"El Hijo Pródigo", r:"Lucas 15"}},
+  {pics:["angel","cross","sunrise"], en:{t:"The Resurrection", r:"Matthew 28"}, es:{t:"La Resurrección", r:"Mateo 28"}}
 ];
 
 function initEmojiStories(){
@@ -3701,7 +3724,7 @@ function screenEmojiStories(){
     '<div class="pixNote">' + t("eb_story")(s.index + 1, s.order.length) + '</div>' +
     pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now"), null, s.past) +
     '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ebChancesLeft(s)), EB_CHANCES) + '</div>' +
-    '<div class="pixPaper"><div class="pixEmoji">' + story.emoji + '</div><div class="pixRef' + (answered ? ' shown' : '') + '">' + hint + '</div></div>' +
+    '<div class="pixPaper"><div class="pixEmoji">' + story.pics.map(function(n){ return '<img src="tiles/emoji/e_' + n + '.png" alt="">'; }).join('') + '</div><div class="pixRef' + (answered ? ' shown' : '') + '">' + hint + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
     (answered && ebChancesLeft(s) > 0 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ebNext()">' + t("eb_next") + '</button>' : '') +
@@ -4372,13 +4395,13 @@ function passportPageInner(page){
     var earned = PASSPORT_SHOW_ALL || state.missions[m.id].badge;
     return '<div class="pxNote">' + t("missionBadge")(page+1) + '</div>' +
       (earned ? '<img class="badge8" src="' + badge8Src(m) + '" alt="">'
-              : '<div class="badge8Locked"><img src="tiles/icons/ic_lock.png" alt=""></div>') +
+              : '<div class="badge8Locked"><img src="tiles/icons48/ic_lock.png" alt=""></div>') +
       '<div class="pxBadgeName">' + (earned ? t(m.themeKey) : t("badgeLocked")) + '</div>' +
       '<div class="pxBadgeMission">' + t(m.nameKey) + '</div>';
   }
   return '<div class="pxNote">' + t("joyousPhotoPage") + '</div>' +
     (state.photo ? '<img class="photoPreview pxPhoto" src="' + state.photo + '" alt="">'
-                 : '<div class="badge8Locked"><img src="tiles/icons/ic_lock.png" alt=""></div><div class="pxBadgeName">' + t("badgeLocked") + '</div>');
+                 : '<div class="badge8Locked"><img src="tiles/icons48/ic_lock.png" alt=""></div><div class="pxBadgeName">' + t("badgeLocked") + '</div>');
 }
 
 // The X: the screen shrinks back into its icon on the Home Screen (n = which icon: 2 = Passport, 4 = Options).
@@ -4403,7 +4426,7 @@ function closeToHome(n){
 function optionRow(kind, label, value){
   var id = kind === "music" ? "Music" : "Sfx";
   return '<div class="optRow">' +
-    '<div class="optHead"><img class="optIcon" src="tiles/icons/ic_' + (kind === "music" ? "music" : "sound") + '.png" alt="">' +
+    '<div class="optHead"><img class="optIcon" src="tiles/icons48/ic_' + (kind === "music" ? "music" : "sound") + '.png" alt="">' +
       '<span class="optLabel">' + label + '</span><span class="optValue" id="optVal' + id + '">' + value + '%</span></div>' +
     '<input type="range" class="pixRange" id="opt' + id + '" min="0" max="100" step="5" value="' + value + '" style="--p:' + (value / 100) + '" aria-label="' + label + '" ' +
       'oninput="setVolume(\'' + kind + '\', this.value)" onchange="optionPreview(\'' + kind + '\')">' +
@@ -4432,7 +4455,7 @@ function screenOptions(){
     '</div>' +
     '<div class="pixPaper optCard">' +
       optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
-      optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 10) +
+      optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 100) +
     '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
