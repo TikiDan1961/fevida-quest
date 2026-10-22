@@ -372,6 +372,10 @@
   /* the ROUND COMPLETED frame sits in the exact vertical middle of the screen (2026-10-22, per Dan), with the same side margins as the other cards */
   .pixMission > .pixRoundMid{position:fixed;left:18px;right:18px;top:50%;transform:translateY(-50%);z-index:2;}
   /* the instruction screen before each game */
+  /* the game's name in a larger type directly above the window, the pair centred in the room between the top of the screen and the buttons (2026-10-22, per Dan) */
+  .pixMission .pixIntroMid{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;padding-top:44px;}
+  .pixMission .pixIntroTitle{margin:0 0 12px;padding:0 8px;font-size:2rem;}
+  @media (max-height:640px){ .pixMission .pixIntroTitle{font-size:1.75rem;margin-bottom:8px;} .pixMission .pixIntroMid{padding-top:40px;} }
   .pixGuide{text-align:left;}
   .pixGuideDesc{margin:0 0 12px;font-weight:700;font-size:1.125rem;line-height:1.25;}
   .pixGuide ul{margin:0;padding:0;list-style:none;}
@@ -2128,9 +2132,8 @@ function screenMissionIntro(){
   if(!guide){ state.introMission = null; return screenMainMenu(); }
   var steps = guide.h.map(function(line){ return '<li>' + line + '</li>'; }).join("");
   var mission = MISSIONS.filter(function(m){ return m.id === id; })[0];
-  return pixShell('<h2 class="pixMTitle">' + t(mission.nameKey) + '</h2>' +
-    '<div class="pixPaper pixGuide"><p class="pixGuideDesc">' + guide.d + '</p><ul>' + steps + '</ul></div>' +
-    '<div class="spacer"></div>' +
+  return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t(mission.nameKey) + '</h2>' +
+    '<div class="pixPaper pixGuide"><p class="pixGuideDesc">' + guide.d + '</p><ul>' + steps + '</ul></div></div>' +
     pixBtnHtml(t("startMission"), "startMission(state.introMission)") +
     pixBtnHtml(t("mainMenu"), "go('mainMenu')", true), "pixLower");
 }
