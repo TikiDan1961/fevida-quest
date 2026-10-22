@@ -1421,7 +1421,11 @@ var PIX_SFX = {
   fmFanfare:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17},   // was 0.55: 10 dB too loud next to the others
   // the ROUND X COMPLETED! sound in Faith Flash: sound_effect_3.wav from the Non 8-Bit Sounds folder, played ONCE -- the file holds the same phrase twice
   // and only the first is used (2026-10-22, per Dan: the whole file made it play twice). It is the same recording as the Faith Match fanfare above.
-  ffRound:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17}
+  ffRound:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17},
+  // Catch the Light (2026-10-22, per Dan): sound_effect_1 when the hands catch a light, sound_effect_2 for each light that fades away after a miss
+  // (both from the Non 8-Bit Sounds folder, with the silence at the end cut off; levelled with the other sounds)
+  clCatch:{url:"sounds/sfx_cl_catch.wav", gain:0.55},
+  clFade:{url:"sounds/sfx_cl_fade.wav", gain:0.55}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -1684,11 +1688,7 @@ function startMission(id){
   else if(id === "chooseJoy"){ initChooseJoy(); go("chooseJoy"); }
   else if(id === "followLight"){ initFollowLightRun(); go("followLight"); flStartLevel(); }
   else if(id === "wordUnscramble"){ initWordUnscramble(); go("wordUnscramble"); }
-  // No explicit clRunReadyCountdown() call here -- go()'s own render() call
-  // already triggers it via the render()-hook (same as clStart() never
-  // needed an explicit call either), and calling it AGAIN right after would
-  // start a second, overlapping countdown chain that halves the visible
-  // time per number (found live: 5,4,3,2,1,0 came out as 5,3,1,go).
+  // No explicit clStart() call here -- go()'s own render() call already starts the lights via the render()-hook.
   else if(id === "catchLight"){ initCatchLight(); go("catchLight"); }
   else if(id === "kindnessSort"){ initKindnessSort(); go("kindnessSort"); }
   else if(id === "hiddenBlessings"){ initHiddenBlessings(); go("hiddenBlessings"); }
@@ -3308,13 +3308,13 @@ var CL_LEVELS = [
 ];
 var CL_MAX_MISSES = 3;
 var CL_SPAWN_MS = 700, CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
-// A "GET READY FOR LEVEL X" beat with a visible 5->0 countdown, shown before
-// the very first level and before each subsequent one (2026-09-29, per Dan).
-var CL_READY_SECONDS = 5;
-// Brief hold on the cleared stage after the last light of a level is caught,
-// before the "GET READY" beat for the next level begins (2026-09-29, per Dan).
+// The GET READY countdown screen is gone (2026-10-22, per Dan): the game has its instruction screen, and a level starts as soon as it is opened.
+// Brief hold on the cleared stage after the last light of a level is caught, before ROUND X COMPLETED! shows.
 var CL_LEVEL_PAUSE_MS = 900;
-var clReadyRunning = false; // guards clRunReadyCountdown against double-starting (see its own comment)
+// A light that touches the bottom edge is a miss (2026-10-22, per Dan). Everything stops, the lights on the screen fade away one at a time from the
+// lowest to the highest (one every CL_FADE_STEP_MS, each taking CL_FADE_MS, each with a sound), then the chance is taken, and after a beat the level restarts.
+var CL_FADE_STEP_MS = 500, CL_FADE_MS = 350, CL_RESTART_BEAT_MS = 800, CL_ICON_H = 32;
+var clFading = false;       // true from the miss until the level restarts
 
 // Unlike every other mission, this one runs a CONTINUOUS animation loop
 // (falling icons + the hands following the player's finger), which doesn't
@@ -3333,44 +3333,12 @@ var clHandX = 0; // current hand center, in px relative to the stage
 var clDragging = false;
 
 function initCatchLight(){
-  state.session.catchLight = {level:0, spawnedInLevel:0, resolvedInLevel:0, caughtInLevel:0, misses:0, status:"playing", phase:"ready", countdown:CL_READY_SECONDS};
+  state.session.catchLight = {level:0, spawnedInLevel:0, resolvedInLevel:0, caughtInLevel:0, misses:0, status:"playing", phase:"playing"};
   saveState();
-}
-
-// Renders the "GET READY" beat once per number (5,4,3,2,1,0 -- each shown
-// for a full second, including 0, before the level actually begins) via the
-// normal render() pipeline, not a direct-DOM trick like the live gameplay
-// below -- there's no falling-icon animation to protect from a re-render
-// during this beat. Self-terminating (no interval to leak/clear), but
-// clReadyRunning still guards against two overlapping chains if this were
-// ever accidentally triggered twice (e.g. by both an explicit call site and
-// the render() resume-hook in the same tick).
-function clRunReadyCountdown(){
-  var s = state.session.catchLight;
-  if(!s || s.status !== "playing" || s.phase !== "ready"){ clReadyRunning = false; return; }
-  clReadyRunning = true;
-  render();
-  setTimeout(function(){
-    var s2 = state.session.catchLight;
-    if(!s2 || s2.status !== "playing" || s2.phase !== "ready"){ clReadyRunning = false; return; }
-    if(s2.countdown <= 0){ clReadyRunning = false; clBeginLevel(); return; }
-    s2.countdown--;
-    saveState();
-    clRunReadyCountdown();
-  }, 1000);
-}
-
-// Flips from the "GET READY" beat to the real stage+hands screen and starts
-// the level's own spawn/collision loop.
-function clBeginLevel(){
-  var s = state.session.catchLight;
-  if(!s || s.status !== "playing") return;
-  s.phase = "playing";
-  saveState();
-  render();
 }
 
 function clClearTimers(){
+  clFading = false;
   if(clTimers.spawn) clearInterval(clTimers.spawn);
   if(clTimers.tick) clearInterval(clTimers.tick);
   clTimers.falls.forEach(function(id){ clearTimeout(id); });
@@ -3409,13 +3377,13 @@ function clMoveHandTo(clientX){
 // The finger slides on the SLIDE band under the play area (2026-10-22, per Dan), not on the play area itself.
 function clPointerDown(ev){
   var s = state.session.catchLight;
-  if(!s || s.status !== "playing") return;
+  if(!s || s.status !== "playing" || clFading) return;      // nothing moves while the lights fade away after a miss
   clDragging = true;
   try { ev.currentTarget.setPointerCapture(ev.pointerId); } catch(e){}     // keeps following the finger even if it slips off the band
   clMoveHandTo(ev.clientX);
 }
 function clPointerMove(ev){
-  if(!clDragging) return;
+  if(!clDragging || clFading) return;
   clMoveHandTo(ev.clientX);
 }
 function clPointerUp(){ clDragging = false; }
@@ -3437,6 +3405,10 @@ function clSpawnIcon(){
   stage.appendChild(el);
   void el.offsetHeight; // force reflow so the transition below actually starts from -36px, not skips straight to the end
   var stageH = stage.clientHeight;
+  // The light falls until its bottom edge touches the bottom edge of the play area (the top of the yellow border there): that is a miss. It keeps the
+  // speed it had when it fell right off the area (fieldH + 40 px in fallMs).
+  var endTop = stageH - CL_ICON_H;
+  var fallTime = Math.round(levelCfg.fallMs * (endTop + 36) / (stageH + 40));
   // setTimeout(fn,0), not requestAnimationFrame -- rAF is suspended whenever
   // the document isn't in the "visible" state (per the Page Visibility spec),
   // which real phones only enter while genuinely backgrounded, but this is
@@ -3445,31 +3417,76 @@ function clSpawnIcon(){
   // reflow above, and a plain macrotask delivers that regardless of paint
   // scheduling.
   setTimeout(function(){
-    el.style.transition = "top " + levelCfg.fallMs + "ms linear";
-    el.style.top = (stageH + 4) + "px";
+    el.style.transition = "top " + fallTime + "ms linear";
+    el.style.top = endTop + "px";
   }, 0);
   var record = {el:el, resolved:false};
   clActiveIcons.push(record);
-  // If it's never caught by clCollisionTick, its own fall timer resolves it
-  // as a miss once it's had time to reach the bottom.
-  var fallId = setTimeout(function(){ clResolveIcon(record, false); }, levelCfg.fallMs + 30);
+  // If it's never caught by clCollisionTick, its own fall timer calls it a miss the moment it has reached the bottom.
+  var fallId = setTimeout(function(){ clResolveIcon(record, false); }, fallTime + 10);
   clTimers.falls.push(fallId);
 }
 
 function clResolveIcon(record, caught){
-  if(record.resolved) return;
+  if(record.resolved || clFading) return;
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing") return;
+  if(!caught){ clStartMiss(); return; }
   record.resolved = true;
   if(record.el.parentNode) record.el.parentNode.removeChild(record.el);
   var idx = clActiveIcons.indexOf(record);
   if(idx !== -1) clActiveIcons.splice(idx, 1);
-  var s = state.session.catchLight;
-  if(!s || s.status !== "playing") return;
-  s.resolvedInLevel++;
-  if(caught) s.caughtInLevel++; else s.misses++;
+  pixSfxPlay("clCatch", false);                                // sound_effect_1 when the hands catch a light
+  s.resolvedInLevel++; s.caughtInLevel++;
   saveState();
   clUpdateHud();
-  if(s.misses >= CL_MAX_MISSES){ clEndRound("fail"); return; }
   clCheckLevelComplete();
+}
+
+// A miss: everything freezes where it is, each light on the screen fades away one at a time from the lowest (the one that was missed) to the highest,
+// with sound_effect_2 for each. Only when the last has gone is the chance heart taken; after a beat the level starts over.
+function clStartMiss(){
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing" || clFading) return;
+  clFading = true; clDragging = false;
+  if(clTimers.spawn) clearInterval(clTimers.spawn);
+  if(clTimers.tick) clearInterval(clTimers.tick);
+  clTimers.spawn = null; clTimers.tick = null;
+  clTimers.falls.forEach(function(id){ clearTimeout(id); });
+  clTimers.falls = [];
+  var list = clActiveIcons.filter(function(r){ return !r.resolved; });
+  list.forEach(function(r){                                       // stop each light exactly where it is
+    var top = getComputedStyle(r.el).top;
+    r.el.style.transition = "none"; r.el.style.top = top;
+  });
+  list.sort(function(a, b){ return b.el.getBoundingClientRect().top - a.el.getBoundingClientRect().top; });   // lowest first
+  list.forEach(function(r, i){
+    clTimers.falls.push(setTimeout(function(){
+      r.el.style.transition = "opacity " + CL_FADE_MS + "ms ease-out"; r.el.style.opacity = "0";
+      pixSfxPlay("clFade", false);
+    }, i * CL_FADE_STEP_MS));
+  });
+  var allGone = Math.max(0, list.length - 1) * CL_FADE_STEP_MS + CL_FADE_MS + 80;
+  clTimers.falls.push(setTimeout(function(){
+    var s2 = state.session.catchLight;
+    if(!s2 || s2.status !== "playing") return;
+    list.forEach(function(r){ r.resolved = true; if(r.el.parentNode) r.el.parentNode.removeChild(r.el); });
+    clActiveIcons = [];
+    s2.misses++;                                                  // the heart goes now, with the screen empty
+    saveState(); clUpdateHud();
+    if(s2.misses >= CL_MAX_MISSES) clTimers.falls.push(setTimeout(function(){ clEndRound("fail"); }, CL_RESTART_BEAT_MS));
+    else clTimers.falls.push(setTimeout(clRestartLevel, CL_RESTART_BEAT_MS));
+  }, allGone));
+}
+function clRestartLevel(){
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing") return;
+  clClearTimers();
+  var field = document.getElementById("clField");
+  if(field) [].slice.call(field.querySelectorAll(".clIcon")).forEach(function(e){ if(e.parentNode) e.parentNode.removeChild(e); });
+  s.spawnedInLevel = 0; s.resolvedInLevel = 0; s.caughtInLevel = 0;
+  saveState();
+  clStart();
 }
 
 // Runs every CL_TICK_MS while a round is live — the only way to detect a
@@ -3499,22 +3516,19 @@ function clCheckLevelComplete(){
   if(!s || s.status !== "playing") return;
   if(s.resolvedInLevel < CL_LEVELS[s.level].count) return;
   // (the last level goes through the round-complete screen too, then on to the results: see clInterlude)
-  // Stop the live spawn/tick loop for the "GET READY" beat between levels —
-  // clBeginLevel() (at the end of clRunReadyCountdown) restarts it once the
-  // countdown finishes, via the same render()-hook every other entry point
-  // into a level uses. Hold on the now-cleared stage for a moment first so
-  // catching the last light doesn't cut straight into the next screen.
+  // Stop the live spawn/tick loop between levels; the next level's loop is started by the render()-hook (see render) once it opens.
+  // Hold on the now-cleared stage for a moment first so catching the last light doesn't cut straight into the next screen.
   clClearTimers();
   setTimeout(function(){
     var s2 = state.session.catchLight;
     if(!s2 || s2.status !== "playing") return;
-    // ROUND X COMPLETED! shows before the next level's GET READY (2026-10-22, per Dan); see clInterlude
+    // ROUND X COMPLETED! shows before the next level (2026-10-22, per Dan); see clInterlude
     s2.phase = "roundDone";
     s2.interlude = {n: s2.level + 1, phase: "msg", award: false, final: s2.level >= CL_LEVELS.length - 1};
     saveState(); render();
   }, CL_LEVEL_PAUSE_MS);
 }
-// the round-complete screen: a chance lost so far is AWARDED! back (the chances are shared by all the levels), then the next level's countdown begins
+// the round-complete screen: a chance lost so far is AWARDED! back (the chances are shared by all the levels), then the next level begins
 function clInterlude(){
   pixRoundRun("catchLight", function(){ return state.session.catchLight; },
     function(s){ if(s.misses > 0){ s.misses--; return true; } return false; },
@@ -3523,9 +3537,9 @@ function clInterlude(){
       s.interlude = null;
       s.level++;
       s.spawnedInLevel = 0; s.resolvedInLevel = 0; s.caughtInLevel = 0;
-      s.phase = "ready"; s.countdown = CL_READY_SECONDS;
+      s.phase = "playing";
       saveState();
-      clRunReadyCountdown();
+      render();                                  // the render()-hook starts the new level's lights
     });
 }
 
@@ -3566,7 +3580,7 @@ function clEndRound(reason){
 
 function clCollectAward(){ state.session.catchLight = null; grantMission("catchLight"); }
 function clTryAgain(){ initCatchLight(); go("catchLight"); }
-function clQuit(){ clClearTimers(); clReadyRunning = false; state.session.catchLight = null; go("mainMenu"); }
+function clQuit(){ clClearTimers(); state.session.catchLight = null; go("mainMenu"); }
 
 function screenCatchLight(){
   var s = state.session.catchLight;
@@ -3585,14 +3599,6 @@ function screenCatchLight(){
     return pixShell('<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
       '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, CL_MAX_MISSES - s.misses), CL_MAX_MISSES) + '</div>' +
       pixRoundDoneHtml(s.interlude) +
-      '<div class="spacer"></div>' +
-      pixBtnHtml(t("mainMenu"), "clQuit()", true));
-  }
-
-  if(s.phase === "ready"){
-    return pixShell('<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
-      '<div class="pixPaper"><div class="pixResTitle">' + t("cl_getReady")(s.level+1) + '</div></div>' +
-      '<div class="pixCountdown">' + s.countdown + '</div>' +
       '<div class="spacer"></div>' +
       pixBtnHtml(t("mainMenu"), "clQuit()", true));
   }
@@ -4954,9 +4960,7 @@ function render(){
   // this screen mid-round (e.g. the tab was discarded under memory pressure)
   // — clRunning is a fresh `false` in that case since it's a brand-new script
   // instance, so this picks the round back up (with whatever score/misses/
-  // time was last saved) instead of leaving the stage empty and frozen. The
-  // "GET READY" countdown (clReadyRunning) gets the same treatment for a
-  // reload landing mid-countdown.
+  // time was last saved) instead of leaving the stage empty and frozen.
   if(state.screen === "faithMatch" && state.session.faithMatch && (state.session.faithMatch.levelDone || state.session.faithMatch.celebrate) && !fmCelebrating) fmCelebrate();
   if(state.screen === "faithFlash" && state.session.faithFlash && state.session.faithFlash.interlude && !ffInterludeRunning) ffInterlude();
   if(state.screen === "faithMatch" && state.session.faithMatch && state.session.faithMatch.interlude && !pixRoundRunning.faithMatch) fmInterlude();
@@ -4969,8 +4973,8 @@ function render(){
   if(state.screen === "sacredSudoku" && state.session.sacredSudoku && state.session.sacredSudoku.done && !sdCelebrating) sdCelebrate();
   var clSession = state.session.catchLight;
   if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
-    if(clSession.phase === "playing" && !clRunning) clStart();
-    else if(clSession.phase === "ready" && !clReadyRunning) clRunReadyCountdown();
+    if(clSession.phase === "ready") clSession.phase = "playing";     // a game saved while the old GET READY screen was up just starts
+    if(clSession.phase === "playing" && !clRunning && !clSession.interlude) clStart();
   }
 }
 
