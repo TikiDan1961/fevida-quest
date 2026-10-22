@@ -491,6 +491,12 @@
   .pixSlot{flex:1 1 0;min-width:0;max-width:38px;height:46px;box-sizing:border-box;border:3px solid #1B1F3B;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;color:#1E2F7A;box-shadow:inset 0 3px 0 rgba(30,47,122,.12);}
   .pixSlot.filled{background:#FFC93A;}
+  /* Word Unscramble's bar: SKIP | Level X of X (centred) | HINT */
+  .wuBar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:2px 4px 0;}
+  .wuBar .pixNote{margin:0;text-align:center;}
+  .wuBar .sdHint.skip{justify-self:start;background:#3A93E8;border-color:#1C4E9A;}
+  .wuBar .sdHint:not(.skip){justify-self:end;}
+  .wuBar .sdHint.skip:not(:disabled):active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 16px 6px rgba(110,190,255,.85);}
   .pixSlot[role=button]{cursor:pointer;}
   .pixSlot.hinted{background:#7FD36F;border-color:#1E6B2B;}
   .pixWuRow.correct .pixSlot{background:#52C246;border-color:#1E6B2B;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);}
@@ -786,7 +792,7 @@ var T = {
 
     wu_intro:"Tap the letters in order to unscramble each word. Finish all 3 levels to win!",
     wu_word:function(n,total){return "Word "+n+" of "+total;},
-    wu_passTitle:"Word Master!", wu_passBody:"You unscrambled all 15 words!",
+    wu_passTitle:"Word Master!", wu_passBody:"You made it through all 3 levels of words!", wu_skip:function(n){return "SKIP ("+n+")";},
     clearWord:"CLEAR",
 
     cl_intro:"Slide the hands left and right to catch the falling lights! Miss too many and you'll start over — you get 3 chances across all 4 levels.",
@@ -898,7 +904,7 @@ var T = {
 
     wu_intro:"Toca las letras en orden para descifrar cada palabra. ¡Termina los 3 niveles para ganar!",
     wu_word:function(n,total){return "Palabra "+n+" de "+total;},
-    wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Descifraste las 15 palabras!",
+    wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Superaste los 3 niveles de palabras!", wu_skip:function(n){return "SALTAR ("+n+")";},
     clearWord:"BORRAR",
 
     cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 3 oportunidades en los 4 niveles.",
@@ -2831,11 +2837,13 @@ function wuSetupWord(s){
 
 // 3 hints on every level (2026-10-21, per Dan): a hint puts one correct letter into its own square and locks it there.
 var WU_HINTS = 3;
+// 3 skips in the whole game (2026-10-21, per Dan): SKIP moves on to the next word without solving this one. A skipped word shows as a red square.
+var WU_SKIPS = 3;
 
 function initWordUnscramble(){
   var lang = state.lang || "en";
   var order = shuffle(WORD_UNSCRAMBLE_WORDS[lang][0].map(function(_,i){return i;}));
-  var s = {level:0, order:order, index:0, hints:WU_HINTS, status:"playing"};
+  var s = {level:0, order:order, index:0, hints:WU_HINTS, skips:WU_SKIPS, past:[], status:"playing"};
   wuSetupWord(s);
   state.session.wordUnscramble = s;
   saveState();
@@ -2847,6 +2855,11 @@ function wuEnsure(s){
   for(var i = 0; i < s.word.length; i++) s.slots.push(s.picked && i < s.picked.length ? s.picked[i] : null);
   s.hinted = [];
   if(typeof s.hints !== "number") s.hints = WU_HINTS;
+}
+// a game saved before skips existed gets its 3 skips
+function wuEnsureSkips(s){
+  if(typeof s.skips !== "number") s.skips = WU_SKIPS;
+  if(!Array.isArray(s.past)) s.past = [];
 }
 function wuFirstEmpty(s){
   for(var i = 0; i < s.slots.length; i++) if(s.slots[i] === null) return i;
@@ -2896,33 +2909,46 @@ function wuHint(){
   s.slots[k] = pos; s.hinted.push(k); s.hints--;
   if(wuFirstEmpty(s) < 0) wuCheck(s); else { saveState(); render(); }
 }
+function wuAdvance(s2){
+  if(s2.index >= s2.order.length - 1){
+    if((s2.level || 0) >= WU_LEVELS - 1){
+      s2.status = "results";
+      saveState(); render();
+    } else {                                   // the next level: longer words, and 3 fresh hints
+      var lang2 = state.lang || "en";
+      s2.level = (s2.level || 0) + 1;
+      s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
+      s2.index = 0;
+      s2.hints = WU_HINTS;
+      s2.past = [];
+      wuSetupWord(s2);
+      saveState(); render();
+    }
+  } else {
+    s2.index++;
+    wuSetupWord(s2);
+    saveState(); render();
+  }
+}
+function wuSkip(){
+  var s = state.session.wordUnscramble;
+  if(!s || s.feedback || s.status !== "playing") return;
+  wuEnsure(s); wuEnsureSkips(s);
+  if(s.skips <= 0) return;
+  s.skips--; s.past[s.index] = "bad";
+  wuAdvance(s);
+}
 // every square is full: right, and on to the next word; wrong, and the squares clear for another try
 function wuCheck(s){
   var guess = s.slots.map(function(pos){ return s.letters[pos]; }).join("");
   if(guess === s.word){
     s.feedback = "correct";
     saveState(); render();
+    wuEnsureSkips(s); s.past[s.index] = "done";
     setTimeout(function(){
       var s2 = state.session.wordUnscramble;
       if(!s2) return;
-      if(s2.index >= s2.order.length - 1){
-        if((s2.level || 0) >= WU_LEVELS - 1){
-          s2.status = "results";
-          saveState(); render();
-        } else {                                   // the next level: longer words, and 3 fresh hints
-          var lang2 = state.lang || "en";
-          s2.level = (s2.level || 0) + 1;
-          s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
-          s2.index = 0;
-          s2.hints = WU_HINTS;
-          wuSetupWord(s2);
-          saveState(); render();
-        }
-      } else {
-        s2.index++;
-        wuSetupWord(s2);
-        saveState(); render();
-      }
+      wuAdvance(s2);
     }, 900);
   } else {
     s.feedback = "wrong";
@@ -2967,7 +2993,7 @@ function screenWordUnscramble(){
     '</div>';
   }
 
-  wuEnsure(s);
+  wuEnsure(s); wuEnsureSkips(s);
   var rowCls = "pixWuRow" + (s.feedback ? " " + s.feedback : "");
   var slotsHtml = "";
   for(var i=0;i<s.word.length;i++){
@@ -2982,9 +3008,11 @@ function screenWordUnscramble(){
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
-    '<div class="sdBar"><span class="pixNote">' + t("fm_level")((s.level || 0) + 1, WU_LEVELS) + '</span>' +
+    '<div class="wuBar">' +
+      '<button class="sdHint skip"' + (s.skips > 0 && !s.feedback ? '' : ' disabled') + ' onclick="wuSkip()">' + t("wu_skip")(s.skips) + '</button>' +
+      '<span class="pixNote">' + t("fm_level")((s.level || 0) + 1, WU_LEVELS) + '</span>' +
       '<button class="sdHint"' + (s.hints > 0 && !s.feedback ? '' : ' disabled') + ' onclick="wuHint()">' + t("sd_hint")(s.hints) + '</button></div>' +
-    pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now") +
+    pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now", null, s.past) +
     '<div class="pixPaper">' +
       '<p class="pixWuIntro">' + t("wu_intro") + '</p>' +
       '<div class="' + rowCls + '">' + slotsHtml + '</div>' +
