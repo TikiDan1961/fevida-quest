@@ -388,7 +388,9 @@
   .sdCell.mine::before{background:rgba(58,147,232,.22);}
   .sdCell.hint::before{background:rgba(82,194,70,.3);}
   .sdCell.clash::before{background:rgba(214,52,58,.5);}
-  .sdCell.sel{z-index:2;box-shadow:0 0 0 3px #fff,0 0 12px 5px rgba(110,190,255,.9);}
+  /* the chosen square is lit only INSIDE its own edges: a blue wash and a blue inner frame, nothing spills onto the lines */
+  .sdCell.sel{box-shadow:inset 0 0 0 3px #3A93E8;}
+  .sdCell.sel:not(.clash)::before{background:rgba(110,190,255,.5);}
   .sdCell:not([onclick]){cursor:default;}
   .sdBoard.win .sdCell{animation:sdWin .3s steps(2) 3;}
   @keyframes sdWin{0%{filter:brightness(1);}50%{filter:brightness(1.6);}100%{filter:brightness(1);}}
