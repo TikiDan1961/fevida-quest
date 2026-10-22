@@ -1424,7 +1424,7 @@ var PIX_SFX = {
   ffRound:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17},
   // Catch the Light (2026-10-22, per Dan): sound_effect_1 when the hands catch a light, sound_effect_2 for each light that fades away after a miss
   // (both from the Non 8-Bit Sounds folder, with the silence at the end cut off; levelled with the other sounds)
-  clCatch:{url:"sounds/sfx_cl_catch.wav", gain:0.55},
+  clCatch:{url:"sounds/sfx_cl_catch.wav", gain:0.275},   // half of 0.55 (2026-10-22, per Dan: the catch sound was too loud)
   clFade:{url:"sounds/sfx_cl_fade.wav", gain:0.55}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
@@ -3313,7 +3313,7 @@ var CL_SPAWN_MS = 700, CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
 var CL_LEVEL_PAUSE_MS = 900;
 // A light that touches the bottom edge is a miss (2026-10-22, per Dan). Everything stops, the lights on the screen fade away one at a time from the
 // lowest to the highest (one every CL_FADE_STEP_MS, each taking CL_FADE_MS, each with a sound), then the chance is taken, and after a beat the level restarts.
-var CL_FADE_STEP_MS = 500, CL_FADE_MS = 350, CL_RESTART_BEAT_MS = 800, CL_ICON_H = 32;
+var CL_FADE_STEP_MS = 250, CL_FADE_MS = 250, CL_RESTART_BEAT_MS = 600, CL_ICON_H = 32;   // 500 / 350 / 800 before: the whole sequence runs about twice as fast (2026-10-22, per Dan)
 var clFading = false;       // true from the miss until the level restarts
 
 // Unlike every other mission, this one runs a CONTINUOUS animation loop
@@ -3528,10 +3528,10 @@ function clCheckLevelComplete(){
     saveState(); render();
   }, CL_LEVEL_PAUSE_MS);
 }
-// the round-complete screen: a chance lost so far is AWARDED! back (the chances are shared by all the levels), then the next level begins
+// the round-complete screen: the message alone, never a chance heart (2026-10-22, per Dan), then the next level begins
 function clInterlude(){
   pixRoundRun("catchLight", function(){ return state.session.catchLight; },
-    function(s){ if(s.misses > 0){ s.misses--; return true; } return false; },
+    null,
     function(s){
       if(s.interlude.final){ s.interlude = null; s.status = "passed"; saveState(); render(); return; }
       s.interlude = null;
