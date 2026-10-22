@@ -2675,21 +2675,30 @@ function flPlayPattern(){
 // Every tile has its own note (2026-10-21, per Dan): a chip-style square-wave beep, heard when the tile lights up in the pattern and again when the
 // player taps it correctly. The nine notes are a major pentatonic scale (C D E G A, then up an octave), so any order of tiles sounds pleasant.
 var FL_TONES = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 587.33];     // C D E F G A B C D: tile 0 is the lowest note, tile 8 the highest
-// Each level plays the first notes of a famous hymn (2026-10-22, per Dan): as many notes as the level's pattern is long. A note is a tile number.
+// Each level plays the first notes of a hymn (2026-10-22, per Dan): as many notes as the level's pattern is long. The seven hymns are the ones Dan
+// chose; their opening notes are from the "Incipit" lists on hymnary.org (the first notes as scale degrees, with no octaves: the octaves are chosen so
+// each note is the nearest one to the note before it, which is not checked against a score). Each hymn is played in its own key: `scale` holds the
+// pitches (Hz) of the nine tiles for that hymn, lowest tile to highest, and a note is a tile number 0 to 8. These are copyrighted hymns (OCP, GIA):
+// the client should check that eight to ten notes in a game is fine with the publishers.
 var FL_HYMNS = [
-  {name:"Joy to the World",      notes:[7, 6, 5, 4, 3, 2, 1, 0]},                 // C B A G F E D C
-  {name:"Silent Night",          notes:[4, 5, 4, 2, 4, 5, 4, 2, 1, 1]},          // G A G E  G A G E  D D
-  {name:"Amazing Grace",         notes:[1, 4, 6, 4, 6, 5, 4, 2]},                  // D G B G B A G E
-  {name:"Ode to Joy (Joyful, Joyful, We Adore Thee)", notes:[2, 2, 3, 4, 4, 3, 2, 1, 0, 0]}   // E E F G G F E D C C
+  {name:"Be Not Afraid", key:"G", scale:[369.99, 392.0, 440.0, 493.88, 523.25, 587.33, 659.26, 739.99, 783.99], notes:[3, 4, 5, 5, 5, 5, 5, 5, 3, 4]},
+  {name:"One Bread, One Body", key:"G", scale:[196.0, 220.0, 246.94, 261.63, 293.66, 329.63, 369.99, 392.0, 440.0], notes:[7, 7, 8, 7, 4, 4, 4, 3, 2, 0]},
+  {name:"Christ, Be Our Light", key:"G", scale:[261.63, 293.66, 329.63, 369.99, 392.0, 440.0, 493.88, 523.25, 587.33], notes:[1, 4, 5, 6, 5, 4, 3, 4, 1, 1]},
+  {name:"I Am the Bread of Life", key:"Ab", scale:[277.18, 311.13, 349.23, 392.0, 415.3, 466.16, 523.25, 554.37, 622.25], notes:[6, 6, 6, 4, 4, 1, 1, 1, 2, 2]},
+  {name:"On Eagle's Wings", key:"D", scale:[277.18, 293.66, 329.63, 369.99, 392.0, 440.0, 493.88, 554.37, 587.33], notes:[5, 5, 5, 2, 3, 3, 5, 2, 3, 3]},
+  {name:"You Are Mine", key:"Bb", scale:[261.63, 293.66, 311.13, 349.23, 392.0, 440.0, 466.16, 523.25, 587.33], notes:[1, 3, 6, 5, 4, 3, 2, 3, 1, 1]},
+  {name:"Here I Am, Lord", key:"G", scale:[220.0, 246.94, 261.63, 293.66, 329.63, 369.99, 392.0, 440.0, 493.88], notes:[6, 5, 6, 3, 2, 3, 3, 6, 5, 6]}
 ];
-var FL_LEVEL_HYMN = [0, 1, 2, 3, 0, 2, 1, 3];     // which hymn each of the 8 levels plays (levels 5 to 8 play more notes of hymns heard before)
+// which hymn each of the 8 levels plays (the level's note count is 3, 4, 5, 6, 7, 8, 9, 10): On Eagle's Wings is heard twice, first 7 notes, then 10
+var FL_LEVEL_HYMN = [0, 1, 2, 3, 4, 5, 6, 4];
 // a bell: a struck note whose overtones fade at different speeds (the high ones quickly), rung an octave above the tile's note
 function flPlayTone(tileIdx, ms){
   try {
     if(pixAudioStale) pixReviveOnTap();          // first tap after coming back from another app: wake the sound engine before the note
     var ctx = pixCtx(); if(!ctx) return;
     if(ctx.state !== "running" && ctx.resume) ctx.resume();
-    var now = ctx.currentTime, f = FL_TONES[tileIdx % FL_TONES.length] * 2;
+    var fs = state.session.followLight, hymn = fs ? FL_HYMNS[FL_LEVEL_HYMN[(fs.level || 0) % FL_LEVEL_HYMN.length]] : null;
+    var now = ctx.currentTime, f = (hymn ? hymn.scale[tileIdx % hymn.scale.length] : FL_TONES[tileIdx % FL_TONES.length]) * 2;   // an octave up
     var parts = [[1, 0.18, 1.7], [2.0, 0.08, 1.1], [2.76, 0.06, 0.65], [4.07, 0.03, 0.4], [5.43, 0.02, 0.25]];   // [pitch ratio, loudness, how long it rings in seconds]
     for(var k = 0; k < parts.length; k++){
       var osc = ctx.createOscillator(), gain = ctx.createGain(), part = parts[k];
