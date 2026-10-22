@@ -368,6 +368,8 @@
   .pixAns.wrong{background:#D6343A;border-color:#7E1B22;}
   .pixAns.disabled{pointer-events:none;}
   .pixAns.disabled:not(.correct):not(.wrong){filter:saturate(.45) brightness(.85);}
+  /* the ROUND COMPLETED frame sits in the exact vertical middle of the screen (2026-10-22, per Dan), with the same side margins as the other cards */
+  .pixMission > .pixRoundMid{position:fixed;left:18px;right:18px;top:50%;transform:translateY(-50%);z-index:2;}
   .pixRoundDone{padding:26px 18px;}
   .pixRoundDone .pixResTitle{font-size:1.75rem;}
   .pixBigHeart{display:block;width:88px;height:80px;margin:16px auto 12px;image-rendering:pixelated;animation:pixHeartIn .45s steps(4) both;}
@@ -2249,9 +2251,9 @@ function screenFaithFlash(){
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
       '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ffChancesLeft(s)), FF_CHANCES) + '</div>' +
-      '<div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("ff_roundDone")(il.n) + '</div>' +
+      '<div class="pixRoundMid"><div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("ff_roundDone")(il.n) + '</div>' +
         (il.award ? '<img class="pixBigHeart" src="tiles/heart_full.png" alt=""><div class="pixResTitle">' + t("ff_awarded") + '</div>' : '') +
-      '</div>' +
+      '</div></div>' +
       '<div class="spacer"></div>' +
       '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ffQuit()">' + t("mainMenu") + '</button>' +
     '</div>';
