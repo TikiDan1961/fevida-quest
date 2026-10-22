@@ -2109,7 +2109,12 @@ function ffAnswer(choiceIdx){
 }
 // The answer buttons make no button sound of their own: the answer's own sound is the one you hear.
 function ffPress(){ pixPressSfx("none"); }
-function ffClickAnswer(i){ pixClickSfx("none"); ffAnswer(i); }
+// An answer counts the moment the finger touches it (2026-10-22, per Dan), not when it is lifted. The click that follows is ignored (it is only used
+// when a keyboard presses the button: event.detail is 0 then), so an answer can never count twice.
+function ffClickAnswer(i){
+  if(pixAudioStale) pixReviveOnTap();          // the first touch after coming back from another app wakes the sound engine before the answer's sound
+  pixClickSfx("none"); ffAnswer(i);
+}
 
 // ROUND X COMPLETED! (2026-10-20, per Dan): the question and answers go away and one 8-bit frame says the round is done, with the level-clear
 // fanfare from Faith Match. After 2 seconds, if a chance has been lost, a big heart is AWARDED! in the same frame and gives one back. The next
@@ -2152,7 +2157,7 @@ function ffInterlude(){
 
 function ffNext(){
   var s = state.session.faithFlash;
-  if(!s) return;
+  if(!s || s.answered === null) return;          // only after an answer: a second touch can never skip a question
   if(s.index >= s.order.length - 1){
     s.status = "results";
     saveState(); render();
@@ -2263,7 +2268,7 @@ function screenFaithFlash(){
       if(actualIdx === q.correct) cls += " correct";
       else if(displayedI === s.answered) cls += " wrong";
     }
-    return '<button class="' + cls + '" data-sfx="own" onpointerdown="ffPress()" onclick="ffClickAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
+    return '<button class="' + cls + '" data-sfx="own" onpointerdown="ffClickAnswer(' + displayedI + ')" onclick="if(event.detail===0)ffClickAnswer(' + displayedI + ')">' + qLang.a[actualIdx] + '</button>';
   }).join("");
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
@@ -2275,7 +2280,7 @@ function screenFaithFlash(){
     '<div class="pixPaper"><div class="pixQ">' + qLang.q + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
-    (answered && ffChancesLeft(s) > 0 && (s.index % FAITH_FLASH_ROUND_SIZE) < FAITH_FLASH_ROUND_SIZE - 1 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffNext()">' + t("nextQuestion") + '</button>' : '') +
+    (answered && ffChancesLeft(s) > 0 && (s.index % FAITH_FLASH_ROUND_SIZE) < FAITH_FLASH_ROUND_SIZE - 1 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx();ffNext()" onclick="pixClickSfx();if(event.detail===0)ffNext()">' + t("nextQuestion") + '</button>' : '') +
     '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ffQuit()">' + t("mainMenu") + '</button>' +
     (isCorrect ? '<div class="pixFlash"></div>' : '') +
   '</div>';
