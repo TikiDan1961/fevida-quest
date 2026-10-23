@@ -1497,6 +1497,18 @@ function pixMusicRestart(){
   pixMusicPlay();
 }
 
+// Runs fn once the sound `name` that was last started has finished (at once if it is not playing). Word Scramble uses it so the sound for a finished
+// word waits for the last letter's own sound instead of cutting it off (2026-10-23, per Dan).
+var pixSfxLast = {};
+function pixSfxWait(name){      // milliseconds left before the sound `name` finishes (0 if it is not playing)
+  var rec = pixSfxLast[name];
+  return rec ? Math.max(0, Math.ceil(rec.t + rec.ms - performance.now())) : 0;
+}
+function pixAfterSfx(name, fn){
+  var wait = pixSfxWait(name);
+  if(wait <= 0) fn(); else setTimeout(fn, wait + 20);
+}
+
 // Plays a sound once. exclusive = true stops the previous answer/level sound first, so they never pile up. Returns true if it started.
 function pixSfxPlay(name, exclusive){
   var ctx = pixCtx(); if(!ctx) return false;
@@ -1509,6 +1521,7 @@ function pixSfxPlay(name, exclusive){
     src.buffer = buf; gain.gain.value = PIX_SFX[name].gain;
     src.connect(gain); gain.connect(pixBus(ctx, "sfx"));
     src.start();
+    pixSfxLast[name] = {t: performance.now(), ms: buf.duration * 1000};          // when it started and how long it lasts, so another sound can wait for it (pixAfterSfx)
     if(exclusive) pixSfxCurrent = src;
     return true;
   } catch(e){ return false; }
@@ -3192,18 +3205,21 @@ function wuSkip(){
 // every square is full: right, and on to the next word; wrong, and the squares clear for another try
 function wuCheck(s){
   var guess = s.slots.map(function(pos){ return s.letters[pos]; }).join("");
+  // The word's sound (right = sound_effect_6, wrong = the SKIP sound) waits until the last letter's own sound has finished (2026-10-23, per Dan).
+  var wait = pixSfxWait("fmFirst");
   if(guess === s.word){
     s.feedback = "correct";
-    pixSfxPlay("fmMatch", true);                     // a word completed = sound_effect_6 (2026-10-23, per Dan)
+    pixAfterSfx("fmFirst", function(){ pixSfxPlay("fmMatch", true); });
     saveState(); render();
     wuEnsureSkips(s); s.past[s.index] = "done";
     setTimeout(function(){
       var s2 = state.session.wordUnscramble;
       if(!s2) return;
       wuAdvance(s2);
-    }, 900);
+    }, 900 + wait);
   } else {
     s.feedback = "wrong";
+    pixAfterSfx("fmFirst", function(){ pixSfxPlay("clFade", true); });
     saveState(); render();
     setTimeout(function(){
       var s2 = state.session.wordUnscramble;
@@ -3211,7 +3227,7 @@ function wuCheck(s){
       for(var i = 0; i < s2.slots.length; i++) if(s2.hinted.indexOf(i) === -1) s2.slots[i] = null;
       s2.feedback = null;
       saveState(); render();
-    }, 900);
+    }, 900 + wait);
   }
 }
 
