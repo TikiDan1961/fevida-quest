@@ -3314,10 +3314,11 @@ var CL_LEVELS = [
   {count:80, fallMs:933, spawnMs:190},
   {count:90, fallMs:867, spawnMs:150}
 ];
-// Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right (picked at random) of the one before,
-// turning the other way when that would go off the edge.
+// Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right of the one before. The side is picked
+// at random and kept for CL_KEEP_DIR lights before it is picked again; at an edge it turns round.
 var CL_STEP_PX = 80;
-var clLastX = null;
+var CL_KEEP_DIR = 3;                  // lights dropped in one direction before a new direction is picked
+var clLastX = null, clDir = 1, clDirLeft = 0;
 var CL_MAX_MISSES = 3;
 var CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
 // The GET READY countdown screen is gone (2026-10-22, per Dan): the game has its instruction screen, and a level starts as soon as it is opened.
@@ -3387,15 +3388,23 @@ function clMoveHandTo(clientX){
 }
 
 // The finger slides on the SLIDE band under the play area (2026-10-22, per Dan), not on the play area itself.
+// The hands move only while the finger is inside the band (2026-10-22, per Dan): a finger that slides off it, up or down or past its ends, stops
+// moving them, and they follow again if it comes back. (A touch keeps sending its moves to the band after it leaves, so the position is checked.)
+function clInBand(ev){
+  var band = document.getElementById("clSlide");
+  if(!band) return false;
+  var r = band.getBoundingClientRect();
+  return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+}
 function clPointerDown(ev){
   var s = state.session.catchLight;
   if(!s || s.status !== "playing" || clFading) return;      // nothing moves while the lights fade away after a miss
+  if(!clInBand(ev)) return;
   clDragging = true;
-  try { ev.currentTarget.setPointerCapture(ev.pointerId); } catch(e){}     // keeps following the finger even if it slips off the band
   clMoveHandTo(ev.clientX);
 }
 function clPointerMove(ev){
-  if(!clDragging || clFading) return;
+  if(!clDragging || clFading || !clInBand(ev)) return;
   clMoveHandTo(ev.clientX);
 }
 function clPointerUp(){ clDragging = false; }
@@ -3413,10 +3422,12 @@ function clSpawnIcon(){
   var stageW = stage.clientWidth, minX = 4, maxX = Math.max(minX, stageW - CL_ICON_H - 4), x;
   if(clLastX === null) x = minX + Math.random() * (maxX - minX);
   else {
-    var dir = Math.random() < 0.5 ? -1 : 1;
-    x = clLastX + dir * CL_STEP_PX;
-    if(x < minX || x > maxX) x = clLastX - dir * CL_STEP_PX;                 // off the edge: the other way instead
+    // the direction is picked at random, then kept for CL_KEEP_DIR lights before a new one is picked (2026-10-22, per Dan)
+    if(clDirLeft <= 0){ clDir = Math.random() < 0.5 ? -1 : 1; clDirLeft = CL_KEEP_DIR; }
+    x = clLastX + clDir * CL_STEP_PX;
+    if(x < minX || x > maxX){ clDir = -clDir; x = clLastX + clDir * CL_STEP_PX; }      // off the edge: it turns round and carries on the other way
     x = Math.max(minX, Math.min(maxX, x));
+    clDirLeft--;
   }
   clLastX = x;
   el.style.left = Math.round(x) + "px";
@@ -3566,7 +3577,7 @@ function clInterlude(){
 function clStart(){
   if(clRunning) return;
   clRunning = true;
-  clLastX = null;                      // the first light of a level starts anywhere
+  clLastX = null; clDirLeft = 0;       // the first light of a level starts anywhere, then a direction is picked
   var s = state.session.catchLight;
   // Reconciles any lights that were spawned-but-unresolved at the moment of
   // a page reload (their DOM elements are gone, so they can never be caught
