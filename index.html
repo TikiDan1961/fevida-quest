@@ -247,6 +247,7 @@
   @keyframes petBreath{0%{transform:translateY(0);}50%{transform:translateY(-7%);}100%{transform:translateY(0);}}
   @keyframes petStep{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
   .pixMenu.pilgrimBusy .homeGrid,.pixMenu.pilgrimBusy .backBtn,.pixMenu.pilgrimBusy .pilgrim,.pixMenu.pilgrimBusy .pixPet{pointer-events:none;}   /* while the pilgrim talks and walks after a badge */
+  .pixMenu.pilgrimBusy .appIcon .appTile::before{pointer-events:none;}      /* the middle of each tile asks for taps on its own (above), so it is switched off here too (2026-10-23, per Dan) */
   .pilgrimBubble{position:absolute;z-index:3;display:none;box-sizing:border-box;max-width:80%;padding:8px 12px;background:#fff;color:#1E2F7A;border:3px solid #1B1F3B;border-radius:10px;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.25;text-align:center;box-shadow:0 3px 0 rgba(20,30,90,.35);
     pointer-events:auto;cursor:pointer;transform-origin:var(--tail,50%) 100%;}
@@ -556,6 +557,8 @@
     box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:none;}
   .pixMission .matchCard:active,.pixMission .flPad:active{transform:none;box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.85);}
   .pixMission .matchCard.flipped,.pixMission .matchCard.matched,.pixMission .flPad.lit{background:#fff;}
+  .pixMission .matchCard.flipped{cursor:default;}
+  .pixMission .matchCard.flipped:active{box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);}      /* a tile that is already turned over does not light up when touched again */
   .pixMission .matchCard.matched{opacity:.5;filter:brightness(.7);box-shadow:none;pointer-events:none;}
   .pixMission .matchGrid.celebrate .matchCard.matched{opacity:1;filter:none;border-color:#1B1F3B;box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);}
   .pixMission .matchGrid.celebrate .matchCard.glow{position:relative;z-index:2;border-color:#fff;box-shadow:inset 0 0 0 2px #FFF6C0,0 0 0 3px #FFF6C0,0 0 22px 9px rgba(255,236,120,.95);}
@@ -1962,10 +1965,20 @@ function pilgrimSceneHtml(extra){
   '</div>' + (extra || "") + '</div>';
 }
 
+// Perspective (2026-10-23, per Dan): the church is far away, so the further up the path he is, the smaller he is. He is full size where he starts (the
+// lowest bend on screen) and half size at the church door (where the door is only about 8 picture pixels tall), shrinking evenly with his height in the
+// picture in between: the same spot always gets the same size.
+var PILGRIM_FAR_SCALE = 0.5;
+function pilgrimScaleAt(y){
+  var near = pilgrimPath[0][1], far = pilgrimPath[pilgrimPath.length - 1][1];
+  var u = near > far ? (y - far) / (near - far) : 1;
+  return PILGRIM_FAR_SCALE + (1 - PILGRIM_FAR_SCALE) * Math.max(0, Math.min(1, u));
+}
 function pilgrimPlace(el, f, sign){
-  var p = pilgrimPoint(f);
-  el.style.left = ((p.x - PILGRIM_W/2) / SCENE_W * 100) + "%";
-  el.style.top = ((p.y - PILGRIM_H + 1) / SCENE_H * 100) + "%";
+  var p = pilgrimPoint(f), sc = pilgrimScaleAt(p.y);
+  el.style.width = (PILGRIM_W * sc / SCENE_W * 100) + "%";                  // the height follows (aspect-ratio), so his feet stay on the path
+  el.style.left = ((p.x - PILGRIM_W * sc / 2) / SCENE_W * 100) + "%";
+  el.style.top = ((p.y - (PILGRIM_H - 1) * sc) / SCENE_H * 100) + "%";
   if(Math.abs(p.dx) > 0.05){
     if(sign) pilgrimFaceLeft = (p.dx * sign < 0);
     else if(pilgrimFaceLeft === null) pilgrimFaceLeft = (p.dx < 0);
@@ -1974,9 +1987,13 @@ function pilgrimPlace(el, f, sign){
   if(flip) flip.classList.toggle("left", !!pilgrimFaceLeft);
 }
 
+// The mission he suggests is always a game that is not done yet (2026-10-23, per Dan): only games move him along the path.
+function pilgrimNextGame(){
+  return MISSIONS.filter(function(m){ return missionIsGame(m.id) && !state.missions[m.id].done; })[0];
+}
 function pilgrimMessages(){
   var list = [], left = PILGRIM_GAMES_TOTAL - pilgrimGamesDone();
-  var next = MISSIONS.filter(function(m){ return !state.missions[m.id].done; })[0];
+  var next = pilgrimNextGame();
   if(goldenTicketUnlocked()) list.push(t("pilgrimTicket"));
   else if(state.points === 0) list.push(t("pilgrimStart"));
   if(next) list.push(t("pilgrimTry")(t(next.nameKey)));
@@ -2053,7 +2070,7 @@ function pilgrimArrived(el, walkedForward){
     pilgrimBusy(el, false);                                   // he has arrived: the icons can be tapped again
     pilgrimGreetTimer = setTimeout(function(){
       if(!el.isConnected) return;
-      var next = MISSIONS.filter(function(m){ return !state.missions[m.id].done; })[0];
+      var next = pilgrimNextGame();
       pilgrimSay(next ? t("pilgrimTryAnother")(t(next.nameKey)) : t("pilgrimCheer1"), null, 6500);
     }, 500);
     return;
@@ -2576,7 +2593,12 @@ function fmIsSecondTile(cardId){
   return !!c && !c.matched && s.flipped.indexOf(cardId) === -1;
 }
 // first tile = sound_effect_10; second tile = silent here (fmFlip plays the match / miss sound); anything else = the button sound
-function fmSoundFor(cardId){ return fmIsFirstTile(cardId) ? "fmFirst" : (fmIsSecondTile(cardId) ? "none" : null); }
+// A tile that is already turned over takes no tap at all (2026-10-23, per Dan): no sound (see also the CSS, which gives it no pressed glow).
+function fmIsRevealed(cardId){
+  var s = state.session.faithMatch, c = s && s.cards[cardId];
+  return !!c && (c.matched || s.flipped.indexOf(cardId) !== -1);
+}
+function fmSoundFor(cardId){ return fmIsFirstTile(cardId) ? "fmFirst" : (fmIsSecondTile(cardId) || fmIsRevealed(cardId) ? "none" : null); }
 // A tile turns over the moment the finger touches it, together with its sound (2026-10-22, per Dan) -- before, it waited for the finger to lift.
 // The click that follows only does the work a keyboard press needs (event.detail is 0 then), or plays the tile's sound late if the sound engine
 // could not start on the touch itself (a phone's first tap): the sound is remembered from the touch, so it is the one for that moment.
