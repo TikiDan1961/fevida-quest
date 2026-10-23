@@ -570,20 +570,27 @@
   .wgBoard{position:relative;display:flex;flex-direction:column;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   .wgRow{display:grid;gap:5px;}
-  .wgLabel{box-sizing:border-box;height:1.65rem;padding-top:.6rem;line-height:1.05rem;text-align:center;white-space:nowrap;overflow:hidden;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;letter-spacing:.04em;color:#FFE680;opacity:0;
+  /* A completed group sits in its own window (2026-10-23, per Dan): a rounded panel in the group's own colour holding the group's name, in a larger size, and its words.
+     Every row has the same room (the window is simply see-through until the row is named), so nothing moves when a name appears. */
+  .wgGroup{box-sizing:border-box;border:3px solid transparent;border-radius:14px;padding:1px 5px 5px;margin-bottom:6px;}
+  .wgGroup.done{background:var(--gc);border-color:#1B1F3B;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.2),0 3px 0 rgba(20,30,90,.35);}
+  .wgGroup.pop{animation:wgWinIn .3s ease-out;}      /* only a window that has just appeared slides in, not every window on each redraw */
+  @keyframes wgWinIn{0%{transform:scale(.94);opacity:.2;}100%{transform:none;opacity:1;}}
+  .wgLabel{height:1.4rem;line-height:1.4rem;text-align:center;white-space:nowrap;overflow:hidden;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.0625rem;letter-spacing:.04em;color:#fff;visibility:hidden;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
-  .wgLabel.show{opacity:1;}
-  .wgLabel.pop{animation:wgLabelIn .3s ease-out;}      /* only a name that has just appeared slides in, not every name on each redraw */
-  @keyframes wgLabelIn{0%{transform:translateY(5px);opacity:0;}100%{transform:none;opacity:1;}}
+  .wgGroup.done .wgLabel{visibility:visible;}
+  .wgGroup.done .wgCell{background:#FFF8E6;cursor:default;box-shadow:inset 0 -3px 0 rgba(27,31,59,.15);}
   .wgCell{aspect-ratio:1.35/1;min-width:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:12px;
     box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 3px 0 rgba(20,30,90,.35);font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#1B1F3B;cursor:grab;
-    font-size:11px;font-size:clamp(7px,calc((100cqw / var(--n) - 12px) / (var(--m) * .7)),19px);}
+    font-size:11px;font-size:clamp(7px,calc(((100cqw - 22px) / var(--n) - 8px) / (var(--m) * .7)),19px);}
   .wgCell span{white-space:nowrap;pointer-events:none;}
   .wgCell.drag{position:relative;z-index:6;cursor:grabbing;background:#FFE9A0;box-shadow:0 8px 14px rgba(20,30,90,.45);}
   .wgCell.back{transition:transform .17s ease-out;}
   .wgCell.target{background:#DCEEFF;box-shadow:inset 0 0 0 3px #3A93E8,0 3px 0 rgba(20,30,90,.35);}
   .wgCell.locked{color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);border-color:#1B1F3B;cursor:default;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),inset 0 -3px 0 rgba(0,0,0,.18),0 3px 0 rgba(20,30,90,.35);}
   .wgFound{min-height:1.6rem;margin:0 0 4px;font-size:1rem;}
+  @media (max-width:340px){ .wgGroup{padding:1px 3px 4px;border-width:2px;} .wgRow{gap:4px;} .wgCell{font-size:clamp(6.5px,calc(((100cqw - 14px) / var(--n) - 6px) / (var(--m) * .82)),19px);} }
+  @media (max-height:700px){ .wgCell{aspect-ratio:1.6/1;} .wgGroup{margin-bottom:4px;padding-bottom:4px;} .wgLabel{height:1.25rem;line-height:1.25rem;} }      /* shorter screens: the biggest board still fits */
   .wtWords{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 8px;margin:2px 4px 8px;}
   .wtWord{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;letter-spacing:.06em;color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;padding:2px 9px 4px;box-shadow:0 2px 0 rgba(20,30,90,.35);}
   @media (max-height:640px){ .wtTrace{height:1.5rem;line-height:1.5rem;font-size:1.125rem;} .wtGrid{width:min(100%,max(200px,calc(100vh - 330px)),380px);} }
@@ -5083,12 +5090,15 @@ function wgReveal(){
   var r = -1;
   for(var i = 0; i < s.n; i++) if(s.locked[i] !== null && !s.named[i]){ r = i; break; }
   if(r < 0) return;
+  if(wgDrag){ setTimeout(wgReveal, 250); return; }                  // a word is being dragged: the redraw waits until it is dropped
   s.named[r] = true; saveState();
-  var el = document.getElementById("wgL" + r);
-  if(el){ el.textContent = s.names[s.locked[r]]; el.classList.add("show", "pop"); }
+  wgRevealing = true;                                                // (the redraw below calls wgReveal again: this makes it stand aside)
+  render();
+  var win = document.getElementById("wgG" + r); if(win) win.classList.add("pop");
   var more = false, all = true;
   for(var j = 0; j < s.n; j++){ if(s.locked[j] === null) all = false; else if(!s.named[j]) more = true; }
-  if(more){ wgRevealing = true; setTimeout(function(){ wgRevealing = false; wgReveal(); }, WG_NAME_GAP_MS); return; }
+  if(more){ setTimeout(function(){ wgRevealing = false; wgReveal(); }, WG_NAME_GAP_MS); return; }
+  wgRevealing = false;
   if(all){
     wgFinishing = true;
     setTimeout(function(){
@@ -5110,14 +5120,16 @@ function screenWordGroups(){
   var n = s.n, rows = "";
   if(!s.named) s.named = s.locked.map(function(x){ return x !== null; });
   for(var r = 0; r < n; r++){
-    var lk = s.locked[r], cells = "";
+    var lk = s.locked[r], named = lk !== null && s.named[r], cells = "";
     for(var k = 0; k < n; k++){
       var i = r * n + k;
-      cells += '<div class="wgCell' + (lk !== null ? ' locked' : '') + '" id="wgC' + i + '"' + (lk !== null ? ' style="background:' + WG_COLORS[lk] + '"' : '') + '><span>' + s.cells[i].w + '</span></div>';
+      // a row that is complete but whose name has not shown yet (two groups in one move) has its words in the group's colour until its window appears
+      cells += '<div class="wgCell' + (lk !== null && !named ? ' locked' : '') + '" id="wgC' + i + '"' + (lk !== null && !named ? ' style="background:' + WG_COLORS[lk] + '"' : '') + '><span>' + s.cells[i].w + '</span></div>';
     }
-    // the line above each row is kept free for the name of its group, which shows once the row is complete
-    rows += '<div class="wgLabel' + (lk !== null && s.named[r] ? ' show' : '') + '" id="wgL' + r + '">' + (lk !== null && s.named[r] ? s.names[lk] : '&nbsp;') + '</div>' +
-      '<div class="wgRow" style="grid-template-columns:repeat(' + n + ',minmax(0,1fr))">' + cells + '</div>';
+    // each row is a window: see-through until the group is complete and named, then in the group's own colour with its name above the words
+    rows += '<div class="wgGroup' + (named ? ' done' : '') + '" id="wgG' + r + '"' + (named ? ' style="--gc:' + WG_COLORS[lk] + '"' : '') + '>' +
+      '<div class="wgLabel">' + (named ? s.names[lk] : '&nbsp;') + '</div>' +
+      '<div class="wgRow" style="grid-template-columns:repeat(' + n + ',minmax(0,1fr))">' + cells + '</div></div>';
   }
   var left = s.locked.filter(function(x){ return x === null; }).length;
   return pixShell('<h2 class="pixMTitle">' + t("wordGroupsName") + '</h2>' +
