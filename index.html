@@ -3333,6 +3333,7 @@ var clHandX = 0; // current hand center, in px relative to the stage
 var clDragging = false;
 
 function initCatchLight(){
+  clDragging = false;
   state.session.catchLight = {level:0, spawnedInLevel:0, resolvedInLevel:0, caughtInLevel:0, misses:0, status:"playing", phase:"playing"};
   saveState();
 }
@@ -3345,7 +3346,7 @@ function clClearTimers(){
   clTimers.spawn = null; clTimers.tick = null; clTimers.falls = [];
   clRunning = false;
   clActiveIcons = [];
-  clDragging = false;
+  // (clDragging is not reset here: a finger still held on the screen carries on steering the hands in the next round, see clWinMove)
 }
 
 function clUpdateHud(){
@@ -3387,15 +3388,27 @@ function clPointerDown(ev){
   var s = state.session.catchLight;
   if(!s || s.status !== "playing" || clFading) return;      // nothing moves while the lights fade away after a miss
   if(!clInBand(ev)) return;
-  clDragging = true;
+  clDragging = true; clPtrId = ev.pointerId; clPtrX = ev.clientX;
   try { ev.currentTarget.setPointerCapture(ev.pointerId); } catch(e){}     // keeps following the finger (or mouse) after it leaves the zone
   clMoveHandTo(ev.clientX);
 }
-function clPointerMove(ev){
-  if(!clDragging || clFading) return;
-  clMoveHandTo(ev.clientX);
+// The finger is followed by listeners on the whole window, not by the band: a round ends with the screen being redrawn (ROUND COMPLETED, then the next
+// round), which removes the band the finger went down on, and the player used to have to lift the finger and touch again (2026-10-22, per Dan). Now a
+// finger that is still down carries on steering the hands in the next round, from wherever it is.
+var clPtrId = null, clPtrX = 0;
+function clWinMove(ev){
+  if(!clDragging || ev.pointerId !== clPtrId) return;
+  if(ev.pointerType === "mouse" && ev.buttons === 0){ clDragging = false; return; }       // a mouse button let go somewhere we did not hear about
+  clPtrX = ev.clientX;
+  if(!clFading && state.screen === "catchLight") clMoveHandTo(ev.clientX);
 }
-function clPointerUp(){ clDragging = false; }
+function clWinUp(ev){
+  if(ev.pointerId !== clPtrId) return;
+  clDragging = false; clPtrId = null;
+}
+window.addEventListener("pointermove", clWinMove, true);
+window.addEventListener("pointerup", clWinUp, true);
+window.addEventListener("pointercancel", clWinUp, true);
 
 function clSpawnIcon(){
   var stage = document.getElementById("clField");
@@ -3474,7 +3487,7 @@ function clResolveIcon(record, caught){
 function clStartMiss(){
   var s = state.session.catchLight;
   if(!s || s.status !== "playing" || clFading) return;
-  clFading = true; clDragging = false;
+  clFading = true;                     // (a finger still down is picked up again when the round restarts)
   if(clTimers.spawn) clearInterval(clTimers.spawn);
   if(clTimers.tick) clearInterval(clTimers.tick);
   clTimers.spawn = null; clTimers.tick = null;
@@ -3583,13 +3596,9 @@ function clStart(){
   if(s) s.spawnedInLevel = s.resolvedInLevel;
   var field = document.getElementById("clField"), band = document.getElementById("clSlide");
   if(field) clHandX = field.clientWidth/2;
-  if(band){
-    band.onpointerdown = clPointerDown;
-    band.onpointermove = clPointerMove;
-    band.onpointerup = clPointerUp;
-    band.onpointercancel = clPointerUp;
-  }
+  if(band) band.onpointerdown = clPointerDown;
   clUpdateHandPosition();
+  if(clDragging) clMoveHandTo(clPtrX);          // the finger is still down from the round before: the hands go straight to it
   clUpdateHud();
   clTimers.spawn = setInterval(clSpawnIcon, s ? CL_LEVELS[s.level].spawnMs : CL_LEVELS[0].spawnMs);
   clTimers.tick = setInterval(clCollisionTick, CL_TICK_MS);
@@ -3597,7 +3606,7 @@ function clStart(){
 
 function clEndRound(reason){
   var s = state.session.catchLight;
-  clClearTimers();
+  clClearTimers(); clDragging = false;
   var stage = document.getElementById("clField");
   if(stage) stage.innerHTML = "";
   if(!s) return;
@@ -3608,7 +3617,7 @@ function clEndRound(reason){
 
 function clCollectAward(){ state.session.catchLight = null; grantMission("catchLight"); }
 function clTryAgain(){ initCatchLight(); go("catchLight"); }
-function clQuit(){ clClearTimers(); state.session.catchLight = null; go("mainMenu"); }
+function clQuit(){ clClearTimers(); clDragging = false; state.session.catchLight = null; go("mainMenu"); }
 
 function screenCatchLight(){
   var s = state.session.catchLight;
