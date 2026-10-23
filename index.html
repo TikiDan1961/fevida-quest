@@ -1422,7 +1422,9 @@ var PIX_SFX = {
   // Catch the Light (2026-10-22, per Dan): sound_effect_1 when the hands catch a light, sound_effect_2 for each light that fades away after a miss
   // (both from the Non 8-Bit Sounds folder, with the silence at the end cut off; levelled with the other sounds)
   clCatch:{url:"sounds/sfx_cl_catch.wav", gain:0.275},   // half of 0.55 (2026-10-22, per Dan: the catch sound was too loud)
-  clFade:{url:"sounds/sfx_cl_fade.wav", gain:0.55}
+  clFade:{url:"sounds/sfx_cl_fade.wav", gain:0.55},
+  // the Mission Complete screen (2026-10-22, per Dan): sound_effect_11 from the 8-Bit Sounds folder, with the silence at the end cut off (peak 0.84, so a low gain)
+  missionDone:{url:"sounds/sfx_mission_done.wav", gain:0.3}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -2117,6 +2119,7 @@ function grantMission(id, missionState){
   state.points += 100;
   Object.assign(state.missions[id], missionState || {});
   state.awardMissionId = id;
+  pixSfxPlay("missionDone", true);       // the Mission Complete sound: the screen appears together with it
   go("award");
 }
 
@@ -2242,7 +2245,8 @@ function pixRoundRun(key, getSession, giveAward, finish){
   pixSfxPlay("ffRound", false);
   setTimeout(function(){
     if(!alive()){ pixRoundRunning[key] = false; return; }
-    var award = giveAward ? giveAward(s) : false;
+    // never on the last round (2026-10-22, per Dan): that one shows the message alone, since the mission is won
+    var award = (giveAward && !s.interlude.final) ? giveAward(s) : false;
     if(award){
       s.interlude.phase = "award"; s.interlude.award = true;
       saveState(); render();
@@ -2279,7 +2283,7 @@ function ffInterlude(){
   pixSfxPlay("ffRound", false);
   setTimeout(function(){
     if(!alive()){ ffInterludeRunning = false; return; }
-    var award = ffChancesLeft(s) < FF_CHANCES;
+    var award = ffChancesLeft(s) < FF_CHANCES && s.index < s.order.length - 1;     // never after the last round (2026-10-22, per Dan)
     if(award){
       s.chances = ffChancesLeft(s) + 1;
       s.interlude.phase = "award"; s.interlude.award = true;
