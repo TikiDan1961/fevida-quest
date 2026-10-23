@@ -3349,6 +3349,7 @@ function clClearTimers(){
   clTimers.falls.forEach(function(id){ clearTimeout(id); });
   clTimers.spawn = null; clTimers.tick = null; clTimers.falls = [];
   clRunning = false;
+  clActiveIcons.forEach(function(r){ if(r.anim) r.anim.cancel(); });
   clActiveIcons = [];
   // (clDragging is not reset here: a finger still held on the screen carries on steering the hands in the next round, see clWinMove)
 }
@@ -3417,7 +3418,7 @@ window.addEventListener("pointercancel", clWinUp, true);
 function clSpawnIcon(){
   var stage = document.getElementById("clField");
   var s = state.session.catchLight;
-  if(!stage || !s || s.status !== "playing") return;
+  if(!stage || !s || s.status !== "playing" || clFading) return;
   var levelCfg = CL_LEVELS[s.level];
   if(s.spawnedInLevel >= levelCfg.count) return; // this level's full quota is already in flight or resolved — just waiting on the rest
   s.spawnedInLevel++;
@@ -3442,27 +3443,21 @@ function clSpawnIcon(){
   }
   clLastX = x;
   el.style.left = Math.round(x) + "px";
-  el.style.top = "-36px";            // just above the play area, which clips it: a light slides in from the top edge instead of crossing the frame
-  el.style.transition = "none";
+  // The light is placed at the top of the play area and slid down with a transform (2026-10-22, per Dan: moving `top` made the lights shake up and down as
+  // they fell, since every frame had to re-lay-out the page; a transform is moved by the graphics card). It starts just above the area, which clips it:
+  // a light slides in from the top edge instead of crossing the frame.
+  el.style.top = "0px";
+  el.style.transform = "translateY(-36px)";
+  el.style.willChange = "transform";
   stage.appendChild(el);
-  void el.offsetHeight; // force reflow so the transition below actually starts from -36px, not skips straight to the end
   var stageH = stage.clientHeight;
   // The light falls until its bottom edge touches the bottom edge of the play area (the top of the yellow border there): that is a miss. It keeps the
   // speed it had when it fell right off the area (fieldH + 40 px in fallMs).
   var endTop = stageH - CL_ICON_H;
   var fallTime = Math.round(levelCfg.fallMs * (endTop + 36) / (stageH + 40));
-  // setTimeout(fn,0), not requestAnimationFrame -- rAF is suspended whenever
-  // the document isn't in the "visible" state (per the Page Visibility spec),
-  // which real phones only enter while genuinely backgrounded, but this is
-  // still the more robust choice for a page a player may glance away from
-  // and back to mid-round; either way it needs a deferred tick after the
-  // reflow above, and a plain macrotask delivers that regardless of paint
-  // scheduling.
-  setTimeout(function(){
-    el.style.transition = "top " + fallTime + "ms linear";
-    el.style.top = endTop + "px";
-  }, 0);
   var record = {el:el, resolved:false};
+  // an animation (not a CSS transition) so a miss can stop every light exactly where it is with pause()
+  record.anim = el.animate([{transform:"translateY(-36px)"}, {transform:"translateY(" + endTop + "px)"}], {duration:fallTime, easing:"linear", fill:"forwards"});
   clActiveIcons.push(record);
   // If it's never caught by clCollisionTick, its own fall timer calls it a miss the moment it has reached the bottom.
   var fallId = setTimeout(function(){ clResolveIcon(record, false); }, fallTime + 10);
@@ -3476,6 +3471,7 @@ function clResolveIcon(record, caught){
   if(!caught && clTouchesHands(record)) caught = true;       // it reached the bottom in the very moment it touched the hands: still a catch
   if(!caught){ clStartMiss(); return; }
   record.resolved = true;
+  if(record.anim) record.anim.cancel();
   if(record.el.parentNode) record.el.parentNode.removeChild(record.el);
   var idx = clActiveIcons.indexOf(record);
   if(idx !== -1) clActiveIcons.splice(idx, 1);
@@ -3498,10 +3494,7 @@ function clStartMiss(){
   clTimers.falls.forEach(function(id){ clearTimeout(id); });
   clTimers.falls = [];
   var list = clActiveIcons.filter(function(r){ return !r.resolved; });
-  list.forEach(function(r){                                       // stop each light exactly where it is
-    var top = getComputedStyle(r.el).top;
-    r.el.style.transition = "none"; r.el.style.top = top;
-  });
+  list.forEach(function(r){ if(r.anim) r.anim.pause(); });        // stop each light exactly where it is: not one carries on falling
   list.sort(function(a, b){ return b.el.getBoundingClientRect().top - a.el.getBoundingClientRect().top; });   // lowest first
   list.forEach(function(r, i){
     clTimers.falls.push(setTimeout(function(){
