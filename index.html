@@ -3301,16 +3301,21 @@ function screenWordUnscramble(){
 // speed, per Dan's spec:
 // The lights fall faster in every level (2026-10-22, per Dan): 3200 / 2700 / 2300 / 2000 ms before, and the play area is shorter now.
 // 8 rounds (2026-10-22, per Dan; it was 4 of 20 / 30 / 40 / 50 lights): each one is a little shorter than the old ones and falls faster than the last.
+// Every fall is 50% faster (2026-10-22, per Dan): the times were 2200 / 2000 / 1850 / 1700 / 1600 / 1500 / 1400 / 1300 ms, now each divided by 1.5.
 var CL_LEVELS = [
-  {count:12, fallMs:2200},
-  {count:14, fallMs:2000},
-  {count:16, fallMs:1850},
-  {count:18, fallMs:1700},
-  {count:20, fallMs:1600},
-  {count:22, fallMs:1500},
-  {count:24, fallMs:1400},
-  {count:26, fallMs:1300}
+  {count:12, fallMs:1467},
+  {count:14, fallMs:1333},
+  {count:16, fallMs:1233},
+  {count:18, fallMs:1133},
+  {count:20, fallMs:1067},
+  {count:22, fallMs:1000},
+  {count:24, fallMs:933},
+  {count:26, fallMs:867}
 ];
+// Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right (picked at random) of the one before,
+// turning the other way when that would go off the edge.
+var CL_STEP_PX = 80;
+var clLastX = null;
 var CL_MAX_MISSES = 3;
 var CL_SPAWN_MS = 700, CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
 // The GET READY countdown screen is gone (2026-10-22, per Dan): the game has its instruction screen, and a level starts as soon as it is opened.
@@ -3403,8 +3408,16 @@ function clSpawnIcon(){
   saveState();
   var el = document.createElement("div");
   el.className = "clIcon";
-  var stageW = stage.clientWidth;
-  el.style.left = Math.max(4, Math.floor(Math.random() * Math.max(1, stageW - 40))) + "px";
+  var stageW = stage.clientWidth, minX = 4, maxX = Math.max(minX, stageW - CL_ICON_H - 4), x;
+  if(clLastX === null) x = minX + Math.random() * (maxX - minX);
+  else {
+    var dir = Math.random() < 0.5 ? -1 : 1;
+    x = clLastX + dir * CL_STEP_PX;
+    if(x < minX || x > maxX) x = clLastX - dir * CL_STEP_PX;                 // off the edge: the other way instead
+    x = Math.max(minX, Math.min(maxX, x));
+  }
+  clLastX = x;
+  el.style.left = Math.round(x) + "px";
   el.style.top = "-36px";            // just above the play area, which clips it: a light slides in from the top edge instead of crossing the frame
   el.style.transition = "none";
   stage.appendChild(el);
@@ -3551,6 +3564,7 @@ function clInterlude(){
 function clStart(){
   if(clRunning) return;
   clRunning = true;
+  clLastX = null;                      // the first light of a level starts anywhere
   var s = state.session.catchLight;
   // Reconciles any lights that were spawned-but-unresolved at the moment of
   // a page reload (their DOM elements are gone, so they can never be caught
