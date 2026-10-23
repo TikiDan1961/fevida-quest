@@ -556,7 +556,7 @@
   .wgBoard{position:relative;display:flex;flex-direction:column;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   .wgRow{display:grid;gap:5px;}
-  .wgLabel{height:1.05rem;line-height:1.05rem;text-align:center;white-space:nowrap;overflow:hidden;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;letter-spacing:.04em;color:#FFE680;opacity:0;
+  .wgLabel{box-sizing:border-box;height:1.65rem;padding-top:.6rem;line-height:1.05rem;text-align:center;white-space:nowrap;overflow:hidden;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;letter-spacing:.04em;color:#FFE680;opacity:0;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .wgLabel.show{opacity:1;}
   .wgLabel.pop{animation:wgLabelIn .3s ease-out;}      /* only a name that has just appeared slides in, not every name on each redraw */
@@ -4946,7 +4946,7 @@ function wgDown(ev){
   try { document.getElementById("wgBoard").setPointerCapture(ev.pointerId); } catch(e){}
   wgDrag = {from: i, rects: rects, x: ev.clientX, y: ev.clientY, target: -1};
   document.getElementById("wgC" + i).classList.add("drag");
-  pixSfxPlay("fmFirst", true);
+  pixPressSfx();            // the button sound when a word is picked up (2026-10-23, per Dan)
 }
 function wgMove(ev){
   var s = state.session.wordGroups;
