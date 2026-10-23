@@ -566,6 +566,7 @@
   .pixMission .flPad.disabled{pointer-events:none;}
   .pixMission .matchCard img,.pixMission .flPad img{image-rendering:pixelated;}
   .pixMission .pzSvg image{image-rendering:pixelated;}
+  .pixMission .pzSvg image.smooth{image-rendering:auto;}      /* the drawn stained-glass pictures are smooth: no blocky scaling */
   .pixMission .flMsg{min-height:1.3em;margin-top:8px;}
   /* the play area is only for watching (2026-10-22, per Dan): the lights fall inside .clField, which sits inside the gold edge so nothing crosses it,
      and the finger slides on the SLIDE band below */
@@ -1635,7 +1636,7 @@ setInterval(function(){ var now = Date.now(), gap = now - pixAudioBeat; pixAudio
 // 2026-10-23, per Dan, no sound after the phone woke from sleep.)
 function pixReviveOnTap(ev){
   if(!pixAudioCtx) return;
-  var endOfTouch = !!(ev && (ev.type === "touchend" || ev.type === "pointerup" || ev.type === "click"));
+  var endOfTouch = !!(ev && !pixTapSynth && (ev.type === "touchend" || ev.type === "pointerup" || ev.type === "click"));     // a click made by the tap-on-touch code below is not the end of a touch
   var interrupted = pixAudioCtx.state === "interrupted";
   if(!endOfTouch || (!pixAudioStale && !interrupted)){
     // a healthy engine that has been put to sleep (suspended) is woken by any tap, including taps on things that make their own sound
@@ -1645,6 +1646,36 @@ function pixReviveOnTap(ev){
   pixAudioStale = false;
   if(!pixFreshAudio()) pixAudioStale = true;       // not made (a moment ago one was, or none could be): still not trusted, so the next touch tries again
 }
+// ---- every button counts the moment the finger touches it (2026-10-23, per Dan) ----
+// Before, a button did its work when the finger was lifted (the "click"). Now a touch on anything with an onclick runs that onclick at once, and the
+// click that follows when the finger lifts is swallowed, so nothing happens twice. Screens that already act on the touch themselves (the Faith Match
+// tiles, the Faith Flash answers, the puzzle pieces, ...) have an onpointerdown that does more than make a sound, and are left alone.
+// This listener is registered before the sound/engine listeners below on purpose: the swallowed click must not reach them (the touch's sound was
+// already made on the touch). The one exception is a touch that came after the phone had slept: its sound was held back until the sound engine could be
+// made again at the end of the touch, so it is played here, when the finger lifts.
+var pixTapSynth = false, tapSwallow = false, tapSwallowTimer = 0, tapHeldSound;
+var TAP_SOUND_ONLY = /^\s*(?:if\s*\(\s*!\s*this\.disabled\s*\)\s*)?(?:pixPressSfx|tlPress|ebPress|ffPress)\(([^)]*)\)\s*;?\s*$/;
+function tapOnTouch(e){
+  tapSwallow = false; tapHeldSound = undefined;
+  if(!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+  var el = e.target && e.target.closest ? e.target.closest("[onclick]") : null;
+  if(!el || el.disabled || el.getAttribute("aria-disabled") === "true" || el.classList.contains("disabled")) return;
+  var pd = el.getAttribute("onpointerdown"), m = pd && TAP_SOUND_ONLY.exec(pd);
+  if(pd && !m) return;                       // it acts on the touch by itself
+  if(pixAudioStale){ var nm = m && /^\s*['"](\w+)['"]\s*$/.exec(m[1]); tapHeldSound = nm ? nm[1] : "tap"; }
+  tapSwallow = true;
+  pixTapSynth = true;
+  try { el.click(); } finally { pixTapSynth = false; }
+}
+document.addEventListener("click", function(e){
+  if(pixTapSynth || !tapSwallow) return;
+  tapSwallow = false; clearTimeout(tapSwallowTimer);
+  e.stopImmediatePropagation(); e.preventDefault();
+  if(tapHeldSound !== undefined){ var nm = tapHeldSound; tapHeldSound = undefined; pixClickSfx(nm === "tap" ? undefined : nm); }
+}, true);
+function tapEnded(){ if(tapSwallow){ clearTimeout(tapSwallowTimer); tapSwallowTimer = setTimeout(function(){ tapSwallow = false; }, 400); } }   // a lift with no click after it (finger slid off) must not swallow a later click
+document.addEventListener("pointerup", tapEnded, true);
+document.addEventListener("pointercancel", tapEnded, true);
 document.addEventListener("touchend", pixReviveOnTap, true);
 document.addEventListener("pointerup", pixReviveOnTap, true);
 document.addEventListener("click", pixReviveOnTap, true);
@@ -1662,6 +1693,7 @@ var PIX_TAP_SELECTOR = "button, [role=button], .appIcon, .flPad, .hbSpot";   // 
 function pixTapTarget(e){ var el = e.target && e.target.closest ? e.target.closest(PIX_TAP_SELECTOR) : null; return (el && !el.disabled && !el.hasAttribute("data-sfx")) ? el : null; }   // data-sfx = this element plays its own sound
 document.addEventListener("pointerdown", function(e){ if(pixTapTarget(e)) pixPressSfx(); }, true);
 document.addEventListener("click", function(e){ if(pixTapTarget(e)) pixClickSfx(); }, true);
+document.addEventListener("pointerdown", tapOnTouch, false);      // bubbling: the sound handlers on the touched element (above) have run by now
 pixSfxFetchAll();
 pixMusicFetch();
 
@@ -2229,11 +2261,23 @@ function grantMission(id, missionState){
 
 // The Mission Completed screen in the 8-bit look (2026-10-22, per Dan): the pixel sky, the mission's name, and a cream card with the badge, the
 // "Mission Complete!" message and what was won, like the other result screens.
+// No RETURN TO MAIN MENU button (2026-10-23, per Dan): the screen shows for 2 seconds and the Main Menu comes by itself (see awardAutoReturn, which
+// render() calls).
+var AWARD_SHOW_MS = 2000, awardTimer = 0, awardTimerFor = null;
+function awardAutoReturn(){
+  if(state.screen !== "award"){ clearTimeout(awardTimer); awardTimer = 0; return; }
+  if(awardTimer) return;                                   // already counting (a redraw of the same screen does not restart it)
+  awardTimerFor = state.awardMissionId;
+  awardTimer = setTimeout(function(){
+    awardTimer = 0;
+    if(state.screen === "award" && state.awardMissionId === awardTimerFor) afterAward();
+  }, AWARD_SHOW_MS);
+}
 function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
   return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.id,
-    buttons:pixBtnHtml(t("returnToMainMenu"), "afterAward()")});
+    buttons:""});
 }
 
 function afterAward(){
@@ -2370,7 +2414,8 @@ function pixRoundRun(key, getSession, giveAward, finish){
   }
   if(s.interlude.phase === "award"){ setTimeout(done, 1200 + ROUND_SHOW_EXTRA_MS); return; }   // reloaded after the heart was given: just let it be seen, then go on
   var buf = pixSfxBuf.ffRound;
-  var soundMs = (buf ? buf.duration * 1000 : 3400) + 250 + ROUND_SHOW_EXTRA_MS;
+  // the very last ROUND COMPLETED goes to the Mission Completed screen as soon as its sound is over: no extra wait (2026-10-23, per Dan, shorter)
+  var soundMs = (buf ? buf.duration * 1000 : 3400) + (s.interlude.final ? 0 : 250 + ROUND_SHOW_EXTRA_MS);
   pixSfxPlay("ffRound", false);
   setTimeout(function(){
     if(!alive()){ pixRoundRunning[key] = false; return; }
@@ -2408,7 +2453,8 @@ function ffInterlude(){
   }
   if(s.interlude.phase === "award"){ setTimeout(finish, 1200 + ROUND_SHOW_EXTRA_MS); return; }   // reloaded after the heart was given: just let it be seen, then go on
   var buf = pixSfxBuf.ffRound;
-  var fanfareMs = (buf ? buf.duration * 1000 : 3400) + 250 + ROUND_SHOW_EXTRA_MS;       // the next round starts when the sound is over, and a moment after
+  var lastRound = s.index >= s.order.length - 1;       // the last one goes to the Mission Completed screen as soon as its sound is over (2026-10-23, per Dan)
+  var fanfareMs = (buf ? buf.duration * 1000 : 3400) + (lastRound ? 0 : 250 + ROUND_SHOW_EXTRA_MS);       // the next round starts when the sound is over, and a moment after
   pixSfxPlay("ffRound", false);
   setTimeout(function(){
     if(!alive()){ ffInterludeRunning = false; return; }
@@ -3997,7 +4043,7 @@ function screenLightCandle(){
 /* ---------- Emoji Bible Stories ---------- */
 
 // Emoji Bible Stories (2026-10-21, per Dan; spec = Five New Missions Design, mission 12, but with 5 chances, not 3, to match Faith Flash). A
-// string of emojis stands for a Bible story: pick its title out of three. 8 stories a round, drawn from 12; every wrong pick costs a chance.
+// string of emojis stands for a Bible story: pick its title out of three. 8 stories a round, drawn from 24; every wrong pick costs a chance.
 // The stories, clues, references and Spanish titles are drafts for the client to approve. The clues are pixel-art pictures (tiles/emoji/e_<name>.png,
 // 24 x 24: 2026-10-22, per Dan), made from the emoji and pixelized, so they look the same on every phone; pics lists them in order.
 var EB_CHANCES = 5;
@@ -4014,7 +4060,21 @@ var EMOJI_STORIES = [
   {pics:["bread","fish","people"], en:{t:"Feeding the 5,000", r:"John 6"}, es:{t:"Jesús Alimenta a los 5,000", r:"Juan 6"}},
   {pics:["wave","walk","sailboat"], en:{t:"Jesus Walks on Water", r:"Matthew 14"}, es:{t:"Jesús Camina sobre el Agua", r:"Mateo 14"}},
   {pics:["moneybag","pig","house"], en:{t:"The Prodigal Son", r:"Luke 15"}, es:{t:"El Hijo Pródigo", r:"Lucas 15"}},
-  {pics:["angel","cross","sunrise"], en:{t:"The Resurrection", r:"Matthew 28"}, es:{t:"La Resurrección", r:"Mateo 28"}}
+  {pics:["angel","cross","sunrise"], en:{t:"The Resurrection", r:"Matthew 28"}, es:{t:"La Resurrección", r:"Mateo 28"}},
+  // 12 more stories (2026-10-23, per Dan), so 24 in all; a game asks 8 of them. Drafts for the client to approve, like the first 12. Nine of the clue
+  // pictures were drawn for these (mountain, tablets, ladder, tower, jar, cup, dove, crown, heart).
+  {pics:["mountain","tablets","fire"], en:{t:"Moses and the Ten Commandments", r:"Exodus 19 to 20"}, es:{t:"Moisés y los Diez Mandamientos", r:"Éxodo 19 a 20"}},
+  {pics:["sun","moon","star","boy"], en:{t:"Joseph's Dreams", r:"Genesis 37"}, es:{t:"Los Sueños de José", r:"Génesis 37"}},
+  {pics:["ladder","angel","moon"], en:{t:"Jacob's Ladder", r:"Genesis 28"}, es:{t:"La Escalera de Jacob", r:"Génesis 28"}},
+  {pics:["tower","people","earth"], en:{t:"The Tower of Babel", r:"Genesis 11"}, es:{t:"La Torre de Babel", r:"Génesis 11"}},
+  {pics:["tree","moneybag","house"], en:{t:"Zacchaeus", r:"Luke 19"}, es:{t:"Zaqueo", r:"Lucas 19"}},
+  {pics:["sheep","walk","heart"], en:{t:"The Lost Sheep", r:"Luke 15"}, es:{t:"La Oveja Perdida", r:"Lucas 15"}},
+  {pics:["jar","wave","cup"], en:{t:"The Wedding at Cana", r:"John 2"}, es:{t:"Las Bodas de Caná", r:"Juan 2"}},
+  {pics:["sailboat","rain","wave","sun"], en:{t:"Jesus Calms the Storm", r:"Mark 4"}, es:{t:"Jesús Calma la Tormenta", r:"Marcos 4"}},
+  {pics:["bread","cup","people"], en:{t:"The Last Supper", r:"Luke 22"}, es:{t:"La Última Cena", r:"Lucas 22"}},
+  {pics:["fire","dove","people"], en:{t:"Pentecost", r:"Acts 2"}, es:{t:"Pentecostés", r:"Hechos 2"}},
+  {pics:["star","crown","walk"], en:{t:"The Visit of the Wise Men", r:"Matthew 2"}, es:{t:"La Visita de los Reyes Magos", r:"Mateo 2"}},
+  {pics:["sailboat","fish","people"], en:{t:"The Miraculous Catch of Fish", r:"Luke 5"}, es:{t:"La Pesca Milagrosa", r:"Lucas 5"}}
 ];
 
 function initEmojiStories(){
@@ -4572,12 +4632,43 @@ function pzBuild(s){
   return {cols:cols, rows:rows, n:n, pw:pw, ph:ph, m:m, pieces:pieces, k:k, H: trayTop + tr*ch + 12};
 }
 
+// 12 stained-glass pictures drawn for the puzzle (2026-10-23, per Dan): smooth, with no big pixels like the Faith Match tiles. A game takes its 4
+// pictures at random from these and the Faith Match tiles together. To use only the new ones, make PZ_POOL = PZ_PICS.
+var PZ_PICS = [];
+for(var pzi = 1; pzi <= 12; pzi++) PZ_PICS.push("tiles/puzzle/pz_" + ("0" + pzi).slice(-2) + ".jpg");
+var PZ_POOL = PZ_PICS.concat(MATCH_SYMBOLS);
+// The new pictures are fetched when a puzzle game starts (only the 4 it uses), and the puzzle waits for them.
+var pzPicsHeld = {};            // src -> the loaded Image, kept so the phone does not throw the decoded picture away
+var pzPicsLoading = false;
+function pzPicsReady(s){
+  return s.imgs.every(function(src){ return MATCH_SYMBOLS.indexOf(src) !== -1 || pzPicsHeld[src]; });
+}
+function pzLoadPics(s){
+  if(pzPicsLoading) return;
+  pzPicsLoading = true;
+  var todo = s.imgs.filter(function(src){ return MATCH_SYMBOLS.indexOf(src) === -1 && !pzPicsHeld[src]; });
+  var left = todo.length, finished = false;
+  function done(){
+    if(finished) return; finished = true; pzPicsLoading = false;
+    todo.forEach(function(src){ if(!pzPicsHeld[src]) pzPicsHeld[src] = new Image(); });          // a picture that failed must not hold the game up forever
+    if(state.screen === "stainedGlass") render();
+  }
+  if(!left){ done(); return; }
+  setTimeout(done, 6000);
+  todo.forEach(function(src){
+    var im = new Image();
+    im.onload = function(){ var once = false; function ok(){ if(once) return; once = true; pzPicsHeld[src] = im; if(--left <= 0) done(); } if(im.decode) im.decode().then(ok).catch(ok); else ok(); setTimeout(ok, 1500); };
+    im.onerror = function(){ if(--left <= 0) done(); };
+    im.src = src;
+  });
+}
+
 function initStainedGlass(){
   pzAdvancing = false; pzDrag = null;
   var seeds = [];
   for(var i=0;i<PZ_LEVELS.length;i++) seeds.push(1 + Math.floor(Math.random()*2000000000));
   state.session.stainedGlass = {
-    round: 0, imgs: shuffle(MATCH_SYMBOLS).slice(0, PZ_LEVELS.length),
+    round: 0, imgs: shuffle(PZ_POOL).slice(0, PZ_LEVELS.length),
     seeds: seeds, placed: [], status: "playing"
   };
   saveState();
@@ -4704,6 +4795,10 @@ function screenStainedGlass(){
   }
   var s = state.session.stainedGlass;
   if(!s){ initStainedGlass(); s = state.session.stainedGlass; }
+  if(!pzPicsReady(s)){
+    pzLoadPics(s);
+    return pixShell('<div class="spacer"></div><div class="pixPaper"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
+  }
 
   if(s.status === "passed"){
     return pixResultHtml("stainedGlassName", {title:t("pz_passTitle"), body:t("pz_passBody"), badge:"stainedGlass",
@@ -4733,14 +4828,14 @@ function screenStainedGlass(){
       'onpointerdown="pzDown(event,' + p.id + ')">' +
       // invisible box so a narrow piece is easy to grab anywhere on it
       '<rect x="0" y="0" width="' + g.pw + '" height="' + g.ph + '" fill="transparent"/>' +
-      '<image href="' + img + '" x="' + (-p.col*g.pw) + '" y="' + (-p.row*g.ph) + '" width="' + PZ_W + '" height="' + PZ_W + '" preserveAspectRatio="none" clip-path="url(#pzC' + p.id + ')"/>' +
+      '<image' + (img.indexOf("tiles/puzzle/") === 0 ? ' class="smooth"' : '') + ' href="' + img + '" x="' + (-p.col*g.pw) + '" y="' + (-p.row*g.ph) + '" width="' + PZ_W + '" height="' + PZ_W + '" preserveAspectRatio="none" clip-path="url(#pzC' + p.id + ')"/>' +
       '<path d="' + p.d + '" class="pzOutline"/>' +
     '</g>';
     if(isPlaced) placedHtml += html; else looseHtml += html;
   });
   // Finished level: the whole picture drawn over the pieces, so no seams or
   // piece lines show for the 3-second hold.
-  var full = solved ? '<image class="pzFull" href="' + img + '" x="0" y="0" width="' + PZ_W + '" height="' + PZ_W + '" preserveAspectRatio="none"/>' : '';
+  var full = solved ? '<image class="pzFull' + (img.indexOf("tiles/puzzle/") === 0 ? ' smooth' : '') + '" href="' + img + '" x="0" y="0" width="' + PZ_W + '" height="' + PZ_W + '" preserveAspectRatio="none"/>' : '';
   var svg = '<svg id="pzSvg" class="pzSvg' + (solved ? ' solved' : '') + '" viewBox="0 0 ' + PZ_W + ' ' + g.H + '" role="img" aria-label="' + t("stainedGlassName") + '">' +
     '<defs>' + defs + '</defs>' +
     '<rect x="0" y="0" width="' + PZ_W + '" height="' + PZ_W + '" class="pzBoardRect"/>' +
@@ -5075,6 +5170,7 @@ function render(){
   if(state.screen === "catchLight" && state.session.catchLight && state.session.catchLight.interlude && !pixRoundRunning.catchLight) clInterlude();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
+  awardAutoReturn();
   if(state.screen === "sacredSudoku" && state.session.sacredSudoku && state.session.sacredSudoku.done && !sdCelebrating) sdCelebrate();
   var clSession = state.session.catchLight;
   if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
