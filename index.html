@@ -584,6 +584,9 @@
     box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 3px 0 rgba(20,30,90,.35);font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#1B1F3B;cursor:grab;
     font-size:11px;font-size:clamp(7px,calc(((100cqw - 22px) / var(--n) - 8px) / (var(--m) * .7)),19px);}
   .wgCell span{white-space:nowrap;pointer-events:none;}
+  .wgCell.pending{background:rgba(255,255,255,.16);border-color:rgba(27,31,59,.22);box-shadow:none;color:transparent;}
+  .wgCell.popin{animation:wgPopIn .22s ease-out;}
+  @keyframes wgPopIn{0%{transform:scale(.55);opacity:.3;}70%{transform:scale(1.08);opacity:1;}100%{transform:scale(1);opacity:1;}}
   .wgCell.drag{position:relative;z-index:6;cursor:grabbing;background:#FFE9A0;box-shadow:0 8px 14px rgba(20,30,90,.45);}
   .wgCell.back{transition:transform .17s ease-out;}
   .wgCell.target{background:#DCEEFF;box-shadow:inset 0 0 0 3px #3A93E8,0 3px 0 rgba(20,30,90,.35);}
@@ -5000,7 +5003,7 @@ function wgNewRound(round){
   } while(clash && ++tries < 200);
   var locked = [], named = []; for(var i = 0; i < n; i++){ locked.push(null); named.push(false); }
   // named[r] = the group's name is showing above row r (the names appear one after another: see wgReveal)
-  return {v: 1, round: round, n: n, names: groups.map(function(g){ return g[lang].n; }), longest: longest, cells: cells, locked: locked, named: named, interlude: null};
+  return {v: 1, round: round, n: n, names: groups.map(function(g){ return g[lang].n; }), longest: longest, cells: cells, locked: locked, named: named, interlude: null, introDone: false};
 }
 function initWordGroups(){
   state.session.wordGroups = wgNewRound(0);
@@ -5042,9 +5045,33 @@ function wgMark(target){          // the frame the dragged word would swap with 
   if(el) el.classList.add("target");
   wgDrag.target = target;
 }
+// When a round starts, the words fill in one at a time in a random order, each with sound_effect_1, all within WG_INTRO_MS (2026-10-23, per Dan). The words
+// cannot be touched until they are all in. wgIntro.done[i] says which frames have been filled (so a redraw during the fill keeps what has shown so far).
+var WG_INTRO_MS = 2500, WG_INTRO_FIRST_MS = 120;
+var wgIntro = null;
+function wgIntroStart(){
+  var s = state.session.wordGroups;
+  if(!s || s.introDone !== false || s.interlude || state.screen !== "wordGroups") return;
+  if(wgIntro && wgIntro.s === s) return;                              // already running for this round
+  var total = s.cells.length, order = shuffle(s.cells.map(function(_, i){ return i; }));
+  wgIntro = {s: s, done: {}, timers: []};
+  var span = WG_INTRO_MS - WG_INTRO_FIRST_MS - 100;                    // the last word shows 100 ms before the 2.5 seconds are up
+  order.forEach(function(cellIdx, k){
+    var at = WG_INTRO_FIRST_MS + (total > 1 ? span * k / (total - 1) : 0);
+    wgIntro.timers.push(setTimeout(function(){
+      var live = wgIntro;
+      if(!live || live.s !== s || state.session.wordGroups !== s || state.screen !== "wordGroups") return;
+      live.done[cellIdx] = true;
+      var el = document.getElementById("wgC" + cellIdx);
+      if(el){ el.classList.remove("pending"); el.classList.add("popin"); }
+      pixSfxPlay("clCatch", true);                                    // sound_effect_1, for every word that shows
+      if(k === total - 1){ s.introDone = true; saveState(); wgIntro = null; }
+    }, at));
+  });
+}
 function wgDown(ev){
   var s = state.session.wordGroups;
-  if(!s || s.interlude || wgDrag) return;
+  if(!s || s.interlude || wgDrag || s.introDone === false) return;       // nothing to pick up until every word has filled in
   var rects = wgRects(s), i = wgCellAt(rects, ev.clientX, ev.clientY);
   if(i < 0 || s.locked[Math.floor(i / s.n)] !== null) return;                  // a locked row's words cannot be picked up
   ev.preventDefault();
@@ -5126,7 +5153,8 @@ function screenWordGroups(){
     for(var k = 0; k < n; k++){
       var i = r * n + k;
       // a row that is complete but whose name has not shown yet (two groups in one move) has its words in the group's colour until its window appears
-      cells += '<div class="wgCell' + (lk !== null && !named ? ' locked' : '') + '" id="wgC' + i + '"' + (lk !== null && !named ? ' style="background:' + WG_COLORS[lk] + '"' : '') + '><span>' + s.cells[i].w + '</span></div>';
+      var pending = s.introDone === false && !(wgIntro && wgIntro.s === s && wgIntro.done[i]);        // a word that has not filled in yet shows as an empty frame
+      cells += '<div class="wgCell' + (lk !== null && !named ? ' locked' : '') + (pending ? ' pending' : '') + '" id="wgC' + i + '"' + (lk !== null && !named ? ' style="background:' + WG_COLORS[lk] + '"' : '') + '><span>' + s.cells[i].w + '</span></div>';
     }
     // each row is a window: see-through until the group is complete and named, then in the group's own colour with its name above the words
     rows += '<div class="wgGroup' + (named ? ' done' : '') + '" id="wgG' + r + '"' + (named ? ' style="--gc:' + WG_COLORS[lk] + '"' : '') + '>' +
@@ -5783,6 +5811,7 @@ function render(){
   if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.interlude && !pixRoundRunning.wordGroups) wgInterlude();
   if(state.screen === "jesusTimeline" && state.session.jesusTimeline && state.session.jesusTimeline.interlude && !pixRoundRunning.jesusTimeline) tlInterlude();
   if(state.screen === "wordGroups" && state.session.wordGroups && !state.session.wordGroups.interlude) wgReveal();
+  if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.introDone === false) wgIntroStart();
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
