@@ -1415,7 +1415,9 @@ var PIX_SFX = {
   fmMatch:{url:"sounds/sfx_fm_match.mp3", gain:0.25},   // was 0.55: too loud next to the other sounds (2026-10-20, per Dan)
   fmMiss:{url:"sounds/sfx_fm_miss.mp3", gain:0.28},
   fmLast:{url:"sounds/sfx_fm_last.mp3", gain:0.37},   // was 1: levelled with the match / miss sounds (2026-10-20, per Dan)
-  fmFanfare:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17},   // was 0.55: 10 dB too loud next to the others
+  // the tile frames flashing at the end of a Faith Match level (and the Sacred Sudoku picture flash): sound_effect_3.wav itself (2026-10-22, per Dan), its first phrase
+  // from the start, 3.7 s (the file holds the phrase twice). It was sfx_fm_fanfare.mp3, a cut that skips the first second and a half of the build-up.
+  fmFanfare:{url:"sounds/sfx_sound3.wav", gain:0.17},   // gain was 0.55 before: 10 dB too loud next to the others
   // the ROUND X COMPLETED! sound in Faith Flash: sound_effect_3.wav from the Non 8-Bit Sounds folder, played ONCE -- the file holds the same phrase twice
   // and only the first is used (2026-10-22, per Dan: the whole file made it play twice). It is the same recording as the Faith Match fanfare above.
   ffRound:{url:"sounds/sfx_fm_fanfare.mp3", gain:0.17},
@@ -2229,6 +2231,7 @@ var ffInterludeRunning = false;
 // (it returns true if it did, and a game with no chances passes null: the message then stays alone); finish(s) starts the next round once the sound is over.
 // render() calls the game's own function again, so a reload in the middle of it picks the sequence back up.
 var pixRoundRunning = {};
+var ROUND_SHOW_EXTRA_MS = 500;     // the ROUND COMPLETED message, with or without the heart, stays up this much longer than the sound (2026-10-22, per Dan)
 function pixRoundRun(key, getSession, giveAward, finish){
   if(pixRoundRunning[key]) return;
   var s = getSession();
@@ -2239,9 +2242,9 @@ function pixRoundRun(key, getSession, giveAward, finish){
     pixRoundRunning[key] = false;
     if(alive()) finish(s);
   }
-  if(s.interlude.phase === "award"){ setTimeout(done, 1200); return; }   // reloaded after the heart was given: just let it be seen, then go on
+  if(s.interlude.phase === "award"){ setTimeout(done, 1200 + ROUND_SHOW_EXTRA_MS); return; }   // reloaded after the heart was given: just let it be seen, then go on
   var buf = pixSfxBuf.ffRound;
-  var soundMs = (buf ? buf.duration * 1000 : 3400) + 250;
+  var soundMs = (buf ? buf.duration * 1000 : 3400) + 250 + ROUND_SHOW_EXTRA_MS;
   pixSfxPlay("ffRound", false);
   setTimeout(function(){
     if(!alive()){ pixRoundRunning[key] = false; return; }
@@ -2251,7 +2254,7 @@ function pixRoundRun(key, getSession, giveAward, finish){
       s.interlude.phase = "award"; s.interlude.award = true;
       saveState(); render();
     }
-    setTimeout(done, Math.max(soundMs - FF_INTERLUDE_AWARD_MS, award ? 1200 : 0));
+    setTimeout(done, Math.max(soundMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
   }, FF_INTERLUDE_AWARD_MS);
 }
 function pixRoundDoneHtml(il){
@@ -2277,9 +2280,9 @@ function ffInterlude(){
     s.interlude = null;
     ffNext();
   }
-  if(s.interlude.phase === "award"){ setTimeout(finish, 1200); return; }   // reloaded after the heart was given: just let it be seen, then go on
+  if(s.interlude.phase === "award"){ setTimeout(finish, 1200 + ROUND_SHOW_EXTRA_MS); return; }   // reloaded after the heart was given: just let it be seen, then go on
   var buf = pixSfxBuf.ffRound;
-  var fanfareMs = (buf ? buf.duration * 1000 : 3400) + 250;       // the next round starts when the sound is over
+  var fanfareMs = (buf ? buf.duration * 1000 : 3400) + 250 + ROUND_SHOW_EXTRA_MS;       // the next round starts when the sound is over, and a moment after
   pixSfxPlay("ffRound", false);
   setTimeout(function(){
     if(!alive()){ ffInterludeRunning = false; return; }
@@ -2289,7 +2292,7 @@ function ffInterlude(){
       s.interlude.phase = "award"; s.interlude.award = true;
       saveState(); render();
     }
-    setTimeout(finish, Math.max(fanfareMs - FF_INTERLUDE_AWARD_MS, award ? 1200 : 0));
+    setTimeout(finish, Math.max(fanfareMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
   }, FF_INTERLUDE_AWARD_MS);
 }
 
@@ -2412,7 +2415,7 @@ function screenFaithFlash(){
     '<div class="pixPaper"><div class="pixQ">' + qLang.q + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
-    (answered && ffChancesLeft(s) > 0 && (s.index % FAITH_FLASH_ROUND_SIZE) < FAITH_FLASH_ROUND_SIZE - 1 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx();ffNext()" onclick="pixClickSfx();if(event.detail===0)ffNext()">' + t("nextQuestion") + '</button>' : '') +
+    (answered && ffChancesLeft(s) > 0 && (s.index % FAITH_FLASH_ROUND_SIZE) < FAITH_FLASH_ROUND_SIZE - 1 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx();ffNext()" onclick="pixClickSfx();ffNext()">' + t("nextQuestion") + '</button>' : '') +
     (isCorrect ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
