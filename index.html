@@ -131,6 +131,15 @@
      at the top is ceiling brown). */
   .pixChurch{padding-top:calc(env(safe-area-inset-top,0px) + 16px);
     background:url("tiles/church_interior2.png") center bottom / 100% auto no-repeat,#6B4423;}
+  /* The church scene (2026-10-23): laid over the same picture as the Welcome screen, in the picture's own 125 x 270 shape, anchored at the bottom like the picture. */
+  .cwScene{position:absolute;left:0;bottom:0;width:100%;aspect-ratio:125/270;pointer-events:none;}
+  .cwPilgrim{position:absolute;aspect-ratio:11/15;}
+  .cwSprite{width:100%;height:100%;background:url("tiles/pilgrim_back.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:pilgrimBreath 1.8s steps(1) infinite;}
+  .cwPilgrim.walking .cwSprite{animation:pilgrimStep .5s steps(1) infinite,pilgrimBob .5s steps(1) infinite;}
+  .cwTicket{position:absolute;display:none;image-rendering:pixelated;}
+  .cwTicket.show{display:block;animation:cwTicketPop .45s ease-out 1,cwTicketGlow 1s ease-in-out .45s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,230,120,.95));}
+  @keyframes cwTicketPop{0%{transform:scale(0);opacity:0;}65%{transform:scale(1.18);opacity:1;}100%{transform:scale(1);opacity:1;}}
+  @keyframes cwTicketGlow{0%{filter:drop-shadow(0 0 5px rgba(255,230,120,.8));}100%{filter:drop-shadow(0 0 16px rgba(255,240,150,1));}}
   .pixWelcomeCard{padding:18px 18px 20px;}
   .pixWelTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 10px;}
   .pixWelBody{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1.25rem;line-height:1.3;letter-spacing:.01em;color:#2A3A78;margin:0;}
@@ -1336,6 +1345,7 @@ function defaultState(){
     pilgrimP: null,
     pilgrimIn: false,    // the pilgrim has gone into the church (after the 5th game)
     pilgrimSteps: 0,     // games finished so far (each moves him one stop; see pilgrimSteps())
+    ticketUnlocked: false, // the Golden Ticket icon is unlocked (at the end of the church scene)
     volSfx: 45,     // Options screen: sound effects volume, 0-100 (starts at 45, per Dan 2026-10-20)
     volMusic: 60,   // music volume, 0-100: it starts at 60 (2026-10-22, per Dan; the slider's 100% is a quiet background level)
     musicScale: 2,  // marks a game saved with the new music slider
@@ -1479,7 +1489,13 @@ var PIX_SFX = {
   clCatch:{url:"sounds/sfx_cl_catch.wav", gain:0.275},   // half of 0.55 (2026-10-22, per Dan: the catch sound was too loud)
   clFade:{url:"sounds/sfx_cl_fade.wav", gain:0.55},
   // the Mission Complete screen (2026-10-22, per Dan): sound_effect_11 from the 8-Bit Sounds folder, with the silence at the end cut off (peak 0.84, so a low gain)
-  missionDone:{url:"sounds/sfx_mission_done.wav", gain:0.3}
+  missionDone:{url:"sounds/sfx_mission_done.wav", gain:0.3},
+  // picking up a word in Word Groups (2026-10-23, per Dan): sound_effect_4 from the Non 8-Bit Sounds folder (24-bit, with the silence before and after cut off:
+  // 0.07 s), levelled with the other sounds
+  wgPick:{url:"sounds/sfx_wg_pick.wav", gain:0.5},
+  // the Golden Ticket appearing above the altar (2026-10-23, per Dan): sound_effect_12 from the 8-Bit Sounds folder, with the silent end cut off (1.6 s; peak 0.83, like the
+  // Mission Complete sound, so the same low gain)
+  ticket:{url:"sounds/sfx_ticket.wav", gain:0.3}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -1796,8 +1812,11 @@ function screenWelcome(){
 
 // Renamed from allMissionsDone (2026-09-29, per Dan) — unlock is now a
 // points threshold (5 of 10 missions' worth), not literally every mission.
+// The Golden Ticket icon unlocks at the end of the church scene (2026-10-23, per Dan): the pilgrim goes in, walks up the aisle, and the ticket appears above
+// the altar. state.ticketUnlocked is set then. (A game saved before this, with the pilgrim already in the church and the points at the line, stays unlocked.)
 function goldenTicketUnlocked(){
-  return state.points >= GOLDEN_TICKET_POINTS;
+  if(typeof state.ticketUnlocked === "boolean") return state.ticketUnlocked;
+  return !!state.pilgrimIn && state.points >= GOLDEN_TICKET_POINTS;
 }
 
 // The games open on an instruction screen first (2026-10-22, per Dan): what the game is and how to play it, with a START MISSION button that
@@ -2145,10 +2164,64 @@ function pilgrimEnter(el){
   el.classList.remove("walking", "hop");
   void el.offsetWidth;
   el.classList.add("entering");
+  cwPreload();
   pilgrimGreetTimer = setTimeout(function(){
     state.pilgrimIn = true; saveState();
     if(el.isConnected){ el.style.visibility = "hidden"; pilgrimBusy(el, false); }
+    if(!goldenTicketUnlocked() && state.screen === "mainMenu") go("churchWalk");        // inside: up the aisle to the altar, and the Golden Ticket
   }, 950);
+}
+
+/* ---------- The church scene: the pilgrim walks up the aisle and the Golden Ticket appears ---------- */
+
+// (2026-10-23, per Dan) After the pilgrim goes in at the church door, the Welcome screen's church interior fills the screen. He walks up the aisle, seen from
+// behind and getting smaller; three quarters of the way to the altar a large pixelated Golden Ticket appears above it, with sound_effect_12. Two seconds
+// later the Main Menu comes back with the Golden Ticket icon unlocked. The scene is laid over the picture in picture pixels (125 x 270), so everything
+// stays on the aisle at any screen size.
+var CW = {W: 125, H: 270, x: 62.5, yStart: 274, yEnd: 206, dur: 4400, ticketAt: .75, ticketMs: 2000, scaleNear: 2.3, scaleFar: .55, ticketScale: 2, ticketY: 90};
+function cwPreload(){ ["tiles/pilgrim_back.png", "tiles/icons48/ic_goldenTicket.png", "tiles/church_interior2.png"].forEach(function(src){ var im = new Image(); im.src = src; }); }
+function screenChurchWalk(){
+  var ts = CW.ticketScale;
+  return '<div class="screen pixHome pixChurch cwScreen"><div class="cwScene" id="cwScene">' +
+    '<img class="cwTicket" id="cwTicket" src="tiles/icons48/ic_goldenTicket.png" alt="" style="left:' + ((CW.x - 24 * ts) / CW.W * 100) + '%;top:' + ((CW.ticketY - 24 * ts) / CW.H * 100) + '%;width:' + (48 * ts / CW.W * 100) + '%">' +
+    '<div class="cwPilgrim walking" id="cwPilgrim"><div class="cwSprite"></div></div>' +
+  '</div></div>';
+}
+var cwRunning = false, cwRaf = 0, cwTimer = 0;
+function cwFinish(){
+  cwRunning = false; cancelAnimationFrame(cwRaf); clearTimeout(cwTimer);
+  if(state.screen !== "churchWalk") return;
+  state.ticketUnlocked = true; saveState();
+  go("mainMenu");                      // the ticket icon is unlocked now
+}
+function cwStart(){
+  if(cwRunning) return;
+  var el = document.getElementById("cwPilgrim"), tk = document.getElementById("cwTicket"); if(!el) return;
+  cwRunning = true;
+  var t0 = performance.now(), shown = false;
+  function place(p){
+    var y = CW.yStart + (CW.yEnd - CW.yStart) * p;
+    var s = CW.scaleFar + (CW.scaleNear - CW.scaleFar) * (y - CW.yEnd) / (CW.yStart - CW.yEnd);       // the further up the aisle, the smaller
+    el.style.width = (11 * s / CW.W * 100) + "%";
+    el.style.left = ((CW.x - 5.5 * s) / CW.W * 100) + "%";
+    el.style.top = ((y - 15 * s) / CW.H * 100) + "%";
+  }
+  place(0);
+  function frame(now){
+    if(state.screen !== "churchWalk" || !el.isConnected){ cwRunning = false; return; }
+    var p = Math.min(1, (now - t0) / CW.dur);
+    place(p);
+    if(p < 1) pilgrimStepSfx(now);
+    if(!shown && p >= CW.ticketAt){
+      shown = true;
+      if(tk) tk.classList.add("show");
+      pixSfxPlay("ticket", true);                                  // sound_effect_12
+      cwTimer = setTimeout(cwFinish, CW.ticketMs);                 // after 2 seconds, back to the Main Menu
+    }
+    if(p >= 1){ el.classList.remove("walking"); el.classList.add("still"); return; }
+    cwRaf = requestAnimationFrame(frame);
+  }
+  cwRaf = requestAnimationFrame(frame);
 }
 function pilgrimArrived(el, walkedForward){
   state.pilgrimP = pilgrimPos; saveState();
@@ -2342,18 +2415,10 @@ function afterAward(){
   state.awardMissionId = null;
   state.folderOpen = false;          // the Missions window is closed, so the player can watch the pilgrim (2026-10-22, per Dan)
   pilgrimAward = state.pilgrimIn ? null : "great";            // see pilgrimArrived (once he is in the church there is no pilgrim to speak)
-  // Auto-advance to the Golden Ticket screen only the ONE time a mission
-  // completion actually crosses the unlock threshold (2026-09-29, per Dan's
-  // 5-of-10 change) — every mission is worth exactly 100 pts, so "this
-  // completion's own 100 pts is what pushed it over" is just points-100
-  // being below the line while points itself is at or past it. Without this
-  // check, completing mission #6 through #10 after already unlocking early
-  // would keep bouncing the player back to the ticket screen instead of
-  // letting them keep going for the rest of the badges.
-  // (only a game can do that now: a non-game gives no points, so it can never be the one that crosses the line)
-  var justUnlocked = missionIsGame(awardedId) && (state.points - 100 < GOLDEN_TICKET_POINTS) && goldenTicketUnlocked();
+  // (It used to open the Golden Ticket screen the moment the points reached the line. Now the 5th game walks the pilgrim into the church, and the
+  // church scene unlocks the ticket: see pilgrimEnter and screenChurchWalk, 2026-10-23, per Dan.)
   saveState();
-  if(justUnlocked) go("goldenTicket"); else go("mainMenu");
+  go("mainMenu");
 }
 
 function screenMissionIntro(){
@@ -4946,7 +5011,7 @@ function wgDown(ev){
   try { document.getElementById("wgBoard").setPointerCapture(ev.pointerId); } catch(e){}
   wgDrag = {from: i, rects: rects, x: ev.clientX, y: ev.clientY, target: -1};
   document.getElementById("wgC" + i).classList.add("drag");
-  pixPressSfx();            // the button sound when a word is picked up (2026-10-23, per Dan)
+  pixPressSfx("wgPick");    // sound_effect_4 when a word is picked up (2026-10-23, per Dan; it was the button sound for a while)
 }
 function wgMove(ev){
   var s = state.session.wordGroups;
@@ -5492,6 +5557,7 @@ function clearTicket(){
   state.pilgrimIn = false;
   state.points = 0;
   state.pilgrimSteps = 0;
+  state.ticketUnlocked = false;       // the ticket is locked again until the pilgrim has walked up the aisle once more
   MISSIONS.forEach(function(m){ state.missions[m.id].done = false; });
   state.missions.faithMatch.level = 0;
   go("mainMenu");
@@ -5584,6 +5650,7 @@ function render(){
     case "sacredSudoku": html = screenSacredSudoku(); break;
     case "wordTrail": html = screenWordTrail(); break;
     case "wordGroups": html = screenWordGroups(); break;
+    case "churchWalk": html = screenChurchWalk(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
     case "goldenTicket": html = screenGoldenTicket(); break;
@@ -5668,6 +5735,7 @@ function render(){
   if(state.screen === "wordTrail" && state.session.wordTrail && state.session.wordTrail.interlude && !pixRoundRunning.wordTrail) wtInterlude();
   if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.interlude && !pixRoundRunning.wordGroups) wgInterlude();
   if(state.screen === "wordGroups" && state.session.wordGroups && !state.session.wordGroups.interlude) wgReveal();
+  if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
   awardAutoReturn();
