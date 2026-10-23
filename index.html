@@ -3395,8 +3395,8 @@ function clMoveHandTo(clientX){
 }
 
 // The finger slides on the SLIDE band under the play area (2026-10-22, per Dan), not on the play area itself.
-// The hands move only while the finger is inside the band (2026-10-22, per Dan): a finger that slides off it, up or down or past its ends, stops
-// moving them, and they follow again if it comes back. (A touch keeps sending its moves to the band after it leaves, so the position is checked.)
+// A slide has to START in the tap zone (from 10 px above the band to the bottom of the screen), but once it has started the hands follow the finger
+// wherever it goes (2026-10-22, per Dan: the finger is no longer kept inside the band; it was, earlier the same day).
 function clInBand(ev){
   var band = document.getElementById("clSlide");
   if(!band) return false;
@@ -3408,10 +3408,11 @@ function clPointerDown(ev){
   if(!s || s.status !== "playing" || clFading) return;      // nothing moves while the lights fade away after a miss
   if(!clInBand(ev)) return;
   clDragging = true;
+  try { ev.currentTarget.setPointerCapture(ev.pointerId); } catch(e){}     // keeps following the finger (or mouse) after it leaves the zone
   clMoveHandTo(ev.clientX);
 }
 function clPointerMove(ev){
-  if(!clDragging || clFading || !clInBand(ev)) return;
+  if(!clDragging || clFading) return;
   clMoveHandTo(ev.clientX);
 }
 function clPointerUp(){ clDragging = false; }
