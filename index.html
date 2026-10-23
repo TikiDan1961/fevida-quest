@@ -3302,22 +3302,23 @@ function screenWordUnscramble(){
 // The lights fall faster in every level (2026-10-22, per Dan): 3200 / 2700 / 2300 / 2000 ms before, and the play area is shorter now.
 // 8 rounds (2026-10-22, per Dan; it was 4 of 20 / 30 / 40 / 50 lights): each one is a little shorter than the old ones and falls faster than the last.
 // Every fall is 50% faster (2026-10-22, per Dan): the times were 2200 / 2000 / 1850 / 1700 / 1600 / 1500 / 1400 / 1300 ms, now each divided by 1.5.
+// spawnMs = the wait between one light and the next (2026-10-22, per Dan): 700 ms in round 1, shrinking in equal steps to half of that (350 ms) in round 8.
 var CL_LEVELS = [
-  {count:12, fallMs:1467},
-  {count:14, fallMs:1333},
-  {count:16, fallMs:1233},
-  {count:18, fallMs:1133},
-  {count:20, fallMs:1067},
-  {count:22, fallMs:1000},
-  {count:24, fallMs:933},
-  {count:26, fallMs:867}
+  {count:12, fallMs:1467, spawnMs:700},
+  {count:14, fallMs:1333, spawnMs:650},
+  {count:16, fallMs:1233, spawnMs:600},
+  {count:18, fallMs:1133, spawnMs:550},
+  {count:20, fallMs:1067, spawnMs:500},
+  {count:22, fallMs:1000, spawnMs:450},
+  {count:24, fallMs:933, spawnMs:400},
+  {count:26, fallMs:867, spawnMs:350}
 ];
 // Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right (picked at random) of the one before,
 // turning the other way when that would go off the edge.
 var CL_STEP_PX = 80;
 var clLastX = null;
 var CL_MAX_MISSES = 3;
-var CL_SPAWN_MS = 700, CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
+var CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
 // The GET READY countdown screen is gone (2026-10-22, per Dan): the game has its instruction screen, and a level starts as soon as it is opened.
 // Brief hold on the cleared stage after the last light of a level is caught, before ROUND X COMPLETED! shows.
 var CL_LEVEL_PAUSE_MS = 900;
@@ -3582,7 +3583,7 @@ function clStart(){
   }
   clUpdateHandPosition();
   clUpdateHud();
-  clTimers.spawn = setInterval(clSpawnIcon, CL_SPAWN_MS);
+  clTimers.spawn = setInterval(clSpawnIcon, s ? CL_LEVELS[s.level].spawnMs : CL_LEVELS[0].spawnMs);
   clTimers.tick = setInterval(clCollisionTick, CL_TICK_MS);
 }
 
