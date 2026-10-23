@@ -3300,6 +3300,10 @@ var CL_LEVELS = [
   {count:40, fallMs:933, spawnMs:190},
   {count:45, fallMs:867, spawnMs:150}
 ];
+// Each round falls 8% faster than the one before, round 1 staying as it was (2026-10-22, per Dan): a speed 1.08 times the last is a fall time of the last
+// divided by 1.08, so the fallMs values above are replaced by this rule (they were 1467 / 1333 / 1233 / 1133 / 1067 / 1000 / 933 / 867).
+var CL_FIRST_FALL_MS = 1467, CL_SPEED_STEP = 1.08;
+CL_LEVELS.forEach(function(lv, i){ lv.fallMs = Math.round(CL_FIRST_FALL_MS / Math.pow(CL_SPEED_STEP, i)); });
 // Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right of the one before. A side is picked at
 // random together with a random number of lights, CL_RUN_MIN to CL_RUN_MAX, to drop that way before a side is picked again; when an edge is hit it heads
 // back toward the middle (carrying on that way for the rest of the run), and next to an edge a new pick is always toward the middle.
