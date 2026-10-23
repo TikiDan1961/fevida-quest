@@ -3294,7 +3294,8 @@ function screenFollowLight(){
 // TODO(Dan): swap in different/NCYC-specific words any time — nothing else
 // needs to change.
 // Three levels of 5 words (2026-10-21, per Dan): level 1 has 4-letter words, level 2 has 5-letter words and level 3 has 6-letter words. No
-// accented letters, so every letter tile is a plain letter.
+// accented letters, so every letter tile is a plain letter -- except AMÉN, which the client spelled with its accent (2026-10-23): its É is a tile of its own, and
+// Word Trail (which uses these same words) shows it in its grid.
 // Each level has 15 words and a game plays 5 of them, picked at random (2026-10-23, per Dan). The words are chosen so that no one of them can be
 // rearranged into a different common word (a word is only right when it is spelled exactly the same).
 var WU_LEVELS = 3;
@@ -3303,7 +3304,7 @@ var WORD_UNSCRAMBLE_WORDS = {
   en: [["HOPE","LOVE","PRAY","HOLY","SOUL","MASS","GIFT","KING","LAMB","LENT","LORD","WORD","HYMN","JOHN","LUKE"],
        ["GRACE","MERCY","FAITH","TRUST","PEACE","CROSS","LIGHT","JESUS","PSALM","BIBLE","WATER","BLESS","SHEEP","CROWN","OLIVE"],
        ["SPIRIT","PRAYER","GOSPEL","HEAVEN","CHURCH","CANDLE","TEMPLE","SAVIOR","PRAISE","BISHOP","ROSARY","SERMON","ADVENT","JOSEPH","CHOSEN"]],
-  es: [["AMOR","CRUZ","VIDA","DIOS","ALMA","HIJO","MISA","PAPA","REZO","AMEN","ORAR","VINO","ROSA","CORO","BODA"],
+  es: [["AMOR","CRUZ","VIDA","DIOS","ALMA","HIJO","MISA","PAPA","REZO","AMÉN","ORAR","VINO","ROSA","CORO","BODA"],
        ["CIELO","SANTO","ALTAR","FELIZ","PADRE","REINO","TRIGO","FUEGO","CANTO","PALMA","OVEJA","SALMO","MUNDO","VERBO","JUSTO"],
        ["GRACIA","CRISTO","BIBLIA","VIRGEN","ALABAR","TIERRA","PUERTA","PASTOR","CORONA","PECADO","PASCUA","CAMINO","SALVAR","TEMPLO","GLORIA"]]
 };
@@ -5075,7 +5076,7 @@ function wgEnd(ev, cancel){
   var a = s.cells[d.from]; s.cells[d.from] = s.cells[target]; s.cells[target] = a;       // the swap
   var found = [];
   for(var r = 0; r < s.n; r++) if(s.locked[r] === null && wgRowDone(s.cells, s.n, r)){ s.locked[r] = s.cells[r * s.n].c; found.push(s.locked[r]); }
-  if(found.length) pixSfxPlay("fmMatch", true); else pixSfxPlay("fmFirst", true);
+  if(!found.length) pixSfxPlay("fmFirst", true);        // (a completed group's sound plays as its window appears: see wgReveal, so a second group in the same move has its own)
   saveState(); render();
   wgReveal();               // the names of the groups just completed
 }
@@ -5095,6 +5096,7 @@ function wgReveal(){
   wgRevealing = true;                                                // (the redraw below calls wgReveal again: this makes it stand aside)
   render();
   var win = document.getElementById("wgG" + r); if(win) win.classList.add("pop");
+  pixSfxPlay("fmMatch", true);                                       // the Category Completed sound, once for every group as its window appears (2026-10-23, per Dan)
   var more = false, all = true;
   for(var j = 0; j < s.n; j++){ if(s.locked[j] === null) all = false; else if(!s.named[j]) more = true; }
   if(more){ setTimeout(function(){ wgRevealing = false; wgReveal(); }, WG_NAME_GAP_MS); return; }
