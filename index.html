@@ -4802,10 +4802,11 @@ function screenWordTrail(){
   var words = s.remaining.map(function(w){ return '<span class="wtWord">' + w + '</span>'; }).join("");
   return pixShell('<h2 class="pixMTitle">' + t("wordTrailName") + '</h2>' +
     '<div class="pixNote">' + t("wt_intro") + '</div>' +
+    '<div class="pixNote">' + t("fm_level")(s.round + 1, WT_ROUNDS.length) + '</div>' +
     '<div class="wtTrace" id="wtTrace">&nbsp;</div>' +
     '<div class="wtGrid" id="wtGrid" style="--n:' + s.size + ';grid-template-columns:repeat(' + s.size + ',minmax(0,1fr))" onpointerdown="wtDown(event)" onpointermove="wtMove(event)" onpointerup="wtUp(event)" onpointercancel="wtCancel(event)" oncontextmenu="return false">' + cells +
       '<svg class="wtLine" id="wtSvg"><polyline id="wtPoly" points=""/></svg></div>' +
-    '<div class="pixNote">' + t("fm_level")(s.round + 1, WT_ROUNDS.length) + ' &nbsp;|&nbsp; ' + t("wt_left")(s.remaining.length) + '</div>' +
+    '<div class="pixNote">' + t("wt_left")(s.remaining.length) + '</div>' +
     '<div class="wtWords">' + words + '</div>' +
     '<div class="spacer"></div>', "pixLower");
 }
