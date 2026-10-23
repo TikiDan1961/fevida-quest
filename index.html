@@ -2341,9 +2341,8 @@ function pixBtnHtml(label, js, secondary){
 // o = {title, body, badge: mission id or nothing, buttons}
 function pixResultHtml(nameKey, o){
   var m = o.badge ? missionById(o.badge) : null;
-  // the window is centred in the room between the game's name and the buttons (2026-10-22, per Dan)
-  return pixShell('<h2 class="pixMTitle">' + t(nameKey) + '</h2>' +
-    '<div class="pixResMid"><div class="pixPaper">' +
+  // the game's name sits just above the window in the instruction screens' larger type, the pair centred together (2026-10-22, per Dan)
+  return pixShell('<div class="pixResMid"><h2 class="pixMTitle pixIntroTitle">' + t(nameKey) + '</h2><div class="pixPaper">' +
       (m ? '<img class="pixResBadge" src="' + badge8Src(m) + '" alt="" decoding="sync">' : '') +
       '<div class="pixResTitle">' + o.title + '</div>' +
       '<p class="pixResBody">' + o.body + '</p>' +
@@ -2377,8 +2376,7 @@ function screenFaithFlash(){
     var pass = ffChancesLeft(s) > 0;                 // got through all the questions with a chance to spare
     var perfect = pass && s.correct === s.order.length;
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
-      '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
-      '<div class="pixResMid"><div class="pixPaper">' +
+      '<div class="pixResMid"><h2 class="pixMTitle pixIntroTitle">' + t("faithFlashName") + '</h2><div class="pixPaper">' +
         (pass ? '<img class="pixResBadge" src="tiles/badges96/b96_faith.png" alt="" decoding="sync">' : '') +
         '<div class="pixResTitle">' + (perfect ? t("ff_resultsTitlePass") : (pass ? t("ff_resultsTitlePass2") : t("ff_resultsTitleFail"))) + '</div>' +
         '<p class="pixResBody">' + (perfect ? t("ff_resultsBodyPass") : (pass ? t("ff_resultsBodyPass2") : t("ff_resultsBodyFail"))) + '</p>' +
@@ -2697,8 +2695,7 @@ function screenBeTheLight(){
       pixBigTileHtml("beTheLight") +
       '<p class="pixResBody pixFirst">' + t("bl_body") + '</p>' +
     '</div></div>' +
-    pixBtnHtml(t("missionCompleted"), "grantMission('beTheLight')") +
-    pixBtnHtml(t("returnToMenu"), "go('mainMenu')", true));
+    pixBtnHtml(t("missionCompleted"), "grantMission('beTheLight')"));      // no RETURN TO MENU button: the red X closes it (2026-10-22, per Dan)
 }
 
 /* ---------- Choose Joy ---------- */
@@ -2762,8 +2759,7 @@ function screenChooseJoy(){
   }
   return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("chooseJoyName") + '</h2>' +
     '<div class="pixPaper">' + card + '</div></div>' +
-    buttons +
-    pixBtnHtml(t("mainMenu"), "cjQuit()", true));
+    buttons);                                          // no MAIN MENU button: the red X closes it (2026-10-22, per Dan)
 }
 
 function screenJoyousPhoto(){
@@ -3231,8 +3227,7 @@ function screenWordUnscramble(){
   if(s.status === "results"){
     var wm = MISSIONS.filter(function(m){ return m.id === "wordUnscramble"; })[0];
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
-      '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
-      '<div class="pixResMid"><div class="pixPaper">' +
+      '<div class="pixResMid"><h2 class="pixMTitle pixIntroTitle">' + t("wordUnscrambleName") + '</h2><div class="pixPaper">' +
         '<img class="pixResBadge" src="' + badge8Src(wm) + '" alt="" decoding="sync">' +
         '<div class="pixResTitle">' + t("wu_passTitle") + '</div>' +
         '<p class="pixResBody">' + t("wu_passBody") + '</p>' +
@@ -3461,6 +3456,7 @@ function clResolveIcon(record, caught){
   if(record.resolved || clFading) return;
   var s = state.session.catchLight;
   if(!s || s.status !== "playing") return;
+  if(!caught && clTouchesHands(record)) caught = true;       // it reached the bottom in the very moment it touched the hands: still a catch
   if(!caught){ clStartMiss(); return; }
   record.resolved = true;
   if(record.el.parentNode) record.el.parentNode.removeChild(record.el);
@@ -3528,17 +3524,18 @@ function clCollisionTick(){
   if(!s || s.status !== "playing") return;
   var hands = document.getElementById("clHands");
   if(!hands) return;
-  var handsRect = hands.getBoundingClientRect();
   clActiveIcons.slice().forEach(function(record){
-    if(record.resolved) return;
-    var r = record.el.getBoundingClientRect();
-    var cx = r.left + r.width/2, cy = r.top + r.height/2;
-    // the catching zone is the middle of the hands picture (28 px each side of its centre: the width it had before the picture got bigger)
-    var mid = (handsRect.left + handsRect.right) / 2;
-    if(cy >= handsRect.top && cy <= handsRect.bottom && cx >= mid - 28 && cx <= mid + 28){
-      clResolveIcon(record, true);
-    }
+    if(record.resolved || clFading) return;
+    if(clTouchesHands(record)) clResolveIcon(record, true);
   });
+}
+// A catch is any part of the light touching any part of the hands' picture (2026-10-22, per Dan), the sides included, for as long as the light has not
+// yet reached the bottom of the play area (that is a miss: see clSpawnIcon).
+function clTouchesHands(record){
+  var hands = document.getElementById("clHands");
+  if(!hands) return false;
+  var h = hands.getBoundingClientRect(), r = record.el.getBoundingClientRect();
+  return r.right > h.left && r.left < h.right && r.bottom > h.top && r.top < h.bottom;
 }
 
 function clCheckLevelComplete(){
