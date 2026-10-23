@@ -222,6 +222,7 @@
   .pilgrim{position:absolute;width:8.8%;aspect-ratio:11/15;z-index:2;pointer-events:auto;cursor:pointer;}
   .pilgrim::before{content:"";position:absolute;left:-60%;right:-60%;top:-40%;bottom:-15%;}
   .pilgrim.hop{animation:pilgrimHop .4s ease-out;}
+  .pilgrim.entering{transition:transform .9s ease-in,opacity .9s ease-in;transform:translateY(-60%) scale(.5);opacity:0;pointer-events:none;}   /* goes in at the church door */
   @keyframes pilgrimHop{0%{transform:translateY(0);}40%{transform:translateY(-45%);}100%{transform:translateY(0);}}
   .pilgrimFlip{width:100%;height:100%;}
   .pilgrimFlip.left{transform:scaleX(-1);}
@@ -1284,6 +1285,7 @@ function defaultState(){
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
+    pilgrimIn: false,    // the pilgrim has gone into the church (after the 5th game)
     volSfx: 45,     // Options screen: sound effects volume, 0-100 (starts at 45, per Dan 2026-10-20)
     volMusic: 60,   // music volume, 0-100: it starts at 60 (2026-10-22, per Dan; the slider's 100% is a quiet background level)
     musicScale: 2,  // marks a game saved with the new music slider
@@ -1819,10 +1821,11 @@ var SCENE_W = 125, SCENE_H = 240, PILGRIM_W = 11, PILGRIM_H = 15;
 var PILGRIM_PATH_FULL = [[103.0,283.0],[99.6,282.4],[96.1,281.9],[92.7,281.3],[89.3,280.8],[85.8,280.2],[82.4,279.7],[79.0,279.1],[75.6,278.6],[72.1,278.0],[68.7,277.5],[65.3,276.9],[61.8,276.3],[58.4,275.7],[55.0,275.2],[51.5,274.8],[48.1,274.3],[44.6,273.9],[41.2,273.4],[37.7,273.0],[34.3,272.5],[30.9,271.9],[27.5,271.1],[24.1,270.2],[20.9,269.0],[17.9,267.1],[15.5,264.7],[13.7,261.7],[12.7,258.4],[12.2,254.9],[11.8,251.5],[11.6,248.0],[11.8,244.6],[13.0,241.3],[15.2,238.7],[18.2,236.9],[21.5,235.7],[24.8,234.9],[28.2,234.2],[31.7,233.6],[35.1,233.1],[38.6,232.7],[42.0,232.3],[45.5,231.9],[48.9,231.5],[52.4,231.1],[55.8,230.6],[59.2,230.1],[62.7,229.6],[66.1,229.1],[69.6,228.6],[73.0,228.2],[76.5,227.7],[79.9,227.3],[83.4,226.8],[86.8,226.3],[90.2,225.8],[93.6,225.2],[97.0,224.5],[100.4,223.6],[103.6,222.3],[106.6,220.5],[109.0,218.0],[110.4,214.8],[110.9,211.4],[111.1,207.9],[110.7,204.5],[109.2,201.3],[106.7,199.0],[103.7,197.3],[100.4,196.1],[97.0,195.3],[93.6,194.6],[90.2,194.1],[86.8,193.6],[83.3,193.1],[79.9,192.7],[76.4,192.2],[73.0,191.8],[69.5,191.4],[66.1,190.9],[62.6,190.4],[59.2,189.9],[55.8,189.3],[52.4,188.8],[48.9,188.3],[45.5,187.8],[42.0,187.3],[38.6,186.8],[35.2,186.2],[31.7,185.6],[28.3,185.0],[24.9,184.2],[21.6,183.2],[18.4,181.9],[15.5,179.9],[13.4,177.2],[12.3,173.9],[11.8,170.5],[11.6,167.0],[13.1,164.0],[15.9,161.9],[19.1,160.6],[22.5,159.7],[25.9,159.0],[29.3,158.4],[32.7,157.8],[36.2,157.3],[39.6,156.9],[43.1,156.4],[46.5,155.9],[50.0,155.5],[53.4,155.0],[56.8,154.5],[60.3,154.0],[63.7,153.4],[67.1,152.9],[70.6,152.4],[74.0,151.9],[77.5,151.4],[80.9,150.9],[84.3,150.4],[87.8,149.9],[91.2,149.4],[94.6,148.7],[98.0,148.0],[101.4,147.2],[104.7,146.0],[107.7,144.4],[110.1,141.9],[111.0,138.6],[110.9,135.1],[109.2,132.1],[106.3,130.3],[103.1,129.0],[99.7,128.1],[96.3,127.4],[92.9,126.8],[89.5,126.3],[86.0,125.7],[82.6,125.3],[79.1,124.8],[75.7,124.3],[72.2,123.8],[68.8,123.4],[65.4,122.9],[61.9,122.3],[58.5,121.7],[55.1,121.2],[51.6,120.6],[48.2,120.1],[44.8,119.6],[41.3,119.0],[37.9,118.5],[34.5,117.9],[31.1,117.3],[27.6,116.6],[24.3,115.9],[20.9,115.0],[17.7,113.8],[14.7,112.0],[12.6,109.3],[11.8,105.9],[12.3,102.5],[14.8,100.2],[18.1,99.0],[21.5,98.3],[24.9,97.8],[28.3,97.4],[31.8,97.1],[35.3,96.8],[38.7,96.5],[42.2,96.3],[45.7,96.0],[49.1,95.7],[52.6,95.3],[56.0,94.9],[59.5,94.4],[62.9,94.0],[66.4,93.5],[69.8,93.1],[73.3,92.6],[76.7,92.1],[80.1,91.6],[83.6,91.1],[87.0,90.5],[90.4,89.9],[93.8,89.1],[97.1,88.0],[100.3,86.6],[102.5,84.1],[100.4,81.7],[97.1,80.6],[93.7,79.8],[90.3,79.1],[86.9,78.5],[83.4,77.9],[80.0,77.3],[76.6,76.8],[73.2,76.2],[69.7,75.6],[66.3,75.1],[62.8,74.7],[59.4,74.2],[55.9,73.8],[52.5,73.4],[49.0,73.0],[45.6,72.5],[42.2,72.1],[38.7,71.5],[35.3,70.8],[31.9,70.0],[28.7,68.8],[26.5,66.5],[29.5,64.8],[32.8,63.9],[36.2,63.1],[39.6,62.4],[43.0,61.8],[46.5,61.2],[49.9,60.7],[53.4,60.3],[56.8,59.9],[60.3,59.6],[63.7,59.3],[67.2,59.0],[70.7,58.7],[74.1,58.4],[77.6,58.0],[81.0,57.5],[84.4,56.9],[87.7,55.6],[87.3,52.9],[84.3,51.3],[80.9,50.3],[77.5,49.6],[74.1,48.8],[70.7,48.1],[67.4,47.1],[64.3,45.6],[62.0,43.0]];
 var pilgrimPath = PILGRIM_PATH_FULL, pilgrimSpeed = 24 / 800;   // speed: 24 picture pixels a second, as a fraction of the path
 
-// Each finished GAME moves the pilgrim 1/15 of the way up the path to the church (2026-10-20, per Dan). Missions that are not games --
-// Be the Light and Choose Joy, and the planned Light a Candle -- don't move him. There will be 15 games in all; the ones not built
-// yet are the grey icons in the Missions folder.
-var PILGRIM_GAMES_TOTAL = 15;
+// Each finished GAME moves the pilgrim on to the next of 5 stops along the path, and the 5th is the church door (2026-10-22, per Dan; it was 1/15 of the
+// way for each of 15 games). Any 5 games do it: the 6th and later don't move him, since he has gone into the church. Missions that are not games --
+// Be the Light, Choose Joy and Light a Candle -- don't move him. There will be 15 games among the 18 missions; the ones not built yet are the grey icons
+// in the Missions folder.
+var PILGRIM_GAMES_TOTAL = 5;
 var PILGRIM_NON_GAMES = ["beTheLight", "chooseJoy", "lightCandle"];
 function pilgrimGamesDone(){
   return MISSIONS.filter(function(m){ return PILGRIM_NON_GAMES.indexOf(m.id) === -1 && state.missions[m.id].done; }).length;
@@ -1989,9 +1992,22 @@ function pilgrimTap(){
 var pilgrimAward = null;
 var pilgrimAllowBack = false;        // true after CLEAR TICKET, until he has walked back to the start
 function pilgrimBusy(el, on){ var scr = el && el.closest(".screen"); if(scr) scr.classList.toggle("pilgrimBusy", on); }
+// The 5th stop is the church door, and there he goes in (2026-10-22, per Dan): he steps up into the doorway and is gone. From then on he stays inside
+// (state.pilgrimIn), and the icons can be tapped again once he is in.
+function pilgrimEnter(el){
+  pilgrimAward = null; pilgrimGreetPending = false; pilgrimHide();
+  el.classList.remove("walking", "hop");
+  void el.offsetWidth;
+  el.classList.add("entering");
+  pilgrimGreetTimer = setTimeout(function(){
+    state.pilgrimIn = true; saveState();
+    if(el.isConnected){ el.style.visibility = "hidden"; pilgrimBusy(el, false); }
+  }, 950);
+}
 function pilgrimArrived(el, walkedForward){
   state.pilgrimP = pilgrimPos; saveState();
   pilgrimAllowBack = false;
+  if(pilgrimPos >= 0.9999 && !state.pilgrimIn){ pilgrimEnter(el); return; }
   if(pilgrimAward){
     pilgrimAward = null; pilgrimGreetPending = false;
     pilgrimBusy(el, false);                                   // he has arrived: the icons can be tapped again
@@ -2026,6 +2042,11 @@ function pilgrimInit(isNew){
   // Clearing a mission (2026-10-22, per Dan) never walks him backward: he stays where he is, and only moves on once the games finished take him
   // further than that. (CLEAR TICKET starts everything over, so that one lets him walk back to the start.)
   if(!pilgrimAllowBack) target = Math.max(target, pilgrimPos);
+  if(state.pilgrimIn && !pilgrimAllowBack){                // he is in the church: nothing to draw
+    pilgrimPos = 1; pilgrimAward = null;
+    el.style.visibility = "hidden"; el.style.pointerEvents = "none";
+    return;
+  }
   pilgrimPlace(el, pilgrimPos, 0);
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var dist = target - pilgrimPos;
@@ -2036,6 +2057,26 @@ function pilgrimInit(isNew){
     return;
   }
   pilgrimWalk(el, target, calm);
+}
+
+// A simple walking sound (2026-10-22, per Dan): a soft footstep, a short burst of filtered noise, every quarter of a second while he walks, alternating a little
+// in tone from one foot to the other. It goes through the sound-effects volume.
+var pilgrimLastStep = 0, pilgrimFoot = 0, pilgrimNoiseBuf = null;
+function pilgrimStepSfx(now){
+  if(now - pilgrimLastStep < 250) return;
+  pilgrimLastStep = now;
+  try {
+    var ctx = pixCtx(); if(!ctx || ctx.state !== "running") return;
+    if(!pilgrimNoiseBuf || pilgrimNoiseBuf.sampleRate !== ctx.sampleRate){
+      var n = Math.floor(ctx.sampleRate * 0.07), b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0);
+      for(var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      pilgrimNoiseBuf = b;
+    }
+    var t0 = ctx.currentTime, src = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = pilgrimNoiseBuf; lp.type = "lowpass"; lp.frequency.value = pilgrimFoot ? 950 : 720; pilgrimFoot ^= 1;
+    g.gain.setValueAtTime(1.0, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.07);
+    src.connect(lp); lp.connect(g); g.connect(pixBus(ctx, "sfx")); src.start(t0);
+  } catch(e){}
 }
 
 function pilgrimWalk(el, target, calm){
@@ -2052,6 +2093,7 @@ function pilgrimWalk(el, target, calm){
     var last = performance.now();
     function step(now){
       if(!el.isConnected) return;      // redrawn: the new drawing picks the walk up from pilgrimPos
+      pilgrimStepSfx(now);
       var move = pilgrimSpeed * Math.min(0.1, (now - last) / 1000); last = now;
       if(Math.abs(target - pilgrimPos) <= move){
         pilgrimPos = target; pilgrimPlace(el, pilgrimPos, sign);
@@ -2137,7 +2179,7 @@ function screenAward(){
 function afterAward(){
   state.awardMissionId = null;
   state.folderOpen = false;          // the Missions window is closed, so the player can watch the pilgrim (2026-10-22, per Dan)
-  pilgrimAward = "great";            // see pilgrimArrived
+  pilgrimAward = state.pilgrimIn ? null : "great";            // see pilgrimArrived (once he is in the church there is no pilgrim to speak)
   // Auto-advance to the Golden Ticket screen only the ONE time a mission
   // completion actually crosses the unlock threshold (2026-09-29, per Dan's
   // 5-of-10 change) — every mission is worth exactly 100 pts, so "this
@@ -2520,15 +2562,12 @@ function fmEvaluate(){
     s.flipped = [];
     var allMatched = s.cards.every(function(c){ return c.matched; });
     if(allMatched){
-      if(s.level === MATCH_LEVELS.length - 1){
-        // the last level: ROUND X COMPLETED! shows before the results (2026-10-22, per Dan); fmInterlude then sets the status to "complete"
-        s.interlude = {n: s.level + 1, phase: "msg", award: false, final: true};
-      } else {
-        s.levelDone = true;
-        saveState(); render();
-        fmCelebrate();
-        return;
-      }
+      // every level, the last one too (2026-10-22, per Dan: the last level was missing the flash and its fanfare), flashes the tile frames with the
+      // fanfare; ROUND X COMPLETED! follows (see fmCelebrate), and after the last level the Mission Complete screen.
+      s.levelDone = true;
+      saveState(); render();
+      fmCelebrate();
+      return;
     }
   } else {
     s.flipped = [];
@@ -2574,7 +2613,7 @@ function fmCelebrate(){
         fmCelebrating = false;
         // After the flashing, ROUND X COMPLETED! shows before the next level (2026-10-22, per Dan); see fmInterlude.
         s3.levelDone = false; s3.celebrate = false;
-        s3.interlude = {n: s3.level + 1, phase: "msg", award: false, next: nextLevel};
+        s3.interlude = {n: s3.level + 1, phase: "msg", award: false, next: nextLevel, final: s3.level >= MATCH_LEVELS.length - 1};
         saveState(); render();
         return;
       }
@@ -2590,12 +2629,12 @@ function fmCelebrate(){
   setTimeout(begin, s.celebrate ? 0 : FM_FANFARE_DELAY_MS);   // after a reload mid-celebration there is no second pause
 }
 
-// ROUND X COMPLETED! between the levels, the same as Faith Flash (2026-10-22, per Dan): the sound plays once, after 2 seconds a chance used during
-// the level is AWARDED! back, and the next level starts when the sound is over. render() calls fmInterlude() so a reload in the middle of it
-// picks the sequence back up.
+// ROUND X COMPLETED! between the levels (2026-10-22, per Dan): the sound plays once and the next level starts when it is over. The message is shown
+// alone, never with a chance heart (2026-10-22, per Dan): Faith Match gives every level all of its chances again, so there is nothing to give back.
+// render() calls fmInterlude() so a reload in the middle of it picks the sequence back up.
 function fmInterlude(){
   pixRoundRun("faithMatch", function(){ return state.session.faithMatch; },
-    function(s){ if(s.chances < (s.maxChances || MATCH_CHANCES[s.level])){ s.chances++; return true; } return false; },
+    null,
     function(s){
       if(s.interlude.final){ s.interlude = null; fmCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
       initFaithMatchLevel(s.interlude.next); render();
@@ -4808,7 +4847,8 @@ function screenPassport(){
 /* ---------- Golden Ticket ---------- */
 
 function clearTicket(){
-  pilgrimAllowBack = true;            // everything starts over, so the pilgrim walks back to the start
+  pilgrimAllowBack = true;            // everything starts over, so the pilgrim comes out of the church and walks back to the start
+  state.pilgrimIn = false;
   state.points = 0;
   MISSIONS.forEach(function(m){ state.missions[m.id].done = false; });
   state.missions.faithMatch.level = 0;
