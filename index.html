@@ -581,8 +581,11 @@
   .pixMission .clHands{position:absolute;bottom:4px;width:78px;height:40px;background:url("tiles/hands2.png") center / 100% 100% no-repeat;image-rendering:pixelated;transform:translateX(-50%);user-select:none;pointer-events:none;}
   .pixMission .clSlide{flex:none;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;height:56px;margin:0;padding:0 16px;background:#2B4BA8;border:4px solid #1B1F3B;border-radius:14px;
     box-shadow:inset 0 0 0 3px #3A93E8,0 6px 0 rgba(20,30,90,.4);touch-action:none;user-select:none;-webkit-user-select:none;cursor:ew-resize;}
-  /* the tap zone is 10 px taller than the band, above and below (2026-10-22, per Dan): the padding is cancelled by the margins, so nothing moves */
-  .pixMission .clSlideZone{flex:none;margin:-10px 0 2px;padding:10px 0;touch-action:none;user-select:none;-webkit-user-select:none;}
+  /* the tap zone starts 10 px above the band and runs down to the bottom of the screen (2026-10-22, per Dan): the padding above and below is cancelled by the
+     margins, so nothing moves, and the ::after carries the zone on down past the band (the screen clips it). MAIN MENU stays on top of it and still works. */
+  .pixMission .clSlideZone{position:relative;flex:none;margin:-10px 0 2px;padding:10px 0;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .pixMission .clSlideZone::after{content:"";position:absolute;left:0;right:0;top:100%;height:100vh;}
+  .pixMission.clScreen .btn.pixBtn{position:relative;z-index:1;}
   .pixMission .clSlideTxt{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.12em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B;pointer-events:none;}
   .pixMission .clArrow{width:0;height:0;border-top:13px solid transparent;border-bottom:13px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);pointer-events:none;}
   .pixMission .clArrow.l{border-right:18px solid #FFC93A;}
@@ -3397,8 +3400,8 @@ function clMoveHandTo(clientX){
 function clInBand(ev){
   var band = document.getElementById("clSlide");
   if(!band) return false;
-  var r = band.getBoundingClientRect();
-  return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+  var r = band.getBoundingClientRect();     // the zone: from 10 px above the band's picture, and on down to the bottom of the screen (2026-10-22, per Dan)
+  return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= window.innerHeight;
 }
 function clPointerDown(ev){
   var s = state.session.catchLight;
@@ -3655,7 +3658,7 @@ function screenCatchLight(){
     '</div>' +
     '<div class="clStage" id="clStage"><div class="clField" id="clField"><div class="clHands" id="clHands"></div></div></div>' +
     '<div class="clSlideZone" id="clSlide"><div class="clSlide"><span class="clArrow l"></span><span class="clSlideTxt">' + t("cl_slide") + '</span><span class="clArrow r"></span></div></div>' +
-    pixBtnHtml(t("mainMenu"), "clQuit()", true));
+    pixBtnHtml(t("mainMenu"), "clQuit()", true), "clScreen");
 }
 
 /* ---------- Acts of Kindness Sort ---------- */
