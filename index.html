@@ -579,8 +579,10 @@
   .pixMission .clField{position:absolute;left:4px;top:4px;right:4px;bottom:4px;overflow:hidden;border-radius:6px;}
   .pixMission .clIcon{position:absolute;top:-50px;width:32px;height:32px;background:url("tiles/icons48/ic_catchLight.png") center / 100% 100% no-repeat;image-rendering:auto;user-select:none;pointer-events:none;}
   .pixMission .clHands{position:absolute;bottom:4px;width:78px;height:40px;background:url("tiles/hands2.png") center / 100% 100% no-repeat;image-rendering:pixelated;transform:translateX(-50%);user-select:none;pointer-events:none;}
-  .pixMission .clSlide{flex:none;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;height:56px;margin:0 0 12px;padding:0 16px;background:#2B4BA8;border:4px solid #1B1F3B;border-radius:14px;
+  .pixMission .clSlide{flex:none;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;height:56px;margin:0;padding:0 16px;background:#2B4BA8;border:4px solid #1B1F3B;border-radius:14px;
     box-shadow:inset 0 0 0 3px #3A93E8,0 6px 0 rgba(20,30,90,.4);touch-action:none;user-select:none;-webkit-user-select:none;cursor:ew-resize;}
+  /* the tap zone is 10 px taller than the band, above and below (2026-10-22, per Dan): the padding is cancelled by the margins, so nothing moves */
+  .pixMission .clSlideZone{flex:none;margin:-10px 0 2px;padding:10px 0;touch-action:none;user-select:none;-webkit-user-select:none;}
   .pixMission .clSlideTxt{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.12em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B;pointer-events:none;}
   .pixMission .clArrow{width:0;height:0;border-top:13px solid transparent;border-bottom:13px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);pointer-events:none;}
   .pixMission .clArrow.l{border-right:18px solid #FFC93A;}
@@ -603,7 +605,8 @@
     .pixMission .flMsg{margin-top:4px;}
     .pixMission.pixLower .flGrid{width:88%;margin:8px auto 6px;gap:8px;}   /* Follow the Light is lowered too, and its longer instruction needs 3 lines */
     .pixMission .clStage{min-height:130px;}
-    .pixMission .clSlide{height:48px;margin-bottom:8px;}
+    .pixMission .clSlide{height:48px;}
+    .pixMission .clSlideZone{margin-bottom:-2px;}
     .pixMission .hbScene{width:82%;margin-left:auto;margin-right:auto;}
   }
   /* Options screen: two volume sliders on a cream card (2026-10-20, per Dan) */
@@ -3651,7 +3654,7 @@ function screenCatchLight(){
       '<span id="clHearts">' + chancesHeartsHtml(Math.max(0, CL_MAX_MISSES - s.misses), CL_MAX_MISSES) + '</span>' +
     '</div>' +
     '<div class="clStage" id="clStage"><div class="clField" id="clField"><div class="clHands" id="clHands"></div></div></div>' +
-    '<div class="clSlide" id="clSlide"><span class="clArrow l"></span><span class="clSlideTxt">' + t("cl_slide") + '</span><span class="clArrow r"></span></div>' +
+    '<div class="clSlideZone" id="clSlide"><div class="clSlide"><span class="clArrow l"></span><span class="clSlideTxt">' + t("cl_slide") + '</span><span class="clArrow r"></span></div></div>' +
     pixBtnHtml(t("mainMenu"), "clQuit()", true));
 }
 
