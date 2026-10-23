@@ -542,9 +542,9 @@
   /* minmax(0,1fr) and min-width:0: a wide letter can never stretch its column, so the grid is always exactly as wide as the screen allows and the right-hand column is never pushed off it */
   .wtGrid{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));width:min(100%,max(220px,calc(100vh - 360px)),380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;
     container-type:inline-size;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;}
-  .wtCell{aspect-ratio:1/1;padding:2px;box-sizing:border-box;pointer-events:none;min-width:0;overflow:hidden;}
+  .wtCell{aspect-ratio:1/1;padding:2px 2px 4px;box-sizing:border-box;pointer-events:none;min-width:0;}     /* no overflow:hidden: it cut off the tile's bottom edge (2026-10-23, per Dan's phone picture) */
   .wtCell i{display:flex;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;font-style:normal;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;
-    font-size:1.125rem;font-size:clamp(12px,5.4cqw,24px);color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 2px 0 rgba(20,30,90,.35);}
+    font-size:1.125rem;font-size:clamp(12px,calc(43cqw / var(--n,8)),28px);color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 2px 0 rgba(20,30,90,.35);}
   .wtCell.sel i{background:#FFC93A;box-shadow:inset 0 -3px 0 rgba(139,90,0,.3),0 0 0 2px #FFF6C0,0 0 10px 3px rgba(255,236,120,.8);}
   .wtCell.ok i{background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.3);}
   .wtCell.bad i{background:#E85A5A;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.3);}
@@ -811,7 +811,7 @@ var T = {
       emojiStories:{d:"Guess the Bible story from the emojis.", h:["Look at the emojis and tap the Bible story they show.", "Answer 8 stories. You have 5 chances."]},
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 2 rounds. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
-      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to win."]}
+      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]}
     },
     fm_failTitle:"Out of Chances!",
     fm_failBody:"Not this time! You start over from Level 1.",
@@ -940,7 +940,7 @@ var T = {
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias. Tienes 5 oportunidades."]},
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 2 rondas. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
-      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para ganar."]}
+      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
     fm_failTitle:"¡Sin Oportunidades!",
     fm_failBody:"¡Esta vez no! Empiezas de nuevo desde el Nivel 1.",
@@ -4568,15 +4568,13 @@ function screenSacredSudoku(){
 
 // Word Trail (2026-10-23, per Dan): a grid of letters (8 x 8 to start) with hidden words in it. Every letter of a word touches the next one above,
 // below or beside it (no diagonals). The player touches a letter and drags to the next, and so on; on lifting the finger, a trail that spells a word
-// from the list at the bottom finds it: the word leaves the list and the letters it used are replaced with new ones. Find every word to win. It
-// cannot be failed. To change the size, change WT_SIZE (and the word count) -- nothing else depends on it.
-var WT_SIZE = 8;
-var WT_WORDS = 6;                 // words hidden in a game
-// No accented letters, so every tile is a plain letter. 4 to 7 letters each; a game takes WT_WORDS of them at random.
-var WORD_TRAIL_WORDS = {
-  en: ["FAITH","GRACE","MERCY","PEACE","HOPE","LOVE","PRAY","HOLY","SOUL","LIGHT","ANGEL","SAINT","CROSS","BIBLE","PSALM","BLESS","TRUST","PRAYER","GOSPEL","CHURCH","SPIRIT","ROSARY","HEAVEN","SERVE","SHARE","KIND","TEMPLE","PRAISE","FORGIVE"],
-  es: ["AMOR","VIDA","DIOS","ALMA","CRUZ","MISA","ORAR","GRACIA","CIELO","SANTO","ALTAR","PADRE","BIBLIA","REINO","FUEGO","SALMO","PASTOR","CAMINO","ROSARIO","IGLESIA","BENDITO","VIRGEN","ALABAR","PASCUA","SERVIR","CORONA","TIERRA","GLORIA","TEMPLO","FELIZ"]
-};
+// from the list at the bottom finds it: the word leaves the list and the letters it used are replaced with new ones. Find every word to finish the
+// round. It cannot be failed (no chances). Three rounds (2026-10-23, per Dan): 6 x 6 with 4-letter words, 7 x 7 with 5-letter words, 8 x 8 with
+// 6-letter words, the words coming from the Word Scramble pool of that level. Between rounds the same ROUND COMPLETED! message as the other games.
+var WT_ROUNDS = [{size: 6, level: 0}, {size: 7, level: 1}, {size: 8, level: 2}];
+var WT_WORDS = 5;                 // words hidden in a round
+var WT_SIZE = 8;                  // the size of the round on screen (set by wtUse, which every function that needs it is given after)
+function wtUse(s){ if(s && s.size) WT_SIZE = s.size; }
 var WT_FILLER = {
   en: "EEEEEEEEAAAAAAAIIIIIIOOOOOUUNNNNNRRRRRTTTTTLLLLSSSSDDDGGBBCCMMPPFFHHVWYK",
   es: "AAAAAAAAEEEEEEEOOOOOOIIIIIUUSSSSRRRRNNNNDDDLLLCCCTTTMMPPBBGVHQFZJ"
@@ -4636,17 +4634,28 @@ function wtFindPath(grid, word){
   for(var i = 0; i < grid.length; i++) if(walk(i, 0, {})) return true;
   return false;
 }
-function initWordTrail(){
-  var pool = WORD_TRAIL_WORDS[state.lang || "en"], hidden = null;
-  for(var tries = 0; tries < 40 && !hidden; tries++){
-    var words = shuffle(pool).slice(0, WT_WORDS).sort(function(a, b){ return b.length - a.length || (a < b ? -1 : 1); });
-    hidden = wtPlace(words);
-  }
+// one round: a fresh grid of that round's size, with WT_WORDS words from the Word Scramble pool of that level hidden in it
+function wtNewRound(round){
+  var cfg = WT_ROUNDS[round];
+  WT_SIZE = cfg.size;
+  var pool = WORD_UNSCRAMBLE_WORDS[state.lang || "en"][cfg.level], hidden = null;
+  for(var tries = 0; tries < 60 && !hidden; tries++) hidden = wtPlace(shuffle(pool).slice(0, WT_WORDS));
   var grid = [];
   for(var i = 0; i < WT_SIZE * WT_SIZE; i++) grid.push(wtLetter());
   hidden.forEach(function(h){ h.cells.forEach(function(c, k){ grid[c] = h.w.charAt(k); }); });
-  state.session.wordTrail = {v: 2, grid: grid, hidden: hidden, remaining: hidden.map(function(h){ return h.w; }), busy: false, status: "playing"};     // v 2 = straight trails only
+  return {v: 3, round: round, size: cfg.size, grid: grid, hidden: hidden, remaining: hidden.map(function(h){ return h.w; }), busy: false, status: "playing", interlude: null};     // v 3 = three rounds
+}
+function initWordTrail(){
+  state.session.wordTrail = wtNewRound(0);
   saveState();
+}
+// ROUND X COMPLETED! between the rounds, and after the last one before the Mission Completed screen (the same as the other games)
+function wtInterlude(){
+  pixRoundRun("wordTrail", function(){ return state.session.wordTrail; }, null, function(s2){
+    if(s2.interlude.final){ s2.interlude = null; wtCollectAward(); return; }
+    state.session.wordTrail = wtNewRound(s2.round + 1);
+    saveState(); render();
+  });
 }
 // A word was found: its squares get new letters. Replacing them could also have taken apart another hidden word (the trail the player traced may
 // have crossed it), so every word still in the list is checked, and one that is gone is hidden again somewhere else.
@@ -4666,6 +4675,15 @@ function wtRefill(s, cells, word){
     });
     if(!again) break;
   }
+  // (a crowded small grid might still have lost one: then all the words left are hidden afresh)
+  if(!s.hidden.every(function(h){ return wtFindPath(s.grid, h.w); })){
+    for(var tries = 0; tries < 40; tries++){
+      var again2 = wtPlace(s.hidden.map(function(h){ return h.w; }));
+      if(!again2) continue;
+      s.hidden = again2; again2.forEach(function(h){ h.cells.forEach(function(c, k){ s.grid[c] = h.w.charAt(k); }); });
+      break;
+    }
+  }
 }
 
 var wtDrag = null;      // the trail being drawn: {path:[squares], x, y}
@@ -4675,7 +4693,7 @@ function wtRects(){
   var out = [];
   for(var i = 0; i < WT_SIZE * WT_SIZE; i++){
     var el = document.getElementById("wtC" + i); if(!el){ out.push(null); continue; }
-    var r = el.getBoundingClientRect(); out.push({l: r.left, t: r.top, w: r.width, h: r.height});
+    var r = (el.firstChild || el).getBoundingClientRect(); out.push({l: r.left, t: r.top, w: r.width, h: r.height});     // the drawn tile itself, so the line meets its middle exactly
   }
   return out;
 }
@@ -4759,8 +4777,9 @@ function wtUp(){
       wtRefill(s2, path, word);
       s2.busy = false;
       if(!s2.remaining.length){
-        s2.status = "won"; saveState(); render();
-        setTimeout(function(){ if(state.session.wordTrail === s2 && state.screen === "wordTrail") wtCollectAward(); }, 900);
+        // every word found: ROUND X COMPLETED! (after the last round it leads to the Mission Completed screen)
+        s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= WT_ROUNDS.length - 1};
+        saveState(); render();
       } else { saveState(); render(); }
     }, 450);
   } else if(path.length >= 3){
@@ -4776,15 +4795,17 @@ function wtQuit(){ state.session.wordTrail = null; wtDrag = null; go("mainMenu")
 
 function screenWordTrail(){
   var s = state.session.wordTrail;
-  if(!s || s.v !== 2){ initWordTrail(); s = state.session.wordTrail; }          // a game saved before the diagonals were taken out starts over
+  if(!s || s.v !== 3){ initWordTrail(); s = state.session.wordTrail; }          // a game saved by an earlier build (one grid, no rounds) starts over
+  wtUse(s);
+  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("wordTrailName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
   var cells = s.grid.map(function(ch, i){ return '<div class="wtCell" id="wtC' + i + '"><i>' + ch + '</i></div>'; }).join("");
   var words = s.remaining.map(function(w){ return '<span class="wtWord">' + w + '</span>'; }).join("");
   return pixShell('<h2 class="pixMTitle">' + t("wordTrailName") + '</h2>' +
     '<div class="pixNote">' + t("wt_intro") + '</div>' +
     '<div class="wtTrace" id="wtTrace">&nbsp;</div>' +
-    '<div class="wtGrid" id="wtGrid" onpointerdown="wtDown(event)" onpointermove="wtMove(event)" onpointerup="wtUp(event)" onpointercancel="wtCancel(event)" oncontextmenu="return false">' + cells +
+    '<div class="wtGrid" id="wtGrid" style="--n:' + s.size + ';grid-template-columns:repeat(' + s.size + ',minmax(0,1fr))" onpointerdown="wtDown(event)" onpointermove="wtMove(event)" onpointerup="wtUp(event)" onpointercancel="wtCancel(event)" oncontextmenu="return false">' + cells +
       '<svg class="wtLine" id="wtSvg"><polyline id="wtPoly" points=""/></svg></div>' +
-    '<div class="pixNote">' + t("wt_left")(s.remaining.length) + '</div>' +
+    '<div class="pixNote">' + t("fm_level")(s.round + 1, WT_ROUNDS.length) + ' &nbsp;|&nbsp; ' + t("wt_left")(s.remaining.length) + '</div>' +
     '<div class="wtWords">' + words + '</div>' +
     '<div class="spacer"></div>', "pixLower");
 }
@@ -5421,6 +5442,7 @@ function render(){
   if(state.screen === "stainedGlass" && state.session.stainedGlass && state.session.stainedGlass.interlude && !pixRoundRunning.stainedGlass) pzInterlude();
   if(state.screen === "wordUnscramble" && state.session.wordUnscramble && state.session.wordUnscramble.interlude && !pixRoundRunning.wordUnscramble) wuInterlude();
   if(state.screen === "catchLight" && state.session.catchLight && state.session.catchLight.interlude && !pixRoundRunning.catchLight) clInterlude();
+  if(state.screen === "wordTrail" && state.session.wordTrail && state.session.wordTrail.interlude && !pixRoundRunning.wordTrail) wtInterlude();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
   awardAutoReturn();
