@@ -1500,13 +1500,14 @@ function pixMusicRestart(){
 // Runs fn once the sound `name` that was last started has finished (at once if it is not playing). Word Scramble uses it so the sound for a finished
 // word waits for the last letter's own sound instead of cutting it off (2026-10-23, per Dan).
 var pixSfxLast = {};
-function pixSfxWait(name){      // milliseconds left before the sound `name` finishes (0 if it is not playing)
+// `early` = how many milliseconds before the file's very end the next sound may start (the end of a file is only a faint tail).
+function pixSfxWait(name, early){      // milliseconds left before the sound `name` finishes (0 if it is not playing)
   var rec = pixSfxLast[name];
-  return rec ? Math.max(0, Math.ceil(rec.t + rec.ms - performance.now())) : 0;
+  return rec ? Math.max(0, Math.ceil(rec.t + rec.ms - (early || 0) - performance.now())) : 0;
 }
-function pixAfterSfx(name, fn){
-  var wait = pixSfxWait(name);
-  if(wait <= 0) fn(); else setTimeout(fn, wait + 20);
+function pixAfterSfx(name, fn, early){
+  var wait = pixSfxWait(name, early);
+  if(wait <= 0) fn(); else setTimeout(fn, wait);
 }
 
 // Plays a sound once. exclusive = true stops the previous answer/level sound first, so they never pile up. Returns true if it started.
@@ -2262,9 +2263,31 @@ function ffRound(s){ return Math.floor(s.index / FAITH_FLASH_ROUND_SIZE); }
 var FF_CHANCES = 5;   // 5 chances for the whole game (2026-10-21, per Dan; it was 3, then 8)
 function ffChancesLeft(s){ return typeof s.chances === "number" ? s.chances : FF_CHANCES; }
 
+// Where the right answer sits (2026-10-23, per Dan: it must appear randomly in all three positions). A plain shuffle can leave it in the same spot
+// for several questions running, so a game gets each position the same number of times, in random order, never 3 in a row. ffTargets(n) = a list of n positions (0, 1 or 2) for the n questions of a game.
+function ffTargets(n){
+  for(var tries = 0; tries < 200; tries++){
+    var list = [];
+    for(var i = 0; i < n; i++) list.push(i % 3);
+    list = shuffle(list);
+    var ok = true;
+    for(var k = 2; k < n; k++) if(list[k] === list[k-1] && list[k] === list[k-2]){ ok = false; break; }
+    if(ok) return list;
+  }
+  return list;
+}
+// answerOrder[displayed position] = which of the question's 3 answers sits there; the right one goes to `target`, the other two are shuffled
+function ffAnswerOrder(q, target){
+  var others = shuffle([0,1,2].filter(function(i){ return i !== q.correct; })), order = [], o = 0;
+  for(var p = 0; p < 3; p++) order.push(p === target ? q.correct : others[o++]);
+  return order;
+}
+
 function initFaithFlash(){
   var order = shuffle(FAITH_FLASH_QUESTIONS.map(function(_,i){return i;})).slice(0, FAITH_FLASH_ROUND_SIZE * FAITH_FLASH_ROUNDS);   // all different
-  state.session.faithFlash = {order:order, index:0, correct:0, answered:null, answerOrder:shuffle([0,1,2]), status:"playing", chances:FF_CHANCES, past:[]};
+  var targets = ffTargets(order.length);
+  state.session.faithFlash = {order:order, index:0, correct:0, answered:null, targets:targets, answerOrder:ffAnswerOrder(FAITH_FLASH_QUESTIONS[order[0]], targets[0]),
+    status:"playing", chances:FF_CHANCES, past:[]};
   saveState();
 }
 
@@ -2388,7 +2411,10 @@ function ffNext(){
   if(s.index >= s.order.length - 1){
     ffCollectAward();               // a win goes straight to the Mission Complete screen (2026-10-22, per Dan: no screen between)
   } else {
-    s.index++; s.answered = null; s.answerOrder = shuffle([0,1,2]); saveState(); render();
+    s.index++; s.answered = null;
+    var nq = FAITH_FLASH_QUESTIONS[s.order[s.index]];
+    s.answerOrder = s.targets ? ffAnswerOrder(nq, s.targets[s.index]) : shuffle([0,1,2]);      // a game saved before the positions were balanced just shuffles
+    saveState(); render();
   }
 }
 
@@ -3067,15 +3093,22 @@ function screenFollowLight(){
 // needs to change.
 // Three levels of 5 words (2026-10-21, per Dan): level 1 has 4-letter words, level 2 has 5-letter words and level 3 has 6-letter words. No
 // accented letters, so every letter tile is a plain letter.
+// Each level has 15 words and a game plays 5 of them, picked at random (2026-10-23, per Dan). The words are chosen so that no one of them can be
+// rearranged into a different common word (a word is only right when it is spelled exactly the same).
 var WU_LEVELS = 3;
+var WU_WORDS_PER_LEVEL = 5;
 var WORD_UNSCRAMBLE_WORDS = {
-  en: [["HOPE","LOVE","PRAY","HOLY","SOUL"],
-       ["GRACE","MERCY","FAITH","TRUST","PEACE"],
-       ["SPIRIT","PRAYER","GOSPEL","HEAVEN","CHURCH"]],
-  es: [["AMOR","CRUZ","VIDA","DIOS","ALMA"],
-       ["CIELO","SANTO","ALTAR","FELIZ","PADRE"],
-       ["GRACIA","CRISTO","BIBLIA","VIRGEN","ALABAR"]]
+  en: [["HOPE","LOVE","PRAY","HOLY","SOUL","MASS","GIFT","KING","LAMB","LENT","LORD","WORD","HYMN","JOHN","LUKE"],
+       ["GRACE","MERCY","FAITH","TRUST","PEACE","CROSS","LIGHT","JESUS","PSALM","BIBLE","WATER","BLESS","SHEEP","CROWN","OLIVE"],
+       ["SPIRIT","PRAYER","GOSPEL","HEAVEN","CHURCH","CANDLE","TEMPLE","SAVIOR","PRAISE","BISHOP","ROSARY","SERMON","ADVENT","JOSEPH","CHOSEN"]],
+  es: [["AMOR","CRUZ","VIDA","DIOS","ALMA","HIJO","MISA","PAPA","REZO","AMEN","ORAR","VINO","ROSA","CORO","BODA"],
+       ["CIELO","SANTO","ALTAR","FELIZ","PADRE","REINO","TRIGO","FUEGO","CANTO","PALMA","OVEJA","SALMO","MUNDO","VERBO","JUSTO"],
+       ["GRACIA","CRISTO","BIBLIA","VIRGEN","ALABAR","TIERRA","PUERTA","PASTOR","CORONA","PECADO","PASCUA","CAMINO","SALVAR","TEMPLO","GLORIA"]]
 };
+// which 5 of a level's words a game plays, in the order they come
+function wuPickOrder(lang, level){
+  return shuffle(WORD_UNSCRAMBLE_WORDS[lang][level].map(function(_,i){return i;})).slice(0, WU_WORDS_PER_LEVEL);
+}
 
 function wuScrambleWord(word){
   var letters = word.split("");
@@ -3102,7 +3135,7 @@ var WU_SKIPS = 3;
 
 function initWordUnscramble(){
   var lang = state.lang || "en";
-  var order = shuffle(WORD_UNSCRAMBLE_WORDS[lang][0].map(function(_,i){return i;}));
+  var order = wuPickOrder(lang, 0);
   var s = {level:0, order:order, index:0, hints:WU_HINTS, skips:WU_SKIPS, past:[], status:"playing"};
   wuSetupWord(s);
   state.session.wordUnscramble = s;
@@ -3186,7 +3219,7 @@ function wuInterlude(){
     if(s2.interlude.final){ s2.interlude = null; wuCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
     s2.interlude = null;
     s2.level = (s2.level || 0) + 1;
-    s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
+    s2.order = wuPickOrder(lang2, s2.level);
     s2.index = 0;
     s2.hints = WU_HINTS;
     s2.past = [];
@@ -3202,14 +3235,16 @@ function wuSkip(){
   s.skips--; s.past[s.index] = "bad";
   wuAdvance(s);
 }
+var WU_SFX_EARLY_MS = 200;
 // every square is full: right, and on to the next word; wrong, and the squares clear for another try
 function wuCheck(s){
   var guess = s.slots.map(function(pos){ return s.letters[pos]; }).join("");
   // The word's sound (right = sound_effect_6, wrong = the SKIP sound) waits until the last letter's own sound has finished (2026-10-23, per Dan).
-  var wait = pixSfxWait("fmFirst");
+  // The letter sound's last 0.2 s is only a faint tail, so the word sound comes in a little early (the gap was too long, 2026-10-23, per Dan).
+  var wait = pixSfxWait("fmFirst", WU_SFX_EARLY_MS);
   if(guess === s.word){
     s.feedback = "correct";
-    pixAfterSfx("fmFirst", function(){ pixSfxPlay("fmMatch", true); });
+    pixAfterSfx("fmFirst", function(){ pixSfxPlay("fmMatch", true); }, WU_SFX_EARLY_MS);
     saveState(); render();
     wuEnsureSkips(s); s.past[s.index] = "done";
     setTimeout(function(){
@@ -3219,7 +3254,7 @@ function wuCheck(s){
     }, 900 + wait);
   } else {
     s.feedback = "wrong";
-    pixAfterSfx("fmFirst", function(){ pixSfxPlay("clFade", true); });
+    pixAfterSfx("fmFirst", function(){ pixSfxPlay("clFade", true); }, WU_SFX_EARLY_MS);
     saveState(); render();
     setTimeout(function(){
       var s2 = state.session.wordUnscramble;
