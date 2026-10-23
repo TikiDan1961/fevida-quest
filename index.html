@@ -5045,7 +5045,7 @@ function wgMark(target){          // the frame the dragged word would swap with 
   if(el) el.classList.add("target");
   wgDrag.target = target;
 }
-// When a round starts, the words fill in one at a time in a random order, each with sound_effect_1, all within WG_INTRO_MS (2026-10-23, per Dan). The words
+// When a round starts, the words fill in one at a time in a random order, all within WG_INTRO_MS (2026-10-23, per Dan), with the Faith Match fanfare. The words
 // cannot be touched until they are all in. wgIntro.done[i] says which frames have been filled (so a redraw during the fill keeps what has shown so far).
 var WG_INTRO_MS = 2500, WG_INTRO_FIRST_MS = 120;
 var wgIntro = null;
@@ -5064,7 +5064,7 @@ function wgIntroStart(){
       live.done[cellIdx] = true;
       var el = document.getElementById("wgC" + cellIdx);
       if(el){ el.classList.remove("pending"); el.classList.add("popin"); }
-      pixSfxPlay("clCatch", true);                                    // sound_effect_1, for every word that shows
+      if(k === 0) pixSfxPlay("fmFanfare", false);                     // no sound per word any more: once, as the first word shows, the fanfare Faith Match plays when its tiles are all matched (2026-10-23, per Dan)
       if(k === total - 1){ s.introDone = true; saveState(); wgIntro = null; }
     }, at));
   });
