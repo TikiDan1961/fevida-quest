@@ -429,12 +429,15 @@
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
   .pixRef.shown{color:#1E6B2B;font-weight:700;}
   /* Life of Jesus Timeline */
-  .tlSlots{display:flex;flex-direction:column;gap:4px;margin:6px 0;}
-  .tlSlot{display:flex;align-items:center;gap:8px;height:34px;box-sizing:border-box;padding:0 8px;border:3px solid #1B1F3B;border-radius:8px;background:rgba(255,255,255,.35);
+  /* taller slots with more room between them, and the words centred in the frame (2026-10-23, per Dan); the 7-event round is a little tighter so it still fits */
+  .tlSlots{display:flex;flex-direction:column;gap:12px;margin:8px 0 10px;}
+  .tlSlot{position:relative;display:flex;align-items:center;justify-content:center;height:46px;box-sizing:border-box;padding:0 30px;border:3px solid #1B1F3B;border-radius:10px;background:rgba(255,255,255,.35);
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;color:#1E2F7A;}
   .tlSlot.placed{background:#FFF3D6;box-shadow:inset 0 0 0 2px #FFC93A;}
-  .tlNum{flex:none;width:20px;height:20px;border-radius:4px;background:#1B1F3B;color:#fff;display:grid;place-items:center;font-size:.8rem;}
-  .tlTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tlNum{position:absolute;left:8px;top:50%;margin-top:-10px;width:20px;height:20px;border-radius:4px;background:#1B1F3B;color:#fff;display:grid;place-items:center;font-size:.8rem;}
+  .tlTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+  .tlSlots.seven{gap:7px;}
+  .tlSlots.seven .tlSlot{height:36px;}
   .tlIcon{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;margin-right:6px;}
   .tlCards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
   .tlCard{display:flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:4px 6px 8px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;
@@ -503,9 +506,11 @@
     .pixEmoji{min-height:36px;gap:5px;}
     .pixEmoji img{width:36px;height:36px;}
     .pixRef{min-height:2.1em;margin-top:0;font-size:.875rem;line-height:1.2;}
-    .tlSlots{gap:2px;margin:4px 0;}
-    .tlSlot{height:26px;font-size:.8125rem;}
-    .tlNum{width:18px;height:18px;font-size:.75rem;}
+    .tlSlots{gap:8px;margin:4px 0 6px;}
+    .tlSlot{height:36px;font-size:.8125rem;padding:0 26px;}
+    .tlSlots.seven{gap:4px;}
+    .tlSlots.seven .tlSlot{height:28px;}
+    .tlNum{width:18px;height:18px;margin-top:-9px;font-size:.75rem;}
     .tlCards{gap:6px;}
     .tlCard{min-height:44px;font-size:.8125rem;}
     .lcZone{--u:3.6px;margin:2px auto;}
@@ -836,7 +841,7 @@ var T = {
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
       lightCandle:{d:"Take a quiet moment to pray.", h:["Choose who or what you are praying for.", "Press and hold the candle to light it.", "Let go too soon and the light fades, so keep holding."]},
       emojiStories:{d:"Guess the Bible story from the emojis.", h:["Look at the emojis and tap the Bible story they show.", "Answer 8 stories. You have 5 chances."]},
-      jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 2 rounds. You have 5 chances."]},
+      jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
@@ -967,7 +972,7 @@ var T = {
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
       lightCandle:{d:"Tómate un momento de calma para orar.", h:["Elige por quién o por qué estás orando.", "Mantén presionada la vela para encenderla.", "Si la sueltas muy pronto, la luz se apaga, así que sigue presionando."]},
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias. Tienes 5 oportunidades."]},
-      jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 2 rondas. Tienes 5 oportunidades."]},
+      jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
@@ -4309,23 +4314,46 @@ var TL_EVENTS = {
   transfig:{icon:"✨", en:"The Transfiguration", es:"La Transfiguración"}
 };
 // every set is listed in the correct order, first to last
-var TL_SETS = [
+// Three rounds (2026-10-23, per Dan): round 1 puts 5 events in order, round 2 puts 7, round 3 puts 5 again. A game takes a 5-event set for round 1, a 7-event
+// set for round 2 and a different 5-event set for round 3, at random.
+var TL_SETS5 = [
   ["birth", "baptism", "feeding", "supper", "resurrection"],
   ["annunciation", "birth", "temple", "baptism", "cana"],
   ["cana", "lazarus", "palm", "cross", "ascension"],
-  ["baptism", "sermon", "transfig", "supper", "cross"]
+  ["baptism", "sermon", "transfig", "supper", "cross"],
+  ["palm", "supper", "cross", "resurrection", "ascension"],
+  ["annunciation", "birth", "baptism", "feeding", "palm"]
 ];
+var TL_SETS7 = [
+  ["annunciation", "birth", "temple", "baptism", "sermon", "feeding", "transfig"],
+  ["baptism", "cana", "sermon", "feeding", "lazarus", "palm", "supper"],
+  ["birth", "baptism", "feeding", "palm", "supper", "cross", "resurrection"]
+];
+var TL_ROUNDS = 3;
 
 function tlStartRound(s){
-  s.deck = shuffle(TL_SETS[s.sets[s.round]]);
-  s.placed = []; s.shake = null; s.busy = false;
+  s.deck = shuffle(s.rounds[s.round]);
+  s.placed = []; s.shake = null; s.busy = false; s.interlude = null;
 }
 function initJesusTimeline(){
-  var sets = shuffle([0, 1, 2, 3]).slice(0, 2);
-  var s = {sets:sets, round:0, deck:[], placed:[], chances:TL_CHANCES, shake:null, busy:false, status:"playing"};
+  var five = shuffle(TL_SETS5);
+  var s = {rounds:[five[0], shuffle(TL_SETS7)[0], five[1]], round:0, deck:[], placed:[], chances:TL_CHANCES, shake:null, busy:false, status:"playing", interlude:null};
   tlStartRound(s);
   state.session.jesusTimeline = s;
   saveState();
+}
+// ROUND X COMPLETED!, like the other games (2026-10-23, per Dan): after rounds 1 and 2 a lost chance is given back with the big heart; after the last round the
+// message comes alone and the Mission Completed screen follows.
+function tlInterlude(){
+  pixRoundRun("jesusTimeline", function(){ return state.session.jesusTimeline; }, function(s2){
+    if(tlChancesLeft(s2) >= TL_CHANCES) return false;
+    s2.chances = tlChancesLeft(s2) + 1;
+    return true;
+  }, function(s2){
+    if(s2.interlude.final){ s2.interlude = null; tlCollectAward(); return; }
+    s2.round++; tlStartRound(s2);
+    saveState(); render();
+  });
 }
 function tlChancesLeft(s){ return typeof s.chances === "number" ? s.chances : TL_CHANCES; }
 function tlPress(){ pixPressSfx("none"); }
@@ -4333,7 +4361,7 @@ function tlTap(id){
   var s = state.session.jesusTimeline;
   if(!s || s.status !== "playing" || s.busy || s.shake) return;     // a shaking card, or a round that is finishing, ignores taps
   if(s.placed.indexOf(id) !== -1) return;
-  var set = TL_SETS[s.sets[s.round]];
+  var set = s.rounds[s.round];
   pixClickSfx("none");
   if(id === set[s.placed.length]){
     s.placed.push(id);
@@ -4343,8 +4371,8 @@ function tlTap(id){
       setTimeout(function(){
         var s2 = state.session.jesusTimeline;
         if(!s2 || s2 !== s || s2.status !== "playing") return;
-        if(s2.round >= s2.sets.length - 1){ tlCollectAward(); }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
-        else { s2.round++; tlStartRound(s2); saveState(); render(); }
+        s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= s2.rounds.length - 1};     // ROUND X COMPLETED!
+        saveState(); render();
       }, 900);
     } else { saveState(); render(); }
     return;
@@ -4369,7 +4397,7 @@ function tlQuit(){ state.session.jesusTimeline = null; go("mainMenu"); }
 
 function screenJesusTimeline(){
   var s = state.session.jesusTimeline;
-  if(!s){ initJesusTimeline(); s = state.session.jesusTimeline; }
+  if(!s || !s.rounds){ initJesusTimeline(); s = state.session.jesusTimeline; }          // a game saved before the three rounds starts over
   var lang = state.lang || "en";
   var press = ' onpointerdown="pixPressSfx()" ';
 
@@ -4381,23 +4409,28 @@ function screenJesusTimeline(){
     return pixResultHtml("jesusTimelineName", {cls:"pixLower", title:t("tl_passTitle"), body:t("tl_passBody"), badge:"jesusTimeline",
       buttons:pixBtnHtml(t("collectAward"), "tlCollectAward()") + pixBtnHtml(t("mainMenu"), "tlQuit()", true)});
   }
+  if(s.interlude){
+    return pixShell('<h2 class="pixMTitle">' + t("jesusTimelineName") + '</h2>' +
+      '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, tlChancesLeft(s)), TL_CHANCES) + '</div>' +
+      pixRoundDoneHtml(s.interlude), "pixLower");
+  }
 
-  var set = TL_SETS[s.sets[s.round]];
+  var set = s.rounds[s.round], n = set.length;
+  // no pictures in the frames, and the words are centred (2026-10-23, per Dan); the 7-event round has slightly shorter slots so that it still fits
   var slotsHtml = set.map(function(_, i){
     var id = s.placed[i];
     return '<div class="tlSlot' + (id ? ' placed' : '') + '"><span class="tlNum">' + (i + 1) + '</span>' +
-      (id ? '<span class="tlTxt"><span class="tlIcon">' + TL_EVENTS[id].icon + '</span>' + TL_EVENTS[id][lang] + '</span>' : '') + '</div>';
+      '<span class="tlTxt">' + (id ? TL_EVENTS[id][lang] : '') + '</span></div>';
   }).join("");
   var cardsHtml = s.deck.filter(function(id){ return s.placed.indexOf(id) === -1; }).map(function(id){
-    return '<button class="tlCard' + (s.shake === id ? ' shake' : '') + '" data-sfx="own" onpointerdown="tlPress()" onclick="tlTap(\'' + id + '\')">' +
-      '<span class="tlIcon">' + TL_EVENTS[id].icon + '</span>' + TL_EVENTS[id][lang] + '</button>';
+    return '<button class="tlCard' + (s.shake === id ? ' shake' : '') + '" data-sfx="own" onpointerdown="tlPress()" onclick="tlTap(\'' + id + '\')">' + TL_EVENTS[id][lang] + '</button>';
   }).join("");
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("jesusTimelineName") + '</h2>' +
     '<div class="pixNote">' + t("tl_intro") + '</div>' +
-    '<div class="pixChances"><span class="pixNote">' + t("tl_round")(s.round + 1, s.sets.length) + '</span>' + chancesHeartsHtml(Math.max(0, tlChancesLeft(s)), TL_CHANCES) + '</div>' +
-    '<div class="tlSlots">' + slotsHtml + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("tl_round")(s.round + 1, s.rounds.length) + '</span>' + chancesHeartsHtml(Math.max(0, tlChancesLeft(s)), TL_CHANCES) + '</div>' +
+    '<div class="tlSlots' + (n > 5 ? ' seven' : '') + '">' + slotsHtml + '</div>' +
     '<div class="tlCards">' + cardsHtml + '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
@@ -5734,6 +5767,7 @@ function render(){
   if(state.screen === "catchLight" && state.session.catchLight && state.session.catchLight.interlude && !pixRoundRunning.catchLight) clInterlude();
   if(state.screen === "wordTrail" && state.session.wordTrail && state.session.wordTrail.interlude && !pixRoundRunning.wordTrail) wtInterlude();
   if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.interlude && !pixRoundRunning.wordGroups) wgInterlude();
+  if(state.screen === "jesusTimeline" && state.session.jesusTimeline && state.session.jesusTimeline.interlude && !pixRoundRunning.jesusTimeline) tlInterlude();
   if(state.screen === "wordGroups" && state.session.wordGroups && !state.session.wordGroups.interlude) wgReveal();
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
