@@ -1752,17 +1752,17 @@ function appIconHtml(o){
 
 // ---- toast (the small "Coming soon!" message) ----
 var toastTimer = null;
-function toast(text){
+function toast(text, ms){            // ms = how long it stays up (2600 unless a message asks for less)
   var el = document.getElementById("toast");
   if(!el){ el = document.createElement("div"); el.id = "toast"; el.className = "toast"; document.body.appendChild(el); }
   el.textContent = text;
   void el.offsetWidth; // let the fade-in start from hidden
   el.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2600);   // long enough to read the longer messages
+  toastTimer = setTimeout(function(){ el.classList.remove("show"); }, ms || 2600);   // 2600 is long enough to read the longer messages
 }
 function comingSoon(){ toast(t("comingSoonToast")); }
-function ticketLocked(){ toast(t("ticketLocked")(GOLDEN_TICKET_POINTS)); }
+function ticketLocked(){ toast(t("ticketLocked")(GOLDEN_TICKET_POINTS), 1560); }   // the "Earn 500 points..." message stays 40% less long than the 2600 ms it had (2026-10-22, per Dan)
 
 // ---- the Missions folder ----
 function openFolder(icon){
@@ -2170,8 +2170,7 @@ function screenMissionIntro(){
   var mission = MISSIONS.filter(function(m){ return m.id === id; })[0];
   return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t(mission.nameKey) + '</h2>' +
     '<div class="pixPaper pixGuide"><p class="pixGuideDesc">' + guide.d + '</p><ul>' + steps + '</ul></div></div>' +
-    pixBtnHtml(t("startMission"), "startMission(state.introMission)") +
-    pixBtnHtml(t("mainMenu"), "go('mainMenu')", true), "pixLower");
+    pixBtnHtml(t("startMission"), "startMission(state.introMission)"), "pixLower");   // no MAIN MENU button: the red X closes it (2026-10-22, per Dan)
 }
 
 /* ---------- Faith Flash ---------- */
@@ -2403,8 +2402,6 @@ function screenFaithFlash(){
       '<h2 class="pixMTitle">' + t("faithFlashName") + '</h2>' +
       '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ffChancesLeft(s)), FF_CHANCES) + '</div>' +
       pixRoundDoneHtml(il) +
-      '<div class="spacer"></div>' +
-      '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ffQuit()">' + t("mainMenu") + '</button>' +
     '</div>';
   }
 
@@ -2432,7 +2429,6 @@ function screenFaithFlash(){
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
     (answered && ffChancesLeft(s) > 0 && (s.index % FAITH_FLASH_ROUND_SIZE) < FAITH_FLASH_ROUND_SIZE - 1 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx();ffNext()" onclick="pixClickSfx();if(event.detail===0)ffNext()">' + t("nextQuestion") + '</button>' : '') +
-    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ffQuit()">' + t("mainMenu") + '</button>' +
     (isCorrect ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
@@ -2668,9 +2664,7 @@ function screenFaithMatch(){
   if(s.interlude){
     return pixShell('<h2 class="pixMTitle">' + t("faithMatchName") + '</h2>' +
       '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0,s.chances), s.maxChances || MATCH_CHANCES[s.level]) + '</div>' +
-      pixRoundDoneHtml(s.interlude) +
-      '<div class="spacer"></div>' +
-      pixBtnHtml(t("mainMenu"), "fmQuit()", true), "pixLower");
+      pixRoundDoneHtml(s.interlude), "pixLower");
   }
 
   var dim = s.dim;
@@ -2691,19 +2685,18 @@ function screenFaithMatch(){
     '<div class="pixNote">' + t("fm_level")(s.level+1, MATCH_LEVELS.length) + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0,s.chances), s.maxChances || MATCH_CHANCES[s.level]) + '</div>' +
     '<div class="matchGrid' + (s.celebrate ? ' celebrate' : '') + '" style="grid-template-columns:repeat(' + dim + ',1fr)">' + cellsHtml + '</div>' +
-    '<div class="spacer"></div>' +
-    pixBtnHtml(t("mainMenu"), "fmQuit()", true), "pixLower");
+    '<div class="spacer"></div>', "pixLower");
 }
 
 /* ---------- Be the Light ---------- */
 
 function screenBeTheLight(){
-  return pixShell('<h2 class="pixMTitle">' + t("beTheLightName") + '</h2>' +
+  // the name (larger, as on the games' instruction screens) directly above the window, the pair centred (2026-10-22, per Dan)
+  return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("beTheLightName") + '</h2>' +
     '<div class="pixPaper">' +
       pixBigTileHtml("beTheLight") +
       '<p class="pixResBody pixFirst">' + t("bl_body") + '</p>' +
-    '</div>' +
-    '<div class="spacer"></div>' +
+    '</div></div>' +
     pixBtnHtml(t("missionCompleted"), "grantMission('beTheLight')") +
     pixBtnHtml(t("returnToMenu"), "go('mainMenu')", true));
 }
@@ -2767,17 +2760,15 @@ function screenChooseJoy(){
     card = pixBigTileHtml("chooseJoy") + '<p class="pixResBody pixFirst">' + t("cj_body") + '</p>';
     buttons = pixBtnHtml(t("takePhoto"), "cjTakePhoto()");
   }
-  return pixShell('<h2 class="pixMTitle">' + t("chooseJoyName") + '</h2>' +
-    '<div class="pixPaper">' + card + '</div>' +
-    '<div class="spacer"></div>' +
+  return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("chooseJoyName") + '</h2>' +
+    '<div class="pixPaper">' + card + '</div></div>' +
     buttons +
     pixBtnHtml(t("mainMenu"), "cjQuit()", true));
 }
 
 function screenJoyousPhoto(){
-  return pixShell('<h2 class="pixMTitle">' + t("joyousPhotoTitle") + '</h2>' +
-    '<div class="pixPaper"><img class="pixPhoto" src="' + state.photo + '" alt=""></div>' +
-    '<div class="spacer"></div>' +
+  return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("joyousPhotoTitle") + '</h2>' +
+    '<div class="pixPaper"><img class="pixPhoto" src="' + state.photo + '" alt=""></div></div>' +
     pixBtnHtml(t("collectAward"), "cjCollectAward()"));
 }
 
@@ -3029,9 +3020,7 @@ function screenFollowLight(){
   if(s.interlude){
     return pixShell('<h2 class="pixMTitle">' + t("followLightName") + '</h2>' +
       '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0,s.chances), s.maxChances) + '</div>' +
-      pixRoundDoneHtml(s.interlude) +
-      '<div class="spacer"></div>' +
-      pixBtnHtml(t("mainMenu"), "flQuit()", true), "pixLower");
+      pixRoundDoneHtml(s.interlude), "pixLower");
   }
 
   var msg = "", msgCls = "pixNote flMsg";
@@ -3052,8 +3041,7 @@ function screenFollowLight(){
     '<div class="flGrid">' + tilesHtml + '</div>' +
     '<p class="' + msgCls + '">' + msg + '</p>' +
     '<div class="spacer"></div>' +
-    (s.phase === "input" ? pixBtnHtml(t("fl_replay"), "flReplay()") : '<button class="btn pixBtn pixBtnSm" disabled>' + t("fl_replay") + '</button>') +   // only while the player is to tap; the greyed button keeps the screen from jumping
-    pixBtnHtml(t("mainMenu"), "flQuit()", true), "pixLower");   // lowered like Faith Flash (2026-10-21, per Dan)
+    (s.phase === "input" ? pixBtnHtml(t("fl_replay"), "flReplay()") : '<button class="btn pixBtn pixBtnSm" disabled>' + t("fl_replay") + '</button>'), "pixLower");   // only while the player is to tap; the greyed button keeps the screen from jumping. Lowered like Faith Flash (2026-10-21, per Dan)
 }
 
 /* ---------- Word Unscramble ---------- */
@@ -3257,8 +3245,6 @@ function screenWordUnscramble(){
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
       pixRoundDoneHtml(s.interlude) +
-      '<div class="spacer"></div>' +
-      '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();wuQuit()">' + t("mainMenu") + '</button>' +
     '</div>';
   }
 
@@ -3289,7 +3275,6 @@ function screenWordUnscramble(){
     '<div class="pixTray">' + trayHtml + '</div>' +
     '<div class="spacer"></div>' +
     '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();wuClear()">' + t("clearWord") + '</button>' +
-    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();wuQuit()">' + t("mainMenu") + '</button>' +
     (s.feedback === "correct" ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
@@ -3644,9 +3629,7 @@ function screenCatchLight(){
   if(s.interlude){
     return pixShell('<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
       '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, CL_MAX_MISSES - s.misses), CL_MAX_MISSES) + '</div>' +
-      pixRoundDoneHtml(s.interlude) +
-      '<div class="spacer"></div>' +
-      pixBtnHtml(t("mainMenu"), "clQuit()", true));
+      pixRoundDoneHtml(s.interlude));
   }
 
   var levelCfg = CL_LEVELS[s.level];
@@ -3658,8 +3641,7 @@ function screenCatchLight(){
       '<span id="clHearts">' + chancesHeartsHtml(Math.max(0, CL_MAX_MISSES - s.misses), CL_MAX_MISSES) + '</span>' +
     '</div>' +
     '<div class="clStage" id="clStage"><div class="clField" id="clField"><div class="clHands" id="clHands"></div></div></div>' +
-    '<div class="clSlideZone" id="clSlide"><div class="clSlide"><span class="clArrow l"></span><span class="clSlideTxt">' + t("cl_slide") + '</span><span class="clArrow r"></span></div></div>' +
-    pixBtnHtml(t("mainMenu"), "clQuit()", true), "clScreen");
+    '<div class="clSlideZone" id="clSlide"><div class="clSlide"><span class="clArrow l"></span><span class="clSlideTxt">' + t("cl_slide") + '</span><span class="clArrow r"></span></div></div>', "clScreen");
 }
 
 /* ---------- Acts of Kindness Sort ---------- */
@@ -3751,7 +3733,6 @@ function screenKindnessSort(){
     '<div class="pixChances pixChancesGap"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0,s.chances), KINDNESS_CHANCES) + '</div>' +
     '<div class="spacer"></div>' +
     '<div class="pixKindRow">' + btnHtml("kind", t("ks_kind")) + btnHtml("unkind", t("ks_notKind")) + '</div>' +
-    pixBtnHtml(t("mainMenu"), "ksQuit()", true) +
     (isCorrect ? '<div class="pixFlash"></div>' : '') );
 }
 
@@ -3802,8 +3783,7 @@ function screenHiddenBlessings(){
     pixPipsHtml(HIDDEN_BLESSINGS_SPOTS.length, s.found.length, "now", t("hb_found")(s.found.length, HIDDEN_BLESSINGS_SPOTS.length)) +
     '<div class="pixNote">' + t("hb_intro") + '</div>' +
     '<div class="hbScene">' + spotsHtml + '</div>' +
-    '<div class="spacer"></div>' +
-    pixBtnHtml(t("mainMenu"), "hbQuit()", true));
+    '<div class="spacer"></div>');
 }
 
 /* ---------- Light a Candle ---------- */
@@ -3915,19 +3895,18 @@ function screenLightCandle(){
     }).join("");
     return pixShell(head + '<div class="pixNote">' + t("lc_intro") + '</div>' +
       '<div class="lcGrid">' + btns + '</div>' +
-      '<div class="spacer"></div>' + pixBtnHtml(t("mainMenu"), "lcQuit()", true), "pixLower");
+      '<div class="spacer"></div>', "pixLower");
   }
   var key = LC_INTENTIONS[s.intention] || LC_INTENTIONS[0];
   if(s.phase === "hold"){
     return pixShell(head + '<div class="pixNote">' + t("lc_for")(t("lc_int_" + key)) + '</div>' +
       lcCandleHtml(false) +
       '<div class="pixNote">' + t("lc_hold") + '</div>' +
-      '<div class="spacer"></div>' + pixBtnHtml(t("mainMenu"), "lcQuit()", true), "pixLower");
+      '<div class="spacer"></div>', "pixLower");
   }
   return pixShell(head + lcCandleHtml(true) +
     '<div class="pixPaper"><div class="pixQ">' + t("lc_pray_" + key) + '</div></div>' +
-    '<div class="spacer"></div>' + pixBtnHtml(t("lc_amen"), "lcAmen()") +
-    pixBtnHtml(t("mainMenu"), "lcQuit()", true), "pixLower");
+    '<div class="spacer"></div>' + pixBtnHtml(t("lc_amen"), "lcAmen()"), "pixLower");
 }
 
 /* ---------- Emoji Bible Stories ---------- */
@@ -4036,7 +4015,6 @@ function screenEmojiStories(){
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
     (answered && ebChancesLeft(s) > 0 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ebNext()">' + t("eb_next") + '</button>' : '') +
-    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();ebQuit()">' + t("mainMenu") + '</button>' +
     (isCorrect ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
@@ -4155,7 +4133,6 @@ function screenJesusTimeline(){
     '<div class="tlSlots">' + slotsHtml + '</div>' +
     '<div class="tlCards">' + cardsHtml + '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();tlQuit()">' + t("mainMenu") + '</button>' +
   '</div>';
 }
 
@@ -4413,7 +4390,6 @@ function screenSacredSudoku(){
     '<div class="sdBoard" style="grid-template-columns:repeat(' + (n / lc) + ',1fr)">' + boxesHtml + '</div>' +
     '<div class="sdPal' + (n >= 9 ? ' two' : '') + '">' + palHtml + '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn pixBtn secondary pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();sdQuit()">' + t("mainMenu") + '</button>' +
   '</div>';
 }
 
@@ -4650,9 +4626,7 @@ function screenStainedGlass(){
 
   if(s.interlude){
     return pixShell('<h2 class="pixMTitle">' + t("stainedGlassName") + '</h2>' +
-      pixRoundDoneHtml(s.interlude) +
-      '<div class="spacer"></div>' +
-      pixBtnHtml(t("mainMenu"), "pzQuit()", true));
+      pixRoundDoneHtml(s.interlude));
   }
 
   var solved = s.status === "solved", lastLevel = s.round >= PZ_LEVELS.length - 1;
@@ -4694,8 +4668,7 @@ function screenStainedGlass(){
     (solved ? '<div class="pixNote good">' + t("pz_solved") + '</div>' : '<div class="pixNote">' + t("pz_intro") + '</div>') +
     svg +
     (solved && !lastLevel ? '<div class="pixNote">' + t("pz_next") + '</div>' : '') +
-    '<div class="spacer"></div>' +
-    pixBtnHtml(t("mainMenu"), "pzQuit()", true));
+    '<div class="spacer"></div>');
 }
 
 /* ---------- Passport ---------- */
