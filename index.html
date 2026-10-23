@@ -553,8 +553,14 @@
   .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   /* Word Groups (2026-10-23): n x n frames. A word's size follows the width of a frame and the longest word on the board (--n, --m), so every word fits across. */
-  .wgBoard{position:relative;display:grid;gap:5px;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
+  .wgBoard{position:relative;display:flex;flex-direction:column;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .wgRow{display:grid;gap:5px;}
+  .wgLabel{height:1.05rem;line-height:1.05rem;text-align:center;white-space:nowrap;overflow:hidden;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;letter-spacing:.04em;color:#FFE680;opacity:0;
+    text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
+  .wgLabel.show{opacity:1;}
+  .wgLabel.pop{animation:wgLabelIn .3s ease-out;}      /* only a name that has just appeared slides in, not every name on each redraw */
+  @keyframes wgLabelIn{0%{transform:translateY(5px);opacity:0;}100%{transform:none;opacity:1;}}
   .wgCell{aspect-ratio:1.35/1;min-width:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:12px;
     box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 3px 0 rgba(20,30,90,.35);font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#1B1F3B;cursor:grab;
     font-size:11px;font-size:clamp(7px,calc((100cqw / var(--n) - 12px) / (var(--m) * .7)),19px);}
@@ -4886,8 +4892,9 @@ function wgNewRound(round){
     cells = shuffle(items); clash = false;
     for(var r = 0; r < n; r++) if(wgRowDone(cells, n, r)) clash = true;          // never deal a row that is already right
   } while(clash && ++tries < 200);
-  var locked = []; for(var i = 0; i < n; i++) locked.push(null);
-  return {v: 1, round: round, n: n, names: groups.map(function(g){ return g[lang].n; }), longest: longest, cells: cells, locked: locked, last: null, interlude: null};
+  var locked = [], named = []; for(var i = 0; i < n; i++){ locked.push(null); named.push(false); }
+  // named[r] = the group's name is showing above row r (the names appear one after another: see wgReveal)
+  return {v: 1, round: round, n: n, names: groups.map(function(g){ return g[lang].n; }), longest: longest, cells: cells, locked: locked, named: named, interlude: null};
 }
 function initWordGroups(){
   state.session.wordGroups = wgNewRound(0);
@@ -4963,15 +4970,37 @@ function wgEnd(ev, cancel){
   var a = s.cells[d.from]; s.cells[d.from] = s.cells[target]; s.cells[target] = a;       // the swap
   var found = [];
   for(var r = 0; r < s.n; r++) if(s.locked[r] === null && wgRowDone(s.cells, s.n, r)){ s.locked[r] = s.cells[r * s.n].c; found.push(s.locked[r]); }
-  if(found.length){ s.last = s.names[found[found.length - 1]]; pixSfxPlay("fmMatch", true); } else pixSfxPlay("fmFirst", true);
-  var all = s.locked.every(function(x){ return x !== null; });
+  if(found.length) pixSfxPlay("fmMatch", true); else pixSfxPlay("fmFirst", true);
   saveState(); render();
-  if(all) setTimeout(function(){
-    var s2 = state.session.wordGroups;
-    if(!s2 || s2 !== s || state.screen !== "wordGroups" || s2.interlude) return;
-    s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= WG_ROUNDS.length - 1};     // ROUND X COMPLETED!, as in the other games
-    saveState(); render();
-  }, 800);
+  wgReveal();               // the names of the groups just completed
+}
+// The name of a completed group shows above its row (2026-10-23, per Dan). If one move completes two groups, the first name shows at once and the
+// second a moment later. After the last name, a pause, and then ROUND X COMPLETED!. render() calls this too, so a reload in the middle carries on.
+var WG_NAME_GAP_MS = 900, WG_AFTER_LAST_MS = 1400;
+var wgRevealing = false, wgFinishing = false;
+function wgReveal(){
+  var s = state.session.wordGroups;
+  if(!s || s.interlude || state.screen !== "wordGroups" || wgRevealing || wgFinishing) return;
+  if(!s.named) s.named = s.locked.map(function(x){ return x !== null; });
+  var r = -1;
+  for(var i = 0; i < s.n; i++) if(s.locked[i] !== null && !s.named[i]){ r = i; break; }
+  if(r < 0) return;
+  s.named[r] = true; saveState();
+  var el = document.getElementById("wgL" + r);
+  if(el){ el.textContent = s.names[s.locked[r]]; el.classList.add("show", "pop"); }
+  var more = false, all = true;
+  for(var j = 0; j < s.n; j++){ if(s.locked[j] === null) all = false; else if(!s.named[j]) more = true; }
+  if(more){ wgRevealing = true; setTimeout(function(){ wgRevealing = false; wgReveal(); }, WG_NAME_GAP_MS); return; }
+  if(all){
+    wgFinishing = true;
+    setTimeout(function(){
+      wgFinishing = false;
+      var s2 = state.session.wordGroups;
+      if(!s2 || s2 !== s || s2.interlude || state.screen !== "wordGroups") return;
+      s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= WG_ROUNDS.length - 1};     // ROUND X COMPLETED!, as in the other games
+      saveState(); render();
+    }, WG_AFTER_LAST_MS);
+  }
 }
 function wgUp(ev){ wgEnd(ev, false); }
 function wgCancel(ev){ wgEnd(ev, true); }
@@ -4980,17 +5009,23 @@ function screenWordGroups(){
   var s = state.session.wordGroups;
   if(!s || s.v !== 1){ initWordGroups(); s = state.session.wordGroups; }
   if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("wordGroupsName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
-  var n = s.n, cells = "";
-  s.cells.forEach(function(it, i){
-    var lk = s.locked[Math.floor(i / n)];
-    cells += '<div class="wgCell' + (lk !== null ? ' locked' : '') + '" id="wgC' + i + '"' + (lk !== null ? ' style="background:' + WG_COLORS[lk] + '"' : '') + '><span>' + it.w + '</span></div>';
-  });
+  var n = s.n, rows = "";
+  if(!s.named) s.named = s.locked.map(function(x){ return x !== null; });
+  for(var r = 0; r < n; r++){
+    var lk = s.locked[r], cells = "";
+    for(var k = 0; k < n; k++){
+      var i = r * n + k;
+      cells += '<div class="wgCell' + (lk !== null ? ' locked' : '') + '" id="wgC' + i + '"' + (lk !== null ? ' style="background:' + WG_COLORS[lk] + '"' : '') + '><span>' + s.cells[i].w + '</span></div>';
+    }
+    // the line above each row is kept free for the name of its group, which shows once the row is complete
+    rows += '<div class="wgLabel' + (lk !== null && s.named[r] ? ' show' : '') + '" id="wgL' + r + '">' + (lk !== null && s.named[r] ? s.names[lk] : '&nbsp;') + '</div>' +
+      '<div class="wgRow" style="grid-template-columns:repeat(' + n + ',minmax(0,1fr))">' + cells + '</div>';
+  }
   var left = s.locked.filter(function(x){ return x === null; }).length;
   return pixShell('<h2 class="pixMTitle">' + t("wordGroupsName") + '</h2>' +
     '<div class="pixNote">' + t("wg_intro") + '</div>' +
     '<div class="pixNote">' + t("fm_level")(s.round + 1, WG_ROUNDS.length) + '</div>' +
-    '<div class="pixNote good wgFound">' + (s.last ? t("wg_found")(s.last) : '&nbsp;') + '</div>' +
-    '<div class="wgBoard" id="wgBoard" style="--n:' + n + ';--m:' + Math.max(4, s.longest) + ';grid-template-columns:repeat(' + n + ',minmax(0,1fr))" onpointerdown="wgDown(event)" onpointermove="wgMove(event)" onpointerup="wgUp(event)" onpointercancel="wgCancel(event)" oncontextmenu="return false">' + cells + '</div>' +
+    '<div class="wgBoard" id="wgBoard" style="--n:' + n + ';--m:' + Math.max(4, s.longest) + '" onpointerdown="wgDown(event)" onpointermove="wgMove(event)" onpointerup="wgUp(event)" onpointercancel="wgCancel(event)" oncontextmenu="return false">' + rows + '</div>' +
     '<div class="pixNote">' + t("wg_left")(left) + '</div>' +
     '<div class="spacer"></div>', "pixLower");
 }
@@ -5632,6 +5667,7 @@ function render(){
   if(state.screen === "catchLight" && state.session.catchLight && state.session.catchLight.interlude && !pixRoundRunning.catchLight) clInterlude();
   if(state.screen === "wordTrail" && state.session.wordTrail && state.session.wordTrail.interlude && !pixRoundRunning.wordTrail) wtInterlude();
   if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.interlude && !pixRoundRunning.wordGroups) wgInterlude();
+  if(state.screen === "wordGroups" && state.session.wordGroups && !state.session.wordGroups.interlude) wgReveal();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
   awardAutoReturn();
