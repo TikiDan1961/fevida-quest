@@ -3315,7 +3315,8 @@ var CL_LEVELS = [
   {count:90, fallMs:867, spawnMs:150}
 ];
 // Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right of the one before. The side is picked
-// at random and kept for CL_KEEP_DIR lights before it is picked again; at an edge it turns round.
+// at random and kept for CL_KEEP_DIR lights before it is picked again; when an edge is hit it heads back toward the middle (carrying on that way for the
+// rest of the run), and next to an edge a new pick is always toward the middle.
 var CL_STEP_PX = 80;
 var CL_KEEP_DIR = 3;                  // lights dropped in one direction before a new direction is picked
 var clLastX = null, clDir = 1, clDirLeft = 0;
@@ -3423,9 +3424,15 @@ function clSpawnIcon(){
   if(clLastX === null) x = minX + Math.random() * (maxX - minX);
   else {
     // the direction is picked at random, then kept for CL_KEEP_DIR lights before a new one is picked (2026-10-22, per Dan)
-    if(clDirLeft <= 0){ clDir = Math.random() < 0.5 ? -1 : 1; clDirLeft = CL_KEEP_DIR; }
+    if(clDirLeft <= 0){
+      var canLeft = clLastX - CL_STEP_PX >= minX, canRight = clLastX + CL_STEP_PX <= maxX;     // next to an edge the pick is always the way back to the middle
+      clDir = (canLeft && canRight) ? (Math.random() < 0.5 ? -1 : 1) : (canLeft ? -1 : 1);
+      clDirLeft = CL_KEEP_DIR;
+    }
     x = clLastX + clDir * CL_STEP_PX;
-    if(x < minX || x > maxX){ clDir = -clDir; x = clLastX + clDir * CL_STEP_PX; }      // off the edge: it turns round and carries on the other way
+    if(x < minX || x > maxX){                                      // the edge is hit: head back toward the middle (and carry on that way for the rest of the run)
+      clDir = -clDir; x = clLastX + clDir * CL_STEP_PX;
+    }
     x = Math.max(minX, Math.min(maxX, x));
     clDirLeft--;
   }
