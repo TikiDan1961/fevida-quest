@@ -3302,16 +3302,17 @@ function screenWordUnscramble(){
 // The lights fall faster in every level (2026-10-22, per Dan): 3200 / 2700 / 2300 / 2000 ms before, and the play area is shorter now.
 // 8 rounds (2026-10-22, per Dan; it was 4 of 20 / 30 / 40 / 50 lights): each one is a little shorter than the old ones and falls faster than the last.
 // Every fall is 50% faster (2026-10-22, per Dan): the times were 2200 / 2000 / 1850 / 1700 / 1600 / 1500 / 1400 / 1300 ms, now each divided by 1.5.
-// spawnMs = the wait between one light and the next (2026-10-22, per Dan): 700 ms in round 1, shrinking in equal steps to half of that (350 ms) in round 8.
+// count = the lights in the round: 20 in round 1, 10 more each round (2026-10-22, per Dan).
+// spawnMs = the wait between one light and the next, shrinking each round (700 to 350 ms before; 450 to 150 ms since, 2026-10-22, per Dan).
 var CL_LEVELS = [
-  {count:12, fallMs:1467, spawnMs:700},
-  {count:14, fallMs:1333, spawnMs:650},
-  {count:16, fallMs:1233, spawnMs:600},
-  {count:18, fallMs:1133, spawnMs:550},
-  {count:20, fallMs:1067, spawnMs:500},
-  {count:22, fallMs:1000, spawnMs:450},
-  {count:24, fallMs:933, spawnMs:400},
-  {count:26, fallMs:867, spawnMs:350}
+  {count:20, fallMs:1467, spawnMs:450},
+  {count:30, fallMs:1333, spawnMs:410},
+  {count:40, fallMs:1233, spawnMs:360},
+  {count:50, fallMs:1133, spawnMs:320},
+  {count:60, fallMs:1067, spawnMs:280},
+  {count:70, fallMs:1000, spawnMs:240},
+  {count:80, fallMs:933, spawnMs:190},
+  {count:90, fallMs:867, spawnMs:150}
 ];
 // Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right (picked at random) of the one before,
 // turning the other way when that would go off the edge.
