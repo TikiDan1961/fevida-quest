@@ -121,6 +121,7 @@
   .btn.pixBtn.secondary{border-color:#1C4E9A;background:#3A93E8;}
   /* Pressed: the button sinks and lights up -- a hard light ring plus a soft glow in its own colour (2026-10-19, per Dan). */
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
+  .pixLang .btn.pixBtn:active{transform:none;}   /* the language buttons on the first screen glow but do not move when pressed (2026-10-22, per Dan) */
   .btn.pixBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 18px 8px rgba(120,255,120,.8);}
   .pixMission.pixLower .btn.pixBtn:active{transform:none;}   /* Faith Match / Faith Flash buttons glow but never move when tapped (2026-10-20, per Dan) */
   .btn.pixBtn:disabled{opacity:.5;filter:grayscale(.4);pointer-events:none;}
@@ -544,7 +545,6 @@
   .pixBigTile{width:112px;height:112px;margin:0 auto 12px;border:3px solid #1B1F3B;border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .pixBigTile img{width:96px;height:96px;image-rendering:pixelated;}
   .pixResBody.pixFirst{margin-top:0;}
-  .pixPhoto{display:block;width:100%;max-height:300px;object-fit:cover;border:3px solid #1B1F3B;border-radius:8px;}
   .pixKindRow{display:flex;gap:10px;margin:0 0 10px;}
   .pixKindRow .pixAns{flex:1;}
   .pixCountdown{margin:14px 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:5rem;line-height:1;color:#FFC93A;
@@ -594,7 +594,6 @@
     .pixHearts img{width:18px;height:16px;}
     .pixBigTile{width:88px;height:88px;margin-bottom:8px;}
     .pixBigTile img{width:64px;height:64px;image-rendering:auto;}
-    .pixPhoto{max-height:220px;}
     .pixCountdown{font-size:4rem;margin:8px 0;}
     .pixMission .matchGrid{margin:6px 0;}
     .pixMission .flMsg{margin-top:4px;}
@@ -661,8 +660,6 @@
   .pzMsg{min-height:1.6em;text-align:center;font-weight:700;margin:2px 0;}
   .pzMsg.good{color:var(--good);font-size:1.2rem;}
 
-  .photoPreview{width:100%;border-radius:16px;border:3px solid var(--gold);margin:10px 0;object-fit:cover;max-height:340px;}
-  .cameraIconBox{font-size:4rem;text-align:center;margin:18px 0;}
 
   /* Passport in 8-bit style (2026-10-19, per Dan): pixel sky behind, a cream page with a gold inner edge, pixel badges at 4x. */
   .pixPassport{height:100dvh;min-height:0;}
@@ -687,7 +684,6 @@
   .badge8Locked img{width:96px;height:96px;image-rendering:pixelated;}
   .pxBadgeName{margin-top:16px;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#1E2F7A;}
   .pxBadgeMission{margin-top:6px;font-weight:500;font-size:1rem;color:#5666a8;}
-  .pxPhoto{width:100%;max-height:240px;border:4px solid #1B1F3B;border-radius:10px;object-fit:cover;image-rendering:auto;}
   .passportNav{display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px;}
   .navArrow{width:56px;height:48px;border:3px solid #1B1F3B;border-radius:12px;background:#FFC93A;color:#1B1F3B;cursor:pointer;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;padding:0 0 3px;
@@ -750,7 +746,6 @@
 </head>
 <body>
 <div id="app"></div>
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
 <script>
 "use strict";
 
@@ -804,14 +799,12 @@ var T = {
     bl_body:"Head to the Fe y Vida Hope Wall and post an encouraging message for someone else. Once you've done it, tap the button below.",
     missionCompleted:"MISSION COMPLETED",
     cj_title:"Choose Joy",
-    cj_body:"Take a joyful photo with a friend at the Fe y Vida booth!",
-    takePhoto:"TAKE PHOTO", savePhoto:"SAVE PHOTO", retakePhoto:"RETAKE PHOTO",
-    joyousPhotoTitle:"Your Joyous Photo!",
+    cj_body:"Have a joyful photo taken with a friend at the Fe y Vida booth! Once you've done it, tap the button below.",
     awardTitle:"Mission Complete!",
     awardBody:function(pts,badge){return "You won "+pts+" Quest Points and unlocked the "+badge+" Badge!";},
+    awardBodyNoPts:function(badge){return "You unlocked the "+badge+" Badge!";},
     passportTitle:"Fe y Vida Passport",
     missionBadge:function(n){return "MISSION "+n+" BADGE";},
-    joyousPhotoPage:"JOYOUS PHOTO",
     badgeLocked:"???",
     ticketTitle:"Golden Ticket Unlocked!",
     ticketBody:"Show this screen to a Fe y Vida booth staff member to play for a prize!",
@@ -933,14 +926,12 @@ var T = {
     bl_body:"Ve al Muro de la Esperanza de Fe y Vida y escribe un mensaje de aliento para alguien más. Cuando termines, toca el botón de abajo.",
     missionCompleted:"MISIÓN COMPLETADA",
     cj_title:"Elige la Alegría",
-    cj_body:"¡Toma una foto alegre con un amigo en el stand de Fe y Vida!",
-    takePhoto:"TOMAR FOTO", savePhoto:"GUARDAR FOTO", retakePhoto:"TOMAR OTRA FOTO",
-    joyousPhotoTitle:"¡Tu Foto Alegre!",
+    cj_body:"¡Hazte una foto alegre con un amigo en el stand de Fe y Vida! Cuando termines, toca el botón de abajo.",
     awardTitle:"¡Misión Completada!",
     awardBody:function(pts,badge){return "¡Ganaste "+pts+" Puntos de Aventura y desbloqueaste la insignia "+badge+"!";},
+    awardBodyNoPts:function(badge){return "¡Desbloqueaste la insignia "+badge+"!";},
     passportTitle:"Pasaporte Fe y Vida",
     missionBadge:function(n){return "INSIGNIA MISIÓN "+n;},
-    joyousPhotoPage:"FOTO ALEGRE",
     badgeLocked:"???",
     ticketTitle:"¡Boleto Dorado Desbloqueado!",
     ticketBody:"¡Muestra esta pantalla a un miembro del personal de Fe y Vida para jugar por un premio!",
@@ -1063,7 +1054,7 @@ var MISSIONS = [
 // Passport's page-count/wrap math and the "/11" CSS above (percentages
 // can't reference a JS constant, so they're hand-kept in sync with this)
 // stay easy to grep together if the mission count ever changes again.
-var PASSPORT_PAGES = MISSIONS.length + 1;
+var PASSPORT_PAGES = MISSIONS.length;       // one badge page for each mission; the Joyous Photo page that came last is gone (2026-10-22, per Dan)
 // The rendered track carries 2 extra "phantom" slides beyond the real
 // PASSPORT_PAGES -- a clone of the last page before slot 0 and a clone of
 // the first page after the last real slot -- purely so a wrap (11th page ->
@@ -1185,6 +1176,10 @@ var MATCH_SYMBOLS = [
   "tiles/faith_tile8_12.png","tiles/faith_tile8_13.png","tiles/faith_tile8_14.png","tiles/faith_tile8_15.png"
 ];
 
+// The tile pictures, and the card back every tile shows face down (2026-10-22, per Dan): the card back is a CSS background, which was only fetched when the first
+// tile was drawn, so Faith Match opened with plain blue tiles and the artwork came a beat later. It is now loaded and kept with the others, and the game
+// waits for it too.
+var MATCH_PRELOAD = MATCH_SYMBOLS.concat(["tiles/card_back.png"]);
 var matchTilesPreloaded = false;
 var matchTilesReady = false; // true once every tile below has actually finished loading+decoding
 // decoding="sync" on the game-grid <img> tags (see screenFaithMatch) wasn't
@@ -1206,7 +1201,7 @@ function keepMatchTilesAlive(){
   box.id = "tileKeeper";
   box.setAttribute("aria-hidden", "true");
   box.style.cssText = "position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;";
-  MATCH_SYMBOLS.forEach(function(src){
+  MATCH_PRELOAD.forEach(function(src){
     var im = document.createElement("img");
     im.alt = ""; im.decoding = "sync"; im.src = src;
     box.appendChild(im);
@@ -1218,7 +1213,7 @@ function preloadMatchTiles(){
   if(matchTilesPreloaded) return;
   matchTilesPreloaded = true;
   keepMatchTilesAlive();
-  var remaining = MATCH_SYMBOLS.length;
+  var remaining = MATCH_PRELOAD.length;
   function tileDone(){
     remaining--;
     if(remaining <= 0){
@@ -1226,7 +1221,7 @@ function preloadMatchTiles(){
       if(state.screen === "faithMatch" || state.screen === "stainedGlass") render();
     }
   }
-  MATCH_SYMBOLS.forEach(function(src){
+  MATCH_PRELOAD.forEach(function(src){
     var img = new Image();
     img.onload = function(){
       // .decode() actually decodes the bitmap into the browser's image cache
@@ -1278,7 +1273,6 @@ function defaultState(){
       jesusTimeline: {done:false, badge:false},
       sacredSudoku: {done:false, badge:false}
     },
-    photo: null,
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
       kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null },
@@ -1318,7 +1312,8 @@ function loadState(){
     });
     // A tab saved by an earlier build may still be on the retired Service
     // Sprint screen (replaced by Stained-Glass Puzzle, 2026-10-19).
-    if(merged.screen === "serviceSprint" || merged.screen === "pathOfLight" || merged.screen === "lightWindows") merged.screen = "mainMenu";
+    if(merged.screen === "serviceSprint" || merged.screen === "pathOfLight" || merged.screen === "lightWindows" || merged.screen === "joyousPhoto") merged.screen = "mainMenu";
+    delete merged.photo;               // a photo saved in this tab by an older version is dropped: the app keeps no photo now
     // a tab saved before the music slider was rescaled would sound far too quiet at its old setting: it starts at the top of the new slider
     if(!parsed.musicScale){ merged.volMusic = 60; merged.musicScale = 2; }
     return merged;
@@ -1566,13 +1561,28 @@ function pixPlaySilentClip(){
     var pr = el.play(); if(pr && pr.catch) pr.catch(function(){});
   } catch(e){}
 }
+var pixAudioBorn = 0;      // when the current engine was made
 function pixFreshAudio(){
   try {
     var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
     var old = pixAudioCtx;
+    // A phone allows only a handful of audio engines at a time: when making one fails, the oldest spare is closed and it is tried once more. (Before, the
+    // failure was silent and the dead engine stayed in use, so every sound afterwards was lost: 2026-10-22, per Dan, sounds stopped after returning to the app.)
+    // And an engine made a moment ago is not thrown away again by a second event of the same return (the app coming back fires several): it is only woken.
+    if(old && performance.now() - pixAudioBorn < 1200){
+      try { var rp = old.resume(); if(rp && rp.catch) rp.catch(function(){}); } catch(e){}
+      return;
+    }
     // iOS 16.4+: ask the phone to re-evaluate the page's audio session ("playback" = plays even with the silent switch on, as before)
     try { if(navigator.audioSession){ navigator.audioSession.type = "auto"; navigator.audioSession.type = "playback"; } } catch(e){}
-    pixAudioCtx = new AC();
+    var fresh = null;
+    try { fresh = new AC(); } catch(e1){
+      try { if(pixAudioOld.length) pixAudioOld.shift().close(); } catch(e2){}
+      try { fresh = new AC(); } catch(e3){ fresh = null; }
+    }
+    if(!fresh){ pixAudioStale = true; return; }                      // still no engine: try again at the next tap
+    pixAudioBorn = performance.now();
+    pixAudioCtx = fresh;
     var p = pixAudioCtx.resume(); if(p && p.catch) p.catch(function(){});
     var silent = pixAudioCtx.createBufferSource(); silent.buffer = pixAudioCtx.createBuffer(1, 1, 22050);
     silent.connect(pixAudioCtx.destination); silent.start(0);
@@ -1613,6 +1623,14 @@ function pixReviveOnTap(){
 document.addEventListener("touchend", pixReviveOnTap, true);
 document.addEventListener("pointerup", pixReviveOnTap, true);
 document.addEventListener("click", pixReviveOnTap, true);
+// any touch on anything (not only on buttons) also tries to wake an engine that has been put to sleep, so a game played with a finger held down, like Catch the
+// Light, gets its sound back without waiting for the finger to lift
+function pixWakeOnTouch(){
+  var c = pixAudioCtx;
+  if(c && c.state !== "running" && c.state !== "closed"){ try { var p = c.resume(); if(p && p.catch) p.catch(function(){}); } catch(e){} }
+}
+document.addEventListener("pointerdown", pixWakeOnTouch, true);
+document.addEventListener("touchstart", pixWakeOnTouch, {capture:true, passive:true});
 
 // Every button, icon and tile that can be tapped makes the button sound -- including the ones with no sound wired in by hand.
 var PIX_TAP_SELECTOR = "button, [role=button], .appIcon, .flPad, .hbSpot";   // (Faith Match tiles call pixPressSfx / pixClickSfx themselves: see fmPress)
@@ -1630,7 +1648,7 @@ function screenLanguage(){
   // two language buttons (2026-10-19, per the client's reference image).
   // tiles/qr_feyvida.png encodes https://feyvidaquest.org -- it only works once
   // that domain is registered and pointed at the Netlify site.
-  return '<div class="screen pixHome">' +
+  return '<div class="screen pixHome pixLang">' +
     '<img class="pixLogoSmall" src="tiles/logo_small.png" alt="Fe y Vida">' +
     '<h1 class="pixQuest" aria-label="Fe y Vida Quest">QUEST</h1>' +
     '<div class="spacer"></div>' +
@@ -2148,7 +2166,7 @@ function resetMission(id){
   if(!ms || !ms.done) return;
   ms.done = false;
   if(id === "faithMatch") ms.level = 0;
-  state.points = Math.max(0, state.points - 100);
+  if(missionIsGame(id)) state.points = Math.max(0, state.points - 100);       // (a non-game gave no points, so none are taken back)
   if(state.session[id] !== undefined) state.session[id] = null;
   go("mainMenu");
 }
@@ -2157,10 +2175,13 @@ function openPassport(){ go("passport"); }
 
 /* ---------- Award Screen ---------- */
 
+// Only the games earn Quest Points (2026-10-22, per Dan), so the points bar on the Main Menu fills only with games, the same ones that walk the pilgrim to
+// the church. Be the Light, Choose Joy and Light a Candle give their badge and nothing else.
+function missionIsGame(id){ return PILGRIM_NON_GAMES.indexOf(id) === -1; }
 function grantMission(id, missionState){
   state.missions[id].done = true;
   state.missions[id].badge = true;
-  state.points += 100;
+  if(missionIsGame(id)) state.points += 100;
   Object.assign(state.missions[id], missionState || {});
   state.awardMissionId = id;
   pixSfxPlay("missionDone", true);       // the Mission Complete sound: the screen appears together with it
@@ -2172,11 +2193,12 @@ function grantMission(id, missionState){
 function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
-  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:t("awardBody")(100, t(m.themeKey)), badge:m.id,
+  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.id,
     buttons:pixBtnHtml(t("returnToMainMenu"), "afterAward()")});
 }
 
 function afterAward(){
+  var awardedId = state.awardMissionId;
   state.awardMissionId = null;
   state.folderOpen = false;          // the Missions window is closed, so the player can watch the pilgrim (2026-10-22, per Dan)
   pilgrimAward = state.pilgrimIn ? null : "great";            // see pilgrimArrived (once he is in the church there is no pilgrim to speak)
@@ -2188,7 +2210,8 @@ function afterAward(){
   // check, completing mission #6 through #10 after already unlocking early
   // would keep bouncing the player back to the ticket screen instead of
   // letting them keep going for the rest of the badges.
-  var justUnlocked = (state.points - 100 < GOLDEN_TICKET_POINTS) && goldenTicketUnlocked();
+  // (only a game can do that now: a non-game gives no points, so it can never be the one that crosses the line)
+  var justUnlocked = missionIsGame(awardedId) && (state.points - 100 < GOLDEN_TICKET_POINTS) && goldenTicketUnlocked();
   saveState();
   if(justUnlocked) go("goldenTicket"); else go("mainMenu");
 }
@@ -2728,75 +2751,22 @@ function screenBeTheLight(){
 
 /* ---------- Choose Joy ---------- */
 
+// The photo is taken at the booth with a real camera now (2026-10-22, per Dan), so the app takes none: no camera, no saved photo, no photo in the
+// Passport and nothing to share. The button just completes the mission, like Be the Light's. (A share button will be added to the app later.)
 function initChooseJoy(){
-  state.session.chooseJoy = {pendingPhoto:null};
+  state.session.chooseJoy = {};
   saveState();
 }
 
-function cjTakePhoto(){
-  document.getElementById("cameraInput").click();
-}
-
-function handlePhotoCapture(ev){
-  var file = ev.target.files && ev.target.files[0];
-  ev.target.value = "";
-  if(!file) return;
-  var img = new Image();
-  var reader = new FileReader();
-  reader.onload = function(e){
-    img.onload = function(){
-      var maxDim = 800;
-      var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-      var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-      var canvas = document.createElement("canvas");
-      canvas.width = w; canvas.height = h;
-      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL("image/jpeg", 0.7);
-      if(!state.session.chooseJoy) state.session.chooseJoy = {};
-      state.session.chooseJoy.pendingPhoto = dataUrl;
-      saveState(); render();
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function cjRetake(){
-  state.session.chooseJoy.pendingPhoto = null;
-  saveState(); render();
-}
-
-function cjSave(){
-  state.photo = state.session.chooseJoy.pendingPhoto;
-  state.session.chooseJoy = null;
-  grantMission("chooseJoy");          // straight to the Mission Complete screen: the photo screen in between is gone (2026-10-22, per Dan)
-}
-
+function cjCollectAward(){ state.session.chooseJoy = null; grantMission("chooseJoy"); }
 function cjQuit(){ state.session.chooseJoy = null; go("mainMenu"); }
 
 function screenChooseJoy(){
-  var s = state.session.chooseJoy;
-  if(!s){ initChooseJoy(); s = state.session.chooseJoy; }
-  var card, buttons;
-  if(s.pendingPhoto){
-    card = '<img class="pixPhoto" src="' + s.pendingPhoto + '" alt="">';
-    buttons = pixBtnHtml(t("savePhoto"), "cjSave()") + pixBtnHtml(t("retakePhoto"), "cjRetake()", true);
-  } else {
-    card = pixBigTileHtml("chooseJoy") + '<p class="pixResBody pixFirst">' + t("cj_body") + '</p>';
-    buttons = pixBtnHtml(t("takePhoto"), "cjTakePhoto()");
-  }
+  if(!state.session.chooseJoy) initChooseJoy();
   return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("chooseJoyName") + '</h2>' +
-    '<div class="pixPaper">' + card + '</div></div>' +
-    buttons);                                          // no MAIN MENU button: the red X closes it (2026-10-22, per Dan)
+    '<div class="pixPaper">' + pixBigTileHtml("chooseJoy") + '<p class="pixResBody pixFirst">' + t("cj_body") + '</p></div></div>' +
+    pixBtnHtml(t("missionCompleted"), "cjCollectAward()"));          // no MAIN MENU button: the red X closes it (2026-10-22, per Dan)
 }
-
-function screenJoyousPhoto(){
-  return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("joyousPhotoTitle") + '</h2>' +
-    '<div class="pixPaper"><img class="pixPhoto" src="' + state.photo + '" alt=""></div></div>' +
-    pixBtnHtml(t("collectAward"), "cjCollectAward()"));
-}
-
-function cjCollectAward(){ grantMission("chooseJoy"); }
 
 /* ---------- Follow the Light ---------- */
 // Simon-style pattern memory on a 3x3 grid of image tiles (redesigned
@@ -3421,6 +3391,7 @@ function clPointerDown(ev){
   var s = state.session.catchLight;
   if(!s || s.status !== "playing" || clFading) return;      // nothing moves while the lights fade away after a miss
   if(!clInBand(ev)) return;
+  if(pixAudioStale) pixReviveOnTap();          // back from another app: the sound engine is woken by the first touch of the slide, not only when the finger lifts
   clDragging = true; clPtrId = ev.pointerId; clPtrX = ev.clientX;
   try { ev.currentTarget.setPointerCapture(ev.pointerId); } catch(e){}     // keeps following the finger (or mouse) after it leaves the zone
   clMoveHandTo(ev.clientX);
@@ -4749,9 +4720,7 @@ function passportPageInner(page){
       '<div class="pxBadgeName">' + (earned ? t(m.themeKey) : t("badgeLocked")) + '</div>' +
       '<div class="pxBadgeMission">' + t(m.nameKey) + '</div>';
   }
-  return '<div class="pxNote">' + t("joyousPhotoPage") + '</div>' +
-    (state.photo ? '<img class="photoPreview pxPhoto" src="' + state.photo + '" alt="">'
-                 : '<div class="badge8Locked"><img src="tiles/icons48/ic_lock.png" alt=""></div><div class="pxBadgeName">' + t("badgeLocked") + '</div>');
+  return "";            // (the Joyous Photo page that used to follow the badges is gone: the photo is taken at the booth now, 2026-10-22, per Dan)
 }
 
 // The X: the screen shrinks back into its icon on the Home Screen (n = which icon: 2 = Passport, 4 = Options).
@@ -4812,6 +4781,7 @@ function screenOptions(){
 }
 
 function screenPassport(){
+  if(!(state.passportPage >= 0 && state.passportPage < PASSPORT_PAGES)) state.passportPage = 0;      // a game saved on the old photo page starts at the first page
   var page = state.passportPage;
   var dotsHtml = "";
   for(var i=0;i<PASSPORT_PAGES;i++) dotsHtml += '<div class="dot' + (i===page?' active':'') + '"></div>';
@@ -4929,7 +4899,6 @@ function render(){
     case "beTheLight": html = screenBeTheLight(); break;
     case "stainedGlass": html = screenStainedGlass(); break;
     case "chooseJoy": html = screenChooseJoy(); break;
-    case "joyousPhoto": html = screenJoyousPhoto(); break;
     case "followLight": html = screenFollowLight(); break;
     case "wordUnscramble": html = screenWordUnscramble(); break;
     case "catchLight": html = screenCatchLight(); break;
@@ -5030,7 +4999,6 @@ function render(){
   }
 }
 
-document.getElementById("cameraInput").addEventListener("change", handlePhotoCapture);
 window.addEventListener("pagehide", saveState);
 window.addEventListener("visibilitychange", saveState);
 
