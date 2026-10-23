@@ -201,8 +201,6 @@
   .pixScene::before{content:"";display:block;padding-top:84.8%;}   /* the top 106 rows (hill, church, first bend) always show in full */
   .pixSceneBox{position:absolute;left:0;top:0;width:100%;aspect-ratio:125/240;}
   .pixSceneBox::after{content:"";position:absolute;left:0;right:0;top:100%;height:300px;background:#52B043;}   /* lawn green below the picture, for very tall screens */
-  /* the temporary reset box floats over the bottom of the lawn so it never pushes the layout (small phones would scroll) */
-  .pixScene .tempReset{position:absolute;left:18px;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);margin:0;z-index:3;pointer-events:auto;}
   @media (max-height:600px){
     .pixMenu .homeGrid{margin:14px 0 0;}
     .pixHome.pixSky > .pixScene{margin-top:0;}
@@ -246,7 +244,7 @@
   .pixPet.walking .petSprite{animation:petStep .4s steps(1) infinite,pilgrimBob .4s steps(1) infinite;}
   @keyframes petBreath{0%{transform:translateY(0);}50%{transform:translateY(-7%);}100%{transform:translateY(0);}}
   @keyframes petStep{0%{background-position:0 0;}50%{background-position:100% 0;}100%{background-position:0 0;}}
-  .pixMenu.pilgrimBusy .homeGrid,.pixMenu.pilgrimBusy .backBtn,.pixMenu.pilgrimBusy .pilgrim,.pixMenu.pilgrimBusy .pixPet,.pixMenu.pilgrimBusy .tempReset{pointer-events:none;}   /* while the pilgrim talks and walks after a badge */
+  .pixMenu.pilgrimBusy .homeGrid,.pixMenu.pilgrimBusy .backBtn,.pixMenu.pilgrimBusy .pilgrim,.pixMenu.pilgrimBusy .pixPet{pointer-events:none;}   /* while the pilgrim talks and walks after a badge */
   .pilgrimBubble{position:absolute;z-index:3;display:none;box-sizing:border-box;max-width:80%;padding:8px 12px;background:#fff;color:#1E2F7A;border:3px solid #1B1F3B;border-radius:10px;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.25;text-align:center;box-shadow:0 3px 0 rgba(20,30,90,.35);
     pointer-events:auto;cursor:pointer;transform-origin:var(--tail,50%) 100%;}
@@ -283,9 +281,6 @@
   .pixMenu .progressBar{height:24px;border:3px solid #1E2F7A;border-radius:12px;background:#fff;}
   .pixMenu .progressFill{background:#FFC93A;}
   .pixMenu .progressLabel{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:1rem;color:#fff;opacity:1;margin-top:6px;text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
-  .pixMenu .tempReset{background:rgba(255,255,255,.88);border-color:#1E2F7A;}
-  .pixMenu .tempResetLbl{color:#1E2F7A;opacity:1;}
-  .pixMenu .tempReset button{color:#1E2F7A;border-color:#1E2F7A;}
   /* Shorter phones: shrink the card (QR 145px -> 116px, whole 4px per module) so the
      church stays visible above it. */
   @media (max-height:740px){
@@ -341,10 +336,6 @@
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .exitBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
-  /* TEMPORARY test aid -- see tempResetHtml() */
-  .tempReset{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;padding:8px;border:1px dashed rgba(255,255,255,.4);border-radius:12px;}
-  .tempResetLbl{width:100%;font-size:.68rem;letter-spacing:.06em;opacity:.7;}
-  .tempReset button{background:transparent;color:var(--cream);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:6px 8px;font-size:.72rem;cursor:pointer;}
 
   /* Pixel-style mission screens (2026-10-20, per Dan) -- Faith Flash first. Same sky and clouds as the Home Screen, a cream pixel card,
      and answer buttons built like the language buttons (glow + press sound). Everything is scoped to .pixMission so the other
@@ -1681,7 +1672,7 @@ function goldenTicketUnlocked(){
 var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","kindnessSort","hiddenBlessings",
   "lightCandle","emojiStories","jesusTimeline","sacredSudoku"];
 function openMission(id){
-  if(state.missions[id].done) return;
+  if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
   else startMission(id);
 }
@@ -1992,9 +1983,11 @@ function pilgrimTap(){
 // to his next spot (nothing on the screen can be tapped while he does), and on arriving he suggests a mission that is not done yet. null = not in that
 // sequence; "great" = about to speak; "walk" = walking.
 var pilgrimAward = null;
+var pilgrimAllowBack = false;        // true after CLEAR TICKET, until he has walked back to the start
 function pilgrimBusy(el, on){ var scr = el && el.closest(".screen"); if(scr) scr.classList.toggle("pilgrimBusy", on); }
 function pilgrimArrived(el, walkedForward){
   state.pilgrimP = pilgrimPos; saveState();
+  pilgrimAllowBack = false;
   if(pilgrimAward){
     pilgrimAward = null; pilgrimGreetPending = false;
     pilgrimBusy(el, false);                                   // he has arrived: the icons can be tapped again
@@ -2026,6 +2019,9 @@ function pilgrimInit(isNew){
   petsInit();
   var target = pilgrimTarget();
   if(pilgrimPos === null) pilgrimPos = (typeof state.pilgrimP === "number") ? Math.max(0, Math.min(1, state.pilgrimP)) : target;
+  // Clearing a mission (2026-10-22, per Dan) never walks him backward: he stays where he is, and only moves on once the games finished take him
+  // further than that. (CLEAR TICKET starts everything over, so that one lets him walk back to the start.)
+  if(!pilgrimAllowBack) target = Math.max(target, pilgrimPos);
   pilgrimPlace(el, pilgrimPos, 0);
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var dist = target - pilgrimPos;
@@ -2091,26 +2087,13 @@ function screenMainMenu(){
       '<div class="progressLabel">' + state.points + ' / ' + GOLDEN_TICKET_POINTS + ' ' + t("questPoints") + '</div>' +
     '</div>' +
     '<div class="homeGrid">' + icons + '</div>' +
-    pilgrimSceneHtml(tempResetHtml()) +
+    pilgrimSceneHtml() +
     folderHtml() +
   '</div>';
 }
 
-// TEMPORARY test aid (2026-10-19, per Dan): one small button per completed
-// mission that makes it playable again. Delete this function, resetMission,
-// the tempResetHtml() call in screenMainMenu and the .tempReset CSS before the
-// event -- or just set SHOW_TEMP_RESET to false. English only on purpose.
-var SHOW_TEMP_RESET = true;
-function tempResetHtml(){
-  if(!SHOW_TEMP_RESET) return "";
-  var done = MISSIONS.filter(function(m){ return state.missions[m.id].done; });
-  if(!done.length) return "";
-  return '<div class="tempReset"><div class="tempResetLbl">TEMP RESET (testing only)</div>' +
-    done.map(function(m){
-      return '<button onclick="resetMission(\'' + m.id + '\')">&#8635; ' + t(m.nameKey) + '</button>';
-    }).join("") + '</div>';
-}
-
+// TEMPORARY test aid (2026-10-22, per Dan; it replaces the TEMP RESET box that sat on the church): tapping a completed mission in the Missions folder
+// just clears it (see openMission), and the next tap plays it. Take that line out of openMission before the event.
 // Makes a completed mission playable again: clears its done flag and its saved
 // game, and takes back its 100 points so earning it again isn't double
 // counted. The Passport badge is kept, as with CLEAR TICKET.
@@ -2310,8 +2293,7 @@ function ffNext(){
   var s = state.session.faithFlash;
   if(!s || s.answered === null) return;          // only after an answer: a second touch can never skip a question
   if(s.index >= s.order.length - 1){
-    s.status = "results";
-    saveState(); render();
+    ffCollectAward();               // a win goes straight to the Mission Complete screen (2026-10-22, per Dan: no screen between)
   } else {
     s.index++; s.answered = null; s.answerOrder = shuffle([0,1,2]); saveState(); render();
   }
@@ -2608,7 +2590,7 @@ function fmInterlude(){
   pixRoundRun("faithMatch", function(){ return state.session.faithMatch; },
     function(s){ if(s.chances < (s.maxChances || MATCH_CHANCES[s.level])){ s.chances++; return true; } return false; },
     function(s){
-      if(s.interlude.final){ s.interlude = null; s.status = "complete"; saveState(); render(); return; }
+      if(s.interlude.final){ s.interlude = null; fmCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
       initFaithMatchLevel(s.interlude.next); render();
     });
 }
@@ -2741,7 +2723,7 @@ function cjRetake(){
 function cjSave(){
   state.photo = state.session.chooseJoy.pendingPhoto;
   state.session.chooseJoy = null;
-  go("joyousPhoto");
+  grantMission("chooseJoy");          // straight to the Mission Complete screen: the photo screen in between is gone (2026-10-22, per Dan)
 }
 
 function cjQuit(){ state.session.chooseJoy = null; go("mainMenu"); }
@@ -2970,7 +2952,7 @@ function flInterlude(){
     function(s){
       var next = s.interlude.next, last = s.interlude.final;
       s.interlude = null;
-      if(last){ s.status = "complete"; saveState(); render(); return; }
+      if(last){ flCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
       flSetupLevel(next); render(); flStartLevel();
     });
 }
@@ -3164,7 +3146,7 @@ function wuAdvance(s2){
 function wuInterlude(){
   pixRoundRun("wordUnscramble", function(){ return state.session.wordUnscramble; }, null, function(s2){
     var lang2 = state.lang || "en";                // the next level: longer words, and 3 fresh hints
-    if(s2.interlude.final){ s2.interlude = null; s2.status = "results"; saveState(); render(); return; }
+    if(s2.interlude.final){ s2.interlude = null; wuCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
     s2.interlude = null;
     s2.level = (s2.level || 0) + 1;
     s2.order = shuffle(WORD_UNSCRAMBLE_WORDS[lang2][s2.level].map(function(_,i){return i;}));
@@ -3570,7 +3552,7 @@ function clInterlude(){
   pixRoundRun("catchLight", function(){ return state.session.catchLight; },
     null,
     function(s){
-      if(s.interlude.final){ s.interlude = null; s.status = "passed"; saveState(); render(); return; }
+      if(s.interlude.final){ s.interlude = null; clCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
       s.interlude = null;
       s.level++;
       s.spawnedInLevel = 0; s.resolvedInLevel = 0; s.caughtInLevel = 0;
@@ -3686,8 +3668,7 @@ function ksAnswer(bucket){
       return;
     }
     if(s2.index >= s2.order.length - 1){
-      s2.status = "passed";
-      saveState(); render();
+      ksCollectAward();                 // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
     } else {
       s2.index++;
       s2.answered = null;
@@ -3761,7 +3742,7 @@ function hbTapSpot(idx){
   if(!s || s.status !== "playing") return;
   if(s.found.indexOf(idx) !== -1) return;
   s.found.push(idx);
-  if(s.found.length >= HIDDEN_BLESSINGS_SPOTS.length) s.status = "passed";
+  if(s.found.length >= HIDDEN_BLESSINGS_SPOTS.length){ hbCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
   saveState(); render();
 }
 
@@ -3858,7 +3839,7 @@ function lcLit(){
 function lcAmen(){
   var s = state.session.lightCandle;
   if(!s || s.phase !== "lit") return;
-  s.status = "results"; saveState(); render();
+  lcCollectAward();                   // AMEN goes straight to the Mission Complete screen (2026-10-22, per Dan)
 }
 function lcCollectAward(){ state.session.lightCandle = null; grantMission("lightCandle"); }
 function lcQuit(){ lcHolding = false; lcProgress = 0; state.session.lightCandle = null; go("mainMenu"); }
@@ -3966,8 +3947,8 @@ function ebAnswer(i){
     setTimeout(function(){
       var s2 = state.session.emojiStories;
       if(!s2 || s2 !== s || s2.status !== "playing" || s2.index !== at) return;
-      s2.status = lastChance ? "failed" : "passed";
-      saveState(); render();
+      if(lastChance){ s2.status = "failed"; saveState(); render(); }
+      else ebCollectAward();            // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
     }, 1300);
   }
 }
@@ -4079,7 +4060,7 @@ function tlTap(id){
       setTimeout(function(){
         var s2 = state.session.jesusTimeline;
         if(!s2 || s2 !== s || s2.status !== "playing") return;
-        if(s2.round >= s2.sets.length - 1){ s2.status = "passed"; saveState(); render(); }
+        if(s2.round >= s2.sets.length - 1){ tlCollectAward(); }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
         else { s2.round++; tlStartRound(s2); saveState(); render(); }
       }, 900);
     } else { saveState(); render(); }
@@ -4340,7 +4321,7 @@ function sdCelebrate(){
 function sdNextPuzzle(s){
   if(state.session.sacredSudoku !== s || s.status !== "playing") return;
   s.done = false; s.celebrate = false;
-  if(s.level >= s.levels.length - 1){ s.status = "passed"; }
+  if(s.level >= s.levels.length - 1){ sdCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
   else {
     s.level++; var nl = s.levels[s.level];
     s.cells = nl.puz.slice(); s.hinted = []; s.hints = SD_HINTS; s.sel = sdFirstEmpty(nl.puz); s.busy = false;
@@ -4605,7 +4586,8 @@ function pzInterlude(){
     function(s){
       var last = s.interlude.final;
       s.interlude = null;
-      if(last) s.status = "passed"; else { s.round++; s.placed = []; s.status = "playing"; }
+      if(last){ pzCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
+      s.round++; s.placed = []; s.status = "playing";
       saveState(); render();
     });
 }
@@ -4819,6 +4801,7 @@ function screenPassport(){
 /* ---------- Golden Ticket ---------- */
 
 function clearTicket(){
+  pilgrimAllowBack = true;            // everything starts over, so the pilgrim walks back to the start
   state.points = 0;
   MISSIONS.forEach(function(m){ state.missions[m.id].done = false; });
   state.missions.faithMatch.level = 0;
