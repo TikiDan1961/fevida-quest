@@ -121,7 +121,7 @@
   .btn.pixBtn.secondary{border-color:#1C4E9A;background:#3A93E8;}
   /* Pressed: the button sinks and lights up -- a hard light ring plus a soft glow in its own colour (2026-10-19, per Dan). */
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
-  .pixLang .btn.pixBtn:active{transform:none;}   /* the language buttons on the first screen glow but do not move when pressed (2026-10-22, per Dan) */
+  .pixLang .btn.pixBtn:active,.pixChurch .btn.pixBtn:active{transform:none;}   /* the buttons on the first two screens (language, START YOUR QUEST) glow but do not move when pressed (2026-10-22, per Dan) */
   .btn.pixBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 18px 8px rgba(120,255,120,.8);}
   .pixMission.pixLower .btn.pixBtn:active{transform:none;}   /* Faith Match / Faith Flash buttons glow but never move when tapped (2026-10-20, per Dan) */
   .btn.pixBtn:disabled{opacity:.5;filter:grayscale(.4);pointer-events:none;}
@@ -783,7 +783,7 @@ var T = {
       stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "Finish all 4 puzzles to win."]},
       followLight:{d:"Watch the tiles light up, then play the same notes back.", h:["Listen to the hymn notes and watch the tiles that light up.", "Tap the same tiles in the same order. Tap REPEAT to see the pattern again.", "A wrong tap costs a chance. You have 3 in all. Finish all 8 levels to win."]},
       wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "Finish 3 levels of 5 words to win."]},
-      catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 10 rounds to win."]},
+      catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 8 rounds to win."]},
       kindnessSort:{d:"Decide if each situation is kind or not kind.", h:["Read each situation.", "Tap KIND or NOT KIND.", "A wrong answer costs a chance. You have 3."]},
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
       lightCandle:{d:"Take a quiet moment to pray.", h:["Choose who or what you are praying for.", "Press and hold the candle to light it.", "Let go too soon and the light fades, so keep holding."]},
@@ -839,12 +839,12 @@ var T = {
     wu_passTitle:"Word Master!", wu_passBody:"You made it through all 3 levels of words!", wu_skip:function(n){return "SKIP ("+n+")";},
     clearWord:"CLEAR",
 
-    cl_intro:"Slide the hands left and right to catch the falling lights! Miss too many and you'll start over — you get 5 chances across all 10 levels.",
+    cl_intro:"Slide the hands left and right to catch the falling lights! Miss too many and you'll start over — you get 5 chances across all 8 levels.",
     cl_slide:"SLIDE",
     cl_level:function(n,total){return "Level "+n+" of "+total;},
     cl_getReady:function(n){return "Get Ready for Level "+n+"!";},
     cl_caught:function(n,total){return "Caught: "+n+" / "+total;},
-    cl_passTitle:"Great Reflexes!", cl_passBody:"You caught every light across all 10 levels!",
+    cl_passTitle:"Great Reflexes!", cl_passBody:"You caught every light across all 8 levels!",
     cl_failTitle:"So Close!", cl_failBody:"You ran out of chances — give it another try from Level 1.",
 
     ks_intro:"Read each scenario and decide — is it a kind act, or not?",
@@ -910,7 +910,7 @@ var T = {
       stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
       wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Termina 3 niveles de 5 palabras para ganar."]},
-      catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo a la izquierda y a la derecha en la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que pase. Si se te escapa una, pierdes una oportunidad. Tienes 5 en total.", "Supera las 10 rondas para ganar."]},
+      catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo a la izquierda y a la derecha en la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que pase. Si se te escapa una, pierdes una oportunidad. Tienes 5 en total.", "Supera las 8 rondas para ganar."]},
       kindnessSort:{d:"Decide si cada situación es un acto de bondad o no.", h:["Lee cada situación.", "Toca BONDAD o NO ES BONDAD.", "Una respuesta incorrecta cuesta una oportunidad. Tienes 3."]},
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
       lightCandle:{d:"Tómate un momento de calma para orar.", h:["Elige por quién o por qué estás orando.", "Mantén presionada la vela para encenderla.", "Si la sueltas muy pronto, la luz se apaga, así que sigue presionando."]},
@@ -965,12 +965,12 @@ var T = {
     wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Superaste los 3 niveles de palabras!", wu_skip:function(n){return "SALTAR ("+n+")";},
     clearWord:"BORRAR",
 
-    cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 5 oportunidades en los 10 niveles.",
+    cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 5 oportunidades en los 8 niveles.",
     cl_slide:"DESLIZA",
     cl_level:function(n,total){return "Nivel "+n+" de "+total;},
     cl_getReady:function(n){return "¡Prepárate para el Nivel "+n+"!";},
     cl_caught:function(n,total){return "Atrapadas: "+n+" / "+total;},
-    cl_passTitle:"¡Excelentes Reflejos!", cl_passBody:"¡Atrapaste todas las luces en los 10 niveles!",
+    cl_passTitle:"¡Excelentes Reflejos!", cl_passBody:"¡Atrapaste todas las luces en los 8 niveles!",
     cl_failTitle:"¡Tan Cerca!", cl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
 
     ks_intro:"Lee cada escenario y decide: ¿es un acto de bondad o no?",
@@ -1564,14 +1564,16 @@ function pixPlaySilentClip(){
 var pixAudioBorn = 0;      // when the current engine was made
 function pixFreshAudio(){
   try {
-    var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+    var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
     var old = pixAudioCtx;
     // A phone allows only a handful of audio engines at a time: when making one fails, the oldest spare is closed and it is tried once more. (Before, the
     // failure was silent and the dead engine stayed in use, so every sound afterwards was lost: 2026-10-22, per Dan, sounds stopped after returning to the app.)
-    // And an engine made a moment ago is not thrown away again by a second event of the same return (the app coming back fires several): it is only woken.
-    if(old && performance.now() - pixAudioBorn < 1200){
+    // And an engine made a moment ago is not thrown away again by the other events of the same tap (pointerup, touchend and click come together): it is only
+    // woken. That answers false, so the caller leaves the engine marked as not yet trusted. (The wait was 1.2 s at first, which let a second tap after waking
+    // be skipped over a dead engine and left the sound dead for good: 2026-10-23, per Dan, no sound after the phone woke from sleep.)
+    if(old && performance.now() - pixAudioBorn < 300){
       try { var rp = old.resume(); if(rp && rp.catch) rp.catch(function(){}); } catch(e){}
-      return;
+      return false;
     }
     // iOS 16.4+: ask the phone to re-evaluate the page's audio session ("playback" = plays even with the silent switch on, as before)
     try { if(navigator.audioSession){ navigator.audioSession.type = "auto"; navigator.audioSession.type = "playback"; } } catch(e){}
@@ -1580,7 +1582,7 @@ function pixFreshAudio(){
       try { if(pixAudioOld.length) pixAudioOld.shift().close(); } catch(e2){}
       try { fresh = new AC(); } catch(e3){ fresh = null; }
     }
-    if(!fresh){ pixAudioStale = true; return; }                      // still no engine: try again at the next tap
+    if(!fresh) return false;                                         // still no engine: try again at the next tap
     pixAudioBorn = performance.now();
     pixAudioCtx = fresh;
     var p = pixAudioCtx.resume(); if(p && p.catch) p.catch(function(){});
@@ -1591,7 +1593,8 @@ function pixFreshAudio(){
     if(old){ pixAudioOld.push(old); while(pixAudioOld.length > 2){ try { pixAudioOld.shift().close(); } catch(e){} } }
     var c = pixAudioCtx, t0 = c.currentTime;
     setTimeout(function(){ if(c === pixAudioCtx && c.currentTime <= t0 + 0.05) pixAudioStale = true; }, 500);   // clock not moving: a dead engine, replace it again on the next tap
-  } catch(e){}
+    return true;
+  } catch(e){ return false; }
 }
 document.addEventListener("visibilitychange", pixMarkAudioStale);
 document.addEventListener("visibilitychange", function(){
@@ -1609,16 +1612,21 @@ document.addEventListener("resume", pixMarkAudioStale);
 var pixAudioBeat = Date.now();
 setInterval(function(){ var now = Date.now(), gap = now - pixAudioBeat; pixAudioBeat = now; if(gap > 4000) pixMarkAudioStale(); }, 1000);
 // registered before the tap-sound listeners below, so after waking, the fresh context exists before that tap's sound plays
-function pixReviveOnTap(){
+// A new engine is only made at the END of a touch (touchend, pointerup, click): a phone lets audio start only then, not when the finger goes down. The game
+// screens that act on the finger going down call this with no event; for those it only tries to wake the engine and leaves the engine marked as it was, so
+// the end of the same touch still replaces it. (Before, such a call used up the mark with an engine that could not start, and the sound stayed dead:
+// 2026-10-23, per Dan, no sound after the phone woke from sleep.)
+function pixReviveOnTap(ev){
   if(!pixAudioCtx) return;
+  var endOfTouch = !!(ev && (ev.type === "touchend" || ev.type === "pointerup" || ev.type === "click"));
   var interrupted = pixAudioCtx.state === "interrupted";
-  if(!pixAudioStale && !interrupted){
+  if(!endOfTouch || (!pixAudioStale && !interrupted)){
     // a healthy engine that has been put to sleep (suspended) is woken by any tap, including taps on things that make their own sound
     if(pixAudioCtx.state === "suspended"){ try { var rp = pixAudioCtx.resume(); if(rp && rp.catch) rp.catch(function(){}); } catch(e){} }
     return;
   }
   pixAudioStale = false;
-  pixFreshAudio();
+  if(!pixFreshAudio()) pixAudioStale = true;       // not made (a moment ago one was, or none could be): still not trusted, so the next touch tries again
 }
 document.addEventListener("touchend", pixReviveOnTap, true);
 document.addEventListener("pointerup", pixReviveOnTap, true);
@@ -3186,6 +3194,7 @@ function wuCheck(s){
   var guess = s.slots.map(function(pos){ return s.letters[pos]; }).join("");
   if(guess === s.word){
     s.feedback = "correct";
+    pixSfxPlay("fmMatch", true);                     // a word completed = sound_effect_6 (2026-10-23, per Dan)
     saveState(); render();
     wuEnsureSkips(s); s.past[s.index] = "done";
     setTimeout(function(){
@@ -3251,15 +3260,17 @@ function screenWordUnscramble(){
   }
   var trayHtml = s.letters.map(function(ch, pos){
     var used = s.slots.indexOf(pos) !== -1;
-    return '<button class="pixTile' + (used?' used':'') + '"' + press + 'onclick="pixClickSfx();wuPick(' + pos + ')">' + ch + '</button>';
+    // Word Scramble's own sounds (2026-10-22, per Dan): a letter = sound_effect_10 (fmFirst), CLEAR = sound_effect_9 (fmMiss), HINT = sound_effect_1 (clCatch),
+    // SKIP = sound_effect_2 (clFade); data-sfx="own" keeps the page-wide button sound from playing as well
+    return '<button class="pixTile' + (used?' used':'') + '" data-sfx="own" onpointerdown="pixPressSfx(\'fmFirst\')" onclick="pixClickSfx(\'fmFirst\');wuPick(' + pos + ')">' + ch + '</button>';
   }).join("");
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
     '<div class="wuBar">' +
-      '<button class="sdHint skip"' + (s.skips > 0 && !s.feedback ? '' : ' disabled') + ' onclick="wuSkip()">' + t("wu_skip")(s.skips) + '</button>' +
+      '<button class="sdHint skip" data-sfx="own"' + (s.skips > 0 && !s.feedback ? '' : ' disabled') + ' onpointerdown="if(!this.disabled)pixPressSfx(\'clFade\')" onclick="if(!this.disabled){pixClickSfx(\'clFade\');wuSkip()}">' + t("wu_skip")(s.skips) + '</button>' +
       '<span class="pixNote">' + t("fm_level")((s.level || 0) + 1, WU_LEVELS) + '</span>' +
-      '<button class="sdHint"' + (s.hints > 0 && !s.feedback ? '' : ' disabled') + ' onclick="wuHint()">' + t("sd_hint")(s.hints) + '</button></div>' +
+      '<button class="sdHint" data-sfx="own"' + (s.hints > 0 && !s.feedback ? '' : ' disabled') + ' onpointerdown="if(!this.disabled)pixPressSfx(\'clCatch\')" onclick="if(!this.disabled){pixClickSfx(\'clCatch\');wuHint()}">' + t("sd_hint")(s.hints) + '</button></div>' +
     pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now", null, s.past) +
     '<div class="pixPaper">' +
       '<p class="pixWuIntro">' + t("wu_intro") + '</p>' +
@@ -3267,7 +3278,7 @@ function screenWordUnscramble(){
     '</div>' +
     '<div class="pixTray">' + trayHtml + '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();wuClear()">' + t("clearWord") + '</button>' +
+    '<button class="btn pixBtn pixBtnSm" data-sfx="own" onpointerdown="pixPressSfx(\'fmMiss\')" onclick="pixClickSfx(\'fmMiss\');wuClear()">' + t("clearWord") + '</button>' +
     (s.feedback === "correct" ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
@@ -3296,9 +3307,7 @@ var CL_LEVELS = [
   {count:30, fallMs:1067, spawnMs:280},
   {count:35, fallMs:1000, spawnMs:240},
   {count:40, fallMs:933, spawnMs:190},
-  {count:45, fallMs:867, spawnMs:150},
-  {count:50, fallMs:0, spawnMs:110},        // rounds 9 and 10 (2026-10-22, per Dan) carry on in the same way: 5 more lights, a wait about 40 ms shorter,
-  {count:55, fallMs:0, spawnMs:70}          // and a fall 8% faster (the fallMs is worked out by the rule below)
+  {count:45, fallMs:867, spawnMs:150}       // (a 9th and 10th round, 50 and 55 lights, were added and taken out again the same day, 2026-10-22, per Dan)
 ];
 // Each round falls 8% faster than the one before, round 1 staying as it was (2026-10-22, per Dan): a speed 1.08 times the last is a fall time of the last
 // divided by 1.08, so the fallMs values above are replaced by this rule (they were 1467 / 1333 / 1233 / 1133 / 1067 / 1000 / 933 / 867).
