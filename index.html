@@ -783,7 +783,7 @@ var T = {
       stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "Finish all 4 puzzles to win."]},
       followLight:{d:"Watch the tiles light up, then play the same notes back.", h:["Listen to the hymn notes and watch the tiles that light up.", "Tap the same tiles in the same order. Tap REPEAT to see the pattern again.", "A wrong tap costs a chance. You have 3 in all. Finish all 8 levels to win."]},
       wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "Finish 3 levels of 5 words to win."]},
-      catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 8 rounds to win."]},
+      catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 10 rounds to win."]},
       kindnessSort:{d:"Decide if each situation is kind or not kind.", h:["Read each situation.", "Tap KIND or NOT KIND.", "A wrong answer costs a chance. You have 3."]},
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
       lightCandle:{d:"Take a quiet moment to pray.", h:["Choose who or what you are praying for.", "Press and hold the candle to light it.", "Let go too soon and the light fades, so keep holding."]},
@@ -839,12 +839,12 @@ var T = {
     wu_passTitle:"Word Master!", wu_passBody:"You made it through all 3 levels of words!", wu_skip:function(n){return "SKIP ("+n+")";},
     clearWord:"CLEAR",
 
-    cl_intro:"Slide the hands left and right to catch the falling lights! Miss too many and you'll start over — you get 5 chances across all 8 levels.",
+    cl_intro:"Slide the hands left and right to catch the falling lights! Miss too many and you'll start over — you get 5 chances across all 10 levels.",
     cl_slide:"SLIDE",
     cl_level:function(n,total){return "Level "+n+" of "+total;},
     cl_getReady:function(n){return "Get Ready for Level "+n+"!";},
     cl_caught:function(n,total){return "Caught: "+n+" / "+total;},
-    cl_passTitle:"Great Reflexes!", cl_passBody:"You caught every light across all 8 levels!",
+    cl_passTitle:"Great Reflexes!", cl_passBody:"You caught every light across all 10 levels!",
     cl_failTitle:"So Close!", cl_failBody:"You ran out of chances — give it another try from Level 1.",
 
     ks_intro:"Read each scenario and decide — is it a kind act, or not?",
@@ -910,7 +910,7 @@ var T = {
       stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
       wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Termina 3 niveles de 5 palabras para ganar."]},
-      catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo a la izquierda y a la derecha en la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que pase. Si se te escapa una, pierdes una oportunidad. Tienes 5 en total.", "Supera las 8 rondas para ganar."]},
+      catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo a la izquierda y a la derecha en la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que pase. Si se te escapa una, pierdes una oportunidad. Tienes 5 en total.", "Supera las 10 rondas para ganar."]},
       kindnessSort:{d:"Decide si cada situación es un acto de bondad o no.", h:["Lee cada situación.", "Toca BONDAD o NO ES BONDAD.", "Una respuesta incorrecta cuesta una oportunidad. Tienes 3."]},
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
       lightCandle:{d:"Tómate un momento de calma para orar.", h:["Elige por quién o por qué estás orando.", "Mantén presionada la vela para encenderla.", "Si la sueltas muy pronto, la luz se apaga, así que sigue presionando."]},
@@ -965,12 +965,12 @@ var T = {
     wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Superaste los 3 niveles de palabras!", wu_skip:function(n){return "SALTAR ("+n+")";},
     clearWord:"BORRAR",
 
-    cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 5 oportunidades en los 8 niveles.",
+    cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 5 oportunidades en los 10 niveles.",
     cl_slide:"DESLIZA",
     cl_level:function(n,total){return "Nivel "+n+" de "+total;},
     cl_getReady:function(n){return "¡Prepárate para el Nivel "+n+"!";},
     cl_caught:function(n,total){return "Atrapadas: "+n+" / "+total;},
-    cl_passTitle:"¡Excelentes Reflejos!", cl_passBody:"¡Atrapaste todas las luces en los 8 niveles!",
+    cl_passTitle:"¡Excelentes Reflejos!", cl_passBody:"¡Atrapaste todas las luces en los 10 niveles!",
     cl_failTitle:"¡Tan Cerca!", cl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
 
     ks_intro:"Lee cada escenario y decide: ¿es un acto de bondad o no?",
@@ -2077,8 +2077,8 @@ function pilgrimInit(isNew){
   pilgrimWalk(el, target, calm);
 }
 
-// A simple walking sound (2026-10-22, per Dan): a soft footstep, a short burst of filtered noise, every quarter of a second while he walks, alternating a little
-// in tone from one foot to the other. It goes through the sound-effects volume.
+// A simple walking sound (2026-10-22, per Dan), softer since like footsteps in sand: a muffled "shff", a short soft burst of noise with a gentle start and a
+// dark, rounded tone, every quarter of a second while he walks, a touch different from one foot to the other. It goes through the sound-effects volume.
 var pilgrimLastStep = 0, pilgrimFoot = 0, pilgrimNoiseBuf = null;
 function pilgrimStepSfx(now){
   if(now - pilgrimLastStep < 250) return;
@@ -2086,13 +2086,13 @@ function pilgrimStepSfx(now){
   try {
     var ctx = pixCtx(); if(!ctx || ctx.state !== "running") return;
     if(!pilgrimNoiseBuf || pilgrimNoiseBuf.sampleRate !== ctx.sampleRate){
-      var n = Math.floor(ctx.sampleRate * 0.07), b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0);
-      for(var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      var n = Math.floor(ctx.sampleRate * 0.1), b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0);
+      for(var i = 0; i < n; i++){ var x = i / n; d[i] = (Math.random() * 2 - 1) * Math.min(1, x * 9) * Math.pow(1 - x, 1.6); }     // a quick soft rise, then a long fade: no sharp click
       pilgrimNoiseBuf = b;
     }
     var t0 = ctx.currentTime, src = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
-    src.buffer = pilgrimNoiseBuf; lp.type = "lowpass"; lp.frequency.value = pilgrimFoot ? 950 : 720; pilgrimFoot ^= 1;
-    g.gain.setValueAtTime(1.0, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.07);
+    src.buffer = pilgrimNoiseBuf; lp.type = "lowpass"; lp.Q.value = 0.3; lp.frequency.value = pilgrimFoot ? 560 : 440; pilgrimFoot ^= 1;     // dark: the sharp top of the noise is gone
+    g.gain.setValueAtTime(0.42, t0);                                                                                                        // about 8 dB quieter than before
     src.connect(lp); lp.connect(g); g.connect(pixBus(ctx, "sfx")); src.start(t0);
   } catch(e){}
 }
@@ -3296,7 +3296,9 @@ var CL_LEVELS = [
   {count:30, fallMs:1067, spawnMs:280},
   {count:35, fallMs:1000, spawnMs:240},
   {count:40, fallMs:933, spawnMs:190},
-  {count:45, fallMs:867, spawnMs:150}
+  {count:45, fallMs:867, spawnMs:150},
+  {count:50, fallMs:0, spawnMs:110},        // rounds 9 and 10 (2026-10-22, per Dan) carry on in the same way: 5 more lights, a wait about 40 ms shorter,
+  {count:55, fallMs:0, spawnMs:70}          // and a fall 8% faster (the fallMs is worked out by the rule below)
 ];
 // Each round falls 8% faster than the one before, round 1 staying as it was (2026-10-22, per Dan): a speed 1.08 times the last is a fall time of the last
 // divided by 1.08, so the fallMs values above are replaced by this rule (they were 1467 / 1333 / 1233 / 1133 / 1067 / 1000 / 933 / 867).
