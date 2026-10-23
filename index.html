@@ -539,21 +539,22 @@
   .pixNote.bad{color:#FFC2BD;}
   .pixNote.good{color:#FFE680;font-size:1.25rem;}
   /* Word Trail (2026-10-23): the letter grid. Every cell is exactly 1/8 of the grid wide, so a touch can be turned into a square by simple division. */
-  .wtGrid{position:relative;display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,max(220px,calc(100vh - 360px)),380px);margin:4px auto;touch-action:none;
-    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;}
-  .wtCell{aspect-ratio:1/1;padding:2px;box-sizing:border-box;pointer-events:none;}
+  /* minmax(0,1fr) and min-width:0: a wide letter can never stretch its column, so the grid is always exactly as wide as the screen allows and the right-hand column is never pushed off it */
+  .wtGrid{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));width:min(100%,max(220px,calc(100vh - 360px)),380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;
+    container-type:inline-size;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;}
+  .wtCell{aspect-ratio:1/1;padding:2px;box-sizing:border-box;pointer-events:none;min-width:0;overflow:hidden;}
   .wtCell i{display:flex;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;font-style:normal;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;
-    font-size:1.375rem;color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 2px 0 rgba(20,30,90,.35);}
+    font-size:1.125rem;font-size:clamp(12px,5.4cqw,24px);color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 2px 0 rgba(20,30,90,.35);}
   .wtCell.sel i{background:#FFC93A;box-shadow:inset 0 -3px 0 rgba(139,90,0,.3),0 0 0 2px #FFF6C0,0 0 10px 3px rgba(255,236,120,.8);}
   .wtCell.ok i{background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.3);}
   .wtCell.bad i{background:#E85A5A;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.3);}
   .wtLine{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
-  .wtLine polyline{fill:none;stroke:#F58B2A;stroke-opacity:.8;stroke-width:.2;stroke-linecap:round;stroke-linejoin:round;}
+  .wtLine polyline{fill:none;stroke:#F58B2A;stroke-opacity:.8;stroke-linecap:round;stroke-linejoin:round;}
   .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .wtWords{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 8px;margin:2px 4px 8px;}
   .wtWord{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;letter-spacing:.06em;color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;padding:2px 9px 4px;box-shadow:0 2px 0 rgba(20,30,90,.35);}
-  @media (max-height:640px){ .wtCell i{font-size:1.125rem;} .wtTrace{height:1.5rem;line-height:1.5rem;font-size:1.125rem;} .wtGrid{width:min(100%,max(200px,calc(100vh - 330px)),380px);} }
+  @media (max-height:640px){ .wtTrace{height:1.5rem;line-height:1.5rem;font-size:1.125rem;} .wtGrid{width:min(100%,max(200px,calc(100vh - 330px)),380px);} }
   .pixChances{display:flex;align-items:center;justify-content:center;gap:4px 10px;flex-wrap:wrap;margin:0 0 10px;}
   .pixChances .pixNote{margin:0;}
   .pixChancesGap{margin-top:12px;}
@@ -810,7 +811,7 @@ var T = {
       emojiStories:{d:"Guess the Bible story from the emojis.", h:["Look at the emojis and tap the Bible story they show.", "Answer 8 stories. You have 5 chances."]},
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 2 rounds. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
-      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter, up, down, across or on a diagonal.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to win."]}
+      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to win."]}
     },
     fm_failTitle:"Out of Chances!",
     fm_failBody:"Not this time! You start over from Level 1.",
@@ -939,7 +940,7 @@ var T = {
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias. Tienes 5 oportunidades."]},
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 2 rondas. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
-      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, a un lado o en diagonal.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para ganar."]}
+      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para ganar."]}
     },
     fm_failTitle:"¡Sin Oportunidades!",
     fm_failBody:"¡Esta vez no! Empiezas de nuevo desde el Nivel 1.",
@@ -4566,7 +4567,7 @@ function screenSacredSudoku(){
 /* ---------- Word Trail ---------- */
 
 // Word Trail (2026-10-23, per Dan): a grid of letters (8 x 8 to start) with hidden words in it. Every letter of a word touches the next one above,
-// below, beside or on a diagonal. The player touches a letter and drags to the next, and so on; on lifting the finger, a trail that spells a word
+// below or beside it (no diagonals). The player touches a letter and drags to the next, and so on; on lifting the finger, a trail that spells a word
 // from the list at the bottom finds it: the word leaves the list and the letters it used are replaced with new ones. Find every word to win. It
 // cannot be failed. To change the size, change WT_SIZE (and the word count) -- nothing else depends on it.
 var WT_SIZE = 8;
@@ -4585,13 +4586,13 @@ function wtLetter(not){
   do { ch = pool.charAt(Math.floor(Math.random() * pool.length)); } while(ch === not);
   return ch;
 }
+// Only the squares directly above, below, left and right (no diagonals: 2026-10-23, per Dan).
 function wtNeighbors(i){
   var r = Math.floor(i / WT_SIZE), c = i % WT_SIZE, out = [];
-  for(var dr = -1; dr <= 1; dr++) for(var dc = -1; dc <= 1; dc++){
-    if(!dr && !dc) continue;
-    var rr = r + dr, cc = c + dc;
-    if(rr >= 0 && cc >= 0 && rr < WT_SIZE && cc < WT_SIZE) out.push(rr * WT_SIZE + cc);
-  }
+  if(r > 0) out.push(i - WT_SIZE);
+  if(r < WT_SIZE - 1) out.push(i + WT_SIZE);
+  if(c > 0) out.push(i - 1);
+  if(c < WT_SIZE - 1) out.push(i + 1);
   return out;
 }
 // a random trail of `len` squares that never visits a square twice and keeps off the squares in `used`; null if none was found
@@ -4644,7 +4645,7 @@ function initWordTrail(){
   var grid = [];
   for(var i = 0; i < WT_SIZE * WT_SIZE; i++) grid.push(wtLetter());
   hidden.forEach(function(h){ h.cells.forEach(function(c, k){ grid[c] = h.w.charAt(k); }); });
-  state.session.wordTrail = {grid: grid, hidden: hidden, remaining: hidden.map(function(h){ return h.w; }), busy: false, status: "playing"};
+  state.session.wordTrail = {v: 2, grid: grid, hidden: hidden, remaining: hidden.map(function(h){ return h.w; }), busy: false, status: "playing"};     // v 2 = straight trails only
   saveState();
 }
 // A word was found: its squares get new letters. Replacing them could also have taken apart another hidden word (the trail the player traced may
@@ -4668,14 +4669,26 @@ function wtRefill(s, cells, word){
 }
 
 var wtDrag = null;      // the trail being drawn: {path:[squares], x, y}
+// where every square really is on the screen, measured from the page itself (not worked out by dividing the grid), so the touch and the line
+// always agree with the letters that are drawn
+function wtRects(){
+  var out = [];
+  for(var i = 0; i < WT_SIZE * WT_SIZE; i++){
+    var el = document.getElementById("wtC" + i); if(!el){ out.push(null); continue; }
+    var r = el.getBoundingClientRect(); out.push({l: r.left, t: r.top, w: r.width, h: r.height});
+  }
+  return out;
+}
 function wtCellAt(x, y, anywhere){
-  var g = document.getElementById("wtGrid"); if(!g) return -1;
-  var r = g.getBoundingClientRect(), pitch = r.width / WT_SIZE;
-  var fx = (x - r.left) / pitch, fy = (y - r.top) / pitch, c = Math.floor(fx), rw = Math.floor(fy);
-  if(c < 0 || rw < 0 || c >= WT_SIZE || rw >= WT_SIZE) return -1;
-  // a square is joined only when the finger is near its middle, so a diagonal move does not clip a corner square
-  if(!anywhere && (Math.abs(fx - c - .5) > .36 || Math.abs(fy - rw - .5) > .36)) return -1;
-  return rw * WT_SIZE + c;
+  var rects = (wtDrag && wtDrag.rects) || wtRects();
+  for(var i = 0; i < rects.length; i++){
+    var q = rects[i]; if(!q) continue;
+    if(x < q.l || x >= q.l + q.w || y < q.t || y >= q.t + q.h) continue;
+    // a square is joined only when the finger is near its middle
+    if(!anywhere && (Math.abs(x - q.l - q.w / 2) > q.w * .36 || Math.abs(y - q.t - q.h / 2) > q.h * .36)) return -1;
+    return i;
+  }
+  return -1;
 }
 function wtPaint(mark){      // mark = "ok" or "bad" colours the trail for a moment
   var s = state.session.wordTrail; if(!s || !wtDrag) return;
@@ -4684,8 +4697,14 @@ function wtPaint(mark){      // mark = "ok" or "bad" colours the trail for a mom
     var on = wtDrag.path.indexOf(i) !== -1;
     el.classList.toggle("sel", on && !mark); el.classList.toggle("ok", on && mark === "ok"); el.classList.toggle("bad", on && mark === "bad");
   }
-  var pts = wtDrag.path.map(function(i){ return (i % WT_SIZE + .5) + "," + (Math.floor(i / WT_SIZE) + .5); }).join(" ");
-  var poly = document.getElementById("wtPoly"); if(poly) poly.setAttribute("points", pts);
+  // the line goes through the middle of every letter's tile: its points are the tiles' own centres, in the grid's own pixels
+  var g = document.getElementById("wtGrid"), svg = document.getElementById("wtSvg"), poly = document.getElementById("wtPoly");
+  if(g && svg && poly && wtDrag.rects){
+    var gr = g.getBoundingClientRect();
+    svg.setAttribute("viewBox", "0 0 " + gr.width + " " + gr.height);
+    poly.setAttribute("stroke-width", Math.max(3, gr.width / WT_SIZE * .2));
+    poly.setAttribute("points", wtDrag.path.map(function(i){ var q = wtDrag.rects[i]; return (q.l + q.w / 2 - gr.left) + "," + (q.t + q.h / 2 - gr.top); }).join(" "));
+  }
   var tr = document.getElementById("wtTrace");
   if(tr) tr.textContent = wtDrag.path.map(function(i){ return s.grid[i]; }).join("") || " ";
 }
@@ -4701,7 +4720,7 @@ function wtDown(ev){
   if(pixAudioStale) pixReviveOnTap();
   var c = wtCellAt(ev.clientX, ev.clientY, true); if(c < 0) return;
   try { document.getElementById("wtGrid").setPointerCapture(ev.pointerId); } catch(e){}
-  wtDrag = {path: [], x: ev.clientX, y: ev.clientY};
+  wtDrag = {path: [], x: ev.clientX, y: ev.clientY, rects: wtRects()};
   wtAdd(c);
 }
 function wtProbe(x, y){
@@ -4715,7 +4734,7 @@ function wtProbe(x, y){
 function wtMove(ev){
   if(!wtDrag) return;
   var g = document.getElementById("wtGrid"); if(!g) return;
-  var pitch = g.getBoundingClientRect().width / WT_SIZE;
+  var pitch = wtDrag.rects[0] ? wtDrag.rects[0].w : g.getBoundingClientRect().width / WT_SIZE;
   var dx = ev.clientX - wtDrag.x, dy = ev.clientY - wtDrag.y, steps = Math.max(1, Math.ceil(Math.hypot(dx, dy) / (pitch * .2)));
   for(var k = 1; k <= steps && wtDrag; k++) wtProbe(wtDrag.x + dx * k / steps, wtDrag.y + dy * k / steps);   // a fast finger does not skip squares
   if(wtDrag){ wtDrag.x = ev.clientX; wtDrag.y = ev.clientY; }
@@ -4757,14 +4776,14 @@ function wtQuit(){ state.session.wordTrail = null; wtDrag = null; go("mainMenu")
 
 function screenWordTrail(){
   var s = state.session.wordTrail;
-  if(!s){ initWordTrail(); s = state.session.wordTrail; }
+  if(!s || s.v !== 2){ initWordTrail(); s = state.session.wordTrail; }          // a game saved before the diagonals were taken out starts over
   var cells = s.grid.map(function(ch, i){ return '<div class="wtCell" id="wtC' + i + '"><i>' + ch + '</i></div>'; }).join("");
   var words = s.remaining.map(function(w){ return '<span class="wtWord">' + w + '</span>'; }).join("");
   return pixShell('<h2 class="pixMTitle">' + t("wordTrailName") + '</h2>' +
     '<div class="pixNote">' + t("wt_intro") + '</div>' +
     '<div class="wtTrace" id="wtTrace">&nbsp;</div>' +
     '<div class="wtGrid" id="wtGrid" onpointerdown="wtDown(event)" onpointermove="wtMove(event)" onpointerup="wtUp(event)" onpointercancel="wtCancel(event)" oncontextmenu="return false">' + cells +
-      '<svg class="wtLine" viewBox="0 0 ' + WT_SIZE + ' ' + WT_SIZE + '"><polyline id="wtPoly" points=""/></svg></div>' +
+      '<svg class="wtLine" id="wtSvg"><polyline id="wtPoly" points=""/></svg></div>' +
     '<div class="pixNote">' + t("wt_left")(s.remaining.length) + '</div>' +
     '<div class="wtWords">' + words + '</div>' +
     '<div class="spacer"></div>', "pixLower");
