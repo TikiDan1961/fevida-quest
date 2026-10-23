@@ -552,6 +552,18 @@
   .wtLine polyline{fill:none;stroke:#F58B2A;stroke-opacity:.8;stroke-linecap:round;stroke-linejoin:round;}
   .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
+  /* Word Groups (2026-10-23): n x n frames. A word's size follows the width of a frame and the longest word on the board (--n, --m), so every word fits across. */
+  .wgBoard{position:relative;display:grid;gap:5px;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .wgCell{aspect-ratio:1.35/1;min-width:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:12px;
+    box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 3px 0 rgba(20,30,90,.35);font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#1B1F3B;cursor:grab;
+    font-size:11px;font-size:clamp(7px,calc((100cqw / var(--n) - 12px) / (var(--m) * .7)),19px);}
+  .wgCell span{white-space:nowrap;pointer-events:none;}
+  .wgCell.drag{position:relative;z-index:6;cursor:grabbing;background:#FFE9A0;box-shadow:0 8px 14px rgba(20,30,90,.45);}
+  .wgCell.back{transition:transform .17s ease-out;}
+  .wgCell.target{background:#DCEEFF;box-shadow:inset 0 0 0 3px #3A93E8,0 3px 0 rgba(20,30,90,.35);}
+  .wgCell.locked{color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);border-color:#1B1F3B;cursor:default;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),inset 0 -3px 0 rgba(0,0,0,.18),0 3px 0 rgba(20,30,90,.35);}
+  .wgFound{min-height:1.6rem;margin:0 0 4px;font-size:1rem;}
   .wtWords{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 8px;margin:2px 4px 8px;}
   .wtWord{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;letter-spacing:.06em;color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;padding:2px 9px 4px;box-shadow:0 2px 0 rgba(20,30,90,.35);}
   @media (max-height:640px){ .wtTrace{height:1.5rem;line-height:1.5rem;font-size:1.125rem;} .wtGrid{width:min(100%,max(200px,calc(100vh - 330px)),380px);} }
@@ -811,7 +823,8 @@ var T = {
       emojiStories:{d:"Guess the Bible story from the emojis.", h:["Look at the emojis and tap the Bible story they show.", "Answer 8 stories. You have 5 chances."]},
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 2 rounds. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
-      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]}
+      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
+      wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
     },
     fm_failTitle:"Out of Chances!",
     fm_failBody:"Not this time! You start over from Level 1.",
@@ -878,6 +891,7 @@ var T = {
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
     sudokuName:"Sacred Sudoku", themeWisdom:"Wisdom",
+    wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
     sd_intro:"Tap a square, then a picture. Each picture goes once in every row, column and box.", sd_intro2:"Tap a square, then a picture. Each picture goes once in every row and column.", sd_hint:function(n){return "HINT ("+n+")";}, sd_erase:"Erase",
     sd_passTitle:"Puzzle Master!", sd_passBody:"You solved every stained-glass puzzle!",
@@ -940,7 +954,8 @@ var T = {
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias. Tienes 5 oportunidades."]},
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 2 rondas. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
-      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]}
+      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
+      wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
     fm_failTitle:"¡Sin Oportunidades!",
     fm_failBody:"¡Esta vez no! Empiezas de nuevo desde el Nivel 1.",
@@ -1006,6 +1021,7 @@ var T = {
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
     sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
+    wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
     sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_intro2:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila y columna.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
     sd_passTitle:"¡Maestro de Rompecabezas!", sd_passBody:"¡Resolviste todos los rompecabezas de vitral!",
@@ -1070,7 +1086,10 @@ var MISSIONS = [
   {id:"sacredSudoku", icon:"🔢", badgeImg:"tiles/badge_hope.png", nameKey:"sudokuName", themeKey:"themeWisdom"},
   // Word Trail (2026-10-23, per Dan): it took the place of the first "TBD" tile. Borrows the Holiness badge until its own (Truth) is drawn: add
   // tiles/badge_truth.png and tiles/badges96/b96_truth.png, then change badgeImg here.
-  {id:"wordTrail", icon:"🔠", badgeImg:"tiles/badge_holiness.png", nameKey:"wordTrailName", themeKey:"themeTruth"}
+  {id:"wordTrail", icon:"🔠", badgeImg:"tiles/badge_holiness.png", nameKey:"wordTrailName", themeKey:"themeTruth"},
+  // Word Groups (2026-10-23, per Dan): took the place of the second "TBD" tile. Borrows the Mercy badge until its own (Understanding) is drawn: add
+  // tiles/badge_understanding.png and tiles/badges96/b96_understanding.png, then change badgeImg here.
+  {id:"wordGroups", icon:"🗂️", badgeImg:"tiles/badge_mercy.png", nameKey:"wordGroupsName", themeKey:"themeUnderstanding"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1300,15 +1319,17 @@ function defaultState(){
       emojiStories: {done:false, badge:false},
       jesusTimeline: {done:false, badge:false},
       sacredSudoku: {done:false, badge:false},
-      wordTrail: {done:false, badge:false}
+      wordTrail: {done:false, badge:false},
+      wordGroups: {done:false, badge:false}
     },
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
     pilgrimIn: false,    // the pilgrim has gone into the church (after the 5th game)
+    pilgrimSteps: 0,     // games finished so far (each moves him one stop; see pilgrimSteps())
     volSfx: 45,     // Options screen: sound effects volume, 0-100 (starts at 45, per Dan 2026-10-20)
     volMusic: 60,   // music volume, 0-100: it starts at 60 (2026-10-22, per Dan; the slider's 100% is a quiet background level)
     musicScale: 2,  // marks a game saved with the new music slider
@@ -1776,7 +1797,7 @@ function goldenTicketUnlocked(){
 // The games open on an instruction screen first (2026-10-22, per Dan): what the game is and how to play it, with a START MISSION button that
 // starts it. Be the Light and Choose Joy are not games and open straight away.
 var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","kindnessSort","hiddenBlessings",
-  "lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail"];
+  "lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups"];
 function openMission(id){
   if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
@@ -1800,6 +1821,7 @@ function startMission(id){
   else if(id === "jesusTimeline"){ initJesusTimeline(); go("jesusTimeline"); }
   else if(id === "sacredSudoku"){ initSacredSudoku(); go("sacredSudoku"); }
   else if(id === "wordTrail"){ initWordTrail(); go("wordTrail"); }
+  else if(id === "wordGroups"){ initWordGroups(); go("wordGroups"); }
 }
 
 /* ---------- Home Screen (the Main Menu) ---------- */
@@ -1812,9 +1834,8 @@ function startMission(id){
 // Placeholder tiles for missions that are planned but not built yet (2026-10-19, per Dan).
 // To make one real: add it to MISSIONS, build its screen, and delete it from this list.
 var COMING_SOON_MISSIONS = [
-  // (the first placeholder became Word Trail, 2026-10-23)
-  // three placeholders (2026-10-20, per Dan) for the games that will replace the missions that are not games; art = which icon picture to use
-  {id:"tbd2", art:"tbd", icon:"❓", nameKey:"tbdName"},
+  // (the first placeholder became Word Trail and the second Word Groups, 2026-10-23)
+  // placeholders (2026-10-20, per Dan) for the games that will replace the missions that are not games; art = which icon picture to use
   {id:"tbd3", art:"tbd", icon:"❓", nameKey:"tbdName"},
   {id:"tbd4", art:"tbd", icon:"❓", nameKey:"tbdName"}
 ];
@@ -1824,7 +1845,7 @@ var COMING_SOON_MISSIONS = [
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
-  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", wordTrail:"#2FA6A0", tbd:"#AEB6C8",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", tbd:"#AEB6C8",
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
@@ -1931,7 +1952,11 @@ var PILGRIM_NON_GAMES = ["beTheLight", "chooseJoy", "lightCandle"];
 function pilgrimGamesDone(){
   return MISSIONS.filter(function(m){ return PILGRIM_NON_GAMES.indexOf(m.id) === -1 && state.missions[m.id].done; }).length;
 }
-function pilgrimTarget(){ return Math.min(1, pilgrimGamesDone() / PILGRIM_GAMES_TOTAL); }
+// Every game finished is one step (2026-10-23, per Dan: Word Trail did not move him). The steps are counted as the games are finished, so finishing a
+// game again after it was cleared (the testing tap-to-clear) still moves him on, instead of being lost because he had already walked past that many
+// stops. For a real player, who cannot clear a mission, steps and games done are the same number.
+function pilgrimSteps(){ return Math.max(pilgrimGamesDone(), state.pilgrimSteps || 0); }
+function pilgrimTarget(){ return Math.min(1, pilgrimSteps() / PILGRIM_GAMES_TOTAL); }
 
 // The path is cropped by the bottom of the screen: start the pilgrim at the lowest point that is still fully on screen.
 function pilgrimFitPath(){
@@ -2050,7 +2075,7 @@ function pilgrimNextGame(){
   return MISSIONS.filter(function(m){ return missionIsGame(m.id) && !state.missions[m.id].done; })[0];
 }
 function pilgrimMessages(){
-  var list = [], left = PILGRIM_GAMES_TOTAL - pilgrimGamesDone();
+  var list = [], left = PILGRIM_GAMES_TOTAL - pilgrimSteps();
   var next = pilgrimNextGame();
   if(goldenTicketUnlocked()) list.push(t("pilgrimTicket"));
   else if(state.points === 0) list.push(t("pilgrimStart"));
@@ -2278,7 +2303,7 @@ function missionIsGame(id){ return PILGRIM_NON_GAMES.indexOf(id) === -1; }
 function grantMission(id, missionState){
   state.missions[id].done = true;
   state.missions[id].badge = true;
-  if(missionIsGame(id)) state.points += 100;
+  if(missionIsGame(id)){ state.points += 100; state.pilgrimSteps = (state.pilgrimSteps || 0) + 1; }
   Object.assign(state.missions[id], missionState || {});
   state.awardMissionId = id;
   pixSfxPlay("missionDone", true);       // the Mission Complete sound: the screen appears together with it
@@ -4811,6 +4836,165 @@ function screenWordTrail(){
     '<div class="spacer"></div>', "pixLower");
 }
 
+/* ---------- Word Groups ---------- */
+
+// Word Groups (2026-10-23, per Dan): a board of words in rounded frames, n rows of n words, where each row's words belong to one group (Apostles,
+// Prophets, ...). The player drags a word onto another to swap their places. When all the words in a row are from the same group, the row changes
+// colour and locks: its words can no longer be picked up or swapped. Sort every row to finish the round. Three rounds (no chances): 4 x 4 = 16 words,
+// 5 x 5 = 25 words, 6 x 6 = 36 words. maxLen is the longest word allowed in a round, so the words fit across the screen.
+var WG_ROUNDS = [{n: 4, maxLen: 8}, {n: 5, maxLen: 7}, {n: 6, maxLen: 6}];
+var WG_COLORS = ["#52C246", "#3A93E8", "#F2B632", "#E85A9B", "#9A5CC8", "#F58B2A"];     // the colour a locked row turns, by the order the groups were dealt
+// The groups and their words, English and Spanish (drafts for the client to approve, like the Spanish elsewhere). No word is in two groups, and no
+// word could reasonably belong to another group on the list. Every group has at least 6 words of 6 letters or fewer, so it can be used in any round.
+var WG_GROUPS = [
+  {en:{n:"Apostles", w:["PETER","ANDREW","JAMES","JOHN","PHILIP","THOMAS","SIMON","JUDE"]},
+   es:{n:"Apóstoles", w:["PEDRO","ANDRÉS","JUAN","FELIPE","TOMÁS","SIMÓN","TADEO","MATEO"]}},
+  {en:{n:"Prophets", w:["ISAIAH","ELIJAH","ELISHA","SAMUEL","DANIEL","AMOS","JONAH","MICAH","JOEL","HOSEA"]},
+   es:{n:"Profetas", w:["ISAÍAS","ELÍAS","ELISEO","SAMUEL","DANIEL","AMÓS","JONÁS","JOEL","OSEAS"]}},
+  {en:{n:"Men of Genesis", w:["NOAH","ADAM","ABEL","CAIN","ISAAC","JACOB","ESAU","LOT","ABRAHAM"]},
+   es:{n:"Hombres del Génesis", w:["NOÉ","ADÁN","ABEL","CAÍN","ISAAC","JACOB","ESAÚ","LOT"]}},
+  {en:{n:"Women of the Bible", w:["RUTH","ESTHER","MARY","MARTHA","EVE","SARAH","RACHEL","HANNAH","NAOMI","JUDITH","LEAH"]},
+   es:{n:"Mujeres de la Biblia", w:["RUT","ESTER","MARÍA","MARTA","EVA","SARA","RAQUEL","ANA","NOEMÍ","JUDIT","LEA"]}},
+  {en:{n:"Bible Places", w:["EGYPT","SINAI","JORDAN","EDEN","CANA","EMMAUS","BABEL","TABOR","ZION","GALILEE"]},
+   es:{n:"Lugares de la Biblia", w:["EGIPTO","SINAÍ","JORDÁN","EDÉN","CANÁ","EMAÚS","BABEL","TABOR","SIÓN","BELÉN"]}},
+  {en:{n:"In a Church", w:["ALTAR","PEW","FONT","BELL","ORGAN","CHOIR","CANDLE","CROSS"]},
+   es:{n:"En la Iglesia", w:["ALTAR","BANCA","PILA","ÓRGANO","CORO","VELA","CRUZ","CAMPANA"]}},
+  {en:{n:"Virtues", w:["HOPE","FAITH","MERCY","WISDOM","PEACE","JOY","TRUST","LOVE"]},
+   es:{n:"Virtudes", w:["FE","AMOR","PAZ","GOZO","BONDAD","GRACIA","PIEDAD"]}},
+  {en:{n:"Animals", w:["LION","LAMB","DOVE","SHEEP","DONKEY","RAVEN","CAMEL","WHALE","SNAKE"]},
+   es:{n:"Animales", w:["LEÓN","PALOMA","OVEJA","BURRO","CUERVO","VÍBORA","PEZ","CAMELLO"]}},
+  {en:{n:"Food and Drink", w:["BREAD","WINE","HONEY","OLIVE","GRAPES","FIGS","WHEAT","MANNA","MILK","OIL"]},
+   es:{n:"Comida y Bebida", w:["PAN","VINO","MIEL","OLIVA","UVAS","HIGOS","TRIGO","MANÁ","LECHE","ACEITE"]}},
+  {en:{n:"Saints", w:["CLARE","TERESA","AGNES","LUCY","MONICA","RITA","BRUNO","GEMMA"]},
+   es:{n:"Santos", w:["CLARA","TERESA","INÉS","LUCÍA","MÓNICA","RITA","BRUNO","GEMA"]}}
+];
+// does any row hold only words of one group?
+function wgRowDone(cells, n, r){
+  var c = cells[r * n].c;
+  for(var k = 1; k < n; k++) if(cells[r * n + k].c !== c) return false;
+  return true;
+}
+function wgNewRound(round){
+  var cfg = WG_ROUNDS[round], lang = state.lang || "en", n = cfg.n;
+  function fits(g){ return g[lang].w.filter(function(w){ return w.length <= cfg.maxLen; }); }
+  var groups = shuffle(WG_GROUPS.filter(function(g){ return fits(g).length >= n; })).slice(0, n), items = [], longest = 0;
+  groups.forEach(function(g, gi){
+    shuffle(fits(g)).slice(0, n).forEach(function(w){ items.push({w: w, c: gi}); longest = Math.max(longest, w.length); });
+  });
+  var cells, tries = 0, clash;
+  do {
+    cells = shuffle(items); clash = false;
+    for(var r = 0; r < n; r++) if(wgRowDone(cells, n, r)) clash = true;          // never deal a row that is already right
+  } while(clash && ++tries < 200);
+  var locked = []; for(var i = 0; i < n; i++) locked.push(null);
+  return {v: 1, round: round, n: n, names: groups.map(function(g){ return g[lang].n; }), longest: longest, cells: cells, locked: locked, last: null, interlude: null};
+}
+function initWordGroups(){
+  state.session.wordGroups = wgNewRound(0);
+  wgDrag = null;
+  saveState();
+}
+function wgInterlude(){
+  pixRoundRun("wordGroups", function(){ return state.session.wordGroups; }, null, function(s2){
+    if(s2.interlude.final){ s2.interlude = null; wgCollectAward(); return; }
+    state.session.wordGroups = wgNewRound(s2.round + 1);
+    saveState(); render();
+  });
+}
+function wgCollectAward(){ state.session.wordGroups = null; wgDrag = null; grantMission("wordGroups"); }
+function wgQuit(){ state.session.wordGroups = null; wgDrag = null; go("mainMenu"); }
+
+var wgDrag = null;      // the word being dragged: {from, rects, x, y, target}
+function wgRects(s){
+  var out = [];
+  for(var i = 0; i < s.cells.length; i++){
+    var el = document.getElementById("wgC" + i);
+    if(!el){ out.push(null); continue; }
+    var r = el.getBoundingClientRect(); out.push({l: r.left, t: r.top, w: r.width, h: r.height});
+  }
+  return out;
+}
+function wgCellAt(rects, x, y){
+  for(var i = 0; i < rects.length; i++){
+    var q = rects[i];
+    if(q && x >= q.l && x < q.l + q.w && y >= q.t && y < q.t + q.h) return i;
+  }
+  return -1;
+}
+function wgMark(target){          // the frame the dragged word would swap with is lit
+  var s = state.session.wordGroups; if(!s || !wgDrag) return;
+  if(target === wgDrag.target) return;
+  var old = document.getElementById("wgC" + wgDrag.target), el = document.getElementById("wgC" + target);
+  if(old) old.classList.remove("target");
+  if(el) el.classList.add("target");
+  wgDrag.target = target;
+}
+function wgDown(ev){
+  var s = state.session.wordGroups;
+  if(!s || s.interlude || wgDrag) return;
+  var rects = wgRects(s), i = wgCellAt(rects, ev.clientX, ev.clientY);
+  if(i < 0 || s.locked[Math.floor(i / s.n)] !== null) return;                  // a locked row's words cannot be picked up
+  ev.preventDefault();
+  if(pixAudioStale) pixReviveOnTap();
+  try { document.getElementById("wgBoard").setPointerCapture(ev.pointerId); } catch(e){}
+  wgDrag = {from: i, rects: rects, x: ev.clientX, y: ev.clientY, target: -1};
+  document.getElementById("wgC" + i).classList.add("drag");
+  pixSfxPlay("fmFirst", true);
+}
+function wgMove(ev){
+  var s = state.session.wordGroups;
+  if(!wgDrag || !s) return;
+  var el = document.getElementById("wgC" + wgDrag.from); if(!el) return;
+  el.style.transform = "translate(" + (ev.clientX - wgDrag.x) + "px," + (ev.clientY - wgDrag.y) + "px) scale(1.08)";
+  var t = wgCellAt(wgDrag.rects, ev.clientX, ev.clientY);
+  if(t === wgDrag.from || t < 0 || s.locked[Math.floor(t / s.n)] !== null) t = -1;      // only an unlocked word can be swapped with
+  wgMark(t);
+}
+function wgEnd(ev, cancel){
+  var s = state.session.wordGroups;
+  if(!wgDrag || !s){ wgDrag = null; return; }
+  var d = wgDrag, el = document.getElementById("wgC" + d.from), target = cancel ? -1 : d.target;
+  wgDrag = null;
+  var tEl = document.getElementById("wgC" + d.target); if(tEl) tEl.classList.remove("target");
+  if(target < 0){
+    if(el){ el.classList.add("back"); el.style.transform = ""; setTimeout(function(){ el.classList.remove("back", "drag"); }, 180); }      // slides home
+    return;
+  }
+  var a = s.cells[d.from]; s.cells[d.from] = s.cells[target]; s.cells[target] = a;       // the swap
+  var found = [];
+  for(var r = 0; r < s.n; r++) if(s.locked[r] === null && wgRowDone(s.cells, s.n, r)){ s.locked[r] = s.cells[r * s.n].c; found.push(s.locked[r]); }
+  if(found.length){ s.last = s.names[found[found.length - 1]]; pixSfxPlay("fmMatch", true); } else pixSfxPlay("fmFirst", true);
+  var all = s.locked.every(function(x){ return x !== null; });
+  saveState(); render();
+  if(all) setTimeout(function(){
+    var s2 = state.session.wordGroups;
+    if(!s2 || s2 !== s || state.screen !== "wordGroups" || s2.interlude) return;
+    s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= WG_ROUNDS.length - 1};     // ROUND X COMPLETED!, as in the other games
+    saveState(); render();
+  }, 800);
+}
+function wgUp(ev){ wgEnd(ev, false); }
+function wgCancel(ev){ wgEnd(ev, true); }
+
+function screenWordGroups(){
+  var s = state.session.wordGroups;
+  if(!s || s.v !== 1){ initWordGroups(); s = state.session.wordGroups; }
+  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("wordGroupsName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
+  var n = s.n, cells = "";
+  s.cells.forEach(function(it, i){
+    var lk = s.locked[Math.floor(i / n)];
+    cells += '<div class="wgCell' + (lk !== null ? ' locked' : '') + '" id="wgC' + i + '"' + (lk !== null ? ' style="background:' + WG_COLORS[lk] + '"' : '') + '><span>' + it.w + '</span></div>';
+  });
+  var left = s.locked.filter(function(x){ return x === null; }).length;
+  return pixShell('<h2 class="pixMTitle">' + t("wordGroupsName") + '</h2>' +
+    '<div class="pixNote">' + t("wg_intro") + '</div>' +
+    '<div class="pixNote">' + t("fm_level")(s.round + 1, WG_ROUNDS.length) + '</div>' +
+    '<div class="pixNote good wgFound">' + (s.last ? t("wg_found")(s.last) : '&nbsp;') + '</div>' +
+    '<div class="wgBoard" id="wgBoard" style="--n:' + n + ';--m:' + Math.max(4, s.longest) + ';grid-template-columns:repeat(' + n + ',minmax(0,1fr))" onpointerdown="wgDown(event)" onpointermove="wgMove(event)" onpointerup="wgUp(event)" onpointercancel="wgCancel(event)" oncontextmenu="return false">' + cells + '</div>' +
+    '<div class="pixNote">' + t("wg_left")(left) + '</div>' +
+    '<div class="spacer"></div>', "pixLower");
+}
+
 /* ---------- Stained-Glass Puzzle ---------- */
 
 // Replaced Service Sprint (2026-10-19, per Dan), then turned from a sliding
@@ -5272,6 +5456,7 @@ function clearTicket(){
   pilgrimAllowBack = true;            // everything starts over, so the pilgrim comes out of the church and walks back to the start
   state.pilgrimIn = false;
   state.points = 0;
+  state.pilgrimSteps = 0;
   MISSIONS.forEach(function(m){ state.missions[m.id].done = false; });
   state.missions.faithMatch.level = 0;
   go("mainMenu");
@@ -5306,7 +5491,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["missionIntro","faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
 
 function exitBarHtml(){
@@ -5333,6 +5518,7 @@ function exitMission(){
     case "jesusTimeline": tlQuit(); break;
     case "sacredSudoku": sdQuit(); break;
     case "wordTrail": wtQuit(); break;
+    case "wordGroups": wgQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -5362,6 +5548,7 @@ function render(){
     case "jesusTimeline": html = screenJesusTimeline(); break;
     case "sacredSudoku": html = screenSacredSudoku(); break;
     case "wordTrail": html = screenWordTrail(); break;
+    case "wordGroups": html = screenWordGroups(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
     case "goldenTicket": html = screenGoldenTicket(); break;
@@ -5444,6 +5631,7 @@ function render(){
   if(state.screen === "wordUnscramble" && state.session.wordUnscramble && state.session.wordUnscramble.interlude && !pixRoundRunning.wordUnscramble) wuInterlude();
   if(state.screen === "catchLight" && state.session.catchLight && state.session.catchLight.interlude && !pixRoundRunning.catchLight) clInterlude();
   if(state.screen === "wordTrail" && state.session.wordTrail && state.session.wordTrail.interlude && !pixRoundRunning.wordTrail) wtInterlude();
+  if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.interlude && !pixRoundRunning.wordGroups) wgInterlude();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
   awardAutoReturn();
