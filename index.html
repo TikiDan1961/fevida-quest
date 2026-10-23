@@ -3308,23 +3308,23 @@ function screenWordUnscramble(){
 // The lights fall faster in every level (2026-10-22, per Dan): 3200 / 2700 / 2300 / 2000 ms before, and the play area is shorter now.
 // 8 rounds (2026-10-22, per Dan; it was 4 of 20 / 30 / 40 / 50 lights): each one is a little shorter than the old ones and falls faster than the last.
 // Every fall is 50% faster (2026-10-22, per Dan): the times were 2200 / 2000 / 1850 / 1700 / 1600 / 1500 / 1400 / 1300 ms, now each divided by 1.5.
-// count = the lights in the round: 20 in round 1, 10 more each round (2026-10-22, per Dan).
+// count = the lights in the round: 10 in round 1, 5 more each round (2026-10-22, per Dan; it was 20, 30 ... 90).
 // spawnMs = the wait between one light and the next, shrinking each round (700 to 350 ms before; 450 to 150 ms since, 2026-10-22, per Dan).
 var CL_LEVELS = [
-  {count:20, fallMs:1467, spawnMs:450},
-  {count:30, fallMs:1333, spawnMs:410},
-  {count:40, fallMs:1233, spawnMs:360},
-  {count:50, fallMs:1133, spawnMs:320},
-  {count:60, fallMs:1067, spawnMs:280},
-  {count:70, fallMs:1000, spawnMs:240},
-  {count:80, fallMs:933, spawnMs:190},
-  {count:90, fallMs:867, spawnMs:150}
+  {count:10, fallMs:1467, spawnMs:450},
+  {count:15, fallMs:1333, spawnMs:410},
+  {count:20, fallMs:1233, spawnMs:360},
+  {count:25, fallMs:1133, spawnMs:320},
+  {count:30, fallMs:1067, spawnMs:280},
+  {count:35, fallMs:1000, spawnMs:240},
+  {count:40, fallMs:933, spawnMs:190},
+  {count:45, fallMs:867, spawnMs:150}
 ];
-// Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right of the one before. The side is picked
-// at random and kept for CL_KEEP_DIR lights before it is picked again; when an edge is hit it heads back toward the middle (carrying on that way for the
-// rest of the run), and next to an edge a new pick is always toward the middle.
+// Where a light starts (2026-10-22, per Dan): the first one anywhere, then each one CL_STEP_PX to the left or right of the one before. A side is picked at
+// random together with a random number of lights, CL_RUN_MIN to CL_RUN_MAX, to drop that way before a side is picked again; when an edge is hit it heads
+// back toward the middle (carrying on that way for the rest of the run), and next to an edge a new pick is always toward the middle.
 var CL_STEP_PX = 80;
-var CL_KEEP_DIR = 3;                  // lights dropped in one direction before a new direction is picked
+var CL_RUN_MIN = 1, CL_RUN_MAX = 4;   // lights dropped in one direction before a new direction is picked
 var clLastX = null, clDir = 1, clDirLeft = 0;
 var CL_MAX_MISSES = 3;
 var CL_TICK_MS = 50, CL_ICON = "✨", CL_HAND_EMOJI = "🤲";
@@ -3429,11 +3429,11 @@ function clSpawnIcon(){
   var stageW = stage.clientWidth, minX = 4, maxX = Math.max(minX, stageW - CL_ICON_H - 4), x;
   if(clLastX === null) x = minX + Math.random() * (maxX - minX);
   else {
-    // the direction is picked at random, then kept for CL_KEEP_DIR lights before a new one is picked (2026-10-22, per Dan)
+    // a direction is picked at random, then kept for a random 1 to 4 lights before a new one is picked (2026-10-22, per Dan)
     if(clDirLeft <= 0){
       var canLeft = clLastX - CL_STEP_PX >= minX, canRight = clLastX + CL_STEP_PX <= maxX;     // next to an edge the pick is always the way back to the middle
       clDir = (canLeft && canRight) ? (Math.random() < 0.5 ? -1 : 1) : (canLeft ? -1 : 1);
-      clDirLeft = CL_KEEP_DIR;
+      clDirLeft = CL_RUN_MIN + Math.floor(Math.random() * (CL_RUN_MAX - CL_RUN_MIN + 1));    // how many lights go that way: 1 to 4
     }
     x = clLastX + clDir * CL_STEP_PX;
     if(x < minX || x > maxX){                                      // the edge is hit: head back toward the middle (and carry on that way for the rest of the run)
