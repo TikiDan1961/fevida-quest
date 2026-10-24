@@ -597,32 +597,39 @@
   .dpReady{position:absolute;left:0;right:0;top:58%;text-align:center;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .pixMission > .dpTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* the whole screen flaps the dove (the red X, above it, still works) */
-  /* Fruits of the Spirit (2026-10-24): a 6 x 6 board of fruit on cream squares, the goals above it and the fruits found below it. */
-  .fsGoals{display:flex;justify-content:center;gap:8px;width:min(100%,380px);margin:2px auto 8px;}
-  .fsGoal{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;height:44px;border:3px solid #1B1F3B;border-radius:11px;background:#F8ECC8;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.05rem;color:#fff;text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
-  .fsGoal img{width:28px;height:28px;image-rendering:pixelated;} .fsGoal.done{color:#7BE07B;}
-  .fsBoardWrap{position:relative;width:min(100%,380px,calc(100vh - 385px));width:min(100%,380px,calc(100dvh - 385px));margin:0 auto;}
-  .fsBoard{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:2px;box-sizing:border-box;padding:4px;overflow:hidden;background:#744828;border:4px solid #FFC93A;border-radius:12px;
-    box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
-  .fsTile{position:relative;aspect-ratio:1/1;min-width:0;display:block;box-sizing:border-box;padding:0;margin:0;border:2px solid #CEB076;border-bottom-width:3px;border-radius:5px;background:#F8ECC8;cursor:pointer;touch-action:manipulation;overflow:visible;}
-  .fsTile img{width:86%;height:86%;margin:7%;display:block;image-rendering:pixelated;pointer-events:none;}
-  .fsTile.sel{box-shadow:0 0 0 3px #fff,0 0 0 6px #3A8FE8;z-index:3;transform:scale(1.06);}
-  .fsTile.pop{animation:fsPop .28s ease-out forwards;z-index:2;}
-  .fsTile.fall{animation:fsFall .3s cubic-bezier(.5,0,.9,.6);}
-  .fsTile.slide{animation:fsSlide .17s ease-out;z-index:3;}
-  .fsTile.spirit img{animation:fsGlow .9s ease-in-out infinite;}
-  @keyframes fsPop{0%{transform:scale(1);opacity:1;box-shadow:0 0 0 3px #fff;}60%{transform:scale(1.18);opacity:1;box-shadow:0 0 14px 4px rgba(255,244,150,.95);}100%{transform:scale(.2);opacity:0;}}
-  @keyframes fsFall{0%{transform:translateY(calc(var(--d) * -105%));}100%{transform:translateY(0);}}
-  @keyframes fsSlide{0%{transform:translate(var(--sx),var(--sy));}100%{transform:translate(0,0);}}
+  /* Fruits of the Spirit (2026-10-24): a 6 x 6 board of cream squares with the fruit laid over them as pictures of their own, so that they can slide; the 8 words and their counts below. */
+  .fsBoardWrap{position:relative;width:min(100%,380px,calc(100vh - 395px));width:min(100%,380px,calc(100dvh - 395px));margin:4px auto 0;}
+  .fsBoard{box-sizing:border-box;padding:4px;overflow:hidden;background:#744828;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .fsInner{position:relative;aspect-ratio:1/1;touch-action:none;cursor:grab;}
+  .fsGrid{position:absolute;left:0;top:0;width:100%;height:100%;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);}
+  .fsCell{margin:1px;border:2px solid #CEB076;border-bottom-width:3px;border-radius:5px;background:#F8ECC8;box-sizing:border-box;}
+  .fsLayer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;}
+  .fsFruit{position:absolute;left:0;top:0;width:calc(100% / 6);height:calc(100% / 6);transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%));transition:transform .19s ease-in-out;will-change:transform;}
+  .fsFruit img{display:block;width:78%;height:78%;margin:11%;image-rendering:pixelated;}
+  .fsFruit.grab img{transform:scale(1.12);}
+  .fsFruit.sel::before{content:"";position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:3px solid #fff;box-shadow:0 0 0 3px #3A8FE8;border-radius:6px;}
+  .fsFruit.pop{animation:fsPop .3s ease-out forwards;z-index:2;}
+  .fsFruit.fresh{animation:fsFresh .4s ease-out;}
+  .fsFruit.born img{animation:fsPop2 .35s ease-out;}
+  .fsFruit.spirit img{animation:fsGlow .9s ease-in-out infinite;}
+  @keyframes fsPop{0%{transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%)) scale(1);opacity:1;}55%{transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%)) scale(1.25);opacity:1;filter:brightness(1.4);}100%{transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%)) scale(.2);opacity:0;}}
+  @keyframes fsPop2{0%{transform:scale(.4);}60%{transform:scale(1.3);}100%{transform:scale(1);}}
+  @keyframes fsFresh{0%{opacity:0;}100%{opacity:1;}}
   @keyframes fsGlow{0%,100%{filter:drop-shadow(0 0 2px #FFC93A);}50%{filter:drop-shadow(0 0 7px #FFF3A0) brightness(1.15);}}
-  .fsPopup{position:absolute;left:0;right:0;top:34%;text-align:center;pointer-events:none;z-index:6;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FFF496;
-    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b;animation:fsPopup 1.2s ease-out forwards;}
+  .fsPopup{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:6;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FFF496;
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b;animation:fsPopup 1.25s ease-out forwards;}
   @keyframes fsPopup{0%{opacity:0;transform:scale(.6);}15%{opacity:1;transform:scale(1.1);}80%{opacity:1;}100%{opacity:0;transform:translateY(-10px);}}
-  .fsFound{width:min(100%,380px);box-sizing:border-box;margin:10px auto 0;padding:7px 8px 8px;border:4px solid #1B1F3B;border-radius:16px;background:#F8ECC8;text-align:center;}
-  .fsFound b{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:.8rem;color:#96642A;margin-bottom:3px;}
-  .fsFound span{display:inline-block;margin:1px 7px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.82rem;color:#B0A082;}
-  .fsFound span.on{color:#FFC93A;text-shadow:2px 0 #1B1F3B,-2px 0 #1B1F3B,0 2px #1B1F3B,0 -2px #1B1F3B;}
+  .fsFound{width:min(100%,380px);box-sizing:border-box;margin:10px auto 0;padding:6px 6px 8px;border:4px solid #1B1F3B;border-radius:16px;background:#F8ECC8;text-align:center;}
+  .fsFound b{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:.78rem;color:#96642A;margin-bottom:4px;}
+  .fsWords{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 2px;}
+  .fsWord{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:0;}
+  .fsWord img{width:22px;height:22px;image-rendering:pixelated;filter:grayscale(.55) opacity(.7);}
+  .fsWord span{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;line-height:1.15;white-space:nowrap;}
+  .fsWord .fsCnt{font-size:.86rem;color:#7A6A4E;} .fsWord .fsNm{font-size:.6rem;color:#A8977A;letter-spacing:0;}
+  .fsWord.on img{filter:none;}
+  .fsWord.on .fsCnt{color:#FFC93A;text-shadow:2px 0 #1B1F3B,-2px 0 #1B1F3B,0 2px #1B1F3B,0 -2px #1B1F3B;}
+  .fsWord.on .fsNm{color:#C98A12;}
   .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
@@ -984,7 +991,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
-      fruitsSpirit:{d:"Match fruit to collect the fruits of the Spirit.", h:["Tap a fruit, then tap the one next to it to swap them. A swap has to make a row or column of 3 or more of the same fruit.", "Collect the fruit shown at the top before you run out of moves. Each goal you finish lights up one of the fruits of the Spirit.", "Match 4 or more in a line to make a glowing Spirit flame. Swap it with a neighbor and it clears its whole row or column. Finish all 3 levels to win."]},
+      fruitsSpirit:{d:"Match fruit to collect the fruits of the Spirit.", h:["Put your finger on a fruit and swipe toward a neighbor to swap them. A swap has to make a row or column of 3 or more of the same fruit, or the two slide back. (You can also tap a fruit and then a neighbor.)", "Each fruit stands for one of the fruits of the Spirit. The words below the board count how many of each fruit you have collected, such as 3/5, and light up when you have them all.", "Light up all 8 words to finish a level. Match 4 or more in a line to make a glowing Spirit flame: swap it with a neighbor and it clears its whole row or column. There are 3 levels, each asking for more of every fruit."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. In the last round the wind pushes the dove around too. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
       prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap the TAP button when a bead is in the ring (tapping the sky does nothing). Some beads come close together, so tap quickly, once for each bead.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Round 1 has 20 beads, round 2 has 30 and round 3 has 40, and they move twice as fast each round. Finish all 3 rounds to win."]},
@@ -1062,9 +1069,8 @@ var T = {
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
-    fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swap two neighbors to match 3 or more. Collect the fruit you need before you run out of moves.", fs_moves:function(n){return "Moves: "+n;}, fs_ok:"OK!",
-    fs_found:"FRUITS FOUND", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
-    fs_failTitle:"Out of Moves!", fs_failBody:"You ran out of moves before collecting every fruit. Try again!",
+    fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swipe a fruit toward a neighbor to swap them and match 3 or more. Collect every fruit to light up all the words.",
+    fs_found:"COLLECT EACH FRUIT", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
@@ -1132,7 +1138,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
-      fruitsSpirit:{d:"Combina frutas para reunir los frutos del Espíritu.", h:["Toca una fruta y luego la que está a su lado para intercambiarlas. El cambio tiene que formar una fila o columna de 3 o más frutas iguales.", "Reúne la fruta que se muestra arriba antes de quedarte sin movimientos. Cada meta que termines ilumina uno de los frutos del Espíritu.", "Junta 4 o más en línea para crear una llama del Espíritu. Cámbiala con una vecina y limpia toda su fila o columna. Termina los 3 niveles para ganar."]},
+      fruitsSpirit:{d:"Combina frutas para reunir los frutos del Espíritu.", h:["Pon el dedo sobre una fruta y desliza hacia una vecina para cambiarlas. El cambio tiene que formar una fila o columna de 3 o más frutas iguales, o las dos vuelven a su lugar. (También puedes tocar una fruta y luego una vecina.)", "Cada fruta representa uno de los frutos del Espíritu. Las palabras debajo del tablero cuentan cuántas has reunido de cada una, por ejemplo 3/5, y se encienden cuando las tienes todas.", "Enciende las 8 palabras para terminar un nivel. Junta 4 o más en línea para crear una llama del Espíritu: cámbiala con una vecina y limpia toda su fila o columna. Hay 3 niveles, y cada uno pide más de cada fruta."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. En la última, además, el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca el botón TOCAR cuando una cuenta esté dentro del aro (tocar el cielo no hace nada). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. La ronda 1 tiene 20 cuentas, la ronda 2 tiene 30 y la ronda 3 tiene 40, y van el doble de rápido en cada ronda. Termina las 3 rondas para ganar."]},
@@ -1209,9 +1215,8 @@ var T = {
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
-    fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Cambia dos casillas vecinas para formar 3 o más iguales. Reúne la fruta que necesitas antes de quedarte sin movimientos.", fs_moves:function(n){return "Movimientos: "+n;}, fs_ok:"¡LISTO!",
-    fs_found:"FRUTOS ENCONTRADOS", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
-    fs_failTitle:"¡Sin Movimientos!", fs_failBody:"Te quedaste sin movimientos antes de reunir toda la fruta. ¡Inténtalo de nuevo!",
+    fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
+    fs_found:"REÚNE CADA FRUTA", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
@@ -6475,24 +6480,22 @@ function screenDovePeace(){
 
 /* ---------- Fruits of the Spirit ---------- */
 
-// Fruits of the Spirit (2026-10-24, per Dan; the screen was mocked up first): a match-3 game. A 6 x 6 board of fruit (1 grapes, 2 olives, 3 figs, 4 pomegranates, 5 wheat). Tap a fruit
-// and then a neighbor to swap them; a swap has to make a row or column of 3 or more of the same fruit, or it swaps back and costs nothing. The matched fruit pops, the ones above fall
-// and new ones drop in, and that can match again (a cascade). Each level asks for so many of some fruits within a number of moves (a swap that works is a move; a cascade is free):
-// run out of moves and it is TRY AGAIN. 4 or more in a line leaves a glowing Spirit flame (6) instead of one of them; swapping it with a neighbor clears its whole row (a side swap)
-// or column (an up or down swap). The 8 goals of the 3 levels are the 8 fruits of the Spirit: each goal finished lights up the next name below the board, with its name popping up.
-// Everything about a swap is worked out first by fsResolve as a list of frames (swap, clear, fall, ...), which are then played one after another, a redraw each; it only needs the
-// board, so it can be tried without the screen. The numbers (moves, goals) were set by playing 60 to 150 games each with a player that picks the swap that collects most of what is needed (wins
-// about 99 %, 91 % and 92 % in the three levels) and one that swaps at random (about 90 %, 50 % and 52 %).
-var FS_N = 6, FS_SPIRIT = 6;
-var FS_ROUNDS = [
-  {moves: 18, goals: [[1, 16], [2, 16]]},
-  {moves: 18, goals: [[1, 20], [5, 18], [3, 18]]},
-  {moves: 20, goals: [[4, 22], [2, 20], [5, 20]]}];
-var FS_MS = {swap: 180, clear: 300, fall: 340};
+// Fruits of the Spirit (2026-10-24, per Dan; the screen was mocked up first): a match-3 game. A 6 x 6 board of fruit, 8 kinds: one for each of the 8 fruits of the Spirit, so the kinds
+// are numbered like the words: 1 Love (pomegranate), 2 Joy (grapes), 3 Peace (olive), 4 Patience (wheat), 5 Kindness (apple), 6 Goodness (fig), 7 Faithfulness (dates), 8 Gentleness (melon).
+// Swipe a fruit towards a neighbor (or tap one and then a neighbor) to swap them; a swap has to make a row or column of 3 or more of the same fruit, or the two slide back. Only the fruit
+// moves: the cream squares stay where they are. The matched fruit pops, the ones above fall and new ones drop in, and that can match again (a cascade). 4 or more in a line leaves a
+// glowing Spirit flame (9) in place of one of them; swapping it with a neighbor clears its whole row (a side swap) or column (an up or down swap).
+// (Changed 2026-10-24, per Dan: there are no moves any more and it cannot be lost.) Each level asks for so many of EVERY fruit (5, 8 and 11): the 8 words below the board each show a
+// count like 3/5 and light up when their fruit has been collected; the level is complete when all 8 are lit. The fruit that is still needed turns up more often than the rest.
+// Everything about a swap is worked out first by fsResolve as a list of frames (swap, clear, fall, shuffle), which are then played on the fruit pictures themselves, so they slide.
+var FS_N = 6, FS_TYPES = 8, FS_SPIRIT = 9;
+var FS_NEED = [5, 8, 11];                                                   // of each fruit, in levels 1, 2 and 3
+var FS_MS = {swap: 190, clear: 320, fall: 360};
 var fsBound = null;                                                          // the game being played now: a game that was saved in the middle of a swap (a reload) is not busy any more
-function fsWeights(round){                                                  // every fruit is as likely as the others, and the ones the level asks for a little more
-  var w = [1, 1, 1, 1, 1];
-  FS_ROUNDS[round].goals.forEach(function(g){ w[g[0] - 1] += .5; });
+var fsEls = [], fsDrag = null;                                               // the fruit picture at each square, and the swipe being made
+function fsWeights(goals){                                                   // the fruit still needed turns up 3 times as often as the rest
+  var w = [];
+  for(var t = 0; t < FS_TYPES; t++) w.push(goals && goals[t] && goals[t].got < goals[t].need ? 3 : 1);
   return w;
 }
 function fsPick(w){
@@ -6508,7 +6511,7 @@ function fsRuns(b){
     while(c < N){
       t = b[r * N + c]; len = 1;
       while(c + len < N && b[r * N + c + len] === t) len++;
-      if(t >= 1 && t <= 5 && len >= 3){ cells = []; for(k = 0; k < len; k++) cells.push(r * N + c + k); runs.push({cells: cells, len: len}); }
+      if(t >= 1 && t <= FS_TYPES && len >= 3){ cells = []; for(k = 0; k < len; k++) cells.push(r * N + c + k); runs.push({cells: cells, len: len}); }
       c += len;
     }
   }
@@ -6517,7 +6520,7 @@ function fsRuns(b){
     while(r < N){
       t = b[r * N + c]; len = 1;
       while(r + len < N && b[(r + len) * N + c] === t) len++;
-      if(t >= 1 && t <= 5 && len >= 3){ cells = []; for(k = 0; k < len; k++) cells.push((r + k) * N + c); runs.push({cells: cells, len: len}); }
+      if(t >= 1 && t <= FS_TYPES && len >= 3){ cells = []; for(k = 0; k < len; k++) cells.push((r + k) * N + c); runs.push({cells: cells, len: len}); }
       r += len;
     }
   }
@@ -6540,14 +6543,14 @@ function fsMoves(b){                                                         // 
 }
 // a new board with nothing to clear already and at least one swap that works
 function fsNewBoard(w){
-  var N = FS_N;
-  for(var tries = 0; tries < 200; tries++){
-    var b = [];
+  var N = FS_N, b;
+  for(var tries = 0; tries < 300; tries++){
+    b = [];
     for(var i = 0; i < N * N; i++){
       var r = Math.floor(i / N), c = i % N, t, guard = 0;
       do {
         t = fsPick(w); guard++;
-      } while(guard < 30 && ((c >= 2 && b[i - 1] === t && b[i - 2] === t) || (r >= 2 && b[i - N] === t && b[i - 2 * N] === t)));
+      } while(guard < 40 && ((c >= 2 && b[i - 1] === t && b[i - 2] === t) || (r >= 2 && b[i - N] === t && b[i - 2 * N] === t)));
       b.push(t);
     }
     if(!fsRuns(b).length && fsMoves(b).length) return b;
@@ -6569,12 +6572,13 @@ function fsGravity(b, w){
   }
   return {board: out, fall: fall};
 }
+function fsZero(){ var g = {}; for(var t = 1; t <= FS_TYPES; t++) g[t] = 0; return g; }
 // everything that happens when the player swaps a1 and a2: null if it does not work, else {frames, board, gained}; frame = {kind: "swap"|"clear"|"fall"|"shuffle", board, ...}
 function fsResolve(board, a1, a2, w){
   if(!fsValidSwap(board, a1, a2)) return null;
-  var N = FS_N, b = fsSwapped(board, a1, a2), frames = [], gained = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, first = true;
+  var N = FS_N, b = fsSwapped(board, a1, a2), frames = [], gained = fsZero(), first = true;
   frames.push({kind: "swap", board: b.slice(), a: a1, b: a2});
-  var clearSet = {}, i, k;
+  var clearSet = {}, k;
   if(b[a1] === FS_SPIRIT || b[a2] === FS_SPIRIT){                            // a Spirit flame swapped: it clears the row or column it is in now
     var sp = b[a1] === FS_SPIRIT ? a1 : a2, horizontal = Math.floor(a1 / N) === Math.floor(a2 / N);
     for(k = 0; k < N; k++) clearSet[horizontal ? Math.floor(sp / N) * N + k : k * N + sp % N] = 1;
@@ -6590,12 +6594,12 @@ function fsResolve(board, a1, a2, w){
       }
     });
     if(!Object.keys(clearSet).length) break;
-    born.forEach(function(p){ delete clearSet[p]; });
-    var list = Object.keys(clearSet).map(Number), gain = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-    list.forEach(function(i2){ var t = b[i2]; if(t >= 1 && t <= 5){ gain[t]++; gained[t]++; } });
+    born.forEach(function(p2){ delete clearSet[p2]; });
+    var list = Object.keys(clearSet).map(Number), gain = fsZero();
+    list.forEach(function(i2){ var t = b[i2]; if(t >= 1 && t <= FS_TYPES){ gain[t]++; gained[t]++; } });
     frames.push({kind: "clear", board: b.slice(), clear: list, gain: gain, born: born});
     list.forEach(function(i2){ b[i2] = 0; });
-    born.forEach(function(p){ b[p] = FS_SPIRIT; });
+    born.forEach(function(p2){ b[p2] = FS_SPIRIT; });
     var g = fsGravity(b, w); b = g.board;
     frames.push({kind: "fall", board: b.slice(), fall: g.fall});
     clearSet = {}; first = false;
@@ -6604,76 +6608,174 @@ function fsResolve(board, a1, a2, w){
   return {frames: frames, board: b, gained: gained};
 }
 function initFruitsSpirit(){
-  var s = {v: 1, round: 0, found: 0, status: "playing", interlude: null};
+  var s = {v: 2, round: 0, found: 0, status: "playing", interlude: null};
   fsStartRound(s);
   state.session.fruitsSpirit = s;
   saveState();
 }
 function fsStartRound(s){
-  var cfg = FS_ROUNDS[s.round];
-  s.board = fsNewBoard(fsWeights(s.round)); s.moves = cfg.moves;
-  s.goals = cfg.goals.map(function(g){ return {t: g[0], need: g[1], got: 0, done: false}; });
-  s.sel = -1; s.busy = false; s.interlude = null; s.pop = null; s.view = null;
+  s.goals = []; for(var t = 0; t < FS_TYPES; t++) s.goals.push({got: 0, need: FS_NEED[s.round], done: false});
+  s.board = fsNewBoard(fsWeights(s.goals));
+  s.sel = -1; s.busy = false; s.interlude = null;
 }
-function fsTap(i){
+// ---- the screen's pictures: the fruit are their own elements, laid over the cream squares, so that they can slide ----
+function fsSetXY(el, x, y){ el.style.setProperty("--x", x); el.style.setProperty("--y", y); }
+function fsFruitHtml(type, i, y){
+  var N = FS_N;
+  return '<div class="fsFruit' + (type === FS_SPIRIT ? ' spirit' : '') + '" data-i="' + i + '" style="--x:' + (i % N) + ';--y:' + (y === undefined ? Math.floor(i / N) : y) + '"><img src="tiles/fruits/fs_' + type + '.png" alt=""></div>';
+}
+function fsBind(){                                                           // after the screen is drawn: which picture is at which square
+  fsEls = [];
+  for(var i = 0; i < FS_N * FS_N; i++) fsEls.push(null);
+  var list = document.querySelectorAll("#fsLayer .fsFruit");
+  for(var k = 0; k < list.length; k++) fsEls[+list[k].getAttribute("data-i")] = list[k];
+}
+function fsMakeFruit(type, x, y){
+  var layer = document.getElementById("fsLayer"), tmp = document.createElement("div");
+  tmp.innerHTML = fsFruitHtml(type, 0, y); var el = tmp.firstChild;
+  el.removeAttribute("data-i"); fsSetXY(el, x, y);
+  layer.appendChild(el);
+  return el;
+}
+function fsPaintWords(s){
+  for(var t = 1; t <= FS_TYPES; t++){
+    var g = s.goals[t - 1], w = document.getElementById("fsW" + t);
+    if(!w) continue;
+    w.classList.toggle("on", g.done);
+    var cnt = w.querySelector(".fsCnt"); if(cnt) cnt.textContent = g.got + "/" + g.need;
+  }
+}
+function fsPopup(text){
+  var wrap = document.querySelector(".fsBoardWrap"); if(!wrap) return;
+  var el = document.createElement("div"); el.className = "fsPopup"; el.textContent = text; wrap.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 1300);
+}
+function fsSwapEls(a, b){                                                    // the two fruit slide into each other's squares
+  var N = FS_N, ea = fsEls[a], eb = fsEls[b];
+  fsEls[a] = eb; fsEls[b] = ea;
+  if(ea) fsSetXY(ea, b % N, Math.floor(b / N));
+  if(eb) fsSetXY(eb, a % N, Math.floor(a / N));
+}
+function fsAlive(s){ return state.session.fruitsSpirit === s && state.screen === "fruitsSpirit"; }
+// plays the frames on the pictures, one after another, each held for as long as its movement lasts; the words are counted as fruit is cleared
+function fsPlay(s, frames, done){
+  var N = FS_N, k = 0;
+  function next(){
+    if(!fsAlive(s)) return;
+    if(k >= frames.length){ done(); return; }
+    var f = frames[k++], wait = FS_MS.swap, i, c, r;
+    if(f.kind === "swap"){
+      fsSwapEls(f.a, f.b); wait = FS_MS.swap;
+    } else if(f.kind === "clear"){
+      wait = FS_MS.clear;
+      pixSfxPlay(k > 2 ? "fmMatch" : "fmFirst", true);
+      for(i = 0; i < f.clear.length; i++){ var el = fsEls[f.clear[i]]; if(el) el.classList.add("pop"); }
+      f.born.forEach(function(p){ var el2 = fsEls[p]; if(el2){ el2.querySelector("img").src = "tiles/fruits/fs_" + FS_SPIRIT + ".png"; el2.classList.add("spirit", "born"); } });
+      if(f.born.length) setTimeout(function(){ pixSfxPlay("ticket", false); }, 160);
+      for(var ty = 1; ty <= FS_TYPES; ty++){
+        var g = s.goals[ty - 1];
+        if(g.done || !f.gain[ty]) continue;
+        g.got = Math.min(g.need, g.got + f.gain[ty]);
+        if(g.got >= g.need){ g.done = true; fsPopup(t("fs_names")[ty - 1] + "!"); s.found++; pixSfxPlay("ticket", false); }
+      }
+      fsPaintWords(s);
+    } else if(f.kind === "fall"){
+      wait = FS_MS.fall;
+      for(i = 0; i < N * N; i++){ var e0 = fsEls[i]; if(e0 && e0.classList.contains("pop")){ if(e0.parentNode) e0.parentNode.removeChild(e0); fsEls[i] = null; } }
+      var next2 = []; for(i = 0; i < N * N; i++) next2.push(null);
+      for(c = 0; c < N; c++){
+        var kept = [];
+        for(r = N - 1; r >= 0; r--) if(fsEls[r * N + c]) kept.push(fsEls[r * N + c]);
+        for(r = N - 1; r >= 0; r--){
+          var kk = N - 1 - r;
+          if(kk < kept.length){ next2[r * N + c] = kept[kk]; fsSetXY(kept[kk], c, r); }
+          else {                                                             // a new fruit drops in from above the board
+            var missing = N - kept.length, ne = fsMakeFruit(f.board[r * N + c], c, r - missing);
+            ne.style.transition = "none"; void ne.offsetWidth; ne.style.transition = ""; fsSetXY(ne, c, r);
+            next2[r * N + c] = ne;
+          }
+        }
+      }
+      fsEls = next2;
+    } else if(f.kind === "shuffle"){                                         // no swap left that works: a fresh board
+      wait = 420;
+      for(i = 0; i < N * N; i++){ if(fsEls[i] && fsEls[i].parentNode) fsEls[i].parentNode.removeChild(fsEls[i]); fsEls[i] = null; }
+      for(i = 0; i < N * N; i++){ var ns = fsMakeFruit(f.board[i], i % N, Math.floor(i / N)); ns.classList.add("fresh"); fsEls[i] = ns; }
+    }
+    s.board = f.board;
+    setTimeout(next, wait);
+  }
+  next();
+}
+function fsSwap(a, b){
   var s = state.session.fruitsSpirit;
   if(!s || s.busy || s.interlude || s.status !== "playing") return;
-  if(s.sel === -1 || s.sel === i || !fsAdjacent(s.sel, i)){ s.sel = (s.sel === i) ? -1 : i; render(); return; }
-  var a = s.sel; s.sel = -1; s.busy = true; fsBound = s;
-  var res = fsResolve(s.board, a, i, fsWeights(s.round));
-  if(!res){                                                                 // does not make a match: the two swap places and back, and no move is used
-    var swapped = fsSwapped(s.board, a, i), orig = s.board.slice();
+  if(s.sel !== -1 && fsEls[s.sel]) fsEls[s.sel].classList.remove("sel");
+  s.sel = -1; s.busy = true; fsBound = s;
+  pixSfxPlay("tap", false);
+  var res = fsResolve(s.board, a, b, fsWeights(s.goals));
+  if(!res){                                                                 // does not make a match: the two slide into each other's squares and then back
     pixSfxPlay("fmMiss", true);
-    fsPlayFrames(s, [{kind: "swap", board: swapped, a: a, b: i}, {kind: "swap", board: orig, a: i, b: a}], function(){ s.busy = false; render(); });
+    fsPlay(s, [{kind: "swap", board: fsSwapped(s.board, a, b), a: a, b: b}, {kind: "swap", board: s.board.slice(), a: a, b: b}], function(){ s.busy = false; });
     return;
   }
-  s.moves--;
-  fsPlayFrames(s, res.frames, function(){
-    s.view = null; s.board = res.board;
+  fsPlay(s, res.frames, function(){
+    s.board = res.board;
     if(s.goals.every(function(g){ return g.done; })){
       setTimeout(function(){
         var s2 = state.session.fruitsSpirit;
         if(!s2 || s2 !== s || state.screen !== "fruitsSpirit") return;
-        s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= FS_ROUNDS.length - 1};     // ROUND X COMPLETED!
+        s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= FS_ROUNDS_COUNT - 1};     // ROUND X COMPLETED!
         saveState(); render();
       }, 900);
-    } else if(s.moves <= 0){
-      pixSfxPlay("fmLast", true); saveState(); render();
-      setTimeout(function(){
-        var s2 = state.session.fruitsSpirit;
-        if(!s2 || s2 !== s || state.screen !== "fruitsSpirit") return;
-        s2.busy = false; s2.status = "failed"; saveState(); render();
-      }, 1200);
-    } else { s.busy = false; saveState(); render(); }
+    } else { s.busy = false; saveState(); }
   });
 }
-// plays the frames one after another: each is drawn (s.board and s.view say what to draw) and held for as long as its animation lasts; the goals are counted as fruit is cleared
-function fsPlayFrames(s, frames, done){
-  var k = 0;
-  function next(){
-    if(state.session.fruitsSpirit !== s || state.screen !== "fruitsSpirit") return;
-    if(k >= frames.length){ done(); return; }
-    var f = frames[k++]; s.board = f.board; s.view = f;
-    if(f.kind === "clear"){
-      var cnt = 0; for(var t in f.gain) cnt += f.gain[t];
-      pixSfxPlay(k > 2 ? "fmMatch" : "fmFirst", true);
-      if(f.born && f.born.length) setTimeout(function(){ pixSfxPlay("ticket", false); }, 150);
-      s.goals.forEach(function(g){
-        if(g.done) return;
-        g.got = Math.min(g.need, g.got + f.gain[g.t]);
-        if(g.got >= g.need){
-          g.done = true; var names = t_names(); s.pop = {text: names[Math.min(s.found, names.length - 1)] + "!"}; s.found++;
-          setTimeout(function(){ if(s.pop){ s.pop = null; if(state.screen === "fruitsSpirit") render(); } }, 1250);
-          pixSfxPlay("ticket", false);
-        }
-      });
-    }
-    render();
-    setTimeout(next, f.kind === "swap" ? FS_MS.swap : (f.kind === "clear" ? FS_MS.clear : FS_MS.fall));
-  }
-  next();
+var FS_ROUNDS_COUNT = 3;
+// ---- the player's fingers: a swipe from a fruit towards a neighbor, or a tap on a fruit and then on a neighbor ----
+function fsCellAt(e){
+  var inner = document.getElementById("fsInner"); if(!inner) return -1;
+  var r = inner.getBoundingClientRect(), N = FS_N, c = Math.floor((e.clientX - r.left) / (r.width / N)), row = Math.floor((e.clientY - r.top) / (r.height / N));
+  if(c < 0 || row < 0 || c >= N || row >= N) return -1;
+  return row * N + c;
 }
-function t_names(){ return t("fs_names"); }
+function fsDown(e){
+  var s = state.session.fruitsSpirit;
+  if(!s || s.busy || s.interlude || s.status !== "playing") return;
+  if(pixAudioStale) pixReviveOnTap();
+  var i = fsCellAt(e); if(i < 0) return;
+  fsDrag = {i: i, x: e.clientX, y: e.clientY, id: e.pointerId, done: false};
+  try { document.getElementById("fsInner").setPointerCapture(e.pointerId); } catch(err){}
+  if(fsEls[i]) fsEls[i].classList.add("grab");
+}
+function fsMove(e){
+  if(!fsDrag || fsDrag.done || e.pointerId !== fsDrag.id) return;
+  var inner = document.getElementById("fsInner"), cell = inner.getBoundingClientRect().width / FS_N;
+  var dx = e.clientX - fsDrag.x, dy = e.clientY - fsDrag.y;
+  if(Math.max(Math.abs(dx), Math.abs(dy)) < cell * .32) return;
+  fsDrag.done = true;
+  var N = FS_N, i = fsDrag.i, c = i % N, r = Math.floor(i / N), j;
+  if(Math.abs(dx) > Math.abs(dy)){ var nc = c + (dx > 0 ? 1 : -1); if(nc < 0 || nc >= N){ fsEnd(); return; } j = r * N + nc; }
+  else { var nr = r + (dy > 0 ? 1 : -1); if(nr < 0 || nr >= N){ fsEnd(); return; } j = nr * N + c; }
+  fsEnd(); fsSwap(i, j);
+}
+function fsEnd(){
+  if(fsDrag && fsEls[fsDrag.i]) fsEls[fsDrag.i].classList.remove("grab");
+}
+function fsUp(e){
+  if(!fsDrag || e.pointerId !== fsDrag.id) return;
+  var d = fsDrag; fsDrag = null;
+  if(fsEls[d.i]) fsEls[d.i].classList.remove("grab");
+  if(d.done) return;
+  var s = state.session.fruitsSpirit; if(!s || s.busy || s.interlude) return;
+  var i = d.i;                                                              // a tap: pick the fruit up, or swap with the one picked up if it is a neighbor
+  if(s.sel === -1){ s.sel = i; if(fsEls[i]) fsEls[i].classList.add("sel"); return; }
+  if(s.sel === i){ if(fsEls[i]) fsEls[i].classList.remove("sel"); s.sel = -1; return; }
+  if(fsAdjacent(s.sel, i)){ fsSwap(s.sel, i); return; }
+  if(fsEls[s.sel]) fsEls[s.sel].classList.remove("sel");
+  s.sel = i; if(fsEls[i]) fsEls[i].classList.add("sel");
+}
+function fsCancel(){ if(fsDrag){ fsEnd(); fsDrag = null; } }
 function fsInterlude(){
   pixRoundRun("fruitsSpirit", function(){ return state.session.fruitsSpirit; }, null, function(s2){
     if(s2.interlude.final){ s2.interlude = null; fsCollectAward(); return; }
@@ -6681,45 +6783,27 @@ function fsInterlude(){
     saveState(); render();
   });
 }
-function fsTryAgain(){ initFruitsSpirit(); render(); }
 function fsCollectAward(){ state.session.fruitsSpirit = null; grantMission("fruitsSpirit"); }
 function fsQuit(){ state.session.fruitsSpirit = null; go("mainMenu"); }
 function screenFruitsSpirit(){
   var s = state.session.fruitsSpirit;
-  if(!s || s.v !== 1 || !s.board){ initFruitsSpirit(); s = state.session.fruitsSpirit; }
-  if(s.status === "failed"){
-    return pixResultHtml("fruitsSpiritName", {cls:"pixLower", title:t("fs_failTitle"), body:t("fs_failBody"),
-      buttons:pixBtnHtml(t("tryAgain"), "fsTryAgain()") + pixBtnHtml(t("mainMenu"), "fsQuit()", true)});
-  }
-  if(s.busy && fsBound !== s){ s.busy = false; s.view = null; }
-  if(!s.busy && s.status === "playing" && !s.interlude){                      // a game that was saved just as a level was won or lost
-    if(s.goals.every(function(g){ return g.done; })) s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= FS_ROUNDS.length - 1};
-    else if(s.moves <= 0){ s.status = "failed"; return screenFruitsSpirit(); }
-  }
+  if(!s || s.v !== 2 || !s.board){ initFruitsSpirit(); s = state.session.fruitsSpirit; }
+  if(s.busy && fsBound !== s) s.busy = false;                                // a game saved in the middle of a swap
+  if(!s.interlude && s.goals.every(function(g){ return g.done; })) s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= FS_ROUNDS_COUNT - 1};
   if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("fruitsSpiritName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
-  var N = FS_N, v = s.view, names = t("fs_names"), cells = "", i;
-  for(i = 0; i < N * N; i++){
-    var cls = "fsTile", st = "", ty = s.board[i];
-    if(i === s.sel) cls += " sel";
-    if(ty === FS_SPIRIT) cls += " spirit";
-    if(v && v.kind === "clear" && v.clear.indexOf(i) !== -1) cls += " pop";
-    else if(v && v.kind === "fall" && v.fall[i]){ cls += " fall"; st = ' style="--d:' + v.fall[i] + '"'; }
-    else if(v && v.kind === "swap" && (i === v.a || i === v.b)){
-      var o = i === v.a ? v.b : v.a, dx = ((o % N) - (i % N)) * 100, dy = (Math.floor(o / N) - Math.floor(i / N)) * 100;
-      cls += " slide"; st = ' style="--sx:' + dx + '%;--sy:' + dy + '%"';
-    }
-    cells += '<button class="' + cls + '"' + st + ' onclick="fsTap(' + i + ')"><img src="tiles/fruits/fs_' + ty + '.png" alt=""></button>';
+  var N = FS_N, names = t("fs_names"), cells = "", fruit = "", i;
+  for(i = 0; i < N * N; i++){ cells += '<div class="fsCell"></div>'; fruit += fsFruitHtml(s.board[i], i); }
+  var words = "";
+  for(i = 1; i <= FS_TYPES; i++){
+    var g = s.goals[i - 1];
+    words += '<div class="fsWord' + (g.done ? ' on' : '') + '" id="fsW' + i + '"><img src="tiles/fruits/fs_' + i + '.png" alt=""><span class="fsCnt">' + g.got + '/' + g.need + '</span><span class="fsNm">' + names[i - 1].toUpperCase() + '</span></div>';
   }
-  var goals = s.goals.map(function(g){
-    return '<div class="fsGoal' + (g.done ? ' done' : '') + '"><img src="tiles/fruits/fs_' + g.t + '.png" alt=""><span>' + (g.done ? t("fs_ok") : g.got + '/' + g.need) + '</span></div>';
-  }).join("");
-  var found = names.map(function(n, k){ return '<span' + (k < s.found ? ' class="on"' : '') + '>' + n.toUpperCase() + '</span>'; }).join("");
   return pixShell('<h2 class="pixMTitle">' + t("fruitsSpiritName") + '</h2>' +
     '<div class="pixNote">' + t("fs_intro") + '</div>' +
-    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, FS_ROUNDS.length) + '</span><span class="pixNote">' + t("fs_moves")(s.moves) + '</span></div>' +
-    '<div class="fsGoals">' + goals + '</div>' +
-    '<div class="fsBoardWrap"><div class="fsBoard" style="--n:' + N + '">' + cells + '</div>' + (s.pop ? '<div class="fsPopup">' + s.pop.text + '</div>' : '') + '</div>' +
-    '<div class="fsFound"><b>' + t("fs_found") + '</b>' + found + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, FS_ROUNDS_COUNT) + '</span></div>' +
+    '<div class="fsBoardWrap"><div class="fsBoard"><div class="fsInner" id="fsInner" onpointerdown="fsDown(event)" onpointermove="fsMove(event)" onpointerup="fsUp(event)" onpointercancel="fsCancel()">' +
+      '<div class="fsGrid">' + cells + '</div><div class="fsLayer" id="fsLayer">' + fruit + '</div></div></div></div>' +
+    '<div class="fsFound"><b>' + t("fs_found") + '</b><div class="fsWords">' + words + '</div></div>' +
     '<div class="spacer"></div>', "pixLower msScreen");
 }
 
@@ -7129,7 +7213,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 R";
+var APP_BUILD = "2026-10-24 S";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -7386,6 +7470,7 @@ function render(){
   if(state.screen === "dovePeace" && state.session.dovePeace && state.session.dovePeace.interlude && !pixRoundRunning.dovePeace) dpInterlude();
   if(state.screen === "dovePeace"){ dpDraw(); dpLoopStart(); }
   if(state.screen === "fruitsSpirit" && state.session.fruitsSpirit && state.session.fruitsSpirit.interlude && !pixRoundRunning.fruitsSpirit) fsInterlude();
+  if(state.screen === "fruitsSpirit" && state.session.fruitsSpirit && !state.session.fruitsSpirit.interlude) fsBind();
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
