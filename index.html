@@ -6086,11 +6086,14 @@ function dpFlap(){
   dp.vy = DP_FLAP; dp.flapAt = performance.now();
   pixSfxPlay("tap", false);
 }
+// the middle of the safe space between the clouds: the gap of the pair the dove is in or is flying towards (the middle of the sky if there is none left)
+function dpSafeY(){
+  for(var i = 0; i < dp.pairs.length; i++){ if(dp.pairs[i].x + DP_CLOUD_R > DP_X - .02) return dp.pairs[i].gc; }
+  return .5;
+}
 function dpHit(s){
   dp.inv = DP_INV; dp.vy = 0;
-  var target = .5;
-  for(var i = 0; i < dp.pairs.length; i++){ if(dp.pairs[i].x + DP_CLOUD_R > DP_X - .02){ target = dp.pairs[i].gc; break; } }
-  dp.y = target;
+  dp.y = dpSafeY();                                                        // put back in the middle of the safe space between the clouds
   s.chances = dpChancesLeft(s) - 1;
   var last = s.chances <= 0;
   pixSfxPlay(last ? "fmLast" : "fmMiss", true);
@@ -6107,6 +6110,7 @@ function dpStep(s, dt){
   if(!dp.started){ dp.y = .5 + Math.sin(performance.now() / 300) * .015; return; }          // hovering until the first tap
   dp.t += dt;
   if(dp.doneAt){ dp.y += (.5 - dp.y) * Math.min(1, dt * 3); dp.vy = 0; }                  // past the last cloud: the dove glides to the middle
+  else if(dp.inv > 0){ dp.vy = 0; dp.y += (dpSafeY() - dp.y) * Math.min(1, dt * 10); }      // after a hit the dove is held in the middle of the safe space until it can be hurt again (it used to sink into a cloud and be hit again)
   else {
     dp.wind = cfg.wind ? 1.2 * Math.sin(dp.t * 1.1) + .8 * Math.sin(dp.t * 2.7 + 1) : 0;
     dp.vy = Math.min(DP_VMAX, dp.vy + (DP_GRAV + dp.wind) * dt);
@@ -6693,7 +6697,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 J";
+var APP_BUILD = "2026-10-24 K";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
