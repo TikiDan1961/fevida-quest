@@ -1217,7 +1217,12 @@ var MISSIONS = [
   {id:"followLight", icon:"🕹️", badgeImg:"tiles/badge_holiness.png", nameKey:"followLightName", themeKey:"themeHoliness"},
   {id:"wordUnscramble", icon:"🔤", badgeImg:"tiles/badge_grace.png", nameKey:"wordUnscrambleName", themeKey:"themeGrace"},
   {id:"catchLight", icon:"✨", badgeImg:"tiles/badge_salvation.png", nameKey:"catchLightName", themeKey:"themeSalvation"},
-  {id:"kindnessSort", icon:"🤲", badgeImg:"tiles/badge_forgiveness.png", nameKey:"kindnessSortName", themeKey:"themeForgiveness"},
+  // Pilgrim's Road (2026-10-24, per Dan) replaced Acts of Kindness, here in the list. Borrows the Hope badge (the road's end) until its own (Perseverance) is drawn: add
+  // tiles/badge_perseverance.png and tiles/badges96/b96_perseverance.png, then change badgeImg here. (Acts of Kindness's Forgiveness badge, tiles/badge_forgiveness.png, is
+  // now unused. The Acts of Kindness game itself, screenKindnessSort and the rest, is still in this file but nothing opens it: to bring it back, put
+  // {id:"kindnessSort", icon:"🤲", badgeImg:"tiles/badge_forgiveness.png", nameKey:"kindnessSortName", themeKey:"themeForgiveness"} back in this list, "kindnessSort" in
+  // GUIDE_MISSIONS and its startMission line.)
+  {id:"pilgrimRoad", icon:"⛪", badgeImg:"tiles/badge_hope.png", nameKey:"pilgrimRoadName", themeKey:"themePerseverance"},
   {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"},
   // Light a Candle (2026-10-21, per Dan: start on the new missions). Its own Prayer badge is not drawn yet, so it borrows the Light to the
   // World badge until Dan's art arrives: add tiles/badge_prayer.png and tiles/badges96/b96_prayer.png, then change badgeImg here.
@@ -1240,10 +1245,7 @@ var MISSIONS = [
   {id:"mustardSeed", icon:"🌱", badgeImg:"tiles/badge_faith.png", nameKey:"mustardSeedName", themeKey:"themeGrowth"},
   // Pray the Beads (2026-10-23, per Dan): took the place of the last "TBD" tile. Borrows the Grace badge (the dove) until its own art is drawn: add tiles/badge_beads.png
   // and tiles/badges96/b96_beads.png, then change badgeImg here.
-  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_grace.png", nameKey:"prayBeadsName", themeKey:"themePrayer"},
-  // Pilgrim's Road (2026-10-24, per Dan): borrows the Hope badge (the road's end) until its own (Perseverance) is drawn: add tiles/badge_perseverance.png and
-  // tiles/badges96/b96_perseverance.png, then change badgeImg here.
-  {id:"pilgrimRoad", icon:"⛪", badgeImg:"tiles/badge_hope.png", nameKey:"pilgrimRoadName", themeKey:"themePerseverance"}
+  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_grace.png", nameKey:"prayBeadsName", themeKey:"themePrayer"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1963,7 +1965,7 @@ function goldenTicketUnlocked(){
 
 // The games open on an instruction screen first (2026-10-22, per Dan): what the game is and how to play it, with a START MISSION button that
 // starts it. Be the Light and Choose Joy are not games and open straight away.
-var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","kindnessSort","hiddenBlessings",
+var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","hiddenBlessings",
   "lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad"];
 function openMission(id){
   if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
@@ -1981,7 +1983,6 @@ function startMission(id){
   else if(id === "wordUnscramble"){ initWordUnscramble(); go("wordUnscramble"); }
   // No explicit clStart() call here -- go()'s own render() call already starts the lights via the render()-hook.
   else if(id === "catchLight"){ initCatchLight(); go("catchLight"); }
-  else if(id === "kindnessSort"){ initKindnessSort(); go("kindnessSort"); }
   else if(id === "hiddenBlessings"){ initHiddenBlessings(); go("hiddenBlessings"); }
   else if(id === "lightCandle"){ initLightCandle(); go("lightCandle"); }
   else if(id === "emojiStories"){ initEmojiStories(); go("emojiStories"); }
@@ -6291,7 +6292,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 B";
+var APP_BUILD = "2026-10-24 C";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
