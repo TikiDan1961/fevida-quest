@@ -5384,6 +5384,7 @@ function msDrop(c){
   var res = msDropIn(s.cols, c, s.cur, s.goal), falling = s.cur;
   var landed = c + "," + landRow;
   s.busy = true;                                                           // nothing can be dropped until this one has landed
+  msPos = msPrevPos = c; msAcc = 0; msPlace();                              // the plant above the grid is now over the column it fell into (the next plant starts there)
   var mover = document.getElementById("msMover"); if(mover) mover.style.visibility = "hidden";
   msFall(c, landRow, falling, function(){
     if(state.session.mustardSeed !== s || state.screen !== "mustardSeed") return;
@@ -5430,7 +5431,7 @@ function screenMustardSeed(){
     '<div class="msHud"><span class="pixNote">' + t("fm_level")(s.round + 1, MS_ROUNDS.length) + '</span>' +
       '<span class="msGoal"><span class="pixNote">' + t("ms_goal") + '</span><span class="msGoalTile">' + msTileHtml(s.goal) + '</span><span class="pixNote">' + s.got + ' / ' + s.need + '</span></span></div>' +
     '<div class="msArea" id="msArea">' +
-      '<div class="msTrack" id="msTrack" style="--n:' + n + ';--r:' + s.rows + '">' + new Array(n + 1).join('<i class="msTrackCell"></i>') + '<div class="msMover" id="msMover">' + msTileHtml(s.cur) + '</div></div>' +
+      '<div class="msTrack" id="msTrack" style="--n:' + n + ';--r:' + s.rows + '">' + new Array(n + 1).join('<i class="msTrackCell"></i>') + '<div class="msMover" id="msMover"' + (s.busy ? ' style="visibility:hidden"' : '') + '>' + msTileHtml(s.cur) + '</div></div>' +
       '<div class="msBoard" id="msBoard" style="--n:' + n + ';--r:' + s.rows + ';grid-template-columns:repeat(' + n + ',minmax(0,1fr))">' + board + '</div>' +
       '<div class="msLegend">' + legend + '</div>' +
       '<button class="msBar" data-sfx="own" onclick="msDropNow()"><span>' + t("ms_dropBtn") + '</span></button>' +
