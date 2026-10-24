@@ -567,7 +567,7 @@
   .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   /* Pilgrim's Road (2026-10-24): grass tiles with road on them, the pilgrim and the church at the two ends. A tile is turned by turning its svg. */
-  .prBoard{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:2px;box-sizing:border-box;padding:4px;width:min(100%,380px,calc(100vh - 330px));width:min(100%,380px,calc(100dvh - 330px));margin:0 auto;
+  .prBoard{position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:2px;box-sizing:border-box;padding:4px;width:min(100%,380px,calc(100vh - 330px));width:min(100%,380px,calc(100dvh - 330px));margin:0 auto;
     background:#2F7D3A;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   .prTile{position:relative;aspect-ratio:1/1;min-width:0;display:block;box-sizing:border-box;padding:0;margin:0;border:0;overflow:hidden;background-color:#5DB34E;cursor:pointer;font:inherit;touch-action:manipulation;
     background-image:radial-gradient(circle at 18% 22%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 78% 70%,#FFD84A 0 1.5px,transparent 2px);}
@@ -575,6 +575,7 @@
   .prTile.g2{background-image:radial-gradient(circle at 30% 70%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 80% 30%,#FFD84A 0 1.5px,transparent 2px);}
   .prTile.g3{background-image:radial-gradient(circle at 84% 80%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 20% 30%,#FF9FC0 0 1.5px,transparent 2px);}
   .prTile:active{filter:brightness(1.12);}
+  .prWalker{position:absolute;z-index:3;pointer-events:none;}
   .prFixed{cursor:default;} .prFixed:active{filter:none;}
   .prRoad{position:absolute;left:0;top:0;width:100%;height:100%;display:block;transition:transform .16s ease-out;}
   .prRoad .o{fill:#9A6B35;} .prRoad .f{fill:#EBD59B;}
@@ -960,7 +961,7 @@ var T = {
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap FLAP to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round, and in the last round the wind pushes the dove around. Finish all 3 rounds to win."]},
-      pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road you have joined so far turns gold.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
+      pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
       prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap TAP when a bead is in the ring. The beads come at different distances, so watch each one.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Round 1 has 20 beads, round 2 has 30 and round 3 has 40, and they move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
@@ -1038,7 +1039,7 @@ var T = {
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
     dovePeaceName:"Dove of Peace", dp_intro:"Tap to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_flap:"FLAP", dp_ready:"Tap FLAP to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
-    pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build a road from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_start:"START", pr_church:"CHURCH",
+    pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
     sd_intro:"Tap a square, then a picture. Each picture goes once in every row, column and box.", sd_intro2:"Tap a square, then a picture. Each picture goes once in every row and column.", sd_hint:function(n){return "HINT ("+n+")";}, sd_erase:"Erase",
@@ -1104,7 +1105,7 @@ var T = {
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca ALETEAR para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda, y en la última el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
-      pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino que ya has unido se vuelve dorado.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
+      pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca TOCAR cuando una cuenta esté dentro del aro. Las cuentas vienen a distancias distintas, así que mira cada una.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. La ronda 1 tiene 20 cuentas, la ronda 2 tiene 30 y la ronda 3 tiene 40, y van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
@@ -1181,7 +1182,7 @@ var T = {
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_flap:"ALETEAR", dp_ready:"¡Toca ALETEAR para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
-    pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un camino del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_start:"SALIDA", pr_church:"IGLESIA",
+    pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
     sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_intro2:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila y columna.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
@@ -5743,9 +5744,10 @@ function screenPrayBeads(){
 // Pilgrim's Road (2026-10-24, per Dan; the screen was mocked up first): a path puzzle. The board is a square of tiles; the pilgrim stands on the left edge, the church on the right
 // edge, and every tile between is a piece of road to turn (a tap turns it a quarter turn). Join the road from the pilgrim to the church. The road joined to the pilgrim so far
 // turns gold. There are no chances, only a count of turns, and three rounds on 4 x 4, 5 x 5 and 6 x 6 boards (ROUND X COMPLETED! between them, no heart).
-// Each board is made fresh: a winding road is laid from next to the pilgrim to next to the church, the other tiles are made of straights, bends, T-junctions and grass, and then
-// every tile is turned at random (and the board is turned again if that happens to solve it). A tile's road is its svg, and turning it only turns the svg, so a tap does not redraw
-// the screen. The pilgrim and the church are fixed tiles: the pilgrim's opens to the right, the church's to the left.
+// Each board is made fresh. The road goes through EVERY tile of the board (2026-10-24, per Dan; before, it was a winding road with other tiles to leave out): one path that visits all
+// the squares once, from the pilgrim's to the church's, so every tile is a straight or a bend, and then every tile is turned at random (and the board is turned again if that happens
+// to solve it). Once the road is joined, the pilgrim walks along it to the church before ROUND X COMPLETED!. A tile's road is its svg, and turning it only turns the svg, so a tap does not redraw
+// the screen. The pilgrim and the church are fixed tiles with road on one side only (towards the road's first and last tile).
 var PR_ROUNDS = [{n: 4}, {n: 5}, {n: 6}];
 var PR_BASE = {S: [0, 2], C: [0, 1], T: [0, 1, 2], E: [], P: [1], H: [3]};      // the sides of each kind of tile that have road: 0 up, 1 right, 2 down, 3 left (before it is turned)
 var PR_DR = [-1, 0, 1, 0], PR_DC = [0, 1, 0, -1];
@@ -5755,7 +5757,7 @@ function prSides(tile){
   PR_BASE[tile.t].forEach(function(d){ out.push((d + r) % 4); });
   return out;
 }
-// which tiles are joined to the pilgrim (by the road on both sides of each join), and whether that reaches the church
+// which tiles are joined to the pilgrim (by the road on both sides of each join), how many that is, and whether it reaches the church with every tile on the way (won)
 function prReach(s){
   var n = s.n, seen = {}, queue = [[s.rs, 0]];
   seen[s.rs + "," + 0] = 1;
@@ -5768,48 +5770,62 @@ function prReach(s){
       seen[nr + "," + nc] = 1; queue.push([nr, nc]);
     }
   }
-  return {seen: seen, won: !!seen[s.re + "," + (n - 1)]};
+  var linked = !!seen[s.re + "," + (n - 1)], count = Object.keys(seen).length;
+  return {seen: seen, linked: linked, count: count, won: linked && count === n * n};      // won = the road reaches the church AND goes through every tile
 }
-// a winding road between (rs, 1) and (re, n - 2), without crossing itself, as a list of squares (a random walk with backtracking, tried until it is long enough)
-function prMakePath(n, rs, re, minLen){
-  var best = null;
+// one path through every square of the n x n board exactly once, from the pilgrim's square (rs, 0) to the church's (re, n - 1) (each of those two has road on one side only, towards
+// the next square of the path, and cannot be turned). Found by a walk that tries the squares with the fewest ways on first (Warnsdorff's rule, with some
+// chance in it), backing up when it is stuck; it is tried again from the start if that takes too long. null if none was found.
+function prMakeHamilton(n, rs, re){
+  var total = n * n;
   for(var attempt = 0; attempt < 300; attempt++){
-    var seen = {}, path = [[rs, 1]]; seen[rs + ",1"] = 1;
-    var found = (function walk(){
+    var seen = {}, path = [[rs, 0]], nodes = 0;
+    seen[rs + ",0"] = 1;
+    var ok = (function walk(){
+      if(++nodes > 6000) return false;
       var cur = path[path.length - 1];
-      if(cur[0] === re && cur[1] === n - 2) return true;
-      var dirs = shuffle([0, 1, 2, 3]);
-      for(var i = 0; i < dirs.length; i++){
-        var nr = cur[0] + PR_DR[dirs[i]], nc = cur[1] + PR_DC[dirs[i]];
-        if(nr < 0 || nr >= n || nc < 1 || nc > n - 2 || seen[nr + "," + nc]) continue;
-        seen[nr + "," + nc] = 1; path.push([nr, nc]);
+      if(path.length === total) return cur[0] === re && cur[1] === n - 1;
+      var cand = [];
+      for(var d = 0; d < 4; d++){
+        var nr = cur[0] + PR_DR[d], nc = cur[1] + PR_DC[d];
+        if(nr < 0 || nc < 0 || nr >= n || nc >= n || seen[nr + "," + nc]) continue;
+        if(nr === re && nc === n - 1 && path.length !== total - 1) continue;          // the church is the last square
+        var free = 0;
+        for(var e = 0; e < 4; e++){
+          var qr = nr + PR_DR[e], qc = nc + PR_DC[e];
+          if(qr >= 0 && qc >= 0 && qr < n && qc < n && !seen[qr + "," + qc]) free++;
+        }
+        cand.push({r: nr, c: nc, k: free + Math.random() * 1.6});
+      }
+      cand.sort(function(x, y){ return x.k - y.k; });
+      for(var i = 0; i < cand.length; i++){
+        seen[cand[i].r + "," + cand[i].c] = 1; path.push([cand[i].r, cand[i].c]);
         if(walk()) return true;
-        path.pop();
+        path.pop(); delete seen[cand[i].r + "," + cand[i].c];
       }
       return false;
     })();
-    if(found && (!best || path.length > best.length)) best = path.slice();
-    if(best && best.length >= minLen) break;
+    if(ok) return path;
   }
-  return best;
+  return null;
 }
 function prDirTo(a, b){ for(var d = 0; d < 4; d++) if(a[0] + PR_DR[d] === b[0] && a[1] + PR_DC[d] === b[1]) return d; return -1; }
 function prMakeBoard(s){
-  var n = PR_ROUNDS[s.round].n, rows = [], rs, re;
-  for(var r = 0; r < n; r++) rows.push(r);
-  rs = shuffle(rows)[0]; do { re = shuffle(rows)[0]; } while(re === rs);
-  var path = prMakePath(n, rs, re, (n - 2) + Math.floor(n / 2) + 1), grid = [];
-  for(var r2 = 0; r2 < n; r2++){
-    var row = [];
-    for(var c = 0; c < n; c++){
-      var kind = shuffle(["S", "S", "S", "C", "C", "C", "T", "E", "E"])[0];
-      row.push({t: kind, rot: Math.floor(Math.random() * 4)});
-    }
-    grid.push(row);
+  var n = PR_ROUNDS[s.round].n, total = n * n, path = null, rs = 0, re = 0, tries = 0;
+  while(!path && tries++ < 500){
+    rs = Math.floor(Math.random() * n); re = Math.floor(Math.random() * n);
+    // a path through every square needs its two ends on the right colours of the board (squares coloured like a chessboard): different ones if there is an even number of squares, both the
+    // colour of the corners if odd
+    var startColor = rs % 2, endColor = (re + n - 1) % 2;
+    if(total % 2 === 0 ? startColor === endColor : (startColor !== 0 || endColor !== 0)) continue;
+    path = prMakeHamilton(n, rs, re);
   }
-  grid[rs][0] = {t: "P", rot: 0}; grid[re][n - 1] = {t: "H", rot: 0};
-  for(var i = 0; i < path.length; i++){
-    var a = i === 0 ? 3 : prDirTo(path[i], path[i - 1]), b = i === path.length - 1 ? 1 : prDirTo(path[i], path[i + 1]);
+  var grid = [];
+  for(var r = 0; r < n; r++) grid.push(new Array(n));
+  // the pilgrim's road leads to the second square of the path and the church's comes from the one before the last (the base of P is the right side, of H the left)
+  grid[rs][0] = {t: "P", rot: (prDirTo(path[0], path[1]) + 3) % 4}; grid[re][n - 1] = {t: "H", rot: (prDirTo(path[total - 1], path[total - 2]) + 1) % 4};
+  for(var i = 1; i < path.length - 1; i++){
+    var a = prDirTo(path[i], path[i - 1]), b = prDirTo(path[i], path[i + 1]);
     var kindP = (a + 2) % 4 === b ? "S" : "C", sol = 0;
     for(var rot = 0; rot < 4; rot++){
       var sides = PR_BASE[kindP].map(function(d){ return (d + rot) % 4; });
@@ -5824,9 +5840,55 @@ function prMakeBoard(s){
     for(var r3 = 0; r3 < n; r3++) for(var c3 = 0; c3 < n; c3++){
       var tl = grid[r3][c3];
       if(tl.t === "P" || tl.t === "H") continue;
-      tl.rot = (tl.rot % 4) + Math.floor(Math.random() * 4);
+      tl.rot = (tl.sol % 4) + Math.floor(Math.random() * 4);
     }
   } while(prReach(s).won && guard++ < 50);
+}
+// the squares the road goes through, from the pilgrim to the church, following the road as it is turned
+function prRoute(s){
+  var n = s.n, r = s.rs, c = 0, pr = -1, pc = -1, route = [[r, c]], guard = 0;
+  while(guard++ < n * n + 2){
+    if(r === s.re && c === n - 1) break;
+    var sides = prSides(s.grid[r][c]), moved = false;
+    for(var i = 0; i < sides.length; i++){
+      var d = sides[i], nr = r + PR_DR[d], nc = c + PR_DC[d];
+      if(nr < 0 || nc < 0 || nr >= n || nc >= n || (nr === pr && nc === pc)) continue;
+      if(prSides(s.grid[nr][nc]).indexOf((d + 2) % 4) === -1) continue;
+      pr = r; pc = c; r = nr; c = nc; route.push([r, c]); moved = true;
+      break;
+    }
+    if(!moved) break;
+  }
+  return route;
+}
+// the reward: the pilgrim walks along the finished road, square by square, and goes in at the church door; done() runs a moment after
+function prWalk(s, done){
+  var board = document.getElementById("prBoard"), route = prRoute(s), first = document.getElementById("prT" + s.rs + "_0");
+  if(!board || !first || route.length < 2){ done(); return; }
+  var fig = first.querySelector(".prFigure"), size = first.offsetWidth * .38, step = Math.max(90, Math.min(200, Math.round(3000 / route.length)));
+  function center(cell){ var el = document.getElementById("prT" + cell[0] + "_" + cell[1]); return {x: el.offsetLeft + el.offsetWidth / 2, y: el.offsetTop + el.offsetHeight / 2}; }
+  var walker = document.createElement("div"); walker.className = "prWalker";
+  walker.innerHTML = '<div class="pilgrimSprite"></div>';
+  var p0 = center(route[0]);
+  walker.style.width = size + "px"; walker.style.height = (size * 15 / 11) + "px";
+  walker.style.left = (p0.x - size / 2) + "px"; walker.style.top = (p0.y - size * 15 / 22) + "px";
+  walker.style.transition = "left " + step + "ms linear, top " + step + "ms linear, opacity .3s";
+  board.appendChild(walker);
+  if(fig) fig.style.visibility = "hidden";
+  var k = 1;
+  function next(){
+    if(state.screen !== "pilgrimRoad" || state.session.pilgrimRoad !== s) return;
+    var c = center(route[k]);
+    walker.style.left = (c.x - size / 2) + "px"; walker.style.top = (c.y - size * 15 / 22) + "px";
+    k++;
+    if(k < route.length) setTimeout(next, step);
+    else setTimeout(function(){                                            // at the church: in at the door
+      if(state.screen !== "pilgrimRoad" || state.session.pilgrimRoad !== s) return;
+      walker.style.opacity = "0"; pixSfxPlay("fmMatch", true);
+      setTimeout(done, 800);
+    }, step + 100);
+  }
+  setTimeout(next, 450);
 }
 function initPilgrimRoad(){
   var s = {v: 1, round: 0, interlude: null};
@@ -5843,12 +5905,13 @@ function prSvg(kind, rot){
 }
 function prTileHtml(s, r, c, reach){
   var tile = s.grid[r][c], key = r + "," + c, cls = "prTile g" + ((r * 3 + c * 5) % 4) + (reach.seen[key] ? " on" : "");
-  if(tile.t === "P") return '<div class="' + cls + ' prFixed" id="prT' + r + '_' + c + '">' + prSvg("P", 0) + '<div class="prFigure"><div class="pilgrimSprite"></div></div></div>';
-  if(tile.t === "H") return '<div class="' + cls + ' prFixed' + (reach.won ? ' won' : '') + '" id="prT' + r + '_' + c + '">' + prSvg("H", 0) + '<img class="prChurchImg" src="tiles/pr/church.png" alt=""></div>';
+  if(tile.t === "P") return '<div class="' + cls + ' prFixed" id="prT' + r + '_' + c + '">' + prSvg("P", tile.rot) + '<div class="prFigure"><div class="pilgrimSprite"></div></div></div>';
+  if(tile.t === "H") return '<div class="' + cls + ' prFixed' + (reach.won ? ' won' : '') + '" id="prT' + r + '_' + c + '">' + prSvg("H", tile.rot) + '<img class="prChurchImg" src="tiles/pr/church.png" alt=""></div>';
   if(tile.t === "E") return '<div class="' + cls + ' prFixed" id="prT' + r + '_' + c + '"></div>';
   return '<button class="' + cls + '" id="prT' + r + '_' + c + '" onclick="prTurn(' + r + ',' + c + ')">' + prSvg(tile.t, tile.rot) + '</button>';
 }
 // the gold road, and the church lit up when it is reached, after a tile has been turned
+function prStatus(s, reach){ return t("pr_road")(reach.count, s.n * s.n) + "   " + t("pr_turns")(s.turns); }
 function prPaint(s){
   var reach = prReach(s);
   for(var r = 0; r < s.n; r++) for(var c = 0; c < s.n; c++){
@@ -5858,7 +5921,7 @@ function prPaint(s){
   var ch = document.getElementById("prT" + s.re + "_" + (s.n - 1));
   if(ch) ch.classList.toggle("won", reach.won);
   var tn = document.getElementById("prTurns");
-  if(tn) tn.textContent = t("pr_turns")(s.turns);
+  if(tn) tn.textContent = prStatus(s, reach);
   return reach;
 }
 function prTurn(r, c){
@@ -5871,15 +5934,14 @@ function prTurn(r, c){
   if(svg) svg.style.transform = "rotate(" + tile.rot * 90 + "deg)";
   var reach = prPaint(s);
   if(reach.won){
-    s.busy = true;                                                         // the road is done: a moment to see it, then ROUND X COMPLETED!
-    pixSfxPlay("fmMatch", true);
+    s.busy = true;                                                         // the road is done: the pilgrim walks it, then ROUND X COMPLETED!
     saveState();
-    setTimeout(function(){
+    prWalk(s, function(){
       var s2 = state.session.pilgrimRoad;
       if(!s2 || s2 !== s || state.screen !== "pilgrimRoad") return;
       s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= PR_ROUNDS.length - 1};
       saveState(); render();
-    }, 1100);
+    });
   } else saveState();
 }
 function prInterlude(){
@@ -5900,9 +5962,9 @@ function screenPilgrimRoad(){
   return pixShell('<h2 class="pixMTitle">' + t("pilgrimRoadName") + '</h2>' +
     '<div class="pixNote">' + t("pr_intro") + '</div>' +
     '<div class="pixNote">' + t("fm_level")(s.round + 1, PR_ROUNDS.length) + '</div>' +
-    '<div class="prBoard" style="--n:' + s.n + '">' + cells + '</div>' +
+    '<div class="prBoard" id="prBoard" style="--n:' + s.n + '">' + cells + '</div>' +
     '<div class="prLegend"><span>' + t("pr_start") + '</span><span>' + t("pr_church") + '</span></div>' +
-    '<div class="prTurns" id="prTurns">' + t("pr_turns")(s.turns) + '</div>' +
+    '<div class="prTurns" id="prTurns">' + prStatus(s, reach) + '</div>' +
     '<div class="spacer"></div>', "pixLower msScreen");
 }
 
@@ -6569,7 +6631,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 E";
+var APP_BUILD = "2026-10-24 F";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
