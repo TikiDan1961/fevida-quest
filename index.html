@@ -572,8 +572,16 @@
   .msGoal{display:flex;align-items:center;gap:6px;}
   .msGoalTile{width:32px;height:32px;display:block;}
   .msArea{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;width:min(100%,380px);margin:0 auto;}
-  .msBoard{display:grid;gap:5px;padding:7px;box-sizing:border-box;width:min(100%,max(220px,calc(100vh - 335px)));margin:0 auto;background:#966C44;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);}
-  .msCell{aspect-ratio:1/1;background:#7A5636;border-radius:5px;min-width:0;cursor:pointer;}
+  .msBoard{display:grid;gap:5px;padding:7px;box-sizing:border-box;width:min(100%,max(210px,calc((100vh - 345px) * var(--n) / var(--r))));margin:0 auto;background:#966C44;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);}
+  .msCol{display:flex;flex-direction:column;gap:5px;min-width:0;cursor:pointer;}
+  .msCol:active .msCell{filter:brightness(1.18);}
+  .msCol.shake{animation:tlShake .32s steps(4);}
+  .msCell{aspect-ratio:1/1;background:#7A5636;border-radius:5px;min-width:0;}
+  .msTray{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 8px;}
+  .msTray .pixNote{margin:0;font-size:.875rem;}
+  .msNow{width:46px;height:46px;display:block;}
+  .msNext{width:32px;height:32px;display:block;opacity:.9;}
+  .msNow .msTile{box-shadow:0 0 0 3px #fff,0 0 0 6px #3A93E8,0 0 12px 5px rgba(120,190,255,.8);}
   .msTile{width:100%;height:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid #1B1F3B;border-radius:7px;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.14);}
   .msTile img{width:80%;height:80%;image-rendering:pixelated;pointer-events:none;}
   .msTile.s1{background:#EEDEB8;} .msTile.s2{background:#D6EEA8;} .msTile.s3{background:#ACE078;} .msTile.s4{background:#FFE270;} .msTile.s5{background:#74C260;} .msTile.s6{background:#FFE88C;}
@@ -590,7 +598,7 @@
   .msArrow{flex:none;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #FFC93A;filter:drop-shadow(1px 1px 0 #1B1F3B);}
   .msBar{display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;height:54px;padding:0 22px;background:#3A8FE8;border:4px solid #1B1F3B;border-radius:18px;box-shadow:inset 0 0 0 3px #1C4E9A;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.06em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
-  @media (max-height:700px){ .msLegend{margin:6px 0 6px;} .msStage{width:32px;height:32px;} .msBar{height:46px;font-size:1.25rem;} }
+  @media (max-height:700px){ .msLegend{display:none;} .msBar{height:44px;font-size:1.25rem;margin-top:8px;} .msNow{width:40px;height:40px;} .msNext{width:28px;height:28px;} }
   /* Word Groups (2026-10-23): n x n frames. A word's size follows the width of a frame and the longest word on the board (--n, --m), so every word fits across. */
   .wgBoard{position:relative;display:flex;flex-direction:column;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
@@ -879,7 +887,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
-      mustardSeed:{d:"Join matching plants to grow a tiny seed into a great tree.", h:["Tap a plant. All the plants of the same kind light up.", "Tap one of them to join the two into one bigger plant: seed, sprout, plant, bush, tree, great tree.", "New seeds keep growing, so don't let the garden fill up! Join the biggest ones first. Grow the goal plant to finish the round. Finish all 3 rounds to win."]},
+      mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["Tap a column to drop the waiting plant into it. The next plant is shown too.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Don't fill the columns to the top. Grow the goal plant to finish the round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
     },
     fm_failTitle:"Out of Chances!",
@@ -947,8 +955,8 @@ var T = {
     hb_found:function(n,total){return "Found: "+n+" / "+total;},
     hb_passTitle:"Blessing Finder!", hb_passBody:"You found every hidden blessing!",
     sudokuName:"Sacred Sudoku", themeWisdom:"Wisdom",
-    mustardSeedName:"Mustard Seed", themeGrowth:"Growth", ms_intro:"Tap a plant, then tap a matching plant to join them.", ms_goal:"Goal:", ms_room:function(n){return "Room: " + n;}, ms_tapA:"TAP A PLANT", ms_tapB:"TAP A MATCH",
-    ms_failTitle:"Garden Full", ms_failBody:"There was no room for new seeds. Join the biggest plants first. Try again!",
+    mustardSeedName:"Mustard Seed", themeGrowth:"Growth", ms_intro:"Tap a column to drop the plant. Two of a kind on top of each other grow.", ms_goal:"Goal:", ms_drop:"Drop:", ms_then:"Then:", ms_tap:"TAP A COLUMN",
+    ms_failTitle:"Garden Full", ms_failBody:"No column had room for the plant. Try stacking plants that match. Try again!",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
     sd_intro:"Tap a square, then a picture. Each picture goes once in every row, column and box.", sd_intro2:"Tap a square, then a picture. Each picture goes once in every row and column.", sd_hint:function(n){return "HINT ("+n+")";}, sd_erase:"Erase",
@@ -1013,7 +1021,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
-      mustardSeed:{d:"Junta plantas iguales para hacer crecer una semilla pequeña hasta un gran árbol.", h:["Toca una planta. Se iluminan todas las plantas del mismo tipo.", "Toca una de ellas para juntar las dos en una planta más grande: semilla, brote, planta, arbusto, árbol, gran árbol.", "Siguen creciendo semillas nuevas, ¡así que no dejes que el jardín se llene! Junta primero las más grandes. Haz crecer la planta de la meta para terminar la ronda. Termina las 3 rondas para ganar."]},
+      mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Toca una columna para dejar caer la planta que espera. También se muestra la siguiente.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "No llenes las columnas hasta arriba. Haz crecer la planta de la meta para terminar la ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
     fm_failTitle:"¡Sin Oportunidades!",
@@ -1080,8 +1088,8 @@ var T = {
     hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
     sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
-    mustardSeedName:"Semilla de Mostaza", themeGrowth:"Crecimiento", ms_intro:"Toca una planta y luego una igual para juntarlas.", ms_goal:"Meta:", ms_room:function(n){return "Espacio: " + n;}, ms_tapA:"TOCA UNA PLANTA", ms_tapB:"TOCA UNA IGUAL",
-    ms_failTitle:"Jardín Lleno", ms_failBody:"No hubo espacio para semillas nuevas. Junta primero las plantas más grandes. ¡Inténtalo de nuevo!",
+    mustardSeedName:"Semilla de Mostaza", themeGrowth:"Crecimiento", ms_intro:"Toca una columna para soltar la planta. Dos iguales una sobre otra crecen.", ms_goal:"Meta:", ms_drop:"Suelta:", ms_then:"Luego:", ms_tap:"TOCA UNA COLUMNA",
+    ms_failTitle:"Jardín Lleno", ms_failBody:"Ninguna columna tenía espacio para la planta. Intenta apilar plantas iguales. ¡Inténtalo de nuevo!",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
     sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_intro2:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila y columna.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
@@ -5207,72 +5215,84 @@ function screenWordGroups(){
 
 /* ---------- Mustard Seed ---------- */
 
-// Mustard Seed (2026-10-23, per Dan): a merge puzzle with plants. Tap a plant (every plant of the same stage lights up), then tap one of them: the two join into one plant
-// of the next stage (1 seed, 2 sprout, 3 plant, 4 flowering bush, 5 tree, 6 great tree) where the second one stands. After every join one new seed grows in an empty square, and
-// usually a second one, so the garden keeps filling up. Reach the goal stage before there is no room for a new seed and the round is complete; otherwise TRY AGAIN. Three rounds
-// (no chances): 4 x 4 for a bush, 5 x 5 for a tree, 6 x 6 for the great tree. (It was a swipe-to-slide game first; Dan found it hard to understand, so now it is tap two.)
-// The numbers were set by playing 500 games with a player that always joins the biggest pair it can (wins every time) and 500 with a player that joins any pair at random
-// (wins about 95 %, 93 % and 83 % in the three rounds): joining the biggest ones first is the way to keep the garden from filling up.
-var MS_ROUNDS = [{size: 4, goal: 4, start: 7}, {size: 5, goal: 5, start: 8}, {size: 6, goal: 6, start: 8}];
-var MS_EXTRA_SEED = .7;                                                  // the chance of a second new seed after a join
+// Mustard Seed (2026-10-23, per Dan): a drop-and-merge puzzle with plants. A plant waits at the top (and the next one is shown); tap a column to drop it. It lands on top of that
+// column's stack, and when it lands on a plant of the same stage the two grow into the next stage (1 seed, 2 sprout, 3 plant, 4 flowering bush, 5 tree, 6 great tree). The grown
+// plant can then match the one below it, and so on, so one drop can chain. A column that is full only takes a plant that matches its top one. Reach the goal stage and the round
+// is complete; if no column can take the plant that is waiting, the garden is full and it is TRY AGAIN. Three rounds (no chances): R1 4 columns of 5 for a tree, R2 5 columns of 6
+// for the great tree, R3 6 columns of 5 for the great tree, with fewer big plants dropping. (It was swipe-to-slide, then tap-two-to-join; Dan found the first hard to understand and
+// the second had no skill in it.) The numbers were set by playing 250 games each with a player that looks one drop ahead and one that drops anywhere at random: the first wins every
+// time, the random one wins about 92 %, 54 % and 15 % in the three rounds.
+var MS_ROUNDS = [{cols: 4, rows: 5, goal: 5, w: [.3, .3, .2, .15]}, {cols: 5, rows: 6, goal: 6, w: [.3, .3, .2, .15, .05]}, {cols: 6, rows: 5, goal: 6, w: [.4, .3, .2, .1]}];
 var MS_TOP = 6;                                                          // the highest stage
+function msNextStage(w){
+  var total = w.reduce(function(x, y){ return x + y; }, 0), r = Math.random() * total, acc = 0;
+  for(var i = 0; i < w.length; i++){ acc += w[i]; if(r < acc) return i + 1; }
+  return 1;
+}
 function msNewRound(round){
-  var cfg = MS_ROUNDS[round], n = cfg.size, grid = [];
-  for(var i = 0; i < n * n; i++) grid.push(0);
-  for(var k = 0; k < cfg.start; k++) msSpawn(grid);
-  return {v: 2, round: round, size: n, goal: cfg.goal, grid: grid, selected: -1, merged: -1, spawned: [], busy: false, status: "playing", interlude: null};
+  var cfg = MS_ROUNDS[round], cols = [];
+  for(var c = 0; c < cfg.cols; c++) cols.push([]);                       // each column is its plants from the bottom up
+  return {v: 3, round: round, cols: cols, rows: cfg.rows, goal: cfg.goal, cur: msNextStage(cfg.w), nxt: msNextStage(cfg.w), merged: [], dropped: "", shake: -1, busy: false, status: "playing", interlude: null};
 }
 function initMustardSeed(){ state.session.mustardSeed = msNewRound(0); saveState(); }
-// a new plant in a random empty square: usually a seed, now and then a sprout; returns where it went (-1 if the garden is full)
-function msSpawn(grid){
-  var empty = [];
-  for(var i = 0; i < grid.length; i++) if(!grid[i]) empty.push(i);
-  if(!empty.length) return -1;
-  var at = empty[Math.floor(Math.random() * empty.length)];
-  grid[at] = Math.random() < .9 ? 1 : 2;
-  return at;
-}
-function msHasPair(grid){
-  var seen = {};
-  for(var i = 0; i < grid.length; i++){ var v = grid[i]; if(v && v < MS_TOP){ if(seen[v]) return true; seen[v] = 1; } }
+// can column c take plant v? (a full column only takes a plant that joins the one on top)
+function msLegal(cols, rows, c, v){ return cols[c].length < rows || cols[c][cols[c].length - 1] === v; }
+function msAnyLegal(cols, rows, v){
+  for(var c = 0; c < cols.length; c++) if(msLegal(cols, rows, c, v)) return true;
   return false;
 }
-function msTap(i){
+// drops v into column c and settles the merges; returns the new columns, how many merges happened, whether the goal was reached, and where plants grew
+function msDropIn(cols, rows, c, v, goal){
+  var out = cols.map(function(col){ return col.slice(); }), merges = 0, reached = false, grown = {};
+  if(out[c].length >= rows){ out[c][rows - 1] = v + 1; merges++; grown[c + "," + (rows - 1)] = 1; if(v + 1 >= goal) reached = true; }
+  else out[c].push(v);
+  var again = true, guard = 0;
+  while(again && !reached && guard++ < 80){
+    again = false;
+    for(var x = 0; x < out.length && !again; x++){
+      var col = out[x];
+      for(var y = 1; y < col.length; y++){
+        if(col[y] && col[y] < MS_TOP && col[y] === col[y - 1]){
+          col[y - 1]++; col.splice(y, 1); merges++; again = true; grown[x + "," + (y - 1)] = 1; if(col[y - 1] >= goal) reached = true;
+          break;
+        }
+      }
+    }
+  }
+  return {cols: out, merges: merges, reached: reached, grown: Object.keys(grown)};
+}
+function msDrop(c){
   var s = state.session.mustardSeed;
   if(!s || s.status !== "playing" || s.interlude || s.busy) return;
   if(pixAudioStale) pixReviveOnTap();
-  var v = s.grid[i];
-  if(!v || s.selected === i){ s.selected = -1; saveState(); render(); return; }                 // soil, or the same plant again: let go of it
-  if(s.selected >= 0 && s.grid[s.selected] === v && v < MS_TOP){                                 // a matching plant: join the two
-    s.grid[i] = v + 1; s.grid[s.selected] = 0; s.selected = -1; s.merged = i; s.spawned = [];
-    var reached = s.grid[i] >= s.goal, over = false;
-    if(!reached){
-      var seeds = 1 + (Math.random() < MS_EXTRA_SEED ? 1 : 0);
-      for(var k = 0; k < seeds && !over; k++){ var at = msSpawn(s.grid); if(at < 0) over = true; else s.spawned.push(at); }
-      while(!over && !msHasPair(s.grid)){ var at2 = msSpawn(s.grid); if(at2 < 0) over = true; else s.spawned.push(at2); }     // no two alike left: seeds keep coming until there are
-    }
-    pixSfxPlay(over ? "fmLast" : "fmMatch", true);
-    if(reached || over) s.busy = true;
-    saveState(); render();
-    if(reached){
-      setTimeout(function(){
-        var s2 = state.session.mustardSeed;
-        if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
-        s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= MS_ROUNDS.length - 1};     // ROUND X COMPLETED!
-        saveState(); render();
-      }, 800);
-    } else if(over){
-      setTimeout(function(){
-        var s2 = state.session.mustardSeed;
-        if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
-        s2.busy = false; s2.status = "failed"; saveState(); render();
-      }, 1000);
-    }
+  var cfg = MS_ROUNDS[s.round];
+  if(!msLegal(s.cols, s.rows, c, s.cur)){                                 // a full column that does not match: it shakes
+    s.shake = c; pixSfxPlay("fmMiss", true); saveState(); render();
+    setTimeout(function(){ var s2 = state.session.mustardSeed; if(s2 === s && s2.shake === c){ s2.shake = -1; render(); } }, 320);
     return;
   }
-  s.selected = i; s.merged = -1; s.spawned = [];                                                  // a plant with nothing selected, or one that does not match: pick this one up instead
-  pixSfxPlay("fmFirst", true);
+  var res = msDropIn(s.cols, s.rows, c, s.cur, s.goal);
+  var landed = s.cols[c].length < s.rows ? c + "," + s.cols[c].length : c + "," + (s.rows - 1);
+  s.cols = res.cols; s.merged = res.grown; s.dropped = landed; s.shake = -1;
+  s.cur = s.nxt; s.nxt = msNextStage(cfg.w);
+  var over = !res.reached && !msAnyLegal(s.cols, s.rows, s.cur);        // no column can take the waiting plant
+  pixSfxPlay(over ? "fmLast" : (res.merges ? "fmMatch" : "fmFirst"), true);
+  if(res.reached || over) s.busy = true;
   saveState(); render();
+  if(res.reached){
+    setTimeout(function(){
+      var s2 = state.session.mustardSeed;
+      if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
+      s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= MS_ROUNDS.length - 1};     // ROUND X COMPLETED!
+      saveState(); render();
+    }, 800);
+  } else if(over){
+    setTimeout(function(){
+      var s2 = state.session.mustardSeed;
+      if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
+      s2.busy = false; s2.status = "failed"; saveState(); render();
+    }, 1100);
+  }
 }
 function msInterlude(){
   pixRoundRun("mustardSeed", function(){ return state.session.mustardSeed; }, null, function(s2){
@@ -5288,17 +5308,21 @@ function msQuit(){ state.session.mustardSeed = null; go("mainMenu"); }
 function msTileHtml(v, cls){ return '<div class="msTile s' + v + (cls || '') + '"><img src="tiles/ms/ms_' + v + '.png" alt=""></div>'; }
 function screenMustardSeed(){
   var s = state.session.mustardSeed;
-  if(!s || s.v !== 2){ initMustardSeed(); s = state.session.mustardSeed; }          // a game saved while it was a swipe game starts over
+  if(!s || s.v !== 3){ initMustardSeed(); s = state.session.mustardSeed; }          // a game saved by an earlier version of Mustard Seed starts over
   if(s.status === "failed"){
     return pixResultHtml("mustardSeedName", {cls:"pixLower", title:t("ms_failTitle"), body:t("ms_failBody"),
       buttons:pixBtnHtml(t("tryAgain"), "msTryAgain()") + pixBtnHtml(t("mainMenu"), "msQuit()", true)});
   }
   if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("mustardSeedName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
-  var n = s.size, cells = "", room = 0, selV = s.selected >= 0 ? s.grid[s.selected] : 0;
-  for(var i = 0; i < n * n; i++){
-    var v = s.grid[i]; if(!v) room++;
-    var cls = (i === s.merged ? ' pop' : '') + (s.spawned.indexOf(i) !== -1 ? ' spawn' : '') + (i === s.selected ? ' sel' : (selV && v === selV && v < MS_TOP ? ' match' : ''));
-    cells += '<div class="msCell" onclick="msTap(' + i + ')">' + (v ? msTileHtml(v, cls) : '') + '</div>';
+  var n = s.cols.length, board = "";
+  for(var c = 0; c < n; c++){
+    var cells = "";
+    for(var y = s.rows - 1; y >= 0; y--){                                  // the top of the column first
+      var v = s.cols[c][y], key = c + "," + y;
+      var cls = (s.merged.indexOf(key) !== -1 ? ' pop' : '') + (key === s.dropped && s.merged.indexOf(key) === -1 ? ' spawn' : '') + (v >= s.goal ? ' goal' : '');
+      cells += '<div class="msCell">' + (v ? msTileHtml(v, cls) : '') + '</div>';
+    }
+    board += '<div class="msCol' + (s.shake === c ? ' shake' : '') + '" onclick="msDrop(' + c + ')">' + cells + '</div>';
   }
   var legend = "";
   for(var k = 1; k <= MS_TOP; k++){
@@ -5307,12 +5331,12 @@ function screenMustardSeed(){
   return pixShell('<h2 class="pixMTitle">' + t("mustardSeedName") + '</h2>' +
     '<div class="pixNote">' + t("ms_intro") + '</div>' +
     '<div class="msHud"><span class="pixNote">' + t("fm_level")(s.round + 1, MS_ROUNDS.length) + '</span>' +
-      '<span class="msGoal"><span class="pixNote">' + t("ms_goal") + '</span><span class="msGoalTile">' + msTileHtml(s.goal) + '</span></span>' +
-      '<span class="pixNote' + (room <= 2 ? ' bad' : '') + '">' + t("ms_room")(room) + '</span></div>' +
+      '<span class="msGoal"><span class="pixNote">' + t("ms_goal") + '</span><span class="msGoalTile">' + msTileHtml(s.goal) + '</span></span></div>' +
+    '<div class="msTray"><span class="pixNote">' + t("ms_drop") + '</span><span class="msNow">' + msTileHtml(s.cur) + '</span><span class="pixNote">' + t("ms_then") + '</span><span class="msNext">' + msTileHtml(s.nxt) + '</span></div>' +
     '<div class="msArea" id="msArea">' +
-      '<div class="msBoard" id="msBoard" style="--n:' + n + ';grid-template-columns:repeat(' + n + ',minmax(0,1fr))">' + cells + '</div>' +
+      '<div class="msBoard" id="msBoard" style="--n:' + n + ';--r:' + s.rows + ';grid-template-columns:repeat(' + n + ',minmax(0,1fr))">' + board + '</div>' +
       '<div class="msLegend">' + legend + '</div>' +
-      '<div class="msBar"><span>' + t(s.selected >= 0 ? "ms_tapB" : "ms_tapA") + '</span></div>' +
+      '<div class="msBar"><span>' + t("ms_tap") + '</span></div>' +
     '</div>' +
     '<div class="spacer"></div>', "pixLower");
 }
