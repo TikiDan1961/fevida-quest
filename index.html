@@ -585,6 +585,7 @@
   .msArea{position:relative;}
   .msArea.noLegend .msLegend{display:none;}
   .msMover .msTile{box-shadow:0 0 0 3px #fff,0 0 0 6px #3A93E8,0 0 12px 5px rgba(120,190,255,.8);}
+  .msCol{transition:background-color .09s ease-out,box-shadow .09s ease-out;}
   .msCol.under{background:rgba(255,255,255,.14);border-radius:6px;box-shadow:0 0 0 3px rgba(255,255,255,.28);}
   .msTile{width:100%;height:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid #1B1F3B;border-radius:7px;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.14);}
   .msTile img{width:80%;height:80%;image-rendering:pixelated;pointer-events:none;}
@@ -1785,7 +1786,7 @@ function pixReviveOnTap(ev){
 // This listener is registered before the sound/engine listeners below on purpose: the swallowed click must not reach them (the touch's sound was
 // already made on the touch). The one exception is a touch that came after the phone had slept: its sound was held back until the sound engine could be
 // made again at the end of the touch, so it is played here, when the finger lifts.
-var pixTapSynth = false, tapSwallow = false, tapSwallowTimer = 0, tapHeldSound;
+var pixTapSynth = false, tapSwallow = false, tapSwallowTimer = 0, tapHeldSound, pixDownT = 0;     // pixDownT = when the finger touched (the event's own time), for the games that judge timing
 var TAP_SOUND_ONLY = /^\s*(?:if\s*\(\s*!\s*this\.disabled\s*\)\s*)?(?:pixPressSfx|tlPress|ebPress|ffPress)\(([^)]*)\)\s*;?\s*$/;
 function tapOnTouch(e){
   tapSwallow = false; tapHeldSound = undefined;
@@ -1796,7 +1797,7 @@ function tapOnTouch(e){
   if(pd && !m) return;                       // it acts on the touch by itself
   if(pixAudioStale){ var nm = m && /^\s*['"](\w+)['"]\s*$/.exec(m[1]); tapHeldSound = nm ? nm[1] : "tap"; }
   tapSwallow = true;
-  pixTapSynth = true;
+  pixTapSynth = true; pixDownT = e.timeStamp;
   try { el.click(); } finally { pixTapSynth = false; }
 }
 document.addEventListener("click", function(e){
@@ -5275,7 +5276,7 @@ function msDropIn(cols, c, v, goal){
 // The plant above the grid. msPos is the column it is over (0 = the first, cols - 1 = the last) and msDir which way it is going; every 1 / rate seconds it JUMPS to the next
 // column, and it turns round at the first and the last. It lives outside the screen drawing, so a redraw never moves it. The column under it is lit.
 var msPos = 0, msDir = 1, msRaf = 0, msLastT = 0, msAcc = 0, msPrevPos = 0, msMovedAt = 0;
-var MS_LAG = 80;                                                         // ms between the eye seeing the plant over a column and the tap reaching the game
+var MS_SHOW_LAG = 40;                                                    // ms the screen is behind the game: what the player sees at a touch is where the plant was this long before
 function msPlace(){
   var s = state.session.mustardSeed, mover = document.getElementById("msMover"), track = document.getElementById("msTrack");
   if(!s || !mover || !track) return;
@@ -5288,16 +5289,21 @@ function msLoop(now){
   var s = state.session.mustardSeed;
   if(state.screen !== "mustardSeed" || !s){ msRaf = 0; return; }
   var dt = Math.min(.1, (now - msLastT) / 1000); msLastT = now;
+  var jumped = false;
   if(s.status === "playing" && !s.interlude && !s.busy){
     var n = s.cols.length, interval = 1 / MS_ROUNDS[s.round].rate;
     msAcc += dt;
     while(msAcc >= interval){
       msAcc -= interval;
       if(msPos + msDir > n - 1 || msPos + msDir < 0) msDir = -msDir;      // the end of the row: turn round
-      msPrevPos = msPos; msPos += msDir; msMovedAt = now;
+      msPrevPos = msPos; msPos += msDir; msMovedAt = now; jumped = true;
     }
   }
   msPlace();
+  if(jumped){                                                             // the plant fades in over its new column, so a glimpse of it just before a tap is faint
+    var mv = document.getElementById("msMover");
+    if(mv && mv.animate) mv.animate([{opacity: .2}, {opacity: 1}], {duration: 90, easing: "ease-out"});
+  }
   msRaf = requestAnimationFrame(msLoop);
 }
 function msLoopStart(){
@@ -5327,12 +5333,14 @@ function msFit(){
 }
 window.addEventListener("resize", function(){ if(state.screen === "mustardSeed") msFit(); });
 // DROP TILE: the plant falls into the column it is over right now
-// (2026-10-23, per Dan: sometimes it fell into the next column. The tap reaches the game a moment after the player saw the plant over a column, and by then it may have jumped on,
-// so a tap in the first MS_LAG ms after a jump counts for the column it just left.)
+// (2026-10-23, per Dan: sometimes it fell into the next column. The tap reaches the game a moment after the finger touched, and by then the plant may have jumped on, so the column
+// is the one it was over when the finger touched (the event's own time, pixDownT) less the little the screen is behind the game.)
 function msDropNow(){
   var s = state.session.mustardSeed;
   if(!s) return;
-  msDrop(performance.now() - msMovedAt < MS_LAG ? msPrevPos : msPos);
+  var now = performance.now(), touched = pixDownT;
+  if(!(touched > 0) || touched > now || now - touched > 400) touched = now;      // no usable touch time (the button pressed some other way)
+  msDrop(touched - MS_SHOW_LAG < msMovedAt ? msPrevPos : msPos);
 }
 // the plant visibly falls from the top square of the column to the square where it lands, then done() runs
 function msFall(c, landRow, v, done){
