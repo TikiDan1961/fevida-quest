@@ -601,19 +601,22 @@
   .fsBoardWrap{position:relative;width:min(100%,380px,calc(100vh - 395px));width:min(100%,380px,calc(100dvh - 395px));margin:4px auto 0;}
   .fsBoard{box-sizing:border-box;padding:4px;overflow:hidden;background:#744828;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
-  .fsInner{position:relative;aspect-ratio:1/1;touch-action:none;cursor:grab;}
-  .fsGrid{position:absolute;left:0;top:0;width:100%;height:100%;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);}
+  .fsInner{--cell:50px;--pad:5px;--img:40px;position:relative;width:calc(var(--cell) * 6);height:calc(var(--cell) * 6);margin:0 auto;touch-action:none;cursor:grab;}      /* fsFit sets --cell to a whole number of pixels */
+  .fsGrid{position:absolute;left:0;top:0;width:100%;height:100%;display:grid;grid-template-columns:repeat(6,var(--cell));grid-template-rows:repeat(6,var(--cell));}
   .fsCell{margin:1px;border:2px solid #CEB076;border-bottom-width:3px;border-radius:5px;background:#F8ECC8;box-sizing:border-box;}
   .fsLayer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;}
-  .fsFruit{position:absolute;left:0;top:0;width:calc(100% / 6);height:calc(100% / 6);transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%));transition:transform .19s ease-in-out;will-change:transform;}
-  .fsFruit img{display:block;width:78%;height:78%;margin:11%;image-rendering:pixelated;}
+  /* (2026-10-24, per Dan: the fruit shifted a pixel sideways when they landed.) They are placed with left and top, in whole pixels, and slide by animating those: no compositing layer comes and goes at the end, as it did with transform, so nothing can move. */
+  .fsFruit{position:absolute;left:calc(var(--x) * var(--cell));top:calc(var(--y) * var(--cell));width:var(--cell);height:var(--cell);transition:left .19s ease-in-out,top .19s ease-in-out;}
+  .fsFruit.shuf{transition-duration:.6s;}
+  .fsInner.fit .fsFruit{transition:none !important;}
+  .fsFruit img{display:block;width:var(--img);height:var(--img);margin:var(--pad);image-rendering:pixelated;}
   .fsFruit.grab img{transform:scale(1.12);}
   .fsFruit.sel::before{content:"";position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:3px solid #fff;box-shadow:0 0 0 3px #3A8FE8;border-radius:6px;}
   .fsFruit.pop{animation:fsPop .3s ease-out forwards;z-index:2;}
   .fsFruit.fresh{animation:fsFresh .4s ease-out;}
   .fsFruit.born img{animation:fsPop2 .35s ease-out;}
   .fsFruit.spirit img{animation:fsGlow .9s ease-in-out infinite;}
-  @keyframes fsPop{0%{transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%)) scale(1);opacity:1;}55%{transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%)) scale(1.25);opacity:1;filter:brightness(1.4);}100%{transform:translate(calc(var(--x) * 100%),calc(var(--y) * 100%)) scale(.2);opacity:0;}}
+  @keyframes fsPop{0%{transform:scale(1);opacity:1;}55%{transform:scale(1.25);opacity:1;filter:brightness(1.4);}100%{transform:scale(.2);opacity:0;}}
   @keyframes fsPop2{0%{transform:scale(.4);}60%{transform:scale(1.3);}100%{transform:scale(1);}}
   @keyframes fsFresh{0%{opacity:0;}100%{opacity:1;}}
   @keyframes fsGlow{0%,100%{filter:drop-shadow(0 0 2px #FFC93A);}50%{filter:drop-shadow(0 0 7px #FFF3A0) brightness(1.15);}}
@@ -630,6 +633,18 @@
   .fsWord.on img{filter:none;}
   .fsWord.on .fsCnt{color:#FFC93A;text-shadow:2px 0 #1B1F3B,-2px 0 #1B1F3B,0 2px #1B1F3B,0 -2px #1B1F3B;}
   .fsWord.on .fsNm{color:#C98A12;}
+  /* Jacob's Ladder (2026-10-24): the sky is one low-resolution canvas stretched up with hard pixels; the controls are two halves of a bar. */
+  .jlArea{width:min(100%,380px);margin:0 auto;}
+  .jlStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 315px),460px);height:clamp(230px,calc(100dvh - 315px),460px);border:4px solid #FFC93A;border-radius:16px;
+    box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;background:#78BDFF;}
+  .jlCanvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
+  .jlBar{display:flex;margin-top:10px;box-sizing:border-box;height:54px;border:4px solid #1B1F3B;border-radius:18px;background:#3A8FE8;box-shadow:inset 0 0 0 3px #1C4E9A;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .jlHalf{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;border:0;background:none;padding:0;margin:0;cursor:pointer;touch-action:none;
+    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;letter-spacing:.04em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
+  .jlHalf + .jlHalf{border-left:4px solid #1B1F3B;}
+  .jlHalf i{width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);}
+  .jlHalf.l i{border-right:16px solid #FFC93A;} .jlHalf.r i{border-left:16px solid #FFC93A;}
+  .jlHalf.held{background:rgba(255,255,255,.22);}
   .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
@@ -991,6 +1006,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
+      jacobLadder:{d:"Bounce Jacob up the rungs to the gate of heaven.", h:["Jacob bounces by himself. Hold the left or right side of the screen to steer him, and he comes out of the other edge if he goes off one.", "He only lands on a rung when he is coming down. Some rungs slide, some break after one bounce, and a winged rung throws him very high.", "In rounds 2 and 3 storm clouds drift about: touching one costs a chance. So does falling too far. You have 3 chances. Reach the gate of heaven in all 3 rounds, each a higher climb, to win."]},
       fruitsSpirit:{d:"Match fruit to collect the fruits of the Spirit.", h:["Put your finger on a fruit and swipe toward a neighbor to swap them. A swap has to make a row or column of 3 or more of the same fruit, or the two slide back. (You can also tap a fruit and then a neighbor.)", "Each fruit stands for one of the fruits of the Spirit. The words below the board count how many of each fruit you have collected, such as 3/5, and light up when you have them all.", "Light up all 8 words to finish a level. Match 4 or more in a line to make a glowing Spirit flame: swap it with a neighbor and it clears its whole row or column. There are 3 levels, each asking for more of every fruit."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. In the last round the wind pushes the dove around too. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
@@ -1019,7 +1035,7 @@ var T = {
     themeFaith:"Faith", themeLove:"God's Love", themeLight:"Be a Light to the World",
     themeUnity:"Unity", themeHope:"Hope",
     themeHoliness:"Holiness", themeGrace:"Grace", themeSalvation:"Salvation",
-    themeForgiveness:"Forgiveness", themeMercy:"Mercy", themePrayer:"Prayer", themeScripture:"Scripture", themeDiscipleship:"Discipleship", themePerseverance:"Perseverance", themePeace:"Peace", themeSpirit:"The Spirit",
+    themeForgiveness:"Forgiveness", themeMercy:"Mercy", themePrayer:"Prayer", themeScripture:"Scripture", themeDiscipleship:"Discipleship", themePerseverance:"Perseverance", themePeace:"Peace", themeSpirit:"The Spirit", themeHeaven:"Heaven",
 
     followLightName:"Follow the Light", wordUnscrambleName:"Word Unscramble",
     catchLightName:"Catch the Light", kindnessSortName:"Acts of Kindness",
@@ -1069,6 +1085,8 @@ var T = {
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
+    jacobLadderName:"Jacob's Ladder", jl_intro:"Hold the left or right side to steer Jacob. Bounce up the rungs to the gate of heaven.", jl_left:"LEFT", jl_right:"RIGHT",
+    jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
     fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swipe a fruit toward a neighbor to swap them and match 3 or more. Collect every fruit to light up all the words.",
     fs_found:"COLLECT EACH FRUIT", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
@@ -1138,6 +1156,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
+      jacobLadder:{d:"Haz rebotar a Jacob por los peldaños hasta la puerta del cielo.", h:["Jacob rebota solo. Mantén pulsado el lado izquierdo o derecho de la pantalla para moverlo, y si se sale por un borde aparece por el otro.", "Solo cae sobre un peldaño cuando va bajando. Algunos peldaños se deslizan, otros se rompen después de un rebote, y uno con alas lo lanza muy alto.", "En las rondas 2 y 3 hay nubes de tormenta: tocar una cuesta una oportunidad, y caer demasiado lejos también. Tienes 3 oportunidades. Llega a la puerta del cielo en las 3 rondas, cada una más alta, para ganar."]},
       fruitsSpirit:{d:"Combina frutas para reunir los frutos del Espíritu.", h:["Pon el dedo sobre una fruta y desliza hacia una vecina para cambiarlas. El cambio tiene que formar una fila o columna de 3 o más frutas iguales, o las dos vuelven a su lugar. (También puedes tocar una fruta y luego una vecina.)", "Cada fruta representa uno de los frutos del Espíritu. Las palabras debajo del tablero cuentan cuántas has reunido de cada una, por ejemplo 3/5, y se encienden cuando las tienes todas.", "Enciende las 8 palabras para terminar un nivel. Junta 4 o más en línea para crear una llama del Espíritu: cámbiala con una vecina y limpia toda su fila o columna. Hay 3 niveles, y cada uno pide más de cada fruta."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. En la última, además, el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
@@ -1166,7 +1185,7 @@ var T = {
     themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé Luz para el Mundo",
     themeUnity:"Unidad", themeHope:"Esperanza",
     themeHoliness:"Santidad", themeGrace:"Gracia", themeSalvation:"Salvación",
-    themeForgiveness:"Perdón", themeMercy:"Misericordia", themePrayer:"Oración", themeScripture:"Escrituras", themeDiscipleship:"Discipulado", themePerseverance:"Perseverancia", themePeace:"Paz", themeSpirit:"El Espíritu",
+    themeForgiveness:"Perdón", themeMercy:"Misericordia", themePrayer:"Oración", themeScripture:"Escrituras", themeDiscipleship:"Discipulado", themePerseverance:"Perseverancia", themePeace:"Paz", themeSpirit:"El Espíritu", themeHeaven:"El Cielo",
 
     followLightName:"Sigue la Luz", wordUnscrambleName:"Desordena Palabras",
     catchLightName:"Atrapa la Luz", kindnessSortName:"Actos de Bondad",
@@ -1215,6 +1234,8 @@ var T = {
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
+    jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado el lado izquierdo o derecho para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo.", jl_left:"IZQUIERDA", jl_right:"DERECHA",
+    jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
     fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
     fs_found:"REÚNE CADA FRUTA", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
@@ -1286,9 +1307,11 @@ var MISSIONS = [
   // it: to bring it back, put {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"} back in this list,
   // "hiddenBlessings" in GUIDE_MISSIONS and its startMission line.)
   {id:"fruitsSpirit", icon:"🍇", badgeImg:"tiles/badge_mercy.png", nameKey:"fruitsSpiritName", themeKey:"themeSpirit"},
-  // Light a Candle (2026-10-21, per Dan: start on the new missions). Its own Prayer badge is not drawn yet, so it borrows the Light to the
-  // World badge until Dan's art arrives: add tiles/badge_prayer.png and tiles/badges96/b96_prayer.png, then change badgeImg here.
-  {id:"lightCandle", icon:"🕯️", badgeImg:"tiles/badge_light.png", nameKey:"lightCandleName", themeKey:"themePrayer"},
+  // Jacob's Ladder (2026-10-24, per Dan) replaced Light a Candle in this slot. It borrows Light a Candle's badge (Light to the World) until its own is drawn: add
+  // tiles/badge_ladder.png and tiles/badges96/b96_ladder.png, then change badgeImg here. (Light a Candle, screenLightCandle and the rest, is still in this file but nothing opens
+  // it: to bring it back, put {id:"lightCandle", icon:"🕯️", badgeImg:"tiles/badge_light.png", nameKey:"lightCandleName", themeKey:"themePrayer"} back in this list,
+  // "lightCandle" in GUIDE_MISSIONS and its startMission line.)
+  {id:"jacobLadder", icon:"🪜", badgeImg:"tiles/badge_light.png", nameKey:"jacobLadderName", themeKey:"themeHeaven"},
   // Emoji Bible Stories and Life of Jesus Timeline (2026-10-21, per Dan). Also borrowing badges until their own art is drawn: Scripture reuses the
   // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges96/b96_...) later.
   {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
@@ -1536,6 +1559,7 @@ function defaultState(){
       kindnessSort: {done:false, badge:false},
       hiddenBlessings: {done:false, badge:false},
       lightCandle: {done:false, badge:false},
+      jacobLadder: {done:false, badge:false},
       emojiStories: {done:false, badge:false},
       jesusTimeline: {done:false, badge:false},
       sacredSudoku: {done:false, badge:false},
@@ -1547,7 +1571,7 @@ function defaultState(){
     },
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null, dovePeace:null, fruitsSpirit:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null, dovePeace:null, fruitsSpirit:null, jacobLadder:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -2030,7 +2054,7 @@ function goldenTicketUnlocked(){
 // The games open on an instruction screen first (2026-10-22, per Dan): what the game is and how to play it, with a START MISSION button that
 // starts it. Be the Light and Choose Joy are not games and open straight away.
 var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","fruitsSpirit",
-  "lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace"];
+  "jacobLadder","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace"];
 function openMission(id){
   if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
@@ -2043,7 +2067,7 @@ function startMission(id){
   else if(id === "dovePeace"){ initDovePeace(); go("dovePeace"); }
   else if(id === "chooseJoy"){ initChooseJoy(); go("chooseJoy"); }
   else if(id === "fruitsSpirit"){ initFruitsSpirit(); go("fruitsSpirit"); }
-  else if(id === "lightCandle"){ initLightCandle(); go("lightCandle"); }
+  else if(id === "jacobLadder"){ initJacobLadder(); go("jacobLadder"); }
   else if(id === "stainedGlass"){ preloadMatchTiles(); initStainedGlass(); go("stainedGlass"); }
   else if(id === "followLight"){ initFollowLightRun(); go("followLight"); flStartLevel(); }
   else if(id === "wordUnscramble"){ initWordUnscramble(); go("wordUnscramble"); }
@@ -2078,7 +2102,7 @@ var COMING_SOON_MISSIONS = [
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", dovePeace:"#4FA6F0", fruitsSpirit:"#8E4FB8", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
-  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", pilgrimRoad:"#58B04A", tbd:"#AEB6C8",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jacobLadder:"#6FB7F5", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", pilgrimRoad:"#58B04A", tbd:"#AEB6C8",
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
@@ -2180,7 +2204,7 @@ var pilgrimPath = PILGRIM_PATH_FULL, pilgrimSpeed = 24 / 800;   // speed: 24 pic
 // way for each of 15 games). Any 5 games do it: the 6th and later don't move him, since he has gone into the church. Missions that are not games -- Choose Joy and Light a
 // Candle (Be the Light, the third, was replaced by Dove of Peace 2026-10-24) -- give no points and don't move him: their ids are in PILGRIM_NON_GAMES.
 var PILGRIM_GAMES_TOTAL = 5;
-var PILGRIM_NON_GAMES = ["chooseJoy", "lightCandle"];      // (put back 2026-10-24 with the two missions: they are not games, so no points and no step; Hidden Blessings is a game)
+var PILGRIM_NON_GAMES = ["chooseJoy", "lightCandle"];      // (put back 2026-10-24 with the two missions: they are not games, so no points and no step; Hidden Blessings is a game. Light a Candle was replaced by Jacob's Ladder, a game, the same day; its id stays here so that it would stay a non-game if it came back)
 function pilgrimGamesDone(){
   return MISSIONS.filter(function(m){ return PILGRIM_NON_GAMES.indexOf(m.id) === -1 && state.missions[m.id].done; }).length;
 }
@@ -6542,6 +6566,19 @@ function fsMoves(b){                                                         // 
   }
   return out;
 }
+// the same fruit in other squares: a random order of them that has nothing to clear and at least one swap that works, with every fruit moved to a different square if that can be done;
+// perm[i] = the square the fruit that is now at i goes to. null if none was found.
+function fsShuffle(b){
+  var n = FS_N * FS_N, i, tries, perm, out;
+  for(tries = 0; tries < 400; tries++){
+    perm = []; for(i = 0; i < n; i++) perm.push(i);
+    for(i = n - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t0 = perm[i]; perm[i] = perm[j]; perm[j] = t0; }
+    if(tries < 300){ var fixed = false; for(i = 0; i < n; i++) if(perm[i] === i){ fixed = true; break; } if(fixed) continue; }
+    out = new Array(n); for(i = 0; i < n; i++) out[perm[i]] = b[i];
+    if(!fsRuns(out).length && fsMoves(out).length) return {board: out, perm: perm};
+  }
+  return null;
+}
 // a new board with nothing to clear already and at least one swap that works
 function fsNewBoard(w){
   var N = FS_N, b;
@@ -6605,7 +6642,11 @@ function fsResolve(board, a1, a2, w){
     frames.push({kind: "fall", board: b.slice(), fall: g.fall});
     clearSet = {}; first = false;
   }
-  if(!fsMoves(b).length){ b = fsNewBoard(w); frames.push({kind: "shuffle", board: b.slice()}); }
+  if(!fsMoves(b).length){                                                    // no swap left that works: the fruit are shuffled about (or, if that cannot be done, new fruit)
+    var sh = fsShuffle(b);
+    if(sh){ b = sh.board; frames.push({kind: "shuffle", board: b.slice(), perm: sh.perm}); }
+    else { b = fsNewBoard(w); frames.push({kind: "shuffle", board: b.slice()}); }
+  }
   return {frames: frames, board: b, gained: gained};
 }
 function initFruitsSpirit(){
@@ -6626,7 +6667,17 @@ function fsFruitHtml(type, i, y){
   var N = FS_N;
   return '<div class="fsFruit' + (type === FS_SPIRIT ? ' spirit' : '') + '" data-i="' + i + '" style="--x:' + (i % N) + ';--y:' + (y === undefined ? Math.floor(i / N) : y) + '"><img src="tiles/fruits/fs_' + type + '.png" alt=""></div>';
 }
-function fsBind(){                                                           // after the screen is drawn: which picture is at which square
+function fsFit(){                                                            // the board in whole pixels: every square, and every fruit in it, is a whole number of pixels
+  var inner = document.getElementById("fsInner"), board = inner && inner.parentNode;
+  if(!inner || !board) return;
+  var cell = Math.max(24, Math.floor((board.clientWidth - 8) / FS_N)), pad = Math.max(2, Math.round(cell * .11));
+  inner.classList.add("fit");                                                // (no sliding while the sizes are being set)
+  inner.style.setProperty("--cell", cell + "px"); inner.style.setProperty("--pad", pad + "px"); inner.style.setProperty("--img", (cell - 2 * pad) + "px");
+  void inner.offsetWidth; inner.classList.remove("fit");
+}
+window.addEventListener("resize", function(){ if(state.screen === "fruitsSpirit") fsFit(); });
+function fsBind(){
+  fsFit();                                                           // after the screen is drawn: which picture is at which square
   fsEls = [];
   for(var i = 0; i < FS_N * FS_N; i++) fsEls.push(null);
   var list = document.querySelectorAll("#fsLayer .fsFruit");
@@ -6709,10 +6760,21 @@ function fsPlay(s, frames, done){
         }
       }
       fsEls = next2;
-    } else if(f.kind === "shuffle"){                                         // no swap left that works: a fresh board
-      wait = 420;
-      for(i = 0; i < N * N; i++){ if(fsEls[i] && fsEls[i].parentNode) fsEls[i].parentNode.removeChild(fsEls[i]); fsEls[i] = null; }
-      for(i = 0; i < N * N; i++){ var ns = fsMakeFruit(f.board[i], i % N, Math.floor(i / N)); ns.classList.add("fresh"); fsEls[i] = ns; }
+    } else if(f.kind === "shuffle"){                                         // no swap left that works: every fruit slides to another square
+      wait = 800;
+      if(f.perm){
+        var moved = new Array(N * N);
+        for(i = 0; i < N * N; i++){
+          var el3 = fsEls[i], to = f.perm[i];
+          if(!el3) continue;
+          el3.classList.add("shuf"); moved[to] = el3; fsSetXY(el3, to % N, Math.floor(to / N));
+        }
+        fsEls = moved;
+        setTimeout(function(){ for(var q = 0; q < N * N; q++) if(fsEls[q]) fsEls[q].classList.remove("shuf"); }, 700);
+      } else {
+        for(i = 0; i < N * N; i++){ if(fsEls[i] && fsEls[i].parentNode) fsEls[i].parentNode.removeChild(fsEls[i]); fsEls[i] = null; }
+        for(i = 0; i < N * N; i++){ var ns = fsMakeFruit(f.board[i], i % N, Math.floor(i / N)); ns.classList.add("fresh"); fsEls[i] = ns; }
+      }
     }
     s.board = f.board;
     setTimeout(next, wait);
@@ -6820,6 +6882,322 @@ function screenFruitsSpirit(){
     '<div class="fsBoardWrap"><div class="fsBoard"><div class="fsInner" id="fsInner" onpointerdown="fsDown(event)" onpointermove="fsMove(event)" onpointerup="fsUp(event)" onpointercancel="fsCancel()">' +
       '<div class="fsGrid">' + cells + '</div><div class="fsLayer" id="fsLayer">' + fruit + '</div></div></div></div>' +
     '<div class="fsFound"><b>' + t("fs_found") + '</b><div class="fsWords">' + words + '</div></div>' +
+    '<div class="spacer"></div>', "pixLower msScreen");
+}
+
+/* ---------- Jacob's Ladder ---------- */
+
+// Jacob's Ladder (2026-10-24, per Dan; the screen was mocked up first, the play is Doodle Jump's): Jacob bounces up by himself and the player steers him left and right by holding the
+// left or right half of the screen (or the LEFT and RIGHT halves of the bar). He is always at the same height on the screen: it is the sky that moves. There are layers of clouds
+// scrolling down behind (a far, a middle and a near one, at different speeds), and in front of them a field of ladder rungs, loose wooden rungs that are not attached to anything, at
+// all sorts of places across. Jacob only lands on a rung when he is coming DOWN, and then bounces again; going up he passes through them. Going off one side he comes in at the other.
+// Rungs: plain ones; ones that slide sideways; ones that break after one bounce (rounds 2 and 3); and, now and then, one with golden wings that bounces him very high. Rounds 2 and 3
+// also have storm clouds drifting about: touching one costs a chance. So does falling a long way below the highest he has been: he is put back on a rung there and flickers for a
+// moment. 3 chances. Each round is a climb to the gate of heaven (1200, 1800 and 2400 pixels of the little picture, shown in metres, 10 pixels to a metre), ROUND X COMPLETED! after
+// each with the lost chance given back after rounds 1 and 2, like the other games. The world is worked out in the pixels of a little canvas, 118 wide and as tall as the stage needs,
+// and nothing about the climb is saved: a game that is reloaded in the middle of a round starts the round again.
+var JL_CHANCES = 3, JL_W = 118;
+var JL_ROUNDS = [
+  {goal: 1200, gap: [26, 44], moving: .15, crumble: 0, wing: 0, storm: 0},
+  {goal: 1800, gap: [28, 50], moving: .25, crumble: .2, wing: .05, storm: .08},
+  {goal: 2400, gap: [30, 54], moving: .3, crumble: .25, wing: .06, storm: .12}];
+var JL_G = 560, JL_V0 = 280, JL_VX = 92, JL_RW = 26;                         // gravity and bounce speed (pixels a second): a bounce goes 70 pixels up; steering speed; a rung's width
+var JL_FALL = .62, JL_INV = 1.1;                                              // how far below his highest he may fall (of the screen's height); seconds of flicker after a mishap
+var JL_BODY = {W: "#FFFFFF", H: "#6E4624", S: "#FAD6B0", R: "#3A6FD8", K: "#281E1E", G: "#FFC93A", B: "#6E4624"};
+var jl = null, jlBound = null, jlBoundRound = -1, jlRaf = 0, jlHold = {}, jlKeys = {l: false, r: false};
+function jlChancesLeft(s){ return typeof s.chances === "number" ? s.chances : JL_CHANCES; }
+function jlRand(a, b){ return a + Math.random() * (b - a); }
+function jlBegin(s){
+  var cfg = JL_ROUNDS[s.round];
+  jl = {x: JL_W / 2, y: 0, vy: JL_V0, top: 0, topAt: 0, inv: 0, t: 0, mode: "play", gate: 0, ch: 160, plats: [], storms: [], nextY: 0, last: "n", count: 0, clouds: [], dir: 0, last_t: performance.now()};
+  jl.plats.push({x: JL_W / 2, y: 0, kind: "n", base: JL_W / 2, ph: 0, broken: false, fall: 0});      // the rung he starts on, in the middle
+  jl.nextY = jlRand(cfg.gap[0], cfg.gap[1]);
+  var layers = [{n: 7, f: .12, w: [10, 18], a: .55}, {n: 5, f: .28, w: [16, 26], a: .8}, {n: 4, f: .5, w: [24, 38], a: 1}];
+  layers.forEach(function(L, li){ for(var i = 0; i < L.n; i++) jl.clouds.push({l: li, f: L.f, x: jlRand(0, JL_W), y: jlRand(0, 300), w: jlRand(L.w[0], L.w[1]), a: L.a}); });
+  jlGenerate(s, 300);
+  jlBound = s; jlBoundRound = s.round;
+}
+// rungs are made above the screen as the climb goes on, and up to the gate
+function jlGenerate(s, until){
+  var cfg = JL_ROUNDS[s.round];
+  while(jl.nextY < until && jl.nextY <= cfg.goal - 14){
+    var last = jl.plats[jl.plats.length - 1] || {base: JL_W / 2, y: jl.nextY - 30}, kind = "n", r = Math.random();
+    if(jl.last === "n" || jl.last === "m"){
+      if(r < cfg.wing) kind = "w"; else if(r < cfg.wing + cfg.crumble) kind = "c"; else if(r < cfg.wing + cfg.crumble + cfg.moving) kind = "m";
+    }
+    var x = last.base + jlRand(-52, 52); x = ((x % JL_W) + JL_W) % JL_W;
+    jl.plats.push({x: x, y: jl.nextY, kind: kind, base: x, ph: jlRand(0, 6.28), broken: false, fall: 0});
+    jl.last = kind; jl.count++;
+    var lastY = last.y, thisY = jl.nextY;
+    if(cfg.storm && jl.count > 3 && Math.random() < cfg.storm){                  // a storm cloud between this rung and the next, away from the two
+      var sx = ((x + jlRand(34, JL_W - 34)) % JL_W + JL_W) % JL_W;
+      jl.storms.push({x: sx, y: jl.nextY + 18, dx: (Math.random() < .5 ? -1 : 1) * jlRand(8, 16)});
+    }
+    var gapNext = jlRand(cfg.gap[0], cfg.gap[1]);
+    if(kind === "c") gapNext = Math.min(gapNext, Math.max(8, 60 - (thisY - lastY)));            // a rung that breaks must not be the only way up: the rung after it is in reach of the one before it
+    jl.nextY += gapNext;
+  }
+  if(jl.nextY > cfg.goal - 14 && !jl.finalRung){                                  // the last rung, just under the gate
+    jl.finalRung = true;
+    jl.plats.push({x: JL_W / 2, y: cfg.goal - 14, kind: "n", base: JL_W / 2, ph: 0, broken: false, fall: 0});
+  }
+}
+function jlDir(){
+  var l = jlKeys.l, r = jlKeys.r, k;
+  for(k in jlHold){ if(jlHold[k] < 0) l = true; else if(jlHold[k] > 0) r = true; }
+  return (r ? 1 : 0) - (l ? 1 : 0);
+}
+function jlLoseChance(s, why){
+  s.chances = jlChancesLeft(s) - 1;
+  var last = s.chances <= 0;
+  pixSfxPlay(last ? "fmLast" : "fmMiss", true);
+  if(last) s.busy = true;
+  saveState(); render();
+  if(last) setTimeout(function(){
+    var s2 = state.session.jacobLadder;
+    if(!s2 || s2 !== s || s2.status !== "playing") return;
+    s2.status = "failed"; saveState(); render();
+  }, 1200);
+}
+function jlStep(s, dt){
+  var cfg = JL_ROUNDS[s.round], i;
+  jl.t += dt;
+  if(jl.inv > 0) jl.inv -= dt;
+  // the platforms that slide, and the ones that have broken and are falling away
+  for(i = 0; i < jl.plats.length; i++){
+    var pl = jl.plats[i];
+    if(pl.kind === "m") pl.x = ((pl.base + Math.sin(jl.t * 1.1 + pl.ph) * 26) % JL_W + JL_W) % JL_W;
+    if(pl.broken) pl.fall += dt * 140;
+  }
+  for(i = 0; i < jl.storms.length; i++){ var st = jl.storms[i]; st.x = ((st.x + st.dx * dt) % JL_W + JL_W) % JL_W; }
+  if(jl.mode === "gate"){                                                       // he has reached the gate: carried up into it
+    jl.gate += dt;
+    jl.x += (JL_W / 2 - jl.x) * Math.min(1, dt * 4); jl.y += (cfg.goal + 8 - jl.y) * Math.min(1, dt * 3); jl.vy = 0;
+    if(jl.gate > 1.5){
+      s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= JL_ROUNDS.length - 1};     // ROUND X COMPLETED!
+      saveState(); render();
+    }
+    return;
+  }
+  // steering, and coming in at the other side
+  jl.dir = jlDir();
+  jl.x += jl.dir * JL_VX * dt; jl.x = ((jl.x % JL_W) + JL_W) % JL_W;
+  // the bounce: gravity pulls him down; he only lands on a rung while he is coming down
+  var prev = jl.y;
+  jl.vy -= JL_G * dt; jl.y += jl.vy * dt;
+  if(jl.vy < 0){
+    for(i = 0; i < jl.plats.length; i++){
+      var p2 = jl.plats[i];
+      if(p2.broken) continue;
+      var dx = Math.abs(jl.x - p2.x); if(dx > JL_W / 2) dx = JL_W - dx;
+      if(prev >= p2.y && jl.y <= p2.y && dx <= JL_RW / 2 + 3){
+        jl.y = p2.y; jl.vy = JL_V0 * (p2.kind === "w" ? 1.75 : 1);
+        if(p2.kind === "c") p2.broken = true;
+        if(p2.kind === "w") pixSfxPlay("fmFirst", false); else pixBoing();
+        break;
+      }
+    }
+  }
+  if(jl.y > jl.top + .5){ jl.top = jl.y; jl.topAt = jl.t; }
+  else if(jl.t - jl.topAt > 9){ jl.plats.push({x: jl.x, y: jl.y + 28, kind: "n", base: jl.x, ph: 0, broken: false, fall: 0}); jl.topAt = jl.t; jl.rescued = (jl.rescued || 0) + 1; }          // no way up for 9 seconds (it should not happen): a rung appears
+  jl.plats = jl.plats.filter(function(q){ return q.y >= jl.top - jl.ch * .5; });         // as in Doodle Jump, the rungs below the highest he has been are gone: he can fall right through
+  jl.storms = jl.storms.filter(function(q){ return q.y >= jl.top - jl.ch * .8; });
+  jlGenerate(s, jl.y + jl.ch * 1.2);
+  var hm = document.getElementById("jlHeight"); if(hm) hm.textContent = t("jl_height")(Math.floor(jl.top / 10), Math.round(cfg.goal / 10));
+  if(jl.y >= cfg.goal){ jl.mode = "gate"; jl.gate = 0; pixSfxPlay("ticket", false); return; }
+  // storm clouds
+  if(jl.inv <= 0){
+    for(i = 0; i < jl.storms.length; i++){
+      var sc = jl.storms[i], sdx = Math.abs(jl.x - sc.x); if(sdx > JL_W / 2) sdx = JL_W - sdx;
+      if(sdx < 13 && Math.abs((jl.y + 8) - sc.y) < 10){ jl.inv = JL_INV; jl.vy = Math.min(jl.vy, 0); jlLoseChance(s, "storm"); return; }
+    }
+  }
+  // falling a long way: back on a rung near where he was highest
+  if(jl.y < jl.top - jl.ch * JL_FALL){
+    var best = null;
+    for(i = 0; i < jl.plats.length; i++){ var q = jl.plats[i]; if(!q.broken && q.y <= jl.top - 6 && (!best || q.y > best.y)) best = q; }
+    if(best){ jl.x = best.x; jl.y = best.y; jl.vy = JL_V0; }
+    jl.inv = JL_INV; jlLoseChance(s, "fall");
+  }
+}
+// a short soft boing for each bounce
+function pixBoing(){
+  try {
+    var ctx = pixCtx(); if(!ctx || pixAudioStale) return;
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
+    var now = ctx.currentTime, osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = "sine"; osc.frequency.setValueAtTime(260, now); osc.frequency.exponentialRampToValueAtTime(520, now + .09);
+    gain.gain.setValueAtTime(.0001, now); gain.gain.linearRampToValueAtTime(.1, now + .008); gain.gain.exponentialRampToValueAtTime(.0001, now + .14);
+    osc.connect(gain); gain.connect(pixBus(ctx, "sfx")); osc.start(now); osc.stop(now + .16);
+  } catch(e){}
+}
+function jlDisc(ctx, cx, cy, r, color){
+  ctx.fillStyle = color;
+  for(var yy = -r; yy <= r; yy++){ var w = Math.floor(Math.sqrt(r * r - yy * yy) + .5); ctx.fillRect(cx - w, cy + yy, 2 * w, 1); }
+}
+function jlDraw(){
+  var cv = document.getElementById("jlCanvas"), s = state.session.jacobLadder;
+  if(!cv || !jl || !s) return;
+  var st = cv.parentNode, cw = JL_W, ch = Math.max(110, Math.round(JL_W * st.clientHeight / Math.max(1, st.clientWidth)));
+  if(cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; }
+  jl.ch = ch;
+  var ctx = cv.getContext("2d"), cfg = JL_ROUNDS[s.round], i, k, now = performance.now();
+  var cy = Math.round(ch * .5) + 7;                                               // Jacob's feet are always this far down the screen (so that the middle of him is the middle of the screen)
+  function sy(wy){ return Math.round(cy - (wy - jl.y)); }
+  // the sky, blue
+  for(i = 0; i < 12; i++){ ctx.fillStyle = "rgb(" + Math.round(104 + i * 6) + "," + Math.round(184 + i * 3.5) + ",255)"; ctx.fillRect(0, Math.floor(i * ch / 12), cw, Math.ceil(ch / 12) + 1); }
+  // layers of clouds scrolling down as he climbs, the near ones faster
+  var P = ch + 60;
+  jl.clouds.forEach(function(c){
+    var y = (((c.y + jl.y * c.f) % P) + P) % P - 30, x = Math.round(c.x), w = Math.round(c.w);
+    ctx.globalAlpha = c.a;
+    var col = c.l === 0 ? "#D6ECFF" : (c.l === 1 ? "#EAF5FF" : "#FFFFFF");
+    jlDisc(ctx, x, y, Math.round(w * .28), col); jlDisc(ctx, x + Math.round(w * .3), y + 1, Math.round(w * .22), col); jlDisc(ctx, x - Math.round(w * .3), y + 1, Math.round(w * .22), col);
+    ctx.fillStyle = col; ctx.fillRect(x - Math.round(w * .45), y + 1, Math.round(w * .9), Math.round(w * .18));
+    ctx.globalAlpha = 1;
+  });
+  // the gate of heaven at the top of the climb
+  var gy = sy(cfg.goal);
+  if(gy > -50 && gy < ch + 30){
+    var gl = jl.mode === "gate" ? 12 + Math.round(jl.gate * 8) : 8;
+    ctx.globalAlpha = .45; jlDisc(ctx, JL_W / 2, gy - 12, gl + 8, "#FFF3B0"); ctx.globalAlpha = 1; jlDisc(ctx, JL_W / 2, gy - 12, gl, "#FFE880");
+    ctx.fillStyle = "#FFC93A"; ctx.fillRect(JL_W / 2 - 22, gy - 34, 5, 34); ctx.fillRect(JL_W / 2 + 17, gy - 34, 5, 34); ctx.fillRect(JL_W / 2 - 22, gy - 36, 44, 4);
+    ctx.fillStyle = "#FFF3B0"; ctx.fillRect(JL_W / 2 - 22, gy - 34, 1, 34); ctx.fillRect(JL_W / 2 + 17, gy - 34, 1, 34);
+    for(k = 0; k < 5; k++) ctx.fillRect(JL_W / 2 - 14 + k * 7, gy - 42 - (k % 2) * 3, 3, 3);
+  }
+  // the rungs: loose wooden bars with golden ends
+  jl.plats.forEach(function(p){
+    var y = sy(p.y) + Math.round(p.fall); if(y < -10 || y > ch + 10) return;
+    var xs = [Math.round(p.x)]; if(p.x < JL_RW / 2) xs.push(Math.round(p.x + JL_W)); if(p.x > JL_W - JL_RW / 2) xs.push(Math.round(p.x - JL_W));
+    ctx.globalAlpha = p.broken ? Math.max(0, 1 - p.fall / 40) : 1;
+    xs.forEach(function(x){
+      var l = x - Math.floor(JL_RW / 2), rr = p.kind === "c" ? ["#B09878", "#D8C6A6", "#8A7458"] : ["#78502C", "#BE8A4E", "#5A3A1C"];
+      ctx.fillStyle = rr[0]; ctx.fillRect(l, y, JL_RW, 3); ctx.fillStyle = rr[1]; ctx.fillRect(l, y, JL_RW, 1); ctx.fillStyle = rr[2]; ctx.fillRect(l, y + 3, JL_RW, 1);
+      ctx.fillStyle = "#FFC93A"; ctx.fillRect(l - 1, y - 1, 3, 5); ctx.fillRect(l + JL_RW - 2, y - 1, 3, 5);
+      if(p.kind === "c"){ ctx.fillStyle = "#5A4630"; ctx.fillRect(x - 4, y, 1, 3); ctx.fillRect(x - 3, y + 1, 1, 2); ctx.fillRect(x + 3, y, 1, 3); ctx.fillRect(x + 4, y + 1, 1, 2); }
+      if(p.kind === "m"){ ctx.fillStyle = "#FFC93A"; ctx.fillRect(l - 4, y + 1, 2, 1); ctx.fillRect(l + JL_RW + 2, y + 1, 2, 1); ctx.fillRect(l - 3, y, 1, 3); ctx.fillRect(l + JL_RW + 3, y, 1, 3); }
+      if(p.kind === "w"){                                                                // golden wings
+        ctx.fillStyle = "#FFC93A"; for(var q = 0; q < 6; q++){ ctx.fillRect(l - 2 - q, y - 2 - Math.floor(q / 2), 2, 3); ctx.fillRect(l + JL_RW + q, y - 2 - Math.floor(q / 2), 2, 3); }
+        ctx.fillStyle = "#FFF3B0"; ctx.fillRect(l - 4, y - 3, 2, 1); ctx.fillRect(l + JL_RW + 2, y - 3, 2, 1);
+      }
+    });
+    ctx.globalAlpha = 1;
+  });
+  // storm clouds
+  jl.storms.forEach(function(c){
+    var y = sy(c.y); if(y < -14 || y > ch + 14) return;
+    [Math.round(c.x), Math.round(c.x - JL_W), Math.round(c.x + JL_W)].forEach(function(x){
+      if(x < -20 || x > JL_W + 20) return;
+      [[-8, 4], [-2, 6], [5, 5], [11, 3]].forEach(function(d){ jlDisc(ctx, x + d[0], y, d[1] + 1, "#2A3048"); });
+      [[-8, 4], [-2, 6], [5, 5], [11, 3]].forEach(function(d){ jlDisc(ctx, x + d[0], y, d[1], "#586080"); });
+      [[-8, 4], [-2, 6], [5, 5]].forEach(function(d){ jlDisc(ctx, x + d[0] - 1, y - 2, Math.max(1, d[1] - 3), "#7C86A8"); });
+      if(Math.floor(now / 300) % 3){ ctx.fillStyle = "#FFEE6E"; ctx.fillRect(x - 1, y + 5, 2, 2); ctx.fillRect(x - 2, y + 7, 2, 2); ctx.fillRect(x - 1, y + 9, 2, 2); ctx.fillRect(x - 3, y + 11, 2, 2); }
+    });
+  });
+  // Jacob, always at the same height on the screen; at an edge he is seen coming in at the other
+  if(!(jl.inv > 0 && Math.floor(jl.inv * 25) % 2)){
+    var up = jl.vy > 0, xj = Math.round(jl.x);
+    [xj, xj - JL_W, xj + JL_W].forEach(function(x){
+      if(x < -8 || x > JL_W + 8) return;
+      var f = JL_BODY;
+      ctx.fillStyle = f.R; ctx.fillRect(x - 3, cy - 9, 7, 7); ctx.fillRect(x - 4, cy - 3, 9, 3);                  // the robe
+      ctx.fillStyle = f.W; ctx.fillRect(x - 3, cy - 9, 7, 1); ctx.fillStyle = f.G; ctx.fillRect(x - 3, cy - 6, 7, 1);
+      ctx.fillStyle = f.B; ctx.fillRect(x - 3, cy, 2, 1); ctx.fillRect(x + 2, cy, 2, 1);                          // sandals
+      ctx.fillStyle = f.H; ctx.fillRect(x - 3, cy - 15, 7, 2); ctx.fillRect(x - 3, cy - 13, 1, 3); ctx.fillRect(x + 3, cy - 13, 1, 3);      // hair
+      ctx.fillStyle = f.S; ctx.fillRect(x - 2, cy - 13, 5, 3);                                                       // face
+      ctx.fillStyle = f.K; ctx.fillRect(x - 1, cy - 12, 1, 1); ctx.fillRect(x + 1, cy - 12, 1, 1);
+      ctx.fillStyle = f.H; ctx.fillRect(x - 2, cy - 10, 5, 2);                                                       // beard
+      ctx.fillStyle = f.S;
+      if(up){ ctx.fillRect(x - 5, cy - 13, 1, 4); ctx.fillRect(x + 5, cy - 13, 1, 4); ctx.fillStyle = f.R; ctx.fillRect(x - 4, cy - 9, 1, 3); ctx.fillRect(x + 4, cy - 9, 1, 3); }       // arms up
+      else { ctx.fillRect(x - 6, cy - 8, 2, 1); ctx.fillRect(x + 5, cy - 8, 2, 1); ctx.fillStyle = f.R; ctx.fillRect(x - 5, cy - 8, 1, 1); ctx.fillRect(x + 4, cy - 8, 1, 1); }           // arms out
+    });
+  }
+  // a gold glow when he flies into the gate
+  if(jl.mode === "gate"){ ctx.fillStyle = "rgba(255,243,176," + Math.min(.7, jl.gate * .5).toFixed(2) + ")"; ctx.fillRect(0, 0, cw, ch); }
+}
+function jlLoop(now){
+  var s = state.session.jacobLadder;
+  if(state.screen !== "jacobLadder" || !s){ jlRaf = 0; return; }
+  var dt = Math.min(.05, (now - jl.last_t) / 1000); jl.last_t = now;
+  if(s.status === "playing" && !s.interlude && !s.busy) jlStep(s, dt);
+  jlDraw();
+  jlRaf = requestAnimationFrame(jlLoop);
+}
+function jlLoopStart(){
+  if(jlRaf) return;
+  if(jl) jl.last_t = performance.now();
+  jlRaf = requestAnimationFrame(jlLoop);
+}
+// the player's fingers: any touch on the left half of the stage or the bar holds LEFT, the right half RIGHT
+function jlPress(e, side){
+  if(pixAudioStale) pixReviveOnTap();
+  var dir = side;
+  if(!dir){ var r = e.currentTarget.getBoundingClientRect(); dir = (e.clientX - r.left) < r.width / 2 ? -1 : 1; }
+  jlHold[e.pointerId] = dir;
+  try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err){}
+  jlPaintHeld();
+}
+function jlMoveTouch(e){
+  if(jlHold[e.pointerId] === undefined || e.currentTarget.id !== "jlStage") return;
+  var r = e.currentTarget.getBoundingClientRect(); jlHold[e.pointerId] = (e.clientX - r.left) < r.width / 2 ? -1 : 1;
+  jlPaintHeld();
+}
+function jlRelease(e){ delete jlHold[e.pointerId]; jlPaintHeld(); }
+document.addEventListener("pointerup", function(e){ if(jlHold[e.pointerId] !== undefined){ delete jlHold[e.pointerId]; jlPaintHeld(); } }, true);        // wherever the finger lifts
+document.addEventListener("pointercancel", function(e){ if(jlHold[e.pointerId] !== undefined){ delete jlHold[e.pointerId]; jlPaintHeld(); } }, true);
+function jlPaintHeld(){
+  var d = jlDir(), l = document.getElementById("jlL"), r = document.getElementById("jlR");
+  if(l) l.classList.toggle("held", d < 0); if(r) r.classList.toggle("held", d > 0);
+}
+document.addEventListener("keydown", function(e){
+  if(state.screen !== "jacobLadder") return;
+  if(e.key === "ArrowLeft" || e.key === "a" || e.key === "A") jlKeys.l = true;
+  if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") jlKeys.r = true;
+});
+document.addEventListener("keyup", function(e){
+  if(e.key === "ArrowLeft" || e.key === "a" || e.key === "A") jlKeys.l = false;
+  if(e.key === "ArrowRight" || e.key === "d" || e.key === "D") jlKeys.r = false;
+});
+function initJacobLadder(){
+  var s = {v: 1, round: 0, chances: JL_CHANCES, busy: false, status: "playing", interlude: null};
+  state.session.jacobLadder = s;
+  jlHold = {};
+  jlBegin(s);
+  saveState();
+}
+function jlInterlude(){
+  pixRoundRun("jacobLadder", function(){ return state.session.jacobLadder; }, function(s2){
+    if(jlChancesLeft(s2) >= JL_CHANCES) return false;
+    s2.chances = jlChancesLeft(s2) + 1;
+    return true;
+  }, function(s2){
+    if(s2.interlude.final){ s2.interlude = null; jlCollectAward(); return; }
+    s2.round++; s2.interlude = null; s2.busy = false; jlHold = {}; jlBegin(s2);
+    saveState(); render();
+  });
+}
+function jlTryAgain(){ initJacobLadder(); render(); }
+function jlCollectAward(){ state.session.jacobLadder = null; grantMission("jacobLadder"); }
+function jlQuit(){ state.session.jacobLadder = null; jlHold = {}; go("mainMenu"); }
+function screenJacobLadder(){
+  var s = state.session.jacobLadder;
+  if(!s || s.v !== 1){ initJacobLadder(); s = state.session.jacobLadder; }
+  if(s.status === "failed"){
+    return pixResultHtml("jacobLadderName", {cls:"pixLower", title:t("jl_failTitle"), body:t("jl_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "jlTryAgain()") + pixBtnHtml(t("mainMenu"), "jlQuit()", true)});
+  }
+  var hearts = chancesHeartsHtml(Math.max(0, jlChancesLeft(s)), JL_CHANCES);
+  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("jacobLadderName") + '</h2><div class="pixChances">' + hearts + '</div>' + pixRoundDoneHtml(s.interlude), "pixLower");
+  if(!jl || jlBound !== s || jlBoundRound !== s.round){ jlHold = {}; jlBegin(s); }          // a round that was saved in the middle starts again
+  var cfg = JL_ROUNDS[s.round];
+  return pixShell('<h2 class="pixMTitle">' + t("jacobLadderName") + '</h2>' +
+    '<div class="pixNote">' + t("jl_intro") + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, JL_ROUNDS.length) + '</span><span class="pixNote" id="jlHeight">' + t("jl_height")(Math.floor(jl.top / 10), Math.round(cfg.goal / 10)) + '</span>' + hearts + '</div>' +
+    '<div class="jlArea">' +
+      '<div class="jlStage" id="jlStage" onpointerdown="jlPress(event,0)" onpointermove="jlMoveTouch(event)" onpointerup="jlRelease(event)" onpointercancel="jlRelease(event)"><canvas class="jlCanvas" id="jlCanvas" width="118" height="150"></canvas></div>' +
+      '<div class="jlBar"><button class="jlHalf l" id="jlL" data-sfx="own" onpointerdown="jlPress(event,-1)" onpointerup="jlRelease(event)" onpointercancel="jlRelease(event)" oncontextmenu="return false"><i></i><span>' + t("jl_left") + '</span></button>' +
+      '<button class="jlHalf r" id="jlR" data-sfx="own" onpointerdown="jlPress(event,1)" onpointerup="jlRelease(event)" onpointercancel="jlRelease(event)" oncontextmenu="return false"><span>' + t("jl_right") + '</span><i></i></button></div>' +
+    '</div>' +
     '<div class="spacer"></div>', "pixLower msScreen");
 }
 
@@ -7229,7 +7607,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 T";
+var APP_BUILD = "2026-10-24 V";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -7323,7 +7701,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["missionIntro","faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
 
 function exitBarHtml(){
@@ -7356,6 +7734,7 @@ function exitMission(){
     case "pilgrimRoad": prQuit(); break;
     case "dovePeace": dpQuit(); break;
     case "fruitsSpirit": fsQuit(); break;
+    case "jacobLadder": jlQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -7391,6 +7770,7 @@ function render(){
     case "pilgrimRoad": html = screenPilgrimRoad(); break;
     case "dovePeace": html = screenDovePeace(); break;
     case "fruitsSpirit": html = screenFruitsSpirit(); break;
+    case "jacobLadder": html = screenJacobLadder(); break;
     case "churchWalk": html = screenChurchWalk(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
@@ -7485,6 +7865,8 @@ function render(){
   if(state.screen === "pilgrimRoad" && state.session.pilgrimRoad && state.session.pilgrimRoad.interlude && !pixRoundRunning.pilgrimRoad) prInterlude();
   if(state.screen === "dovePeace" && state.session.dovePeace && state.session.dovePeace.interlude && !pixRoundRunning.dovePeace) dpInterlude();
   if(state.screen === "dovePeace"){ dpDraw(); dpLoopStart(); }
+  if(state.screen === "jacobLadder" && state.session.jacobLadder && state.session.jacobLadder.interlude && !pixRoundRunning.jacobLadder) jlInterlude();
+  if(state.screen === "jacobLadder"){ jlDraw(); jlLoopStart(); }
   if(state.screen === "fruitsSpirit" && state.session.fruitsSpirit && state.session.fruitsSpirit.interlude && !pixRoundRunning.fruitsSpirit) fsInterlude();
   if(state.screen === "fruitsSpirit" && state.session.fruitsSpirit && !state.session.fruitsSpirit.interlude) fsBind();
   if(state.screen === "churchWalk") cwStart();
