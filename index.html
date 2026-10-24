@@ -6492,7 +6492,8 @@ var FS_N = 6, FS_TYPES = 8, FS_SPIRIT = 9;
 var FS_NEED = [5, 8, 11];                                                   // of each fruit, in levels 1, 2 and 3
 var FS_MS = {swap: 190, clear: 320, fall: 360};
 var fsBound = null;                                                          // the game being played now: a game that was saved in the middle of a swap (a reload) is not busy any more
-var fsEls = [], fsDrag = null;                                               // the fruit picture at each square, and the swipe being made
+var fsEls = [], fsDrag = null;
+var fsQueue = [], fsRevealing = false;                                      // the words to light up, one at a time (2026-10-24, per Dan: two finished in one swap showed only the first)                                               // the fruit picture at each square, and the swipe being made
 function fsWeights(goals){                                                   // the fruit still needed turns up 3 times as often as the rest
   var w = [];
   for(var t = 0; t < FS_TYPES; t++) w.push(goals && goals[t] && goals[t].got < goals[t].need ? 3 : 1);
@@ -6614,7 +6615,8 @@ function initFruitsSpirit(){
   saveState();
 }
 function fsStartRound(s){
-  s.goals = []; for(var t = 0; t < FS_TYPES; t++) s.goals.push({got: 0, need: FS_NEED[s.round], done: false});
+  fsQueue = []; fsRevealing = false;
+  s.goals = []; for(var t = 0; t < FS_TYPES; t++) s.goals.push({got: 0, need: FS_NEED[s.round], done: false, shown: false});
   s.board = fsNewBoard(fsWeights(s.goals));
   s.sel = -1; s.busy = false; s.interlude = null;
 }
@@ -6641,12 +6643,22 @@ function fsPaintWords(s){
   for(var t = 1; t <= FS_TYPES; t++){
     var g = s.goals[t - 1], w = document.getElementById("fsW" + t);
     if(!w) continue;
-    w.classList.toggle("on", g.done);
+    w.classList.toggle("on", !!g.shown);
     var cnt = w.querySelector(".fsCnt"); if(cnt) cnt.textContent = g.got + "/" + g.need;
   }
 }
+// a word is lit and its name shown when its turn comes: if several are finished by one swap they come one after another, a beat apart
+function fsPump(s){
+  if(fsRevealing || !fsQueue.length || !fsAlive(s)) return;
+  fsRevealing = true;
+  var ty = fsQueue.shift();
+  s.goals[ty - 1].shown = true; fsPaintWords(s);
+  fsPopup(t("fs_names")[ty - 1] + "!"); pixSfxPlay("ticket", false);
+  setTimeout(function(){ fsRevealing = false; fsPump(s); }, 1550);
+}
 function fsPopup(text){
   var wrap = document.querySelector(".fsBoardWrap"); if(!wrap) return;
+  var old = wrap.querySelectorAll(".fsPopup"); for(var k = 0; k < old.length; k++) old[k].parentNode.removeChild(old[k]);
   var el = document.createElement("div"); el.className = "fsPopup"; el.textContent = text; wrap.appendChild(el);
   setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 1300);
 }
@@ -6676,9 +6688,9 @@ function fsPlay(s, frames, done){
         var g = s.goals[ty - 1];
         if(g.done || !f.gain[ty]) continue;
         g.got = Math.min(g.need, g.got + f.gain[ty]);
-        if(g.got >= g.need){ g.done = true; fsPopup(t("fs_names")[ty - 1] + "!"); s.found++; pixSfxPlay("ticket", false); }
+        if(g.got >= g.need){ g.done = true; s.found++; fsQueue.push(ty); }
       }
-      fsPaintWords(s);
+      fsPaintWords(s); fsPump(s);
     } else if(f.kind === "fall"){
       wait = FS_MS.fall;
       for(i = 0; i < N * N; i++){ var e0 = fsEls[i]; if(e0 && e0.classList.contains("pop")){ if(e0.parentNode) e0.parentNode.removeChild(e0); fsEls[i] = null; } }
@@ -6722,12 +6734,15 @@ function fsSwap(a, b){
   fsPlay(s, res.frames, function(){
     s.board = res.board;
     if(s.goals.every(function(g){ return g.done; })){
-      setTimeout(function(){
-        var s2 = state.session.fruitsSpirit;
-        if(!s2 || s2 !== s || state.screen !== "fruitsSpirit") return;
-        s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= FS_ROUNDS_COUNT - 1};     // ROUND X COMPLETED!
-        saveState(); render();
-      }, 900);
+      (function finish(){
+        if(!fsAlive(s)) return;
+        if(fsQueue.length || fsRevealing){ setTimeout(finish, 150); return; }       // the last names are still to be shown
+        setTimeout(function(){
+          if(!fsAlive(s)) return;
+          s.busy = false; s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= FS_ROUNDS_COUNT - 1};     // ROUND X COMPLETED!
+          saveState(); render();
+        }, 900);
+      })();
     } else { s.busy = false; saveState(); }
   });
 }
@@ -6789,6 +6804,7 @@ function screenFruitsSpirit(){
   var s = state.session.fruitsSpirit;
   if(!s || s.v !== 2 || !s.board){ initFruitsSpirit(); s = state.session.fruitsSpirit; }
   if(s.busy && fsBound !== s) s.busy = false;                                // a game saved in the middle of a swap
+  s.goals.forEach(function(g){ if(g.done) g.shown = true; });                // (so a word finished just before a reload is lit)
   if(!s.interlude && s.goals.every(function(g){ return g.done; })) s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= FS_ROUNDS_COUNT - 1};
   if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("fruitsSpiritName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
   var N = FS_N, names = t("fs_names"), cells = "", fruit = "", i;
@@ -7213,7 +7229,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 S";
+var APP_BUILD = "2026-10-24 T";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
