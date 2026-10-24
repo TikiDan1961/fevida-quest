@@ -591,14 +591,12 @@
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   /* Dove of Peace (2026-10-24): the sky is one low-resolution canvas (about a third of the stage's size) that is stretched up with hard pixels, so everything drawn on it is 8-bit. */
   .dpArea{width:min(100%,380px);margin:0 auto;}
-  .dpStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 315px),460px);height:clamp(230px,calc(100dvh - 315px),460px);border:4px solid #FFC93A;border-radius:16px;
-    box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:pointer;background:#7CC4FF;}
+  .dpStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 260px),520px);height:clamp(230px,calc(100dvh - 260px),520px);border:4px solid #FFC93A;border-radius:16px;
+    box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;background:#7CC4FF;}
   .dpCanvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
   .dpReady{position:absolute;left:0;right:0;top:58%;text-align:center;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
-  .dpBar{margin-top:10px;position:relative;}
-  .dpBar::before,.dpBar::after{content:"";position:absolute;top:50%;width:0;height:0;margin-top:-13px;border-left:15px solid transparent;border-right:15px solid transparent;border-bottom:26px solid #FFC93A;filter:drop-shadow(2px 2px 0 #1B1F3B);}
-  .dpBar::before{left:22px;} .dpBar::after{right:22px;}
+  .pixMission > .dpTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* the whole screen flaps the dove (the red X, above it, still works) */
   .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
@@ -960,7 +958,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
-      dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap FLAP to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round, and in the last round the wind pushes the dove around. Finish all 3 rounds to win."]},
+      dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round, and in the last round the wind pushes the dove around. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
       prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap TAP when a bead is in the ring. The beads come at different distances, so watch each one.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Round 1 has 20 beads, round 2 has 30 and round 3 has 40, and they move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
@@ -1037,7 +1035,7 @@ var T = {
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
-    dovePeaceName:"Dove of Peace", dp_intro:"Tap to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_flap:"FLAP", dp_ready:"Tap FLAP to start!",
+    dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
@@ -1104,7 +1102,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
-      dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca ALETEAR para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda, y en la última el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
+      dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda, y en la última el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca TOCAR cuando una cuenta esté dentro del aro. Las cuentas vienen a distancias distintas, así que mira cada una.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. La ronda 1 tiene 20 cuentas, la ronda 2 tiene 30 y la ronda 3 tiene 40, y van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
@@ -1180,7 +1178,7 @@ var T = {
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
-    dovePeaceName:"Paloma de la Paz", dp_intro:"Toca para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_flap:"ALETEAR", dp_ready:"¡Toca ALETEAR para empezar!",
+    dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
@@ -5418,10 +5416,13 @@ function msFit(){
   var n = s.cols.length, rows = s.rows, TINY = 16;
   var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
   var scr = area.closest(".screen"), pad = scr ? parseFloat(getComputedStyle(scr).paddingBottom) || 0 : 0;
+  var bar = area.querySelector(".msBar"), board = area.querySelector(".msBoard");
+  // (2026-10-24, per Dan: the DROP TILE button sits halfway between the bottom of the grid and the bottom of the screen.) What is under the grid at the least (the stage guide and
+  // the button) has to fit above the button's own middle, so the room kept for it is twice that, less half the button.
   function solve(){
-    area.style.setProperty("--cell", TINY + "px");
-    var bottom = area.querySelector(".msBar").getBoundingClientRect().bottom + (window.scrollY || 0);
-    var byH = TINY + (vh - pad - 14 - bottom) / (rows + 1);
+    area.style.setProperty("--cell", TINY + "px"); bar.style.marginTop = "";
+    var boardBottom = board.getBoundingClientRect().bottom + (window.scrollY || 0), stack = bar.getBoundingClientRect().bottom + (window.scrollY || 0) - boardBottom;
+    var byH = TINY + (vh - 6 - boardBottom - (2 * stack - bar.offsetHeight)) / (rows + 1);
     var byW = (Math.min(area.clientWidth, 380) - 22 - (n - 1) * 5) / n;
     return Math.floor(Math.min(byH, byW, 62));
   }
@@ -5429,6 +5430,13 @@ function msFit(){
   var cell = solve();
   if(cell < 34){ area.classList.add("noLegend"); cell = solve(); }          // a short screen: the stage guide goes so the squares can stay big enough
   area.style.setProperty("--cell", Math.max(18, cell) + "px");
+  bar.style.marginTop = "";
+  var bb = board.getBoundingClientRect().bottom, goal = bb + (vh - bb) / 2, mt = parseFloat(getComputedStyle(bar).marginTop) || 0;
+  for(var pass = 0; pass < 3; pass++){                                       // (the button's margin collapses with the stage guide's, so the move is measured, not worked out)
+    var br = bar.getBoundingClientRect(), extra = goal - (br.top + br.height / 2);      // how far the button's middle is above the middle of the room under the grid
+    if(Math.abs(extra) < .5) break;
+    mt = Math.max(0, mt + extra); bar.style.marginTop = mt + "px";
+  }
   msPlace();
 }
 window.addEventListener("resize", function(){ if(state.screen === "mustardSeed") msFit(); });
@@ -5970,8 +5978,8 @@ function screenPilgrimRoad(){
 
 /* ---------- Dove of Peace ---------- */
 
-// Dove of Peace (2026-10-24, per Dan; the screen was mocked up first): a one-tap flapper. The dove flies to the right, carrying an olive branch, and each tap on FLAP (or on the sky)
-// makes it flap upward; between taps it sinks. Pairs of dark storm clouds, one above and one below a gap, come in from the right and the dove has to fly through the gaps. Ten
+// Dove of Peace (2026-10-24, per Dan; the screen was mocked up first): a one-tap flapper. The dove flies to the right, carrying an olive branch, and a tap anywhere on the screen (2026-10-24,
+// per Dan: there is no FLAP button) makes it flap upward; between taps it sinks. Pairs of dark storm clouds, one above and one below a gap, come in from the right and the dove has to fly through the gaps. Ten
 // pairs make a round and a green path along the top shows how many are behind it. Hitting a cloud (or the ground) costs one of 5 hearts: the dove is put back in the nearest gap
 // and flickers for a moment, when nothing can hurt it. The three rounds have the clouds coming faster and the gaps narrower, and in the third the wind pushes the dove up and down.
 // ROUND X COMPLETED! after each, with the lost chance given back after rounds 1 and 2, like the other games.
@@ -6218,9 +6226,9 @@ function screenDovePeace(){
   return pixShell('<h2 class="pixMTitle">' + t("dovePeaceName") + '</h2>' +
     '<div class="pixNote">' + t("dp_intro") + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, DP_ROUNDS.length) + '</span><span class="pixNote" id="dpCount">' + t("dp_clouds")(dp.passed, DP_CLOUDS) + '</span>' + hearts + '</div>' +
+    '<div class="dpTapAll" onclick="dpFlap()"></div>' +
     '<div class="dpArea">' +
-      '<div class="dpStage" id="dpStage" onclick="dpFlap()"><canvas class="dpCanvas" id="dpCanvas" width="113" height="150"></canvas>' + (dp.started ? '' : '<div class="dpReady" id="dpReady">' + t("dp_ready") + '</div>') + '</div>' +
-      '<button class="msBar dpBar" data-sfx="own" onclick="dpFlap()"><span>' + t("dp_flap") + '</span></button>' +
+      '<div class="dpStage" id="dpStage"><canvas class="dpCanvas" id="dpCanvas" width="113" height="150"></canvas>' + (dp.started ? '' : '<div class="dpReady" id="dpReady">' + t("dp_ready") + '</div>') + '</div>' +
     '</div>' +
     '<div class="spacer"></div>', "pixLower msScreen");
 }
@@ -6631,7 +6639,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 F";
+var APP_BUILD = "2026-10-24 H";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
