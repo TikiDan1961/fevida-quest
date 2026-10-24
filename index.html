@@ -572,14 +572,18 @@
   .msGoal{display:flex;align-items:center;gap:6px;}
   .msGoalTile{width:32px;height:32px;display:block;}
   .msArea{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;width:min(100%,380px);margin:0 auto;}
-  .msBoard{display:grid;gap:5px;padding:7px;box-sizing:border-box;width:min(100%,max(210px,calc((100vh - 345px) * var(--n) / var(--r))));margin:0 auto;background:#966C44;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);}
+  .msBoard{display:grid;gap:5px;padding:7px;box-sizing:border-box;width:calc(var(--n) * var(--cell, 44px) + (var(--n) - 1) * 5px + 22px);margin:0 auto;background:#966C44;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);}
   .msCol{display:flex;flex-direction:column;gap:5px;min-width:0;}
   .msCol.shake{animation:tlShake .32s steps(4);}
   .msCell{aspect-ratio:1/1;background:#7A5636;border-radius:5px;min-width:0;}
   /* the plant that slides above the grid, the same size as a square of the grid, with a lit column below it */
-  .msTrack{position:relative;width:min(100%,max(210px,calc((100vh - 345px) * var(--n) / var(--r,5))));margin:0 auto 6px;box-sizing:border-box;padding:0 11px;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:5px;}
+  .msTrack{position:relative;width:calc(var(--n) * var(--cell, 44px) + (var(--n) - 1) * 5px + 22px);margin:0 auto 6px;box-sizing:border-box;padding:0 11px;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:5px;}
   .msTrackCell{aspect-ratio:1/1;min-width:0;}
-  .msMover{position:absolute;left:0;top:0;width:calc((100% - 22px - (var(--n) - 1) * 5px) / var(--n));aspect-ratio:1/1;will-change:transform;z-index:3;}
+  .msMover{position:absolute;left:0;top:0;width:var(--cell, 44px);height:var(--cell, 44px);z-index:3;}
+  .msFall{position:absolute;z-index:4;pointer-events:none;}
+  .msScreen{height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;overflow:hidden;}
+  .msArea{position:relative;}
+  .msArea.noLegend .msLegend{display:none;}
   .msMover .msTile{box-shadow:0 0 0 3px #fff,0 0 0 6px #3A93E8,0 0 12px 5px rgba(120,190,255,.8);}
   .msCol.under{background:rgba(255,255,255,.14);border-radius:6px;box-shadow:0 0 0 3px rgba(255,255,255,.28);}
   .msTile{width:100%;height:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid #1B1F3B;border-radius:7px;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.14);}
@@ -592,14 +596,14 @@
   @keyframes msMatch{0%,100%{box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.14),0 0 0 2px #fff;}50%{box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.14),0 0 0 3px #fff,0 0 12px 5px rgba(255,236,130,.95);}}
   @keyframes msPop{0%{transform:scale(.7);}60%{transform:scale(1.14);}100%{transform:scale(1);}}
   @keyframes msSpawn{0%{transform:scale(.3);opacity:.2;}100%{transform:scale(1);opacity:1;}}
-  .msLegend{display:flex;align-items:center;justify-content:center;gap:4px;margin:10px 0 8px;}
-  .msStage{width:38px;height:38px;flex:none;}
+  .msLegend{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 6px;}
+  .msStage{width:30px;height:30px;flex:none;}
   .msStage.isGoal .msTile{box-shadow:0 0 0 3px #fff,0 0 0 6px #FFC93A;}
   .msArrow{flex:none;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #FFC93A;filter:drop-shadow(1px 1px 0 #1B1F3B);}
   .msBar:active{box-shadow:inset 0 0 0 3px #1C4E9A,0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .msBar{display:flex;width:100%;cursor:pointer;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;height:54px;padding:0 22px;background:#3A8FE8;border:4px solid #1B1F3B;border-radius:18px;box-shadow:inset 0 0 0 3px #1C4E9A;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.06em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
-  @media (max-height:700px){ .msLegend{display:none;} .msBar{height:44px;font-size:1.25rem;margin-top:8px;} }
+  @media (max-height:700px){ .msBar{height:44px;font-size:1.25rem;margin-top:6px;} }
   /* Word Groups (2026-10-23): n x n frames. A word's size follows the width of a frame and the longest word on the board (--n, --m), so every word fits across. */
   .wgBoard{position:relative;display:flex;flex-direction:column;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
@@ -888,7 +892,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
-      mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant slides back and forth above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Don't fill the columns to the top. Grow the goal plant to finish the round. The plant slides faster each round. Finish all 3 rounds to win."]},
+      mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Don't fill the columns to the top. Grow the goal plant to finish the round. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
     },
     fm_failTitle:"Out of Chances!",
@@ -1022,7 +1026,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
-      mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta se desliza de lado a lado sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "No llenes las columnas hasta arriba. Haz crecer la planta de la meta para terminar la ronda. La planta se desliza más rápido en cada ronda. Termina las 3 rondas para ganar."]},
+      mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "No llenes las columnas hasta arriba. Haz crecer la planta de la meta para terminar la ronda. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
     fm_failTitle:"¡Sin Oportunidades!",
@@ -5224,8 +5228,8 @@ function screenWordGroups(){
 // for the great tree, R3 6 columns of 5 for the great tree, with fewer big plants dropping. (It was swipe-to-slide, then tap-two-to-join; Dan found the first hard to understand and
 // the second had no skill in it.) The numbers were set by playing 250 games each with a player that looks one drop ahead and one that drops anywhere at random: the first wins every
 // time, the random one wins about 92 %, 54 % and 15 % in the three rounds.
-// speed = how many columns the sliding plant crosses in a second.
-var MS_ROUNDS = [{cols: 4, rows: 5, goal: 5, w: [.3, .3, .2, .15], speed: 1.5}, {cols: 5, rows: 6, goal: 6, w: [.3, .3, .2, .15, .05], speed: 2.2}, {cols: 6, rows: 5, goal: 6, w: [.4, .3, .2, .1], speed: 3.0}];
+// rate = how many columns the plant jumps along in a second (2026-10-23, per Dan: it jumps from column to column, much faster than the smooth slide it had).
+var MS_ROUNDS = [{cols: 4, rows: 5, goal: 5, w: [.3, .3, .2, .15], rate: 4}, {cols: 5, rows: 6, goal: 6, w: [.3, .3, .2, .15, .05], rate: 5.5}, {cols: 6, rows: 5, goal: 6, w: [.4, .3, .2, .1], rate: 7}];
 var MS_TOP = 6;                                                          // the highest stage
 function msNextStage(w){
   var total = w.reduce(function(x, y){ return x + y; }, 0), r = Math.random() * total, acc = 0;
@@ -5234,7 +5238,7 @@ function msNextStage(w){
 }
 function msNewRound(round){
   var cfg = MS_ROUNDS[round], cols = [];
-  msPos = 0; msDir = 1;                                                  // the sliding plant starts over the first column
+  msPos = 0; msDir = 1; msAcc = 0;                                       // the plant above the grid starts over the first column
   for(var c = 0; c < cfg.cols; c++) cols.push([]);                       // each column is its plants from the bottom up
   return {v: 3, round: round, cols: cols, rows: cfg.rows, goal: cfg.goal, cur: msNextStage(cfg.w), merged: [], dropped: "", shake: -1, busy: false, status: "playing", interlude: null};
 }
@@ -5265,26 +5269,29 @@ function msDropIn(cols, rows, c, v, goal){
   }
   return {cols: out, merges: merges, reached: reached, grown: Object.keys(grown)};
 }
-// The sliding plant. msPos is where it is in columns (0 = over the first column, cols - 1 = over the last) and msDir which way it goes; it turns round at both ends.
-// It lives outside the screen drawing, so a redraw never makes it jump. The column under it is lit.
-var msPos = 0, msDir = 1, msRaf = 0, msLastT = 0;
+// The plant above the grid. msPos is the column it is over (0 = the first, cols - 1 = the last) and msDir which way it is going; every 1 / rate seconds it JUMPS to the next
+// column, and it turns round at the first and the last. It lives outside the screen drawing, so a redraw never moves it. The column under it is lit.
+var msPos = 0, msDir = 1, msRaf = 0, msLastT = 0, msAcc = 0;
 function msPlace(){
   var s = state.session.mustardSeed, mover = document.getElementById("msMover"), track = document.getElementById("msTrack");
   if(!s || !mover || !track) return;
   var n = s.cols.length, cw = mover.offsetWidth, step = cw + 5;
   mover.style.transform = "translateX(" + (11 + msPos * step) + "px)";
-  var under = Math.max(0, Math.min(n - 1, Math.round(msPos))), cols = document.querySelectorAll(".msCol");
-  for(var i = 0; i < cols.length; i++) cols[i].classList.toggle("under", i === under);
+  var cols = document.querySelectorAll(".msCol");
+  for(var i = 0; i < cols.length; i++) cols[i].classList.toggle("under", i === msPos);
 }
 function msLoop(now){
   var s = state.session.mustardSeed;
   if(state.screen !== "mustardSeed" || !s){ msRaf = 0; return; }
-  var dt = Math.min(.05, (now - msLastT) / 1000); msLastT = now;
+  var dt = Math.min(.1, (now - msLastT) / 1000); msLastT = now;
   if(s.status === "playing" && !s.interlude && !s.busy){
-    var n = s.cols.length, speed = MS_ROUNDS[s.round].speed;
-    msPos += msDir * speed * dt;
-    if(msPos >= n - 1){ msPos = n - 1; msDir = -1; }
-    if(msPos <= 0){ msPos = 0; msDir = 1; }
+    var n = s.cols.length, interval = 1 / MS_ROUNDS[s.round].rate;
+    msAcc += dt;
+    while(msAcc >= interval){
+      msAcc -= interval;
+      if(msPos + msDir > n - 1 || msPos + msDir < 0) msDir = -msDir;      // the end of the row: turn round
+      msPos += msDir;
+    }
   }
   msPlace();
   msRaf = requestAnimationFrame(msLoop);
@@ -5293,11 +5300,46 @@ function msLoopStart(){
   if(msRaf) return;
   msLastT = performance.now(); msRaf = requestAnimationFrame(msLoop);
 }
+// Everything has to fit on one screen, with no scrolling (2026-10-23, per Dan), so the size of a square comes from the real height of the screen: lay it out with tiny squares,
+// see how much room is left under the button, and give that room to the (rows + 1) squares that stack up (the grid and the plant above it). The width also limits it.
+function msFit(){
+  var area = document.getElementById("msArea"), s = state.session.mustardSeed;
+  if(!area || !s || s.interlude) return;
+  var n = s.cols.length, rows = s.rows, TINY = 16;
+  var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  var scr = area.closest(".screen"), pad = scr ? parseFloat(getComputedStyle(scr).paddingBottom) || 0 : 0;
+  function solve(){
+    area.style.setProperty("--cell", TINY + "px");
+    var bottom = area.querySelector(".msBar").getBoundingClientRect().bottom + (window.scrollY || 0);
+    var byH = TINY + (vh - pad - 14 - bottom) / (rows + 1);
+    var byW = (Math.min(area.clientWidth, 380) - 22 - (n - 1) * 5) / n;
+    return Math.floor(Math.min(byH, byW, 62));
+  }
+  area.classList.remove("noLegend");
+  var cell = solve();
+  if(cell < 34){ area.classList.add("noLegend"); cell = solve(); }          // a short screen: the stage guide goes so the squares can stay big enough
+  area.style.setProperty("--cell", Math.max(18, cell) + "px");
+  msPlace();
+}
+window.addEventListener("resize", function(){ if(state.screen === "mustardSeed") msFit(); });
 // DROP TILE: the plant falls into the column it is over right now
 function msDropNow(){
   var s = state.session.mustardSeed;
   if(!s) return;
-  msDrop(Math.max(0, Math.min(s.cols.length - 1, Math.round(msPos))));
+  msDrop(msPos);
+}
+// the plant visibly falls from the top square of the column to the square where it lands, then done() runs
+function msFall(c, landRow, v, done){
+  var area = document.getElementById("msArea"), col = document.querySelectorAll(".msCol")[c];
+  if(!area || !col){ done(); return; }
+  var cells = col.querySelectorAll(".msCell"), rows = cells.length;
+  var first = cells[0].getBoundingClientRect(), target = cells[rows - 1 - landRow].getBoundingClientRect(), ar = area.getBoundingClientRect();
+  var el = document.createElement("div"); el.className = "msFall"; el.innerHTML = msTileHtml(v);
+  el.style.left = (first.left - ar.left) + "px"; el.style.top = (first.top - ar.top) + "px"; el.style.width = first.width + "px"; el.style.height = first.height + "px";
+  area.appendChild(el);
+  var dist = target.top - first.top, squares = Math.round(dist / (first.height + 5)), dur = Math.max(150, Math.min(520, 100 + squares * 60));
+  if(el.animate) el.animate([{transform: "translateY(0)"}, {transform: "translateY(" + dist + "px)"}], {duration: dur, easing: "cubic-bezier(.5,0,.9,.6)", fill: "forwards"});
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); done(); }, dur);
 }
 function msDrop(c){
   var s = state.session.mustardSeed;
@@ -5309,28 +5351,35 @@ function msDrop(c){
     setTimeout(function(){ var s2 = state.session.mustardSeed; if(s2 === s && s2.shake === c){ s2.shake = -1; render(); } }, 320);
     return;
   }
-  var res = msDropIn(s.cols, s.rows, c, s.cur, s.goal);
-  var landed = s.cols[c].length < s.rows ? c + "," + s.cols[c].length : c + "," + (s.rows - 1);
-  s.cols = res.cols; s.merged = res.grown; s.dropped = landed; s.shake = -1;
-  s.cur = msNextStage(cfg.w);
-  var over = !res.reached && !msAnyLegal(s.cols, s.rows, s.cur);        // no column can take the waiting plant
-  pixSfxPlay(over ? "fmLast" : (res.merges ? "fmMatch" : "fmFirst"), true);
-  if(res.reached || over) s.busy = true;
-  saveState(); render();
-  if(res.reached){
-    setTimeout(function(){
-      var s2 = state.session.mustardSeed;
-      if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
-      s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= MS_ROUNDS.length - 1};     // ROUND X COMPLETED!
-      saveState(); render();
-    }, 800);
-  } else if(over){
-    setTimeout(function(){
-      var s2 = state.session.mustardSeed;
-      if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
-      s2.busy = false; s2.status = "failed"; saveState(); render();
-    }, 1100);
-  }
+  // where it lands: on top of the stack, or, if the plant on top is the same kind, in that plant's own square (where it is at once replaced by the next stage)
+  var len = s.cols[c].length, joins = len > 0 && s.cols[c][len - 1] === s.cur, landRow = joins ? len - 1 : len;
+  var res = msDropIn(s.cols, s.rows, c, s.cur, s.goal), falling = s.cur;
+  var landed = c + "," + landRow;
+  s.busy = true;                                                           // nothing can be dropped until this one has landed
+  var mover = document.getElementById("msMover"); if(mover) mover.style.visibility = "hidden";
+  msFall(c, landRow, falling, function(){
+    if(state.session.mustardSeed !== s || state.screen !== "mustardSeed") return;
+    s.cols = res.cols; s.merged = res.grown; s.dropped = landed; s.shake = -1;
+    s.cur = msNextStage(cfg.w);
+    var over = !res.reached && !msAnyLegal(s.cols, s.rows, s.cur);        // no column can take the waiting plant
+    pixSfxPlay(over ? "fmLast" : (res.merges ? "fmMatch" : "fmFirst"), true);
+    if(!res.reached && !over) s.busy = false;
+    saveState(); render();
+    if(res.reached){
+      setTimeout(function(){
+        var s2 = state.session.mustardSeed;
+        if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
+        s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= MS_ROUNDS.length - 1};     // ROUND X COMPLETED!
+        saveState(); render();
+      }, 800);
+    } else if(over){
+      setTimeout(function(){
+        var s2 = state.session.mustardSeed;
+        if(!s2 || s2 !== s || state.screen !== "mustardSeed") return;
+        s2.busy = false; s2.status = "failed"; saveState(); render();
+      }, 1100);
+    }
+  });
 }
 function msInterlude(){
   pixRoundRun("mustardSeed", function(){ return state.session.mustardSeed; }, null, function(s2){
@@ -5376,7 +5425,7 @@ function screenMustardSeed(){
       '<div class="msLegend">' + legend + '</div>' +
       '<button class="msBar" data-sfx="own" onclick="msDropNow()"><span>' + t("ms_dropBtn") + '</span></button>' +
     '</div>' +
-    '<div class="spacer"></div>', "pixLower");
+    '<div class="spacer"></div>', "pixLower msScreen");
 }
 
 /* ---------- Stained-Glass Puzzle ---------- */
@@ -6024,7 +6073,7 @@ function render(){
   if(state.screen === "wordGroups" && state.session.wordGroups && !state.session.wordGroups.interlude) wgReveal();
   if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.introDone === false) wgIntroStart();
   if(state.screen === "mustardSeed" && state.session.mustardSeed && state.session.mustardSeed.interlude && !pixRoundRunning.mustardSeed) msInterlude();
-  if(state.screen === "mustardSeed") msLoopStart();
+  if(state.screen === "mustardSeed"){ msFit(); msLoopStart(); }
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
