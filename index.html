@@ -601,7 +601,7 @@
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
   .pbStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 315px),460px);height:clamp(230px,calc(100dvh - 315px),460px);border:4px solid #FFC93A;border-radius:16px;
-    box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:pointer;
+    box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;
     background:
       radial-gradient(circle at 12% 14%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 84% 9%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 26% 38%,#cfd6ff 0 1px,transparent 1.5px),
       radial-gradient(circle at 90% 34%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 8% 58%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 77% 52%,#cfd6ff 0 1px,transparent 1.5px),
@@ -960,7 +960,7 @@ var T = {
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. In the last round the wind pushes the dove around too. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
-      prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap TAP when a bead is in the ring. The beads come at different distances, so watch each one.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Round 1 has 20 beads, round 2 has 30 and round 3 has 40, and they move faster each round. Finish all 3 rounds to win."]},
+      prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap the TAP button when a bead is in the ring (tapping the sky does nothing). Some beads come close together, so tap quickly, once for each bead.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Round 1 has 20 beads, round 2 has 30 and round 3 has 40, and they move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
     },
@@ -1031,7 +1031,7 @@ var T = {
     sudokuName:"Sacred Sudoku", themeWisdom:"Wisdom",
     mustardSeedName:"Mustard Seed", themeGrowth:"Growth", ms_intro:"Tap DROP TILE when the plant is over the column you want.", ms_goal:"Goal:", ms_dropBtn:"DROP TILE",
     ms_failTitle:"Garden Full", ms_failBody:"A column filled up to the top. Join matching plants to keep the columns low. Try again!",
-    prayBeadsName:"Pray the Beads", pb_intro:"Tap each bead when it is in the ring. Watch each one: they come at different distances.", pb_tap:"TAP",
+    prayBeadsName:"Pray the Beads", pb_intro:"Tap the TAP button when a bead is in the ring. Some beads come close together: tap quickly!", pb_tap:"TAP",
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
@@ -1104,7 +1104,7 @@ var T = {
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. En la última, además, el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
-      prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca TOCAR cuando una cuenta esté dentro del aro. Las cuentas vienen a distancias distintas, así que mira cada una.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. La ronda 1 tiene 20 cuentas, la ronda 2 tiene 30 y la ronda 3 tiene 40, y van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
+      prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca el botón TOCAR cuando una cuenta esté dentro del aro (tocar el cielo no hace nada). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. La ronda 1 tiene 20 cuentas, la ronda 2 tiene 30 y la ronda 3 tiene 40, y van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
@@ -1174,7 +1174,7 @@ var T = {
     sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
     mustardSeedName:"Semilla de Mostaza", themeGrowth:"Crecimiento", ms_intro:"Toca SOLTAR cuando la planta esté sobre la columna que quieres.", ms_goal:"Meta:", ms_dropBtn:"SOLTAR PLANTA",
     ms_failTitle:"Jardín Lleno", ms_failBody:"Una columna se llenó hasta arriba. Une plantas iguales para mantener las columnas bajas. ¡Inténtalo de nuevo!",
-    prayBeadsName:"Reza el Rosario", pb_intro:"Toca cada cuenta cuando esté dentro del aro. Míralas bien: vienen a distancias distintas.", pb_tap:"TOCAR",
+    prayBeadsName:"Reza el Rosario", pb_intro:"Toca el botón TOCAR cuando una cuenta esté dentro del aro. Algunas vienen juntas: ¡toca rápido!", pb_tap:"TOCAR",
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
@@ -3271,6 +3271,25 @@ var FL_HYMNS = [
 // which hymn each of the 8 levels plays (the level's note count is 3, 4, 5, 6, 7, 8, 9, 10): On Eagle's Wings is heard twice, first 7 notes, then 10
 var FL_LEVEL_HYMN = [0, 1, 2, 3, 4, 5, 6, 4];
 // a bell: a struck note whose overtones fade at different speeds (the high ones quickly), rung an octave above the tile's note
+function pixBell(freq){
+  try {
+    if(pixAudioStale) pixReviveOnTap();
+    var ctx = pixCtx(); if(!ctx) return;
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
+    var now = ctx.currentTime, f = freq * 2;                                   // an octave up, as in Follow the Light
+    var parts = [[1, 0.18, 1.7], [2.0, 0.08, 1.1], [2.76, 0.06, 0.65], [4.07, 0.03, 0.4], [5.43, 0.02, 0.25]];
+    for(var k = 0; k < parts.length; k++){
+      var osc = ctx.createOscillator(), gain = ctx.createGain(), part = parts[k];
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f * part[0], now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(part[1], now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + part[2]);
+      osc.connect(gain); gain.connect(pixBus(ctx, "sfx"));
+      osc.start(now); osc.stop(now + part[2] + 0.05);
+    }
+  } catch(e){}
+}
 function flPlayTone(tileIdx, ms){
   try {
     if(pixAudioStale) pixReviveOnTap();          // first tap after coming back from another app: wake the sound engine before the note
@@ -5562,12 +5581,15 @@ function screenMustardSeed(){
 // the ring with a little room above and below it, there are 20 beads, they move faster and there are 3 chances, not 5. Then, 2026-10-24: the distance from one bead to the next is random
 // (and then more so: .8 to 2.2 times the usual) and the three rounds have 20, 30 and 40 beads and go much faster one after the other.) A tap that is too early, or a bead that gets by untouched,
 // costs a chance. ROUND X COMPLETED! after each round, with the lost chance given back after rounds 1 and 2, like the other games.
+// Changed again 2026-10-24, per Dan: only the TAP button counts a tap (not the stage); some beads come close together, in bursts of 2 to 4, to be tapped quickly one after the other; and
+// a bead tapped in time rings the bell of Follow the Light on a random note of G (round 1), D (round 2) or C (round 3).
 // All of it runs on the clock: bead i reaches the ring at s.at[i] ms after the round starts (made when the round begins), and where a bead is drawn depends only on the time, so a redraw (which
 // happens at every tap) never moves anything. The tap is judged from the moment the finger touched (pixDownT), less the little the screen is behind the game. How far from the
 // ring's centre a bead may be (as a fraction of the width of the stage) is turned into milliseconds from how fast the beads are going.
 var PB_CHANCES = 3;
 var PB_ROUNDS = [{gap: 760, beads: 20}, {gap: 600, beads: 30}, {gap: 460, beads: 40}];     // gap = ms for a bead to travel the usual distance to the next one (it sets the speed); beads = how many, after the large one
-var PB_APART = [.8, 2.2];                                                // the distance from one bead to the next is random, this many times the usual one (never closer than one bead at a time in the ring)
+var PB_APART = [.9, 2.2];
+var PB_BURST = {chance: .35, count: [1, 3], apart: [.55, .8]};            // now and then a bead is followed by 1 to 3 close ones (2026-10-24, per Dan), to be tapped quickly one after the other                                                // the distance from one bead to the next is random, this many times the usual one (never closer than one bead at a time in the ring)
 var PB_FIRST = 2;                                                          // the first bead reaches the ring this many usual gaps after the round starts
 var PB_TRAVEL = 4;                                                         // the beads are this many gaps apart along the string's length: with the ring only a little bigger than a bead, one at a time is in it
 var PB_RING = .15;                                                         // the ring's width, and a bead is .12, as fractions of the stage's width
@@ -5575,6 +5597,7 @@ var PB_ROOM = .02;                                                         // th
 var PB_PERFECT_ZONE = .045;                                                // a bead this near the middle of the ring is Perfect
 var PB_SHOW_LAG = 40, PB_START_WAIT = 800;
 var PB_GRACE = 60;                                                         // ms a bead is not yet counted as missed after its window, for a tap that is still on its way to the game
+var pbLastNote = -1;
 var pbStartAt = 0, pbRaf = 0, pbLastT = 0, pbBound = null, pbBoundRound = -1, pbLastTapAt = 0;
 // the string: a curve from the top of the stage down to the cross (all in % of the stage), measured so that beads a steady time apart are an even distance apart
 var PB_PATH = (function(){
@@ -5606,13 +5629,33 @@ function pbWindows(s){
   var speed = (PB_PATH.total / 1.3 * h / 100) / (PB_TRAVEL * gap);          // px per ms, straight down at the ring
   return {good: (PB_RING / 2 + PB_ROOM) * w / speed, perfect: PB_PERFECT_ZONE * w / speed};
 }
+// A tapped bead rings the bell of Follow the Light (2026-10-24, per Dan), on a random note of the round's key: G in round 1, D in round 2, C in round 3. The notes are one major scale
+// from its keynote up to the keynote again (one octave and a note, in Hz, rung an octave higher by pixBell as the tiles of Follow the Light are).
+var PB_KEYS = [
+  [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 369.99, 392.00],           // G major: G A B C D E F# G
+  [293.66, 329.63, 369.99, 392.00, 440.00, 493.88, 554.37, 587.33],           // D major: D E F# G A B C# D
+  [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]];          // C major: C D E F G A B C
+function pbChime(s){
+  var key = PB_KEYS[Math.min(s.round, PB_KEYS.length - 1)], i = Math.floor(Math.random() * key.length);
+  if(i === pbLastNote) i = (i + 1 + Math.floor(Math.random() * (key.length - 1))) % key.length;      // never the same note twice running
+  pbLastNote = i;
+  pixBell(key[i]);
+}
 function pbChancesLeft(s){ return typeof s.chances === "number" ? s.chances : PB_CHANCES; }
 function pbBeginRound(s){
   var cfg = PB_ROUNDS[s.round], n = cfg.beads + 1;
   s.res = []; s.at = [];
+  var burst = 0;
   for(var i = 0; i < n; i++){
     s.res.push(0);                                                         // 0 still to come, 1 Perfect, 2 Good, 3 missed
-    s.at.push(i === 0 ? PB_FIRST * cfg.gap : s.at[i - 1] + cfg.gap * (PB_APART[0] + Math.random() * (PB_APART[1] - PB_APART[0])));     // when it reaches the ring, ms after the start
+    var f;
+    if(i === 0) f = 0;
+    else if(burst > 0){ f = PB_BURST.apart[0] + Math.random() * (PB_BURST.apart[1] - PB_BURST.apart[0]); burst--; }
+    else {
+      f = PB_APART[0] + Math.random() * (PB_APART[1] - PB_APART[0]);
+      if(Math.random() < PB_BURST.chance) burst = PB_BURST.count[0] + Math.floor(Math.random() * (PB_BURST.count[1] - PB_BURST.count[0] + 1));
+    }
+    s.at.push(i === 0 ? PB_FIRST * cfg.gap : s.at[i - 1] + cfg.gap * f);       // when it reaches the ring, ms after the start
   }
   s.fb = null; s.busy = false; s.interlude = null;
   pbStartAt = performance.now() + PB_START_WAIT; pbBound = s; pbBoundRound = s.round; pbLastTapAt = 0;
@@ -5689,16 +5732,19 @@ function pbTap(){
   var t = touched - PB_SHOW_LAG - pbStartAt;
   if(t < 0) return;                                                        // the round has not started yet
   pbLastTapAt = now;
-  var gap = PB_ROUNDS[s.round].gap, i = s.res.indexOf(0);
+  var win = pbWindows(s), i = -1, dt = 0;
+  for(var k = 0; k < s.res.length; k++){                                  // with beads close together two can be in the ring: the tap is for the first that is still to come and not too late
+    if(s.res[k] !== 0) continue;
+    var dtk = t - pbArrive(s, k);
+    if(dtk > win.good) continue;                                           // its time has gone (the clock will count it as missed)
+    i = k; dt = dtk; break;
+  }
   if(i === -1) return;
-  var dt = t - pbArrive(s, i);
-  var win = pbWindows(s);
-  if(dt < -win.good){ pbLoseChance(s, "early"); return; }                  // too early: the bead is not in the ring yet and stays
-  if(dt > win.good){ pbMiss(i); return; }
+  if(dt < -win.good){ pbLoseChance(s, "early"); return; }                 // too early: the bead is not in the ring yet and stays
   var perfect = Math.abs(dt) <= win.perfect;
   s.res[i] = perfect ? 1 : 2;
   s.fb = {k: perfect ? "perfect" : "good", n: (s.fb ? s.fb.n : 0) + 1};
-  pixSfxPlay(perfect ? "fmMatch" : "fmFirst", true);
+  pbChime(s);
   saveState(); render();
 }
 function pbInterlude(){
@@ -5735,7 +5781,7 @@ function screenPrayBeads(){
     '<div class="pixNote">' + t("pb_intro") + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, PB_ROUNDS.length) + '</span>' + chancesHeartsHtml(Math.max(0, pbChancesLeft(s)), PB_CHANCES) + '</div>' +
     '<div class="pbArea">' +
-      '<div class="pbStage" id="pbStage" onclick="pbTap()">' +
+      '<div class="pbStage" id="pbStage">' +
         '<svg class="pbString" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="' + pts.join(" ") + ' 50,90"/></svg>' +
         '<div class="pbCrux"></div>' +
         '<div class="pbLabel"><b>' + label + '</b><i>' + sub + '</i></div>' +
@@ -5985,6 +6031,8 @@ function screenPilgrimRoad(){
 // ROUND X COMPLETED! after each, with the lost chance given back after rounds 1 and 2, like the other games.
 // Rounds 2 and 3 also have vultures (2026-10-24, per Dan): one now and then flies in from the right, quicker than the clouds, at about the height the dove is at (2026-10-24, per Dan: it has to be in its way), and hitting one costs a chance too.
 // A vulture is only sent when it would reach the dove in the open sky between two pairs of clouds, so it can always be got out of the way of.
+// At the end of round 3 (2026-10-24, per Dan) the storm clears and the dove, with the olive branch in its beak, flies across the sky and lands on Noah's Ark floating on the flood,
+// under a rainbow: about 6 seconds, drawn by dpDrawScene, and then ROUND 3 COMPLETED! and the Mission Complete screen as before.
 // The sky is drawn on a <canvas> a third of the stage's size and stretched up with hard pixels. The flight itself (where the dove and the clouds are) is not saved: a game that is
 // reloaded in the middle of a round starts the round again. Distances are fractions of the stage (x of its width, y of its height) so that it plays the same on any phone.
 var DP_CHANCES = 5, DP_CLOUDS = 10;
@@ -6075,7 +6123,7 @@ function dpDiscs(p, cw, ch){
 }
 function dpFlap(){
   var s = state.session.dovePeace;
-  if(!s || s.status !== "playing" || s.interlude || s.busy || !dp) return;
+  if(!s || s.status !== "playing" || s.interlude || s.busy || !dp || dp.scene) return;
   if(pixAudioStale) pixReviveOnTap();
   if(!dp.started){
     dp.started = true; dp.last = performance.now();
@@ -6107,6 +6155,7 @@ function dpHit(s){
 }
 function dpStep(s, dt){
   var cfg = DP_ROUNDS[s.round];
+  if(dp.scene){ dpSceneStep(s, dt); return; }
   if(!dp.started){ dp.y = .5 + Math.sin(performance.now() / 300) * .015; return; }          // hovering until the first tap
   dp.t += dt;
   if(dp.doneAt){ dp.y += (.5 - dp.y) * Math.min(1, dt * 3); dp.vy = 0; }                  // past the last cloud: the dove glides to the middle
@@ -6149,7 +6198,8 @@ function dpStep(s, dt){
   if(!dp.doneAt && dp.passed >= DP_CLOUDS) dp.doneAt = dp.t;
   if(dp.doneAt){
     if(dp.t - dp.doneAt > .9){
-      s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= DP_ROUNDS.length - 1};     // ROUND X COMPLETED!
+      if(s.round >= DP_ROUNDS.length - 1){ dp.scene = {t: 0, landed: false}; return; }       // the last round ends with the dove flying to Noah's Ark
+      s.interlude = {n: s.round + 1, phase: "msg", award: false, final: false};     // ROUND X COMPLETED!
       saveState(); render();
     }
     return;
@@ -6177,10 +6227,11 @@ function dpDisc(ctx, cx, cy, r, color){
   for(var yy = -r; yy <= r; yy++){ var w = Math.floor(Math.sqrt(r * r - yy * yy) + .5); ctx.fillRect(cx - w, cy + yy, 2 * w, 1); }
 }
 function dpMix(a, b, f){ return "rgb(" + Math.round(a[0] + (b[0] - a[0]) * f) + "," + Math.round(a[1] + (b[1] - a[1]) * f) + "," + Math.round(a[2] + (b[2] - a[2]) * f) + ")"; }
-function dpSprite(ctx, rows, x, y, flip){
+function dpSprite(ctx, rows, x, y, flip, sc){
+  sc = sc || 1;
   for(var j = 0; j < rows.length; j++) for(var i = 0; i < rows[j].length; i++){
     var c = DP_PAL[rows[j][i]]; if(!c) continue;
-    ctx.fillStyle = c; ctx.fillRect(flip ? x + rows[j].length - 1 - i : x + i, y + j, 1, 1);
+    ctx.fillStyle = c; ctx.fillRect(x + (flip ? rows[j].length - 1 - i : i) * sc, y + j * sc, sc, sc);
   }
 }
 function dpDraw(){
@@ -6190,6 +6241,7 @@ function dpDraw(){
   if(cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; }
   dp.cw = cw; dp.ch = ch;
   var ctx = cv.getContext("2d"), i, k, now = performance.now(), cfg = DP_ROUNDS[s.round];
+  if(dp.scene){ dpDrawScene(ctx, cw, ch); return; }
   // the sky: sunny on the left, stormier to the right
   for(i = 0; i < 10; i++){ ctx.fillStyle = dpMix([124, 196, 255], [76, 104, 154], i / 9); ctx.fillRect(Math.floor(i * cw / 10), 0, Math.ceil(cw / 10) + 1, ch); }
   // small white clouds drifting behind
@@ -6242,6 +6294,75 @@ function dpDraw(){
     for(k = 0; k < 3; k++){ var len = [7, 10, 6][k]; if(Math.floor(now / 80 + k) % 2) ctx.fillRect(dx - 9 - len - Math.floor((now / 40 + k * 5) % 4), dy - 3 + k * 3, len, 1); }
     var fa = (now / 70) % 30; ctx.fillRect(Math.round(dx - 10 - fa), Math.round(dy + 3 + fa * .25), 3, 1);
     dpSprite(ctx, (now - dp.flapAt < 130) ? DP_UP : DP_DOWN, dx - 7, dy - 5);
+  }
+}
+// The ending: the storm blows away, the sun and a rainbow come out over the flood, and the dove flies in an arc across the sky to land on the roof of Noah's Ark (which bobs on the
+// water), where Noah looks out of the window. t is seconds since it began: the dove flies from 0.6 s to 3.8 s, the rainbow comes in from 3 s, it lands at 3.8 s.
+function dpDrawScene(ctx, cw, ch){
+  var t = dp.scene.t, i, k, r, seaY = Math.round(ch * .74);
+  for(i = 0; i < 16; i++){ ctx.fillStyle = dpMix([84, 160, 250], [204, 234, 255], i / 15); ctx.fillRect(0, Math.floor(i * seaY / 16), cw, Math.ceil(seaY / 16) + 1); }
+  var fade = Math.max(0, 1 - t / 2.6);                                     // the storm clouds fade and drift off to the left
+  if(fade > 0){
+    ctx.globalAlpha = fade;
+    for(k = 0; k < 4; k++){ var sx = Math.round(cw * (.1 + k * .27) - t * 10), sy = Math.round(ch * (.06 + (k % 2) * .06)); for(i = 0; i < 4; i++) dpDisc(ctx, sx + i * 7, sy + (i % 2) * 3, 8, "#5C6A86"); }
+    ctx.globalAlpha = 1;
+  }
+  var sunX = Math.round(cw * .84), sunY = Math.round(ch * .13);              // the sun
+  ctx.globalAlpha = .45; dpDisc(ctx, sunX, sunY, 13, "#FFF3B0"); ctx.globalAlpha = 1; dpDisc(ctx, sunX, sunY, 9, "#FFE45C");
+  // the ark: a brown hull, a cabin with a pitched roof and a window
+  var L = Math.round(cw * .60), arkCx = Math.round(cw * .55), H = Math.round(L * .2), bob = Math.round(Math.sin(t * 1.6)), base = seaY + 1 + bob;
+  // the rainbow over it, coming in
+  var rb = Math.max(0, Math.min(1, (t - 3) / 1.2)), R0 = L * .76, bands = ["#FF5A5A", "#FFA040", "#FFE24A", "#5CCB5C", "#4A9BF0", "#8A5CD6"];
+  if(rb > 0){
+    ctx.globalAlpha = rb * .9;
+    for(k = 0; k < bands.length; k++){
+      ctx.fillStyle = bands[k];
+      for(var a = Math.PI; a <= 2 * Math.PI + .001; a += .018) ctx.fillRect(Math.round(arkCx + Math.cos(a) * (R0 - k * 2.4)), Math.round(seaY + Math.sin(a) * (R0 - k * 2.4)), 2, 2);
+    }
+    ctx.globalAlpha = 1;
+  }
+  for(r = 0; r < H + 2; r++){                                              // the hull, a little wider at the top, planked
+    var w = Math.round(L - (L * .26) * (r / (H + 1))), x0 = arkCx - Math.floor(w / 2);
+    ctx.fillStyle = (r % 4 === 3) ? "#52341C" : "#6E482A"; ctx.fillRect(x0, base - H + r, w, 1);
+  }
+  ctx.fillStyle = "#A8703C"; ctx.fillRect(arkCx - Math.floor(L / 2), base - H - 1, L, 2);
+  var Wc = Math.round(L * .56), Hc = Math.round(L * .30), cx0 = arkCx - Math.floor(Wc / 2) + 3, cy0 = base - H - 1 - Hc;
+  for(r = 0; r < Hc; r++){ ctx.fillStyle = (r % 4 === 3) ? "#8E5E34" : "#B27C46"; ctx.fillRect(cx0, cy0 + r, Wc, 1); }
+  var roofH = Math.round(Wc * .42);
+  for(r = 0; r < roofH; r++){ var rw = Wc + 6 - Math.round((Wc + 4) * r / roofH); ctx.fillStyle = r < 2 ? "#A24F36" : "#7A3A26"; ctx.fillRect(cx0 + Math.floor((Wc - rw) / 2), cy0 - 1 - r, rw, 1); }
+  var wx = cx0 + Math.floor(Wc / 2) - 3, wy = cy0 + 3;                    // the window, lit, with Noah looking out once the dove has landed
+  ctx.fillStyle = "#32201A"; ctx.fillRect(wx - 1, wy - 1, 8, 9); ctx.fillStyle = "#FFDC78"; ctx.fillRect(wx, wy, 6, 7);
+  if(t > 4.2){ ctx.fillStyle = "#F4CEAA"; ctx.fillRect(wx + 2, wy + 1, 3, 3); ctx.fillStyle = "#FFFFFF"; ctx.fillRect(wx + 2, wy + 4, 3, 3); ctx.fillStyle = "#B8442C"; ctx.fillRect(wx + 1, wy, 5, 1); }
+  ctx.fillStyle = "#32201A"; ctx.fillRect(cx0 + 3, cy0 + Hc - 7, 5, 7);
+  // the sea, over the bottom of the hull: two layers of waves
+  for(i = 0; i < cw; i++){
+    var yy = seaY + Math.round(Math.sin(i * .22 + t * 2.2) * 1.4);
+    ctx.fillStyle = "#3C7CD2"; ctx.fillRect(i, yy, 1, ch - yy); ctx.fillStyle = "#DCF0FF"; ctx.fillRect(i, yy, 1, 1);
+    var y2 = seaY + Math.round((ch - seaY) * .42) + Math.round(Math.sin(i * .17 - t * 1.7) * 1.4);
+    ctx.fillStyle = "#2A62B4"; ctx.fillRect(i, y2, 1, ch - y2);
+  }
+  // the dove: along a curve from the top left corner down to the roof of the ark, flapping, then perched
+  var roofTop = cy0 - roofH, endX = cx0 + Math.floor(Wc / 2) - 14, endY = roofTop - 20;
+  var P0 = [-.14 * cw, .1 * ch], P1 = [.3 * cw, -.02 * ch], P2 = [.3 * cw, .36 * ch], P3 = [endX, endY];
+  var p = Math.max(0, Math.min(1, (t - .6) / 3.2)), e = p * p * (3 - 2 * p), q = 1 - e;
+  var dx = q * q * q * P0[0] + 3 * q * q * e * P1[0] + 3 * q * e * e * P2[0] + e * e * e * P3[0], dy = q * q * q * P0[1] + 3 * q * q * e * P1[1] + 3 * q * e * e * P2[1] + e * e * e * P3[1];
+  dpSprite(ctx, p < 1 ? (Math.floor(t * 7) % 2 ? DP_UP : DP_DOWN) : DP_DOWN, Math.round(dx), Math.round(dy), false, 2);
+  if(t > 3.8){                                                              // sparkles round the ark
+    ctx.fillStyle = "#FFFFFF";
+    for(k = 0; k < 7; k++){
+      if(Math.floor(t * 6 + k) % 2) continue;
+      var sxk = Math.round(arkCx + Math.cos(k * 1.1 + t * .8) * L * .5), syk = Math.round(roofTop - 4 + Math.sin(k * 1.7 + t * .9) * 12);
+      ctx.fillRect(sxk - 1, syk, 3, 1); ctx.fillRect(sxk, syk - 1, 1, 3);
+    }
+  }
+  if(t < .4){ ctx.fillStyle = "rgba(255,255,255," + (1 - t / .4).toFixed(2) + ")"; ctx.fillRect(0, 0, cw, ch); }      // a flash as the scene begins
+}
+function dpSceneStep(s, dt){
+  var sc = dp.scene; sc.t += dt;
+  if(!sc.landed && sc.t > 3.8){ sc.landed = true; pixSfxPlay("fmMatch", true); }
+  if(sc.t > 6.4){
+    s.interlude = {n: s.round + 1, phase: "msg", award: false, final: true};     // ROUND 3 COMPLETED!, then the Mission Complete screen
+    saveState(); render();
   }
 }
 function dpLoop(now){
@@ -6697,7 +6818,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 K";
+var APP_BUILD = "2026-10-24 M";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
