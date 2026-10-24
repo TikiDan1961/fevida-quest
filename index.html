@@ -972,7 +972,7 @@ var T = {
     bl_body:"Head to the Fe y Vida Hope Wall and post an encouraging message for someone else. Once you've done it, tap the button below.",
     missionCompleted:"MISSION COMPLETED",
     cj_title:"Choose Joy",
-    cj_body:"Have a joyful photo taken with a friend at the Fe y Vida booth! Once you've done it, tap the button below.",
+    cj_body:"Go to the Fe y Vida booth (#301) to have a joyful instant photo taken with a friend! Once you've done it, tap the button below.",
     awardTitle:"Mission Complete!",
     awardBody:function(pts,badge){return "You won "+pts+" Quest Points and unlocked the "+badge+" Badge!";},
     awardBodyNoPts:function(badge){return "You unlocked the "+badge+" Badge!";},
@@ -1116,7 +1116,7 @@ var T = {
     bl_body:"Ve al Muro de la Esperanza de Fe y Vida y escribe un mensaje de aliento para alguien más. Cuando termines, toca el botón de abajo.",
     missionCompleted:"MISIÓN COMPLETADA",
     cj_title:"Elige la Alegría",
-    cj_body:"¡Hazte una foto alegre con un amigo en el stand de Fe y Vida! Cuando termines, toca el botón de abajo.",
+    cj_body:"¡Ve al stand de Fe y Vida (#301) para hacerte una foto instantánea alegre con un amigo! Cuando termines, toca el botón de abajo.",
     awardTitle:"¡Misión Completada!",
     awardBody:function(pts,badge){return "¡Ganaste "+pts+" Puntos de Aventura y desbloqueaste la insignia "+badge+"!";},
     awardBodyNoPts:function(badge){return "¡Desbloqueaste la insignia "+badge+"!";},
@@ -1222,10 +1222,8 @@ var MISSIONS = [
   // Dan). It reuses Service Sprint's old badge art (tiles/badge_friendship.png)
   // until a dedicated "Unity" badge exists; swap badgeImg when it does.
   {id:"stainedGlass", icon:"🧩", badgeImg:"tiles/badge_friendship.png", nameKey:"stainedGlassName", themeKey:"themeUnity"},
-  // (Choose Joy, Hidden Blessings and Light a Candle were taken out of the mission list on 2026-10-24, per Dan. Their games, screens and text are still in this file, but nothing opens
-  // them. To bring one back, put its line back in this list: {id:"chooseJoy", icon:"📸", badgeImg:"tiles/badge_hope.png", nameKey:"chooseJoyName", themeKey:"themeHope"},
-  // {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"} or
-  // {id:"lightCandle", icon:"🕯️", badgeImg:"tiles/badge_light.png", nameKey:"lightCandleName", themeKey:"themePrayer"}; for the last two also its name in GUIDE_MISSIONS and its startMission line.)
+  // (Choose Joy, Hidden Blessings and Light a Candle were taken out of this list on 2026-10-24 and put back the same day, per Dan.)
+  {id:"chooseJoy", icon:"📸", badgeImg:"tiles/badge_hope.png", nameKey:"chooseJoyName", themeKey:"themeHope"},
   // 5 new missions added 2026-09-29, per Dan. Real badge art wired in
   // 2026-09-29 (same day) — Dan supplied 5 more stained-glass badges
   // (Badges\Holiness Badge.png, Grace Badge.png, Salvation Badge.png,
@@ -1244,6 +1242,10 @@ var MISSIONS = [
   // {id:"kindnessSort", icon:"🤲", badgeImg:"tiles/badge_forgiveness.png", nameKey:"kindnessSortName", themeKey:"themeForgiveness"} back in this list, "kindnessSort" in
   // GUIDE_MISSIONS and its startMission line.)
   {id:"pilgrimRoad", icon:"⛪", badgeImg:"tiles/badge_hope.png", nameKey:"pilgrimRoadName", themeKey:"themePerseverance"},
+  {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"},
+  // Light a Candle (2026-10-21, per Dan: start on the new missions). Its own Prayer badge is not drawn yet, so it borrows the Light to the
+  // World badge until Dan's art arrives: add tiles/badge_prayer.png and tiles/badges96/b96_prayer.png, then change badgeImg here.
+  {id:"lightCandle", icon:"🕯️", badgeImg:"tiles/badge_light.png", nameKey:"lightCandleName", themeKey:"themePrayer"},
   // Emoji Bible Stories and Life of Jesus Timeline (2026-10-21, per Dan). Also borrowing badges until their own art is drawn: Scripture reuses the
   // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges96/b96_...) later.
   {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
@@ -1983,8 +1985,8 @@ function goldenTicketUnlocked(){
 
 // The games open on an instruction screen first (2026-10-22, per Dan): what the game is and how to play it, with a START MISSION button that
 // starts it. Be the Light and Choose Joy are not games and open straight away.
-var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight",
-  "emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace"];
+var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","hiddenBlessings",
+  "lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace"];
 function openMission(id){
   if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
@@ -1995,6 +1997,9 @@ function startMission(id){
   if(id === "faithFlash"){ initFaithFlash(); go("faithFlash"); }
   else if(id === "faithMatch"){ preloadMatchTiles(); initFaithMatchLevel(0); go("faithMatch"); }   // always from Level 1
   else if(id === "dovePeace"){ initDovePeace(); go("dovePeace"); }
+  else if(id === "chooseJoy"){ initChooseJoy(); go("chooseJoy"); }
+  else if(id === "hiddenBlessings"){ initHiddenBlessings(); go("hiddenBlessings"); }
+  else if(id === "lightCandle"){ initLightCandle(); go("lightCandle"); }
   else if(id === "stainedGlass"){ preloadMatchTiles(); initStainedGlass(); go("stainedGlass"); }
   else if(id === "followLight"){ initFollowLightRun(); go("followLight"); flStartLevel(); }
   else if(id === "wordUnscramble"){ initWordUnscramble(); go("wordUnscramble"); }
@@ -2128,11 +2133,10 @@ var PILGRIM_PATH_FULL = [[103.0,283.0],[99.6,282.4],[96.1,281.9],[92.7,281.3],[8
 var pilgrimPath = PILGRIM_PATH_FULL, pilgrimSpeed = 24 / 800;   // speed: 24 picture pixels a second, as a fraction of the path
 
 // Each finished GAME moves the pilgrim on to the next of 5 stops along the path, and the 5th is the church door (2026-10-22, per Dan; it was 1/15 of the
-// way for each of 15 games). Any 5 games do it: the 6th and later don't move him, since he has gone into the church. (2026-10-24, per Dan: Be the Light, Choose Joy and Light
-// a Candle, the missions that were not games and did not move him, are gone, and every mission in the list is a game that gives 100 points and moves him. If a mission that is not
-// a game is ever added, put its id in PILGRIM_NON_GAMES and it gives no points and does not move him.)
+// way for each of 15 games). Any 5 games do it: the 6th and later don't move him, since he has gone into the church. Missions that are not games -- Choose Joy and Light a
+// Candle (Be the Light, the third, was replaced by Dove of Peace 2026-10-24) -- give no points and don't move him: their ids are in PILGRIM_NON_GAMES.
 var PILGRIM_GAMES_TOTAL = 5;
-var PILGRIM_NON_GAMES = [];
+var PILGRIM_NON_GAMES = ["chooseJoy", "lightCandle"];      // (put back 2026-10-24 with the two missions: they are not games, so no points and no step; Hidden Blessings is a game)
 function pilgrimGamesDone(){
   return MISSIONS.filter(function(m){ return PILGRIM_NON_GAMES.indexOf(m.id) === -1 && state.missions[m.id].done; }).length;
 }
@@ -6836,7 +6840,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 O";
+var APP_BUILD = "2026-10-24 Q";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
