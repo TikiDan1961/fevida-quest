@@ -5551,14 +5551,14 @@ function screenMustardSeed(){
 // (or the stage) when a bead is in the ring. Every round is a large gold bead (Our Father) and then 20 beads (Hail Mary), a steady beat apart, and each round the beat is quicker.
 // (Changed 2026-10-23, per Dan: the beads are spaced so that only one can be in the ring at a time, the ring is only a little larger than a bead, a tap counts when the bead is in
 // the ring with a little room above and below it, there are 20 beads, they move faster and there are 3 chances, not 5. Then, 2026-10-24: the distance from one bead to the next is random
-// and the three rounds have 20, 30 and 40 beads.) A tap that is too early, or a bead that gets by untouched,
+// (and then more so: .8 to 2.2 times the usual) and the three rounds have 20, 30 and 40 beads and go much faster one after the other.) A tap that is too early, or a bead that gets by untouched,
 // costs a chance. ROUND X COMPLETED! after each round, with the lost chance given back after rounds 1 and 2, like the other games.
 // All of it runs on the clock: bead i reaches the ring at s.at[i] ms after the round starts (made when the round begins), and where a bead is drawn depends only on the time, so a redraw (which
 // happens at every tap) never moves anything. The tap is judged from the moment the finger touched (pixDownT), less the little the screen is behind the game. How far from the
 // ring's centre a bead may be (as a fraction of the width of the stage) is turned into milliseconds from how fast the beads are going.
 var PB_CHANCES = 3;
-var PB_ROUNDS = [{gap: 800, beads: 20}, {gap: 680, beads: 30}, {gap: 560, beads: 40}];     // gap = ms for a bead to travel the usual distance to the next one (it sets the speed); beads = how many, after the large one
-var PB_APART = [.85, 1.6];                                                // the distance from one bead to the next is random, this many times the usual one (never closer than one bead at a time in the ring)
+var PB_ROUNDS = [{gap: 760, beads: 20}, {gap: 600, beads: 30}, {gap: 460, beads: 40}];     // gap = ms for a bead to travel the usual distance to the next one (it sets the speed); beads = how many, after the large one
+var PB_APART = [.8, 2.2];                                                // the distance from one bead to the next is random, this many times the usual one (never closer than one bead at a time in the ring)
 var PB_FIRST = 2;                                                          // the first bead reaches the ring this many usual gaps after the round starts
 var PB_TRAVEL = 4;                                                         // the beads are this many gaps apart along the string's length: with the ring only a little bigger than a bead, one at a time is in it
 var PB_RING = .15;                                                         // the ring's width, and a bead is .12, as fractions of the stage's width
@@ -6569,7 +6569,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 D";
+var APP_BUILD = "2026-10-24 E";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
