@@ -575,7 +575,7 @@
       radial-gradient(circle at 12% 14%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 84% 9%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 26% 38%,#cfd6ff 0 1px,transparent 1.5px),
       radial-gradient(circle at 90% 34%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 8% 58%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 77% 52%,#cfd6ff 0 1px,transparent 1.5px),
       radial-gradient(circle at 19% 78%,#cfd6ff 0 1px,transparent 1.5px),radial-gradient(circle at 92% 70%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 70% 90%,#fff 0 1.5px,transparent 2px),
-      radial-gradient(circle at 36% 8%,#cfd6ff 0 1px,transparent 1.5px),radial-gradient(circle at 50% 80%,rgba(255,214,90,.22),transparent 38%),linear-gradient(#2B2262,#1A1445);}
+      radial-gradient(circle at 36% 8%,#cfd6ff 0 1px,transparent 1.5px),radial-gradient(circle at 50% 72%,rgba(255,214,90,.22),transparent 32%),linear-gradient(#2B2262,#1A1445);}
   .pbString{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;}
   .pbString polyline{fill:none;stroke:#C9B27A;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;}
   .pbBead{position:absolute;display:none;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
@@ -583,17 +583,18 @@
   .pbBead.big{background:linear-gradient(#9A6A10,#9A6A10) center/42% 3px no-repeat,linear-gradient(#9A6A10,#9A6A10) center/3px 42% no-repeat,radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93A 55%,#C98A12);}
   .pbBead.hit{background:linear-gradient(#9A6A10,#9A6A10) center/42% 2px no-repeat,linear-gradient(#9A6A10,#9A6A10) center/2px 42% no-repeat,radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93A 55%,#C98A12);box-shadow:0 0 10px 3px rgba(255,214,90,.8);}
   .pbBead.miss{filter:grayscale(.9) brightness(.55);}
-  .pbCross{position:absolute;left:50%;top:80%;width:31%;aspect-ratio:1/1;transform:translate(-50%,-50%);box-sizing:border-box;border:4px solid #FFC93A;border-radius:50%;pointer-events:none;
+  .pbCross{position:absolute;left:50%;top:72%;width:15%;aspect-ratio:1/1;transform:translate(-50%,-50%);box-sizing:border-box;border:3px solid #FFC93A;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle,rgba(255,214,90,.25),rgba(255,214,90,.04) 70%);}
-  .pbCross::before,.pbCross::after{content:"";position:absolute;background:#FFC93A;box-shadow:0 0 0 2px #1B1F3B;}
-  .pbCross::before{left:50%;top:18%;width:12%;height:64%;transform:translateX(-50%);}
-  .pbCross::after{left:30%;top:34%;width:40%;height:11%;}
+  .pbCrux{position:absolute;left:50%;top:92%;width:11%;aspect-ratio:7/10;transform:translate(-50%,-50%);pointer-events:none;}
+  .pbCrux::before,.pbCrux::after{content:"";position:absolute;background:#FFC93A;box-shadow:0 0 0 2px #1B1F3B;}
+  .pbCrux::before{left:50%;top:0;width:26%;height:100%;transform:translateX(-50%);}
+  .pbCrux::after{left:0;top:26%;width:100%;height:22%;}
   .pbCross.flash{animation:pbRing .35s ease-out;}
-  @keyframes pbRing{0%{transform:translate(-50%,-50%) scale(1.22);box-shadow:0 0 22px 8px rgba(255,236,130,.95);}100%{transform:translate(-50%,-50%) scale(1);box-shadow:none;}}
+  @keyframes pbRing{0%{transform:translate(-50%,-50%) scale(1.3);box-shadow:0 0 18px 6px rgba(255,236,130,.95);}100%{transform:translate(-50%,-50%) scale(1);box-shadow:none;}}
   .pbLabel{position:absolute;left:5%;top:4%;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#fff;line-height:1.35;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
   .pbLabel b{display:block;font-size:1rem;font-weight:700;} .pbLabel i{display:block;font-style:normal;font-size:1.25rem;color:#FFE680;}
-  .pbFb{position:absolute;left:5%;top:72%;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.3rem;opacity:0;animation:pbFb .9s ease-out forwards;
+  .pbFb{position:absolute;left:5%;top:64%;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.3rem;opacity:0;animation:pbFb .9s ease-out forwards;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .pbFb.perfect{color:#FFE680;} .pbFb.good{color:#B8F2A0;} .pbFb.early,.pbFb.miss{color:#FF8A8A;}
   @keyframes pbFb{0%{opacity:1;transform:translateY(6px);}15%{opacity:1;transform:translateY(0);}70%{opacity:1;}100%{opacity:0;transform:translateY(-6px);}}
@@ -926,7 +927,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
-      prayBeads:{d:"Tap each rosary bead as it reaches the cross.", h:["Rosary beads glide down the string toward the gold cross.", "Tap TAP just as each bead reaches the cross, and keep a steady rhythm to finish the decade.", "A tap that is too early, or a bead you miss, costs a chance. You have 5 chances. The beads move faster each round. Finish all 3 rounds to win."]},
+      prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap TAP when a bead is in the ring, and keep a steady rhythm to the end of the beads.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. The beads move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
     },
@@ -997,7 +998,7 @@ var T = {
     sudokuName:"Sacred Sudoku", themeWisdom:"Wisdom",
     mustardSeedName:"Mustard Seed", themeGrowth:"Growth", ms_intro:"Tap DROP TILE when the plant is over the column you want.", ms_goal:"Goal:", ms_dropBtn:"DROP TILE",
     ms_failTitle:"Garden Full", ms_failBody:"A column filled up to the top. Join matching plants to keep the columns low. Try again!",
-    prayBeadsName:"Pray the Beads", pb_intro:"Tap each bead as it reaches the cross. Keep a steady rhythm.", pb_tap:"TAP",
+    prayBeadsName:"Pray the Beads", pb_intro:"Tap each bead when it is in the ring. Keep a steady rhythm.", pb_tap:"TAP",
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
@@ -1065,7 +1066,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
-      prayBeads:{d:"Toca cada cuenta del rosario cuando llegue a la cruz.", h:["Las cuentas del rosario se deslizan por el cordón hacia la cruz dorada.", "Toca TOCAR justo cuando cada cuenta llegue a la cruz, y mantén un ritmo constante para terminar la decena.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 5 oportunidades. Las cuentas van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
+      prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca TOCAR cuando una cuenta esté dentro del aro, y mantén un ritmo constante hasta la última cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. Las cuentas van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
@@ -1135,7 +1136,7 @@ var T = {
     sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
     mustardSeedName:"Semilla de Mostaza", themeGrowth:"Crecimiento", ms_intro:"Toca SOLTAR cuando la planta esté sobre la columna que quieres.", ms_goal:"Meta:", ms_dropBtn:"SOLTAR PLANTA",
     ms_failTitle:"Jardín Lleno", ms_failBody:"Una columna se llenó hasta arriba. Une plantas iguales para mantener las columnas bajas. ¡Inténtalo de nuevo!",
-    prayBeadsName:"Reza el Rosario", pb_intro:"Toca cada cuenta cuando llegue a la cruz. Mantén un ritmo constante.", pb_tap:"TOCAR",
+    prayBeadsName:"Reza el Rosario", pb_intro:"Toca cada cuenta cuando esté dentro del aro. Mantén un ritmo constante.", pb_tap:"TOCAR",
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
@@ -5494,22 +5495,28 @@ function screenMustardSeed(){
 
 /* ---------- Pray the Beads ---------- */
 
-// Pray the Beads (2026-10-23, per Dan; the screen was mocked up first): a rhythm game. Rosary beads glide down a curving string toward a gold cross, and the player taps TAP
-// (or the stage) just as each bead reaches the cross. A round is one decade: a large gold bead (Our Father) and then ten beads (Hail Mary), a steady beat apart, and each round
-// the beat is quicker (1.0, 0.85 and 0.7 s). A tap within 90 ms of the beat is Perfect and within 190 ms is Good; a tap earlier than that, or a bead that gets by untouched,
-// costs a chance (5 hearts). ROUND X COMPLETED! after each round, with the lost chance given back after rounds 1 and 2, like the other games.
-// All of it runs on the clock: bead i reaches the cross at (PB_FIRST + i) gaps after the round starts, and where a bead is drawn depends only on the time, so a redraw (which
-// happens at every tap) never moves anything. The tap is judged from the moment the finger touched (pixDownT), less the little the screen is behind the game.
-var PB_CHANCES = 5;
-var PB_ROUNDS = [{gap: 1000}, {gap: 850}, {gap: 700}];                    // ms from one bead to the next
-var PB_BEADS = 11;                                                         // the large bead, then ten
-var PB_FIRST = 2;                                                          // the first bead reaches the cross this many gaps after the round starts
-var PB_TRAVEL = 7;                                                         // a bead is in sight for this many gaps before it reaches the cross
-var PB_PERFECT = 90, PB_GOOD = 190, PB_SHOW_LAG = 40, PB_START_WAIT = 800;
+// Pray the Beads (2026-10-23, per Dan; the screen was mocked up first): a rhythm game. Rosary beads glide down a curving string toward a gold ring, and the player taps TAP
+// (or the stage) when a bead is in the ring. Every round is a large gold bead (Our Father) and then 20 beads (Hail Mary), a steady beat apart, and each round the beat is quicker.
+// (Changed 2026-10-23, per Dan: the beads are spaced so that only one can be in the ring at a time, the ring is only a little larger than a bead, a tap counts when the bead is in
+// the ring with a little room above and below it, there are 20 beads, they move faster and there are 3 chances, not 5.) A tap that is too early, or a bead that gets by untouched,
+// costs a chance. ROUND X COMPLETED! after each round, with the lost chance given back after rounds 1 and 2, like the other games.
+// All of it runs on the clock: bead i reaches the ring at (PB_FIRST + i) gaps after the round starts, and where a bead is drawn depends only on the time, so a redraw (which
+// happens at every tap) never moves anything. The tap is judged from the moment the finger touched (pixDownT), less the little the screen is behind the game. How far from the
+// ring's centre a bead may be (as a fraction of the width of the stage) is turned into milliseconds from how fast the beads are going.
+var PB_CHANCES = 3;
+var PB_ROUNDS = [{gap: 800}, {gap: 680}, {gap: 560}];                     // ms from one bead to the next
+var PB_BEADS = 21;                                                         // the large bead, then twenty
+var PB_FIRST = 2;                                                          // the first bead reaches the ring this many gaps after the round starts
+var PB_TRAVEL = 4;                                                         // the beads are this many gaps apart along the string's length: with the ring only a little bigger than a bead, one at a time is in it
+var PB_RING = .15;                                                         // the ring's width, and a bead is .12, as fractions of the stage's width
+var PB_ROOM = .02;                                                         // the room above and below the ring in which a tap still counts
+var PB_PERFECT_ZONE = .045;                                                // a bead this near the middle of the ring is Perfect
+var PB_SHOW_LAG = 40, PB_START_WAIT = 800;
+var PB_GRACE = 60;                                                         // ms a bead is not yet counted as missed after its window, for a tap that is still on its way to the game
 var pbStartAt = 0, pbRaf = 0, pbLastT = 0, pbBound = null, pbBoundRound = -1, pbLastTapAt = 0;
 // the string: a curve from the top of the stage down to the cross (all in % of the stage), measured so that beads a steady time apart are an even distance apart
 var PB_PATH = (function(){
-  var P = [[60, -6], [82, 22], [28, 52], [50, 80]], pts = [], len = [0], N = 160;
+  var P = [[60, -6], [82, 20], [28, 44], [50, 72]], pts = [], len = [0], N = 160;
   for(var i = 0; i <= N; i++){
     var u = i / N, v = 1 - u;
     var x = v * v * v * P[0][0] + 3 * v * v * u * P[1][0] + 3 * v * u * u * P[2][0] + u * u * u * P[3][0];
@@ -5530,6 +5537,12 @@ function pbPoint(u){
   return [pts[lo][0] + (pts[hi][0] - pts[lo][0]) * f, pts[lo][1] + (pts[hi][1] - pts[lo][1]) * f];
 }
 function pbArrive(i, gap){ return (PB_FIRST + i) * gap; }
+// how long before or after a bead's beat a tap still counts (good) and is Perfect, from how fast the beads are going where they reach the ring
+function pbWindows(s){
+  var st = document.getElementById("pbStage"), w = st ? st.clientWidth : 340, h = st ? st.clientHeight : 320, gap = PB_ROUNDS[s.round].gap;
+  var speed = (PB_PATH.total / 1.3 * h / 100) / (PB_TRAVEL * gap);          // px per ms, straight down at the ring
+  return {good: (PB_RING / 2 + PB_ROOM) * w / speed, perfect: PB_PERFECT_ZONE * w / speed};
+}
 function pbChancesLeft(s){ return typeof s.chances === "number" ? s.chances : PB_CHANCES; }
 function pbBeginRound(s){
   s.res = []; for(var i = 0; i < PB_BEADS; i++) s.res.push(0);              // 0 still to come, 1 Perfect, 2 Good, 3 missed
@@ -5537,7 +5550,7 @@ function pbBeginRound(s){
   pbStartAt = performance.now() + PB_START_WAIT; pbBound = s; pbBoundRound = s.round; pbLastTapAt = 0;
 }
 function initPrayBeads(){
-  var s = {v: 1, round: 0, chances: PB_CHANCES, res: [], fb: null, busy: false, status: "playing", interlude: null};
+  var s = {v: 2, round: 0, chances: PB_CHANCES, res: [], fb: null, busy: false, status: "playing", interlude: null};
   state.session.prayBeads = s;
   pbBeginRound(s);
   saveState();
@@ -5550,11 +5563,11 @@ function pbPlace(){
   for(var i = 0; i < PB_BEADS; i++){
     var el = document.getElementById("pbB" + i); if(!el) continue;
     var u = 1 - (pbArrive(i, gap) - t) / (PB_TRAVEL * gap);
-    if(u < -.03 || u > 1.3){ el.style.display = "none"; continue; }
+    if(u < -.03 || u > 1.14){ el.style.display = "none"; continue; }
     var p = pbPoint(u), sz = bw * (.55 + .45 * Math.min(1, Math.max(0, u))) * (i === 0 ? 1.45 : 1);
     el.style.display = "block"; el.style.width = sz + "px"; el.style.height = sz + "px";
     el.style.left = p[0] + "%"; el.style.top = p[1] + "%";
-    el.style.opacity = Math.min(1, (u + .03) / .08);
+    el.style.opacity = Math.min(1, (u + .03) / .08, Math.max(0, (1.14 - u) / .08));
   }
 }
 function pbLoop(now){
@@ -5563,9 +5576,9 @@ function pbLoop(now){
   var dt = now - pbLastT; pbLastT = now;
   if(dt > 300) pbStartAt += dt;                                            // the screen was asleep or the page in the background: the round waits
   if(s.status === "playing" && !s.interlude && !s.busy && s.res){
-    var gap = PB_ROUNDS[s.round].gap, t = now - pbStartAt;
+    var gap = PB_ROUNDS[s.round].gap, t = now - PB_SHOW_LAG - pbStartAt, win = pbWindows(s);     // the same clock as the taps (pbTap), so a bead is never missed while a tap on it is still on its way
     for(var i = 0; i < PB_BEADS; i++){
-      if(s.res[i] === 0 && t > pbArrive(i, gap) + PB_GOOD){ pbMiss(i); break; }     // a bead got by (one at a time: the screen redraws)
+      if(s.res[i] === 0 && t > pbArrive(i, gap) + win.good + PB_GRACE){ pbMiss(i); break; }     // a bead got by (one at a time: the screen redraws)
     }
     if(s.status === "playing" && !s.busy && !s.interlude && s.res.indexOf(0) === -1 && t > pbArrive(PB_BEADS - 1, gap) + 800){
       s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= PB_ROUNDS.length - 1};     // ROUND X COMPLETED!
@@ -5611,9 +5624,10 @@ function pbTap(){
   var gap = PB_ROUNDS[s.round].gap, i = s.res.indexOf(0);
   if(i === -1) return;
   var dt = t - pbArrive(i, gap);
-  if(dt < -PB_GOOD){ pbLoseChance(s, "early"); return; }                  // too early: the bead stays
-  if(dt > PB_GOOD){ pbMiss(i); return; }
-  var perfect = Math.abs(dt) <= PB_PERFECT;
+  var win = pbWindows(s);
+  if(dt < -win.good){ pbLoseChance(s, "early"); return; }                  // too early: the bead is not in the ring yet and stays
+  if(dt > win.good){ pbMiss(i); return; }
+  var perfect = Math.abs(dt) <= win.perfect;
   s.res[i] = perfect ? 1 : 2;
   s.fb = {k: perfect ? "perfect" : "good", n: (s.fb ? s.fb.n : 0) + 1};
   pixSfxPlay(perfect ? "fmMatch" : "fmFirst", true);
@@ -5635,7 +5649,7 @@ function pbCollectAward(){ state.session.prayBeads = null; grantMission("prayBea
 function pbQuit(){ state.session.prayBeads = null; go("mainMenu"); }
 function screenPrayBeads(){
   var s = state.session.prayBeads;
-  if(!s || s.v !== 1){ initPrayBeads(); s = state.session.prayBeads; }
+  if(!s || s.v !== 2){ initPrayBeads(); s = state.session.prayBeads; }
   if(s.status === "failed"){
     return pixResultHtml("prayBeadsName", {cls:"pixLower", title:t("pb_failTitle"), body:t("pb_failBody"),
       buttons:pixBtnHtml(t("tryAgain"), "pbTryAgain()") + pixBtnHtml(t("mainMenu"), "pbQuit()", true)});
@@ -5654,7 +5668,8 @@ function screenPrayBeads(){
     '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, PB_ROUNDS.length) + '</span>' + chancesHeartsHtml(Math.max(0, pbChancesLeft(s)), PB_CHANCES) + '</div>' +
     '<div class="pbArea">' +
       '<div class="pbStage" id="pbStage" onclick="pbTap()">' +
-        '<svg class="pbString" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="' + pts.join(" ") + ' 50,112"/></svg>' +
+        '<svg class="pbString" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="' + pts.join(" ") + ' 50,90"/></svg>' +
+        '<div class="pbCrux"></div>' +
         '<div class="pbLabel"><b>' + label + '</b><i>' + sub + '</i></div>' +
         '<div class="pbCross' + (s.fb && (s.fb.k === "perfect" || s.fb.k === "good") ? ' flash' : '') + '"></div>' +
         beads + fb +
@@ -6070,7 +6085,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-23 B";
+var APP_BUILD = "2026-10-23 C";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
