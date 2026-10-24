@@ -566,6 +566,28 @@
   .wtLine polyline{fill:none;stroke:#F58B2A;stroke-opacity:.8;stroke-linecap:round;stroke-linejoin:round;}
   .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
+  /* Pilgrim's Road (2026-10-24): grass tiles with road on them, the pilgrim and the church at the two ends. A tile is turned by turning its svg. */
+  .prBoard{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:2px;box-sizing:border-box;padding:4px;width:min(100%,380px,calc(100vh - 330px));width:min(100%,380px,calc(100dvh - 330px));margin:0 auto;
+    background:#2F7D3A;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .prTile{position:relative;aspect-ratio:1/1;min-width:0;display:block;box-sizing:border-box;padding:0;margin:0;border:0;overflow:hidden;background-color:#5DB34E;cursor:pointer;font:inherit;touch-action:manipulation;
+    background-image:radial-gradient(circle at 18% 22%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 78% 70%,#FFD84A 0 1.5px,transparent 2px);}
+  .prTile.g1{background-image:radial-gradient(circle at 70% 20%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 24% 78%,#FF9FC0 0 1.5px,transparent 2px);}
+  .prTile.g2{background-image:radial-gradient(circle at 30% 70%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 80% 30%,#FFD84A 0 1.5px,transparent 2px);}
+  .prTile.g3{background-image:radial-gradient(circle at 84% 80%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 20% 30%,#FF9FC0 0 1.5px,transparent 2px);}
+  .prTile:active{filter:brightness(1.12);}
+  .prFixed{cursor:default;} .prFixed:active{filter:none;}
+  .prRoad{position:absolute;left:0;top:0;width:100%;height:100%;display:block;transition:transform .16s ease-out;}
+  .prRoad .o{fill:#9A6B35;} .prRoad .f{fill:#EBD59B;}
+  .prTile.on .prRoad .o{fill:#C98A12;} .prTile.on .prRoad .f{fill:#FFD84A;}
+  .prTile.on{box-shadow:inset 0 0 0 2px rgba(255,248,200,.9);}
+  .prFigure{position:absolute;left:14%;top:20%;width:38%;aspect-ratio:11/15;pointer-events:none;}
+  .prChurchImg{position:absolute;right:8%;top:10%;width:56%;image-rendering:pixelated;pointer-events:none;}
+  .prTile.won .prChurchImg{animation:prGlow .5s ease-in-out 3;}
+  @keyframes prGlow{0%,100%{filter:none;}50%{filter:drop-shadow(0 0 6px #FFF3A0) brightness(1.2);}}
+  .prLegend{display:flex;justify-content:space-between;width:min(100%,380px);margin:8px auto 0;padding:0 6px;box-sizing:border-box;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8rem;color:#FFC93A;
+    text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
+  .prTurns{text-align:center;margin-top:10px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#fff;
+    text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
@@ -927,6 +949,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
+      pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road you have joined so far turns gold.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
       prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap TAP when a bead is in the ring. The beads come at different distances, so watch each one.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Round 1 has 20 beads, round 2 has 30 and round 3 has 40, and they move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
@@ -1002,6 +1025,7 @@ var T = {
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
+    pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build a road from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_start:"START", pr_church:"CHURCH",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
     sd_intro:"Tap a square, then a picture. Each picture goes once in every row, column and box.", sd_intro2:"Tap a square, then a picture. Each picture goes once in every row and column.", sd_hint:function(n){return "HINT ("+n+")";}, sd_erase:"Erase",
@@ -1066,6 +1090,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
+      pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino que ya has unido se vuelve dorado.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca TOCAR cuando una cuenta esté dentro del aro. Las cuentas vienen a distancias distintas, así que mira cada una.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. La ronda 1 tiene 20 cuentas, la ronda 2 tiene 30 y la ronda 3 tiene 40, y van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
@@ -1140,6 +1165,7 @@ var T = {
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
+    pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un camino del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_start:"SALIDA", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
     sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_intro2:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila y columna.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
@@ -1214,7 +1240,10 @@ var MISSIONS = [
   {id:"mustardSeed", icon:"🌱", badgeImg:"tiles/badge_faith.png", nameKey:"mustardSeedName", themeKey:"themeGrowth"},
   // Pray the Beads (2026-10-23, per Dan): took the place of the last "TBD" tile. Borrows the Grace badge (the dove) until its own art is drawn: add tiles/badge_beads.png
   // and tiles/badges96/b96_beads.png, then change badgeImg here.
-  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_grace.png", nameKey:"prayBeadsName", themeKey:"themePrayer"}
+  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_grace.png", nameKey:"prayBeadsName", themeKey:"themePrayer"},
+  // Pilgrim's Road (2026-10-24, per Dan): borrows the Hope badge (the road's end) until its own (Perseverance) is drawn: add tiles/badge_perseverance.png and
+  // tiles/badges96/b96_perseverance.png, then change badgeImg here.
+  {id:"pilgrimRoad", icon:"⛪", badgeImg:"tiles/badge_hope.png", nameKey:"pilgrimRoadName", themeKey:"themePerseverance"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1447,11 +1476,12 @@ function defaultState(){
       wordTrail: {done:false, badge:false},
       wordGroups: {done:false, badge:false},
       mustardSeed: {done:false, badge:false},
-      prayBeads: {done:false, badge:false}
+      prayBeads: {done:false, badge:false},
+      pilgrimRoad: {done:false, badge:false}
     },
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -1934,7 +1964,7 @@ function goldenTicketUnlocked(){
 // The games open on an instruction screen first (2026-10-22, per Dan): what the game is and how to play it, with a START MISSION button that
 // starts it. Be the Light and Choose Joy are not games and open straight away.
 var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","kindnessSort","hiddenBlessings",
-  "lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads"];
+  "lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad"];
 function openMission(id){
   if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
@@ -1961,6 +1991,7 @@ function startMission(id){
   else if(id === "wordGroups"){ initWordGroups(); go("wordGroups"); }
   else if(id === "mustardSeed"){ initMustardSeed(); go("mustardSeed"); }
   else if(id === "prayBeads"){ initPrayBeads(); go("prayBeads"); }
+  else if(id === "pilgrimRoad"){ initPilgrimRoad(); go("pilgrimRoad"); }
 }
 
 /* ---------- Home Screen (the Main Menu) ---------- */
@@ -1982,7 +2013,7 @@ var COMING_SOON_MISSIONS = [
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
-  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", tbd:"#AEB6C8",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", pilgrimRoad:"#58B04A", tbd:"#AEB6C8",
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
@@ -5686,6 +5717,174 @@ function screenPrayBeads(){
     '<div class="spacer"></div>', "pixLower msScreen");
 }
 
+/* ---------- Pilgrim's Road ---------- */
+
+// Pilgrim's Road (2026-10-24, per Dan; the screen was mocked up first): a path puzzle. The board is a square of tiles; the pilgrim stands on the left edge, the church on the right
+// edge, and every tile between is a piece of road to turn (a tap turns it a quarter turn). Join the road from the pilgrim to the church. The road joined to the pilgrim so far
+// turns gold. There are no chances, only a count of turns, and three rounds on 4 x 4, 5 x 5 and 6 x 6 boards (ROUND X COMPLETED! between them, no heart).
+// Each board is made fresh: a winding road is laid from next to the pilgrim to next to the church, the other tiles are made of straights, bends, T-junctions and grass, and then
+// every tile is turned at random (and the board is turned again if that happens to solve it). A tile's road is its svg, and turning it only turns the svg, so a tap does not redraw
+// the screen. The pilgrim and the church are fixed tiles: the pilgrim's opens to the right, the church's to the left.
+var PR_ROUNDS = [{n: 4}, {n: 5}, {n: 6}];
+var PR_BASE = {S: [0, 2], C: [0, 1], T: [0, 1, 2], E: [], P: [1], H: [3]};      // the sides of each kind of tile that have road: 0 up, 1 right, 2 down, 3 left (before it is turned)
+var PR_DR = [-1, 0, 1, 0], PR_DC = [0, 1, 0, -1];
+var PR_ARM = ['<rect x="33" y="0" width="34" height="67"/>', '<rect x="33" y="33" width="67" height="34"/>', '<rect x="33" y="33" width="34" height="67"/>', '<rect x="0" y="33" width="67" height="34"/>'];
+function prSides(tile){
+  var r = ((tile.rot % 4) + 4) % 4, out = [];
+  PR_BASE[tile.t].forEach(function(d){ out.push((d + r) % 4); });
+  return out;
+}
+// which tiles are joined to the pilgrim (by the road on both sides of each join), and whether that reaches the church
+function prReach(s){
+  var n = s.n, seen = {}, queue = [[s.rs, 0]];
+  seen[s.rs + "," + 0] = 1;
+  while(queue.length){
+    var cur = queue.shift(), sides = prSides(s.grid[cur[0]][cur[1]]);
+    for(var i = 0; i < sides.length; i++){
+      var d = sides[i], nr = cur[0] + PR_DR[d], nc = cur[1] + PR_DC[d];
+      if(nr < 0 || nc < 0 || nr >= n || nc >= n || seen[nr + "," + nc]) continue;
+      if(prSides(s.grid[nr][nc]).indexOf((d + 2) % 4) === -1) continue;
+      seen[nr + "," + nc] = 1; queue.push([nr, nc]);
+    }
+  }
+  return {seen: seen, won: !!seen[s.re + "," + (n - 1)]};
+}
+// a winding road between (rs, 1) and (re, n - 2), without crossing itself, as a list of squares (a random walk with backtracking, tried until it is long enough)
+function prMakePath(n, rs, re, minLen){
+  var best = null;
+  for(var attempt = 0; attempt < 300; attempt++){
+    var seen = {}, path = [[rs, 1]]; seen[rs + ",1"] = 1;
+    var found = (function walk(){
+      var cur = path[path.length - 1];
+      if(cur[0] === re && cur[1] === n - 2) return true;
+      var dirs = shuffle([0, 1, 2, 3]);
+      for(var i = 0; i < dirs.length; i++){
+        var nr = cur[0] + PR_DR[dirs[i]], nc = cur[1] + PR_DC[dirs[i]];
+        if(nr < 0 || nr >= n || nc < 1 || nc > n - 2 || seen[nr + "," + nc]) continue;
+        seen[nr + "," + nc] = 1; path.push([nr, nc]);
+        if(walk()) return true;
+        path.pop();
+      }
+      return false;
+    })();
+    if(found && (!best || path.length > best.length)) best = path.slice();
+    if(best && best.length >= minLen) break;
+  }
+  return best;
+}
+function prDirTo(a, b){ for(var d = 0; d < 4; d++) if(a[0] + PR_DR[d] === b[0] && a[1] + PR_DC[d] === b[1]) return d; return -1; }
+function prMakeBoard(s){
+  var n = PR_ROUNDS[s.round].n, rows = [], rs, re;
+  for(var r = 0; r < n; r++) rows.push(r);
+  rs = shuffle(rows)[0]; do { re = shuffle(rows)[0]; } while(re === rs);
+  var path = prMakePath(n, rs, re, (n - 2) + Math.floor(n / 2) + 1), grid = [];
+  for(var r2 = 0; r2 < n; r2++){
+    var row = [];
+    for(var c = 0; c < n; c++){
+      var kind = shuffle(["S", "S", "S", "C", "C", "C", "T", "E", "E"])[0];
+      row.push({t: kind, rot: Math.floor(Math.random() * 4)});
+    }
+    grid.push(row);
+  }
+  grid[rs][0] = {t: "P", rot: 0}; grid[re][n - 1] = {t: "H", rot: 0};
+  for(var i = 0; i < path.length; i++){
+    var a = i === 0 ? 3 : prDirTo(path[i], path[i - 1]), b = i === path.length - 1 ? 1 : prDirTo(path[i], path[i + 1]);
+    var kindP = (a + 2) % 4 === b ? "S" : "C", sol = 0;
+    for(var rot = 0; rot < 4; rot++){
+      var sides = PR_BASE[kindP].map(function(d){ return (d + rot) % 4; });
+      if(sides.indexOf(a) !== -1 && sides.indexOf(b) !== -1){ sol = rot; break; }
+    }
+    grid[path[i][0]][path[i][1]] = {t: kindP, rot: sol, path: true, sol: sol};      // sol = the way it was laid, kept so that a board can be checked to be solvable
+  }
+  s.n = n; s.rs = rs; s.re = re; s.grid = grid; s.turns = 0; s.busy = false; s.interlude = null;
+  // turn the road tiles about at random until the board is not already solved
+  var guard = 0;
+  do {
+    for(var r3 = 0; r3 < n; r3++) for(var c3 = 0; c3 < n; c3++){
+      var tl = grid[r3][c3];
+      if(tl.t === "P" || tl.t === "H") continue;
+      tl.rot = (tl.rot % 4) + Math.floor(Math.random() * 4);
+    }
+  } while(prReach(s).won && guard++ < 50);
+}
+function initPilgrimRoad(){
+  var s = {v: 1, round: 0, interlude: null};
+  prMakeBoard(s);
+  state.session.pilgrimRoad = s;
+  saveState();
+}
+// the svg of a tile's road, drawn with its sides as they are before the tile is turned: a darker edge under the lighter road
+function prSvg(kind, rot){
+  var sides = PR_BASE[kind], edge = "", fill = "";
+  if(!sides.length) return "";
+  sides.forEach(function(d){ edge += PR_ARM[d]; fill += PR_ARM[d]; });
+  return '<svg class="prRoad" viewBox="0 0 100 100" style="transform:rotate(' + rot * 90 + 'deg)"><g class="o" transform="translate(50 50) scale(1.22) translate(-50 -50)">' + edge + '</g><g class="f">' + fill + '</g></svg>';
+}
+function prTileHtml(s, r, c, reach){
+  var tile = s.grid[r][c], key = r + "," + c, cls = "prTile g" + ((r * 3 + c * 5) % 4) + (reach.seen[key] ? " on" : "");
+  if(tile.t === "P") return '<div class="' + cls + ' prFixed" id="prT' + r + '_' + c + '">' + prSvg("P", 0) + '<div class="prFigure"><div class="pilgrimSprite"></div></div></div>';
+  if(tile.t === "H") return '<div class="' + cls + ' prFixed' + (reach.won ? ' won' : '') + '" id="prT' + r + '_' + c + '">' + prSvg("H", 0) + '<img class="prChurchImg" src="tiles/pr/church.png" alt=""></div>';
+  if(tile.t === "E") return '<div class="' + cls + ' prFixed" id="prT' + r + '_' + c + '"></div>';
+  return '<button class="' + cls + '" id="prT' + r + '_' + c + '" onclick="prTurn(' + r + ',' + c + ')">' + prSvg(tile.t, tile.rot) + '</button>';
+}
+// the gold road, and the church lit up when it is reached, after a tile has been turned
+function prPaint(s){
+  var reach = prReach(s);
+  for(var r = 0; r < s.n; r++) for(var c = 0; c < s.n; c++){
+    var el = document.getElementById("prT" + r + "_" + c);
+    if(el) el.classList.toggle("on", !!reach.seen[r + "," + c]);
+  }
+  var ch = document.getElementById("prT" + s.re + "_" + (s.n - 1));
+  if(ch) ch.classList.toggle("won", reach.won);
+  var tn = document.getElementById("prTurns");
+  if(tn) tn.textContent = t("pr_turns")(s.turns);
+  return reach;
+}
+function prTurn(r, c){
+  var s = state.session.pilgrimRoad;
+  if(!s || s.interlude || s.busy) return;
+  var tile = s.grid[r][c];
+  if(tile.t === "P" || tile.t === "H" || tile.t === "E") return;
+  tile.rot++; s.turns++;
+  var el = document.getElementById("prT" + r + "_" + c), svg = el && el.querySelector("svg");
+  if(svg) svg.style.transform = "rotate(" + tile.rot * 90 + "deg)";
+  var reach = prPaint(s);
+  if(reach.won){
+    s.busy = true;                                                         // the road is done: a moment to see it, then ROUND X COMPLETED!
+    pixSfxPlay("fmMatch", true);
+    saveState();
+    setTimeout(function(){
+      var s2 = state.session.pilgrimRoad;
+      if(!s2 || s2 !== s || state.screen !== "pilgrimRoad") return;
+      s2.busy = false; s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= PR_ROUNDS.length - 1};
+      saveState(); render();
+    }, 1100);
+  } else saveState();
+}
+function prInterlude(){
+  pixRoundRun("pilgrimRoad", function(){ return state.session.pilgrimRoad; }, null, function(s2){
+    if(s2.interlude.final){ s2.interlude = null; prCollectAward(); return; }
+    s2.round++; prMakeBoard(s2);
+    saveState(); render();
+  });
+}
+function prCollectAward(){ state.session.pilgrimRoad = null; grantMission("pilgrimRoad"); }
+function prQuit(){ state.session.pilgrimRoad = null; go("mainMenu"); }
+function screenPilgrimRoad(){
+  var s = state.session.pilgrimRoad;
+  if(!s || s.v !== 1 || !s.grid){ initPilgrimRoad(); s = state.session.pilgrimRoad; }
+  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("pilgrimRoadName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
+  var reach = prReach(s), cells = "";
+  for(var r = 0; r < s.n; r++) for(var c = 0; c < s.n; c++) cells += prTileHtml(s, r, c, reach);
+  return pixShell('<h2 class="pixMTitle">' + t("pilgrimRoadName") + '</h2>' +
+    '<div class="pixNote">' + t("pr_intro") + '</div>' +
+    '<div class="pixNote">' + t("fm_level")(s.round + 1, PR_ROUNDS.length) + '</div>' +
+    '<div class="prBoard" style="--n:' + s.n + '">' + cells + '</div>' +
+    '<div class="prLegend"><span>' + t("pr_start") + '</span><span>' + t("pr_church") + '</span></div>' +
+    '<div class="prTurns" id="prTurns">' + t("pr_turns")(s.turns) + '</div>' +
+    '<div class="spacer"></div>', "pixLower msScreen");
+}
+
 /* ---------- Stained-Glass Puzzle ---------- */
 
 // Replaced Service Sprint (2026-10-19, per Dan), then turned from a sliding
@@ -6092,7 +6291,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 A";
+var APP_BUILD = "2026-10-24 B";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -6186,7 +6385,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["missionIntro","faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
 
 function exitBarHtml(){
@@ -6216,6 +6415,7 @@ function exitMission(){
     case "wordGroups": wgQuit(); break;
     case "mustardSeed": msQuit(); break;
     case "prayBeads": pbQuit(); break;
+    case "pilgrimRoad": prQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -6248,6 +6448,7 @@ function render(){
     case "wordGroups": html = screenWordGroups(); break;
     case "mustardSeed": html = screenMustardSeed(); break;
     case "prayBeads": html = screenPrayBeads(); break;
+    case "pilgrimRoad": html = screenPilgrimRoad(); break;
     case "churchWalk": html = screenChurchWalk(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
@@ -6339,6 +6540,7 @@ function render(){
   if(state.screen === "mustardSeed"){ msFit(); msLoopStart(); }
   if(state.screen === "prayBeads" && state.session.prayBeads && state.session.prayBeads.interlude && !pixRoundRunning.prayBeads) pbInterlude();
   if(state.screen === "prayBeads"){ pbPlace(); pbLoopStart(); }
+  if(state.screen === "pilgrimRoad" && state.session.pilgrimRoad && state.session.pilgrimRoad.interlude && !pixRoundRunning.pilgrimRoad) prInterlude();
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
