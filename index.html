@@ -5983,13 +5983,14 @@ function screenPilgrimRoad(){
 // pairs make a round and a green path along the top shows how many are behind it. Hitting a cloud (or the ground) costs one of 5 hearts: the dove is put back in the nearest gap
 // and flickers for a moment, when nothing can hurt it. The three rounds have the clouds coming faster and the gaps narrower, and in the third the wind pushes the dove up and down.
 // ROUND X COMPLETED! after each, with the lost chance given back after rounds 1 and 2, like the other games.
-// Rounds 2 and 3 also have vultures (2026-10-24, per Dan): one now and then, at a random height, flies in from the right, quicker than the clouds, and hitting one costs a chance too.
+// Rounds 2 and 3 also have vultures (2026-10-24, per Dan): one now and then flies in from the right, quicker than the clouds, at about the height the dove is at (2026-10-24, per Dan: it has to be in its way), and hitting one costs a chance too.
 // A vulture is only sent when it would reach the dove in the open sky between two pairs of clouds, so it can always be got out of the way of.
 // The sky is drawn on a <canvas> a third of the stage's size and stretched up with hard pixels. The flight itself (where the dove and the clouds are) is not saved: a game that is
 // reloaded in the middle of a round starts the round again. Distances are fractions of the stage (x of its width, y of its height) so that it plays the same on any phone.
 var DP_CHANCES = 5, DP_CLOUDS = 10;
 var DP_ROUNDS = [{speed: .34, gap: .44, wind: 0}, {speed: .40, gap: .36, wind: 0, vulture: {speed: .58, every: [3.2, 5.6]}}, {speed: .46, gap: .31, wind: 1, vulture: {speed: .72, every: [2.2, 4.0]}}];     // speed = stage widths per second; gap = of the stage's height; vulture: its speed and the seconds between one and the next
-var DP_SPACING = .80, DP_X = .26, DP_GRAV = 3.6, DP_FLAP = -1.0, DP_VMAX = 1.5, DP_CLOUD_R = .115, DP_HIT = 3.4;       // gravity and flap in stage heights per second (squared)
+var DP_SPACING = .80, DP_X = .26, DP_GRAV = 2.8, DP_FLAP = -.8, DP_VMAX = 1.3, DP_CLOUD_R = .115, DP_HIT = 3.4;       // gravity and flap in stage heights per second (squared)
+var DP_INV = 1.1;                                                                                // seconds the dove flickers, and nothing can hurt it, after a hit (flickering fast)
 var DP_PAL = {W: "#FFFFFF", G: "#C4D2E8", E: "#1B1F3B", B: "#F5A623", O: "#4FA83D", S: "#78963C", D: "#342622", M: "#5C463A", H: "#E8A08C", Y: "#ECC43C", K: "#141420"};
 // the vulture, facing right as drawn (it is drawn the other way round: it flies from right to left): a dark body, big dark wings, a bald pink head and a yellow hooked beak
 var DP_VUL_UP = [
@@ -6086,7 +6087,7 @@ function dpFlap(){
   pixSfxPlay("tap", false);
 }
 function dpHit(s){
-  dp.inv = 1.6; dp.vy = 0;
+  dp.inv = DP_INV; dp.vy = 0;
   var target = .5;
   for(var i = 0; i < dp.pairs.length; i++){ if(dp.pairs[i].x + DP_CLOUD_R > DP_X - .02){ target = dp.pairs[i].gc; break; } }
   dp.y = target;
@@ -6125,7 +6126,9 @@ function dpStep(s, dt){
       var arrive = (1.1 - DP_X) / vc.speed, clear = true;
       for(i = 0; i < dp.pairs.length; i++) if(Math.abs(dp.pairs[i].x - cfg.speed * arrive - DP_X) < DP_CLOUD_R + .13) clear = false;
       if(clear && dp.spawned > 0 && (dp.spawned < DP_CLOUDS || dp.pairs.length)){
-        dp.vultures.push({x: 1.1, y: .12 + Math.random() * .74});
+        var aim = dp.y;                                                    // right in the dove's path: between where it is now and the gap it is heading for (the next pair of clouds it has not reached when the vulture arrives)
+        for(i = 0; i < dp.pairs.length; i++){ if(dp.pairs[i].x - cfg.speed * arrive > DP_X + DP_CLOUD_R){ aim = (dp.y + dp.pairs[i].gc) / 2; break; } }
+        dp.vultures.push({x: 1.1, y: Math.max(.1, Math.min(.88, aim + (Math.random() - .5) * .1))});
         dp.nextV = dp.t + vc.every[0] + Math.random() * (vc.every[1] - vc.every[0]);
       }
     }
@@ -6230,7 +6233,7 @@ function dpDraw(){
   }
   // the dove, with speed lines and a feather behind it
   var dx = Math.round(DP_X * cw), dy = Math.round(dp.y * ch);
-  if(!(dp.inv > 0 && Math.floor(dp.inv * 12) % 2)){
+  if(!(dp.inv > 0 && Math.floor(dp.inv * 25) % 2)){
     ctx.fillStyle = "rgba(255,255,255,.85)";
     for(k = 0; k < 3; k++){ var len = [7, 10, 6][k]; if(Math.floor(now / 80 + k) % 2) ctx.fillRect(dx - 9 - len - Math.floor((now / 40 + k * 5) % 4), dy - 3 + k * 3, len, 1); }
     var fa = (now / 70) % 30; ctx.fillRect(Math.round(dx - 10 - fa), Math.round(dy + 3 + fa * .25), 3, 1);
@@ -6690,7 +6693,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 I";
+var APP_BUILD = "2026-10-24 J";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
