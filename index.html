@@ -566,6 +566,7 @@
   .wtLine polyline{fill:none;stroke:#F58B2A;stroke-opacity:.8;stroke-linecap:round;stroke-linejoin:round;}
   .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
+  .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
   .pbStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 315px),460px);height:clamp(230px,calc(100dvh - 315px),460px);border:4px solid #FFC93A;border-radius:16px;
@@ -5388,17 +5389,17 @@ function msDropNow(){
   msDrop(touched - MS_SHOW_LAG < msMovedAt ? msPrevPos : msPos);
 }
 // the plant visibly falls from the top square of the column to the square where it lands, then done() runs
+// (2026-10-23, per Dan: the tile he was watching above the grid seemed to show up over the next column as another one fell. There is no second tile now: the one above the grid,
+// which msDrop has just put over the column it falls into, is the one that falls.)
 function msFall(c, landRow, v, done){
-  var area = document.getElementById("msArea"), col = document.querySelectorAll(".msCol")[c];
-  if(!area || !col){ done(); return; }
+  var col = document.querySelectorAll(".msCol")[c], mover = document.getElementById("msMover");
+  if(!col || !mover){ done(); return; }
   var cells = col.querySelectorAll(".msCell"), rows = cells.length;
-  var first = cells[0].getBoundingClientRect(), target = cells[rows - 1 - landRow].getBoundingClientRect(), ar = area.getBoundingClientRect();
-  var el = document.createElement("div"); el.className = "msFall"; el.innerHTML = msTileHtml(v);
-  el.style.left = (first.left - ar.left) + "px"; el.style.top = (first.top - ar.top) + "px"; el.style.width = first.width + "px"; el.style.height = first.height + "px";
-  area.appendChild(el);
-  var dist = target.top - first.top, squares = Math.round(dist / (first.height + 5)), dur = Math.max(150, Math.min(520, 100 + squares * 60));
-  if(el.animate) el.animate([{transform: "translateY(0)"}, {transform: "translateY(" + dist + "px)"}], {duration: dur, easing: "cubic-bezier(.5,0,.9,.6)", fill: "forwards"});
-  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); done(); }, dur);
+  var from = mover.getBoundingClientRect(), target = cells[rows - 1 - landRow].getBoundingClientRect();
+  var dist = target.top - from.top, squares = Math.round(dist / (from.height + 5)), dur = Math.max(150, Math.min(520, 100 + squares * 60));
+  var base = mover.style.transform;
+  if(mover.animate) mover.animate([{transform: base + " translateY(0px)"}, {transform: base + " translateY(" + dist + "px)"}], {duration: dur, easing: "cubic-bezier(.5,0,.9,.6)", fill: "forwards"});
+  setTimeout(done, dur);
 }
 // shows a settled drop and works out what comes next: a goal plant glows and is then picked, a full column ends the game, otherwise the next plant can be dropped
 function msShow(s, res, landed){
@@ -5438,7 +5439,6 @@ function msDrop(c){
   var landed = c + "," + landRow;
   s.busy = true;                                                           // nothing can be dropped until this one has landed
   msPos = msPrevPos = c; msAcc = 0; msPlace();                              // the plant above the grid is now over the column it fell into (the next plant starts there)
-  var mover = document.getElementById("msMover"); if(mover) mover.style.visibility = "hidden";
   msFall(c, landRow, falling, function(){
     if(state.session.mustardSeed !== s || state.screen !== "mustardSeed") return;
     s.cur = msNextStage(cfg.w);
@@ -6069,6 +6069,8 @@ function setVolume(kind, v){
 // letting go of the sound-effects slider plays a sound so the level can be heard
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
+// shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
+var APP_BUILD = "2026-10-23 B";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -6081,6 +6083,7 @@ function screenOptions(){
       optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
       optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
+    '<div class="optBuild">Build ' + APP_BUILD + '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
