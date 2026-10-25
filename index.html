@@ -638,6 +638,9 @@
   @keyframes fsGlow{0%,100%{filter:drop-shadow(0 0 2px #FFC93A);}50%{filter:drop-shadow(0 0 7px #FFF3A0) brightness(1.15);}}
   .fsPopup{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:6;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FFF496;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b;animation:fsPopup 1.25s ease-out forwards;}
+  .fsShuffleMsg{position:absolute;left:0;right:0;top:50%;margin-top:-1.4rem;text-align:center;pointer-events:none;z-index:7;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.4rem;letter-spacing:.06em;line-height:1;color:#fff;
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 6px 0 rgba(0,0,0,.35);animation:fsShuf .36s steps(2) infinite;}      /* SHUFFLING over the board while the fruit move to new squares (2026-10-25, per Dan) */
+  @keyframes fsShuf{0%{transform:translateY(0);}100%{transform:translateY(-3px);}}
   @keyframes fsPopup{0%{opacity:0;transform:scale(.6);}15%{opacity:1;transform:scale(1.1);}80%{opacity:1;}100%{opacity:0;transform:translateY(-10px);}}
   .fsFound{width:min(100%,380px);box-sizing:border-box;margin:10px auto 0;padding:8px 6px 10px;border:4px solid #1B1F3B;border-radius:16px;background:#F8ECC8;text-align:center;}
   .fsFound b{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1rem;color:#96642A;margin-bottom:6px;}
@@ -1118,7 +1121,7 @@ var T = {
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
     fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swipe a fruit toward a neighbor to swap them and match 3 or more. Collect every fruit to light up all the words.",
-    fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
+    fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_shuffling:"SHUFFLING", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
@@ -1267,7 +1270,7 @@ var T = {
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
     fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
-    fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
+    fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
@@ -6726,15 +6729,35 @@ function fsFruitHtml(type, i, y){
 }
 // the fall of a set of fruit {el, x, to (the row it ends in), from (the row it starts in)}: lowest first, each a moment after the one before, and each lasting as long as its drop; returns the
 // seconds until the last has landed
+// a short tick at the moment a falling fruit reaches its square (2026-10-25, per Dan); `at` = seconds from now (on the audio clock, so it is exact)
+function fsLandSound(at, pitch){
+  try {
+    var ctx = pixCtx(); if(!ctx || pixAudioStale) return;
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
+    var t0 = ctx.currentTime + Math.max(0, at), bus = pixBus(ctx, "sfx"), o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(260 * pitch, t0); o.frequency.exponentialRampToValueAtTime(130 * pitch, t0 + .05);
+    g.gain.setValueAtTime(.0001, t0); g.gain.linearRampToValueAtTime(.16, t0 + .004); g.gain.exponentialRampToValueAtTime(.0001, t0 + .075);
+    o.connect(g); g.connect(bus); o.start(t0); o.stop(t0 + .09);
+    var o2 = ctx.createOscillator(), g2 = ctx.createGain();                  // a tiny bright click on top
+    o2.type = "triangle"; o2.frequency.setValueAtTime(1100 * pitch, t0);
+    g2.gain.setValueAtTime(.0001, t0); g2.gain.linearRampToValueAtTime(.05, t0 + .002); g2.gain.exponentialRampToValueAtTime(.0001, t0 + .02);
+    o2.connect(g2); g2.connect(bus); o2.start(t0); o2.stop(t0 + .03);
+  } catch(e){}
+}
+var FS_LAND_GAP = .03;                                                       // seconds: landings closer together than this share one tick, so a whole board falling is not a buzz
 function fsDrop(list, gap){
   list.sort(function(a, b){ return (b.to - a.to) || (a.x - b.x); });
-  var total = 0;
+  var total = 0, lands = [];
   list.forEach(function(f, k){
     var dist = Math.max(.5, f.to - f.from), dur = FS_FALL[0] + dist * FS_FALL[1], delay = k * gap;
     f.el.style.transition = "top " + dur.toFixed(3) + "s cubic-bezier(.45,0,.85,.55) " + delay.toFixed(3) + "s";
     fsSetXY(f.el, f.x, f.to);
     total = Math.max(total, delay + dur);
+    lands.push({t: delay + dur, d: dist});
   });
+  lands.sort(function(a, b){ return a.t - b.t; });
+  var lastTick = -9;
+  lands.forEach(function(L){ if(L.t - lastTick >= FS_LAND_GAP){ lastTick = L.t; fsLandSound(L.t, 1.15 - Math.min(L.d, 5) * .06); } });         // a longer fall lands a little lower
   setTimeout(function(){ list.forEach(function(f){ f.el.style.transition = ""; }); }, total * 1000 + 80);
   return total;
 }
@@ -6803,6 +6826,12 @@ function fsPopup(text){
   var el = document.createElement("div"); el.className = "fsPopup"; el.textContent = text; wrap.appendChild(el);
   setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 1300);
 }
+function fsShuffleMsg(ms){
+  var wrap = document.querySelector(".fsBoardWrap"); if(!wrap) return;
+  var old = wrap.querySelectorAll(".fsShuffleMsg"); for(var k = 0; k < old.length; k++) old[k].parentNode.removeChild(old[k]);
+  var el = document.createElement("div"); el.className = "fsShuffleMsg"; el.textContent = t("fs_shuffling"); wrap.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, ms);
+}
 function fsSwapEls(a, b){                                                    // the two fruit slide into each other's squares
   var N = FS_N, ea = fsEls[a], eb = fsEls[b];
   fsEls[a] = eb; fsEls[b] = ea;
@@ -6856,7 +6885,7 @@ function fsPlay(s, frames, done){
       void document.getElementById("fsInner").offsetWidth;
       wait = Math.round(fsDrop(movers, FS_STAGGER.fall) * 1000) + 90;                                   // held until the last one has landed
     } else if(f.kind === "shuffle"){                                         // no swap left that works: every fruit slides to another square
-      wait = 800;
+      wait = 1200; fsShuffleMsg(wait - 100);                                  // (SHUFFLING over the board while they do)
       if(f.perm){
         var moved = new Array(N * N);
         for(i = 0; i < N * N; i++){
@@ -7780,7 +7809,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 E";
+var APP_BUILD = "2026-10-25 F";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
