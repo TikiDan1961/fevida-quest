@@ -5722,7 +5722,6 @@ var PB_ROOM = .02;                                                         // th
 var PB_PERFECT_ZONE = .045;                                                // a bead this near the middle of the ring is Perfect
 var PB_SHOW_LAG = 40, PB_START_WAIT = 800;
 var PB_GRACE = 60;                                                         // ms a bead is not yet counted as missed after its window, for a tap that is still on its way to the game
-var pbLastNote = -1;
 var pbStartAt = 0, pbRaf = 0, pbLastT = 0, pbBound = null, pbBoundRound = -1, pbLastTapAt = 0;
 // the string: a curve from the top of the stage down to the cross (all in % of the stage), measured so that beads a steady time apart are an even distance apart
 var PB_PATH = (function(){
@@ -5764,17 +5763,17 @@ function pbWindows(s){
   var speed = (PB_PATH.total / 1.3 * h / 100) / (PB_TRAVEL * gap);          // px per ms, straight down at the ring
   return {good: Math.max((PB_RING / 2 + PB_ROOM) * w / speed, PB_MIN_WINDOW.good), perfect: Math.max(PB_PERFECT_ZONE * w / speed, PB_MIN_WINDOW.perfect)};
 }
-// A tapped bead sounds a chime (it was the bell of Follow the Light, then a chime: 2026-10-24, per Dan), on a random note of the round's key: G in round 1, D in round 2, C in round 3.
-// The notes are one major scale from its keynote up to the keynote again (one octave and a note, in Hz, sounded two octaves higher by pixChime).
-var PB_KEYS = [
-  [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 369.99, 392.00],           // G major: G A B C D E F# G
-  [293.66, 329.63, 369.99, 392.00, 440.00, 493.88, 554.37, 587.33],           // D major: D E F# G A B C# D
-  [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]];          // C major: C D E F G A B C
-function pbChime(s){
-  var key = PB_KEYS[Math.min(s.round, PB_KEYS.length - 1)], i = Math.floor(Math.random() * key.length);
-  if(i === pbLastNote) i = (i + 1 + Math.floor(Math.random() * (key.length - 1))) % key.length;      // never the same note twice running
-  pbLastNote = i;
-  pixChime(key[i]);
+// A tapped bead sounds a chime (it was the bell of Follow the Light, then a chime on a random note of the round's key: 2026-10-24, per Dan). Now (2026-10-25, per Dan) the chimes play the tune of
+// Schubert's Ave Maria (public domain), one note for each bead, in the order of the beads: the first 60 notes of the voice part (bars 3 to 9 of the Mutopia score, in B-flat major, without the
+// small ornament notes and counting a tied note once) are PB_MELODY, as MIDI note numbers (Bb4 = 70, middle C = 60). The sound is still the same chime (pixChime, which sounds a freq two octaves up).
+// A missed bead is a missing note: the bead keeps its place in the tune. The tune is moved into the round's key as before, G in round 1, D in round 2 and C in round 3 (PB_SHIFT, in half-steps
+// down from B-flat major), which keeps it inside the range of the old notes.
+var PB_MELODY = [70,69,70,74,72, 70,72,70,69,67,69, 70,74,74,72,70,69,67,74,76, 74,73,69,72,70,69,72,74,75,72,69, 70,74,72,72,69,67,71,74,77,74,71, 72,67,69,70,69,67,65,65, 72,72,72,71,72,74,72,74,70,70];
+var PB_SHIFT = [-3, -8, -10];
+function pbChime(s, i){
+  var m = PB_MELODY[i];
+  if(typeof m !== "number") return;
+  pixChime(440 * Math.pow(2, (m + PB_SHIFT[Math.min(s.round, PB_SHIFT.length - 1)] - 69) / 12));
 }
 // (2026-10-24, per Dan: the TAP button sits halfway between the bottom of the play area and the bottom of the screen.) The button's margin is set by measuring where it is.
 function pbFit(){
@@ -5893,7 +5892,7 @@ function pbTap(){
   var perfect = Math.abs(dt) <= win.perfect;
   s.res[i] = perfect ? 1 : 2;
   s.fb = {k: perfect ? "perfect" : "good", n: (s.fb ? s.fb.n : 0) + 1};
-  pbChime(s);
+  pbChime(s, i);
   saveState(); render();
 }
 function pbInterlude(){
@@ -7865,7 +7864,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 M";
+var APP_BUILD = "2026-10-25 N";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
