@@ -5709,7 +5709,7 @@ var PB_CHANCES = 3;
 // (2026-10-24, per Dan: the speed doubles each round, so the beads move 2 and then 4 times as fast as in round 1. gap = ms for a bead to travel the usual distance to the next one, which
 // is how far apart they are drawn, so it halves each round. Taps would then come too fast to make, so no two beads are less than PB_MIN_MS apart, and a tap counts for at least
 // PB_MIN_WINDOW ms either side of the beat even when the ring is passed quicker than that.) beads = how many, after the large one.
-var PB_ROUNDS = [{gap: 700}, {gap: 540}, {gap: 380}];      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
+var PB_ROUNDS = [{gap: 600}, {gap: 540}, {gap: 450}];      // (2026-10-25, per Dan: round 1 faster, was 700, and round 3 slower, was 380; round 2 as it was)      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
 var PB_MIN_MS = {normal: 300, burst: 220};
 var PB_MIN_WINDOW = {good: 110, perfect: 55};
 var PB_FIRST_MS = 1500;                                                    // the first bead is never sooner than this after the round starts
@@ -7865,7 +7865,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 L";
+var APP_BUILD = "2026-10-25 M";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
