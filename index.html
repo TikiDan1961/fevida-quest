@@ -609,7 +609,9 @@
   .fsFruit{position:absolute;left:calc(var(--x) * var(--cell));top:calc(var(--y) * var(--cell));width:var(--cell);height:var(--cell);transition:left .19s ease-in-out,top .19s ease-in-out;}
   .fsFruit.shuf{transition-duration:.6s;}
   .fsInner.fit .fsFruit{transition:none !important;}
-  .fsFruit img{display:block;width:var(--img);height:var(--img);margin:var(--pad);image-rendering:pixelated;}
+  .fsFruit img{display:block;position:relative;width:var(--img);height:var(--img);margin:var(--pad);image-rendering:pixelated;}
+  .fsFruit[data-t="2"] img{left:calc(var(--n1) * -1);top:calc(var(--n1) * -1);}      /* the grapes, a pixel left and a pixel up */
+  .fsFruit[data-t="8"] img{top:var(--n2);}                                         /* the watermelon, two pixels down */
   .fsFruit.grab img{transform:scale(1.12);}
   .fsFruit.sel::before{content:"";position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:3px solid #fff;box-shadow:0 0 0 3px #3A8FE8;border-radius:6px;}
   .fsFruit.pop{animation:fsPop .3s ease-out forwards;z-index:2;}
@@ -6674,7 +6676,7 @@ function fsStartRound(s){
 function fsSetXY(el, x, y){ el.style.setProperty("--x", x); el.style.setProperty("--y", y); }
 function fsFruitHtml(type, i, y){
   var N = FS_N;
-  return '<div class="fsFruit' + (type === FS_SPIRIT ? ' spirit' : '') + '" data-i="' + i + '" style="--x:' + (i % N) + ';--y:' + (y === undefined ? Math.floor(i / N) : y) + '"><img src="tiles/fruits/fs_' + type + '.png" alt=""></div>';
+  return '<div class="fsFruit' + (type === FS_SPIRIT ? ' spirit' : '') + '" data-t="' + type + '" data-i="' + i + '" style="--x:' + (i % N) + ';--y:' + (y === undefined ? Math.floor(i / N) : y) + '"><img src="tiles/fruits/fs_' + type + '.png" alt=""></div>';
 }
 // the fall of a set of fruit {el, x, to (the row it ends in), from (the row it starts in)}: lowest first, each a moment after the one before, and each lasting as long as its drop; returns the
 // seconds until the last has landed
@@ -6710,6 +6712,8 @@ function fsFit(){                                                            // 
   var cell = Math.max(24, Math.floor((board.clientWidth - 8) / FS_N)), pad = Math.max(2, Math.round(cell * .11));
   inner.classList.add("fit");                                                // (no sliding while the sizes are being set)
   inner.style.setProperty("--cell", cell + "px"); inner.style.setProperty("--pad", pad + "px"); inner.style.setProperty("--img", (cell - 2 * pad) + "px");
+  var nudge = Math.max(1, Math.round(cell / 56));                           // (2026-10-24, per Dan: the grapes and the watermelon looked off centre) whole pixels
+  inner.style.setProperty("--n1", nudge + "px"); inner.style.setProperty("--n2", (2 * nudge) + "px");
   void inner.offsetWidth; inner.classList.remove("fit");
 }
 window.addEventListener("resize", function(){ if(state.screen === "fruitsSpirit") fsFit(); });
@@ -6772,7 +6776,7 @@ function fsPlay(s, frames, done){
       wait = FS_MS.clear;
       pixSfxPlay(k > 2 ? "fmMatch" : "fmFirst", true);
       for(i = 0; i < f.clear.length; i++){ var el = fsEls[f.clear[i]]; if(el) el.classList.add("pop"); }
-      f.born.forEach(function(p){ var el2 = fsEls[p]; if(el2){ el2.querySelector("img").src = "tiles/fruits/fs_" + FS_SPIRIT + ".png"; el2.classList.add("spirit", "born"); } });
+      f.born.forEach(function(p){ var el2 = fsEls[p]; if(el2){ el2.querySelector("img").src = "tiles/fruits/fs_" + FS_SPIRIT + ".png"; el2.setAttribute("data-t", FS_SPIRIT); el2.classList.add("spirit", "born"); } });
       if(f.born.length) setTimeout(function(){ pixSfxPlay("ticket", false); }, 160);
       for(var ty = 1; ty <= FS_TYPES; ty++){
         var g = s.goals[ty - 1];
@@ -7687,7 +7691,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 Y";
+var APP_BUILD = "2026-10-24 Z";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
