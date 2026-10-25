@@ -2694,7 +2694,7 @@ function afterAward(){
   var awardedId = state.awardMissionId;
   state.awardMissionId = null;
   state.folderOpen = false;          // the Missions window is closed, so the player can watch the pilgrim (2026-10-22, per Dan)
-  pilgrimAward = state.pilgrimIn ? null : "great";            // see pilgrimArrived (once he is in the church there is no pilgrim to speak)
+  pilgrimAward = (state.pilgrimIn || !missionIsGame(awardedId)) ? null : "great";            // see pilgrimArrived (once he is in the church there is no pilgrim to speak). A mission that is not a game (Choose Joy) does not move him, so there is no "great" and no waiting: the icons stay as they are (2026-10-25, per Dan)
   // (It used to open the Golden Ticket screen the moment the points reached the line. Now the 5th game walks the pilgrim into the church, and the
   // church scene unlocks the ticket: see pilgrimEnter and screenChurchWalk, 2026-10-23, per Dan.)
   saveState();
@@ -7864,7 +7864,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 N";
+var APP_BUILD = "2026-10-25 O";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
