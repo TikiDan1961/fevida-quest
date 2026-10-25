@@ -1740,7 +1740,11 @@ var PIX_SFX = {
   wgPick:{url:"sounds/sfx_wg_pick.wav", gain:0.5},
   // the Golden Ticket appearing above the altar (2026-10-23, per Dan): sound_effect_12 from the 8-Bit Sounds folder, with the silent end cut off (1.6 s; peak 0.83, like the
   // Mission Complete sound, so the same low gain)
-  ticket:{url:"sounds/sfx_ticket.wav", gain:0.3}
+  ticket:{url:"sounds/sfx_ticket.wav", gain:0.3},
+  // Jacob's Ladder bounces (2026-10-24, per Dan), the silence before and after cut off: sound_effect_14 off a plain rung, _13 off a rung that breaks, _15 off a winged one
+  jlBounce:{url:"sounds/sfx_jl_bounce.wav", gain:0.2},      // peak 0.95, and it is heard every second, so it is quiet
+  jlCrumble:{url:"sounds/sfx_jl_crumble.wav", gain:0.45},   // peak 0.56
+  jlSuper:{url:"sounds/sfx_jl_super.wav", gain:0.4}         // peak 0.70
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -7074,7 +7078,8 @@ function jlStep(s, dt){
       if(prev >= p2.y && jl.y <= p2.y && dx <= JL_RW / 2 + 3){
         jl.y = p2.y; jl.vy = JL_V0 * (p2.kind === "w" ? 1.75 : 1);
         if(p2.kind === "c") p2.broken = true;
-        if(p2.kind === "w") pixSfxPlay("fmFirst", false); else pixBoing();
+        var jlSnd = p2.kind === "w" ? "jlSuper" : p2.kind === "c" ? "jlCrumble" : "jlBounce";
+        if(pixSfxBuf[jlSnd]) pixSfxPlay(jlSnd, false); else pixBoing();
         break;
       }
     }
@@ -7717,7 +7722,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 ZE";
+var APP_BUILD = "2026-10-24 ZF";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
