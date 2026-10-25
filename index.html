@@ -58,7 +58,8 @@
     flex-direction:column;
   }
   .screen.screen-enter{ animation:fadeIn .25s ease-out; }
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  /* Fade only -- no slide (2026-10-24, per Dan): a slide moves the whole screen 6px and then snaps it into place, which looked like a 1px shift. */
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
   h1{font-size:1.5rem;margin:.2em 0 .1em;color:var(--gold);text-align:center;}
   h2{font-size:1.15rem;margin:.3em 0;color:var(--gold);text-align:center;}
   p{line-height:1.45;font-size:.98rem;}
@@ -146,7 +147,9 @@
   /* Same box as the language screen's white card (width and side padding), so the buttons land in the same place and size. */
   .pixBtnDock{width:calc(100% - 28px);max-width:420px;padding:0 16px 12px;}
   /* The welcome buttons carry longer words in a smaller type, but keep the language buttons' exact box (51.8px tall). */
-  .btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:51.8px;display:flex;align-items:center;justify-content:center;line-height:1;padding:0 12px 3px;}
+  /* ENGLISH / ESPAÑOL (pixBtnLg) and START YOUR QUEST / CHANGE LANGUAGE (pixBtnMd, pixBtnSm) share one frame; only the type size differs. The words are centred on the button face (between the 3px top edge and the 6px bottom edge). */
+  .btn.pixBtn.pixBtnLg,.btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:51.8px;display:flex;align-items:center;justify-content:center;line-height:1;padding:1px 12px 0;}
+  .btn.pixBtn.pixBtnLg{font-size:1.5rem;padding-top:2px;}
   .btn.pixBtn.pixBtnMd{font-size:1.25rem;}
   .btn.pixBtn.pixBtnSm{font-size:1rem;letter-spacing:.04em;}
   /* Home screen icons, the Missions folder and the expanding tile (2026-10-19, per Dan) */
@@ -301,7 +304,8 @@
     .pixWelTitle{font-size:1rem;margin-bottom:6px;}
     .pixWelBody{font-size:1rem;line-height:1.25;}
     .pixBtnDock{padding:0 14px 6px;}
-    .btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:43px;padding:0 12px 2px;}
+    .btn.pixBtn.pixBtnLg,.btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:43px;padding:1px 12px 0;}
+    .btn.pixBtn.pixBtnLg{font-size:1.25rem;padding-top:1px;}
     .pixQuest{font-size:3rem;margin-top:0;}
     .pixCard{padding:10px 14px 6px;}
     .pixQr{width:148px;height:148px;margin:6px auto 8px;padding:12px;}
@@ -2023,8 +2027,8 @@ function screenLanguage(){
       '<div class="pixCardSub">ESCANEA PARA JUGAR</div>' +
       '<div class="pixQr"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i>' +
         '<img src="tiles/qr_feyvida.png" alt="QR code for feyvidaquest.org"></div>' +
-      '<button class="btn pixBtn" onpointerdown="pixPressSfx()" onclick="pixClickSfx();selectLanguage(\'en\')">' + T.en.english + '</button>' +
-      '<button class="btn pixBtn secondary" onpointerdown="pixPressSfx()" onclick="pixClickSfx();selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
+      '<button class="btn pixBtn pixBtnLg" onpointerdown="pixPressSfx()" onclick="pixClickSfx();selectLanguage(\'en\')">' + T.en.english + '</button>' +
+      '<button class="btn pixBtn secondary pixBtnLg" onpointerdown="pixPressSfx()" onclick="pixClickSfx();selectLanguage(\'es\')">' + T.es.spanish + '</button>' +
     '</div>' +
   '</div>';
 }
@@ -7691,7 +7695,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 Z";
+var APP_BUILD = "2026-10-24 ZA";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
