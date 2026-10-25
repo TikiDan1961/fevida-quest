@@ -6522,6 +6522,8 @@ function screenDovePeace(){
 var FS_N = 6, FS_TYPES = 8, FS_SPIRIT = 9;
 var FS_NEED = [5, 8, 11];                                                   // of each fruit, in levels 1, 2 and 3
 var FS_MS = {swap: 190, clear: 320, fall: 360};
+// (2026-10-24, per Dan: fruit that fall do not all move and land together: each starts a moment after the one before it, lower ones first.) A fall lasts FS_FALL[0] plus FS_FALL[1] for each square it drops.
+var FS_STAGGER = {intro: .028, fall: .05}, FS_FALL = [.16, .055];
 var fsBound = null;                                                          // the game being played now: a game that was saved in the middle of a swap (a reload) is not busy any more
 var fsEls = [], fsDrag = null;
 var fsQueue = [], fsRevealing = false;                                      // the words to light up, one at a time (2026-10-24, per Dan: two finished in one swap showed only the first)                                               // the fruit picture at each square, and the swipe being made
@@ -6666,13 +6668,41 @@ function fsStartRound(s){
   fsQueue = []; fsRevealing = false;
   s.goals = []; for(var t = 0; t < FS_TYPES; t++) s.goals.push({got: 0, need: FS_NEED[s.round], done: false, shown: false});
   s.board = fsNewBoard(fsWeights(s.goals));
-  s.sel = -1; s.busy = false; s.interlude = null;
+  s.sel = -1; s.busy = false; s.interlude = null; s.intro = true;
 }
 // ---- the screen's pictures: the fruit are their own elements, laid over the cream squares, so that they can slide ----
 function fsSetXY(el, x, y){ el.style.setProperty("--x", x); el.style.setProperty("--y", y); }
 function fsFruitHtml(type, i, y){
   var N = FS_N;
   return '<div class="fsFruit' + (type === FS_SPIRIT ? ' spirit' : '') + '" data-i="' + i + '" style="--x:' + (i % N) + ';--y:' + (y === undefined ? Math.floor(i / N) : y) + '"><img src="tiles/fruits/fs_' + type + '.png" alt=""></div>';
+}
+// the fall of a set of fruit {el, x, to (the row it ends in), from (the row it starts in)}: lowest first, each a moment after the one before, and each lasting as long as its drop; returns the
+// seconds until the last has landed
+function fsDrop(list, gap){
+  list.sort(function(a, b){ return (b.to - a.to) || (a.x - b.x); });
+  var total = 0;
+  list.forEach(function(f, k){
+    var dist = Math.max(.5, f.to - f.from), dur = FS_FALL[0] + dist * FS_FALL[1], delay = k * gap;
+    f.el.style.transition = "top " + dur.toFixed(3) + "s cubic-bezier(.45,0,.85,.55) " + delay.toFixed(3) + "s";
+    fsSetXY(f.el, f.x, f.to);
+    total = Math.max(total, delay + dur);
+  });
+  setTimeout(function(){ list.forEach(function(f){ f.el.style.transition = ""; }); }, total * 1000 + 80);
+  return total;
+}
+// at the start of a round the board is filled by dropping every fruit in from above the top of it, one after another
+function fsIntro(s){
+  var N = FS_N, list = [], i;
+  s.busy = true; fsBound = s; s.intro = false;
+  for(i = 0; i < N * N; i++){
+    var el = fsEls[i]; if(!el) continue;
+    var r = Math.floor(i / N), c = i % N;
+    el.style.transition = "none"; fsSetXY(el, c, -1.1);
+    list.push({el: el, x: c, to: r, from: -1.1});
+  }
+  void document.getElementById("fsInner").offsetWidth;
+  var total = fsDrop(list, FS_STAGGER.intro);
+  setTimeout(function(){ if(fsAlive(s)){ s.busy = false; saveState(); } }, total * 1000 + 120);
 }
 function fsFit(){                                                            // the board in whole pixels: every square, and every fruit in it, is a whole number of pixels
   var inner = document.getElementById("fsInner"), board = inner && inner.parentNode;
@@ -6689,6 +6719,8 @@ function fsBind(){
   for(var i = 0; i < FS_N * FS_N; i++) fsEls.push(null);
   var list = document.querySelectorAll("#fsLayer .fsFruit");
   for(var k = 0; k < list.length; k++) fsEls[+list[k].getAttribute("data-i")] = list[k];
+  var s0 = state.session.fruitsSpirit;
+  if(s0 && s0.intro && !s0.interlude) fsIntro(s0);                            // a new round: the fruit drop in
 }
 function fsMakeFruit(type, x, y){
   var layer = document.getElementById("fsLayer"), tmp = document.createElement("div");
@@ -6750,23 +6782,28 @@ function fsPlay(s, frames, done){
       }
       fsPaintWords(s); fsPump(s);
     } else if(f.kind === "fall"){
-      wait = FS_MS.fall;
       for(i = 0; i < N * N; i++){ var e0 = fsEls[i]; if(e0 && e0.classList.contains("pop")){ if(e0.parentNode) e0.parentNode.removeChild(e0); fsEls[i] = null; } }
-      var next2 = []; for(i = 0; i < N * N; i++) next2.push(null);
+      var next2 = [], movers = []; for(i = 0; i < N * N; i++) next2.push(null);
       for(c = 0; c < N; c++){
-        var kept = [];
-        for(r = N - 1; r >= 0; r--) if(fsEls[r * N + c]) kept.push(fsEls[r * N + c]);
+        var kept = [], keptRow = [];
+        for(r = N - 1; r >= 0; r--) if(fsEls[r * N + c]){ kept.push(fsEls[r * N + c]); keptRow.push(r); }
+        var missing = N - kept.length;
         for(r = N - 1; r >= 0; r--){
           var kk = N - 1 - r;
-          if(kk < kept.length){ next2[r * N + c] = kept[kk]; fsSetXY(kept[kk], c, r); }
-          else {                                                             // a new fruit drops in from above the board
-            var missing = N - kept.length, ne = fsMakeFruit(f.board[r * N + c], c, r - missing);
-            ne.style.transition = "none"; void ne.offsetWidth; ne.style.transition = ""; fsSetXY(ne, c, r);
+          if(kk < kept.length){
+            next2[r * N + c] = kept[kk];
+            if(keptRow[kk] !== r) movers.push({el: kept[kk], x: c, to: r, from: keptRow[kk]});            // a fruit that drops into the gap below it
+          } else {                                                                                       // a new fruit comes in from above the board
+            var ne = fsMakeFruit(f.board[r * N + c], c, r - missing);
+            ne.style.transition = "none"; fsSetXY(ne, c, r - missing);
             next2[r * N + c] = ne;
+            movers.push({el: ne, x: c, to: r, from: r - missing});
           }
         }
       }
       fsEls = next2;
+      void document.getElementById("fsInner").offsetWidth;
+      wait = Math.round(fsDrop(movers, FS_STAGGER.fall) * 1000) + 90;                                   // held until the last one has landed
     } else if(f.kind === "shuffle"){                                         // no swap left that works: every fruit slides to another square
       wait = 800;
       if(f.perm){
@@ -7650,7 +7687,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 X";
+var APP_BUILD = "2026-10-24 Y";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
