@@ -639,8 +639,7 @@
   .fsPopup{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:6;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FFF496;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b;animation:fsPopup 1.25s ease-out forwards;}
   .fsShuffleMsg{position:absolute;left:0;right:0;top:50%;margin-top:-1.4rem;text-align:center;pointer-events:none;z-index:7;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.4rem;letter-spacing:.06em;line-height:1;color:#fff;
-    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 6px 0 rgba(0,0,0,.35);animation:fsShuf .36s steps(2) infinite;}      /* SHUFFLING over the board while the fruit move to new squares (2026-10-25, per Dan) */
-  @keyframes fsShuf{0%{transform:translateY(0);}100%{transform:translateY(-3px);}}
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 6px 0 rgba(0,0,0,.35);}      /* SHUFFLING over the board while the fruit move to new squares (2026-10-25, per Dan; it stays still: the bounce was taken out) */
   @keyframes fsPopup{0%{opacity:0;transform:scale(.6);}15%{opacity:1;transform:scale(1.1);}80%{opacity:1;}100%{opacity:0;transform:translateY(-10px);}}
   .fsFound{width:min(100%,380px);box-sizing:border-box;margin:10px auto 0;padding:8px 6px 10px;border:4px solid #1B1F3B;border-radius:16px;background:#F8ECC8;text-align:center;}
   .fsFound b{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1rem;color:#96642A;margin-bottom:6px;}
@@ -6826,6 +6825,23 @@ function fsPopup(text){
   var el = document.createElement("div"); el.className = "fsPopup"; el.textContent = text; wrap.appendChild(el);
   setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 1300);
 }
+// the sound of the shuffle (2026-10-25, per Dan): a rustle, like cards being riffled -- filtered noise that sweeps up and flutters -- for as long as the fruit slide about
+function fsShuffleSound(sec){
+  try {
+    var ctx = pixCtx(); if(!ctx || pixAudioStale) return;
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
+    var t0 = ctx.currentTime + .02, n = Math.floor(ctx.sampleRate * sec), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+    for(var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    var src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+    src.buffer = buf; bp.type = "bandpass"; bp.Q.value = 1.6;
+    bp.frequency.setValueAtTime(700, t0); bp.frequency.exponentialRampToValueAtTime(3000, t0 + sec * .85);
+    g.gain.setValueAtTime(.0001, t0); g.gain.linearRampToValueAtTime(.2, t0 + .06); g.gain.setValueAtTime(.2, t0 + sec - .15); g.gain.exponentialRampToValueAtTime(.0001, t0 + sec);
+    lfo.type = "square"; lfo.frequency.value = 22; lg.gain.value = .09;      // the flutter: the loudness jumps up and down 22 times a second
+    lfo.connect(lg); lg.connect(g.gain);
+    src.connect(bp); bp.connect(g); g.connect(pixBus(ctx, "sfx"));
+    src.start(t0); src.stop(t0 + sec); lfo.start(t0); lfo.stop(t0 + sec);
+  } catch(e){}
+}
 function fsShuffleMsg(ms){
   var wrap = document.querySelector(".fsBoardWrap"); if(!wrap) return;
   var old = wrap.querySelectorAll(".fsShuffleMsg"); for(var k = 0; k < old.length; k++) old[k].parentNode.removeChild(old[k]);
@@ -6885,7 +6901,7 @@ function fsPlay(s, frames, done){
       void document.getElementById("fsInner").offsetWidth;
       wait = Math.round(fsDrop(movers, FS_STAGGER.fall) * 1000) + 90;                                   // held until the last one has landed
     } else if(f.kind === "shuffle"){                                         // no swap left that works: every fruit slides to another square
-      wait = 1200; fsShuffleMsg(wait - 100);                                  // (SHUFFLING over the board while they do)
+      wait = 1200; fsShuffleMsg(wait - 100); fsShuffleSound(.9);                                  // (SHUFFLING over the board while they do)
       if(f.perm){
         var moved = new Array(N * N);
         for(i = 0; i < N * N; i++){
@@ -7809,7 +7825,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 F";
+var APP_BUILD = "2026-10-25 G";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
