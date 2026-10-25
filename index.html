@@ -182,9 +182,13 @@
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
   .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
     display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}
-  .appIcon.locked .appTile{filter:grayscale(.5) brightness(.92);}
-  .appIcon.soon .appTile{opacity:.55;}
+  /* (2026-10-25, per Dan) an icon that cannot be opened is grey: the locked Golden Ticket, the coming-soon missions, and all the icons while the pilgrim is talking and walking */
+  .appIcon{transition:filter .2s,opacity .2s;}
+  .appIcon.locked .appTile{filter:grayscale(1) brightness(.9);}
+  .appIcon.locked .appName{opacity:.75;}
+  .appIcon.soon .appTile{filter:grayscale(1);opacity:.55;}
   .appIcon.soon .appName{opacity:.85;}
+  .pixMenu.pilgrimBusy .homeGrid .appIcon{filter:grayscale(1);opacity:.55;}
   .appIcon.done .appTile{filter:saturate(.65);}
   .pixHome.pixSky > .folderOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:18px;
     background:rgba(10,20,70,.55);animation:folderFade .2s ease-out;}
@@ -617,8 +621,8 @@
   /* the grapes: their picture itself was moved a picture-pixel left and one up (2026-10-24), so they need no nudge here */
   .fsFruit[data-t="8"] img{top:var(--n2);}                                         /* the watermelon, two pixels down */
   .fsFruit.grab img{transform:scale(1.12);}
-  .fsFruit.hint::before{content:"";position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:3px solid #FFF07A;box-shadow:0 0 0 3px #FF9F1C,0 0 14px 5px rgba(255,200,60,.9);border-radius:6px;animation:fsHint .55s ease-in-out infinite alternate;z-index:3;}
-  @keyframes fsHint{from{opacity:.45;}to{opacity:1;}}
+  .fsFruit.hint::before{content:"";position:absolute;left:1px;top:1px;right:1px;bottom:1px;box-sizing:border-box;border:4px solid #FF1FA3;background:rgba(255,31,163,.24);box-shadow:0 0 0 2px #fff,0 0 0 4px #5B0F55,0 0 16px 6px rgba(255,31,163,.85);border-radius:7px;animation:fsHint .5s ease-in-out infinite alternate;z-index:3;}      /* hot pink with a white and a dark ring: nothing else on the board is that colour (2026-10-25, per Dan: the yellow one blended in) */
+  @keyframes fsHint{from{opacity:.55;}to{opacity:1;}}
   .fsHintBtn{margin-left:6px;cursor:pointer;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1rem;letter-spacing:.04em;line-height:1;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     padding:6px 14px 5px;background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 2px 0 rgba(255,255,255,.4);}
   .fsHintBtn:active{box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 14px 6px rgba(110,190,255,.85);}
@@ -6875,9 +6879,16 @@ function fsPlay(s, frames, done){
 // ---- the HINT button (2026-10-25, per Dan): 3 in each level. It lights up the tiles of ONE match that can be made: a random one of the swaps that work; the lit tiles are where they are now
 // (the two that stay and the one that has to be moved in), and they stay lit until the next swap.
 function fsHintsLeft(s){ return typeof s.hints === "number" ? s.hints : FS_HINTS; }
+function fsHintLit(){ return !!document.querySelector("#fsLayer .fsFruit.hint"); }
+function fsPaintHintBtn(s){                                                  // the button: how many are left, and greyed while a hint is showing that has not been played yet
+  var btn = document.getElementById("fsHintBtn"); if(!btn || !s) return;
+  btn.textContent = t("fs_hint") + " (" + fsHintsLeft(s) + ")";
+  btn.disabled = fsHintsLeft(s) <= 0 || fsHintLit();
+}
 function fsClearHint(){
   var list = document.querySelectorAll("#fsLayer .fsFruit.hint");
   for(var i = 0; i < list.length; i++) list[i].classList.remove("hint");
+  fsPaintHintBtn(state.session.fruitsSpirit);
 }
 function fsPickHint(b){                                                      // the squares (as they are now) of one match that a swap could make, or null
   var moves = fsMoves(b); if(!moves.length) return null;
@@ -6889,21 +6900,18 @@ function fsPickHint(b){                                                      // 
 }
 function fsHint(){
   var s = state.session.fruitsSpirit;
-  if(!s || s.busy || s.interlude || s.status !== "playing" || fsHintsLeft(s) <= 0) return;
+  if(!s || s.busy || s.interlude || s.status !== "playing" || fsHintsLeft(s) <= 0 || fsHintLit()) return;      // (no second hint while the first one has not been played)
   var cells = fsPickHint(s.board); if(!cells) return;
-  fsClearHint();
   if(s.sel !== -1 && fsEls[s.sel]) fsEls[s.sel].classList.remove("sel");
   s.sel = -1;
   cells.forEach(function(i){ if(fsEls[i]) fsEls[i].classList.add("hint"); });
   s.hints = fsHintsLeft(s) - 1; saveState();
-  var btn = document.getElementById("fsHintBtn");
-  if(btn){ btn.textContent = t("fs_hint") + " (" + s.hints + ")"; btn.disabled = s.hints <= 0; }
+  fsPaintHintBtn(s);
 }
 function fsSwap(a, b){
   var s = state.session.fruitsSpirit;
   if(!s || s.busy || s.interlude || s.status !== "playing") return;
   if(s.sel !== -1 && fsEls[s.sel]) fsEls[s.sel].classList.remove("sel");
-  fsClearHint();
   s.sel = -1; s.busy = true; fsBound = s;
   pixSfxPlay("tap", false);
   var res = fsResolve(s.board, a, b, fsWeights(s.goals));
@@ -6912,6 +6920,7 @@ function fsSwap(a, b){
     fsPlay(s, [{kind: "swap", board: fsSwapped(s.board, a, b), a: a, b: b}, {kind: "swap", board: s.board.slice(), a: a, b: b}], function(){ s.busy = false; });
     return;
   }
+  fsClearHint();                                                            // the hint is played (a swap that does not work leaves it showing)
   fsPlay(s, res.frames, function(){
     s.board = res.board;
     if(s.goals.every(function(g){ return g.done; })){
@@ -7771,7 +7780,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 C";
+var APP_BUILD = "2026-10-25 E";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
