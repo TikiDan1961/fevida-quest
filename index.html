@@ -658,6 +658,7 @@
   .jlHalf i{width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);}
   .jlHalf.l i{border-right:16px solid #FFC93A;} .jlHalf.r i{border-left:16px solid #FFC93A;}
   .jlHalf.held{background:rgba(255,255,255,.22);}
+  .jlBar.tilt{pointer-events:none;}      /* the tilt of the phone steers: the buttons are only lights */
   .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
@@ -1019,7 +1020,7 @@ var T = {
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
-      jacobLadder:{d:"Bounce Jacob up the rungs to the gate of heaven.", h:["Jacob bounces by himself. Hold the LEFT or RIGHT button to steer him (touching the sky does nothing), and he bounces off the edges of the sky. The bar on the right fills up as he climbs.", "He only lands on a rung when he is coming down. In round 1 the rungs stay still; in round 2 some slide slowly and in round 3 more of them slide a little faster. Some break after one bounce, and a winged rung throws him very high.", "In rounds 2 and 3 storm clouds drift about: touching one costs a chance. So does missing the rungs and falling off the bottom: OH NO!!!! comes up, and then you start the climb again from the bottom with an empty height bar. You have 3 chances. Reach the gate of heaven in all 3 rounds, each a higher climb, to win."]},
+      jacobLadder:{d:"Bounce Jacob up the rungs to the gate of heaven.", h:["Jacob bounces by himself. Tilt your phone to the left or right to steer him: the further you tilt, the faster he goes (if your phone's tilt is not available, the LEFT and RIGHT buttons steer instead). He bounces off the edges of the sky. The bar on the right fills up as he climbs.", "He only lands on a rung when he is coming down. In round 1 the rungs stay still; in round 2 some slide slowly and in round 3 more of them slide a little faster. Some break after one bounce, and a winged rung throws him very high.", "In rounds 2 and 3 storm clouds drift about: touching one costs a chance. So does missing the rungs and falling off the bottom: OH NO!!!! comes up, and then you start the climb again from the bottom with an empty height bar. You have 3 chances. Reach the gate of heaven in all 3 rounds, each a higher climb, to win."]},
       fruitsSpirit:{d:"Match fruit to collect the fruits of the Spirit.", h:["Put your finger on a fruit and swipe toward a neighbor to swap them. A swap has to make a row or column of 3 or more of the same fruit, or the two slide back. (You can also tap a fruit and then a neighbor.)", "Each fruit stands for one of the fruits of the Spirit. The words below the board count how many of each fruit you have collected, such as 3/5, and light up when you have them all.", "Light up all 8 words to finish a level. Match 4 or more in a line to make a flickering Spirit flame. The flame is a wild piece: put it next to two matching fruit in a line, as the third piece, and all three clear. There are 3 levels, each asking for more of every fruit."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. In the last round the wind pushes the dove around too. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
@@ -1098,7 +1099,7 @@ var T = {
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
-    jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
+    jacobLadderName:"Jacob's Ladder", jl_intro:"Tilt your phone left or right to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
     fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swipe a fruit toward a neighbor to swap them and match 3 or more. Collect every fruit to light up all the words.",
     fs_found:"COLLECT EACH FRUIT", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
@@ -1169,7 +1170,7 @@ var T = {
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
-      jacobLadder:{d:"Haz rebotar a Jacob por los peldaños hasta la puerta del cielo.", h:["Jacob rebota solo. Mantén pulsado el botón IZQUIERDA o DERECHA para moverlo (tocar el cielo no hace nada), y rebota en los bordes del cielo. La barra de la derecha se llena a medida que sube.", "Solo cae sobre un peldaño cuando va bajando. En la ronda 1 los peldaños no se mueven; en la ronda 2 algunos se deslizan despacio y en la ronda 3 más de ellos se deslizan un poco más rápido. Algunos se rompen después de un rebote, y uno con alas lo lanza muy alto.", "En las rondas 2 y 3 hay nubes de tormenta: tocar una cuesta una oportunidad, y fallar los peldaños y caer por abajo también: aparece ¡AY, NO!!!! y luego empiezas la subida otra vez desde abajo, con la barra de altura vacía. Tienes 3 oportunidades. Llega a la puerta del cielo en las 3 rondas, cada una más alta, para ganar."]},
+      jacobLadder:{d:"Haz rebotar a Jacob por los peldaños hasta la puerta del cielo.", h:["Jacob rebota solo. Inclina tu teléfono a la izquierda o a la derecha para moverlo: cuanto más lo inclines, más rápido va (si la inclinación no está disponible, los botones IZQUIERDA y DERECHA lo mueven). Rebota en los bordes del cielo. La barra de la derecha se llena a medida que sube.", "Solo cae sobre un peldaño cuando va bajando. En la ronda 1 los peldaños no se mueven; en la ronda 2 algunos se deslizan despacio y en la ronda 3 más de ellos se deslizan un poco más rápido. Algunos se rompen después de un rebote, y uno con alas lo lanza muy alto.", "En las rondas 2 y 3 hay nubes de tormenta: tocar una cuesta una oportunidad, y fallar los peldaños y caer por abajo también: aparece ¡AY, NO!!!! y luego empiezas la subida otra vez desde abajo, con la barra de altura vacía. Tienes 3 oportunidades. Llega a la puerta del cielo en las 3 rondas, cada una más alta, para ganar."]},
       fruitsSpirit:{d:"Combina frutas para reunir los frutos del Espíritu.", h:["Pon el dedo sobre una fruta y desliza hacia una vecina para cambiarlas. El cambio tiene que formar una fila o columna de 3 o más frutas iguales, o las dos vuelven a su lugar. (También puedes tocar una fruta y luego una vecina.)", "Cada fruta representa uno de los frutos del Espíritu. Las palabras debajo del tablero cuentan cuántas has reunido de cada una, por ejemplo 3/5, y se encienden cuando las tienes todas.", "Enciende las 8 palabras para terminar un nivel. Junta 4 o más en línea para crear una llama del Espíritu que parpadea. La llama es una pieza comodín: ponla junto a dos frutas iguales en línea, como la tercera pieza, y las tres desaparecen. Hay 3 niveles, y cada uno pide más de cada fruta."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. En la última, además, el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
@@ -1247,7 +1248,7 @@ var T = {
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
-    jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
+    jacobLadderName:"La Escalera de Jacob", jl_intro:"Inclina tu teléfono a la izquierda o a la derecha para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
     fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
     fs_found:"REÚNE CADA FRUTA", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
@@ -1744,7 +1745,8 @@ var PIX_SFX = {
   // Jacob's Ladder bounces (2026-10-24, per Dan), the silence before and after cut off: sound_effect_14 off a plain rung, _13 off a rung that breaks, _15 off a winged one
   jlBounce:{url:"sounds/sfx_jl_bounce.wav", gain:0.2},      // peak 0.95, and it is heard every second, so it is quiet
   jlCrumble:{url:"sounds/sfx_jl_crumble.wav", gain:0.45},   // peak 0.56
-  jlSuper:{url:"sounds/sfx_jl_super.wav", gain:0.4}         // peak 0.70
+  jlSuper:{url:"sounds/sfx_jl_super.wav", gain:0.4},        // peak 0.70
+  jlFall:{url:"sounds/sfx_jl_fall.wav", gain:0.3}           // falling off the bottom of the sky (2026-10-24, per Dan): sound_effect_16, peak 0.99, in place of the Faith Match miss / last-chance sounds
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -2079,6 +2081,7 @@ function openMission(id){
 }
 function startMission(id){
   state.introMission = null;
+  if(id === "jacobLadder") jlTiltEnable();          // (from the START MISSION tap: the phone may ask permission for its tilt sensor)
   if(id === "faithFlash"){ initFaithFlash(); go("faithFlash"); }
   else if(id === "faithMatch"){ preloadMatchTiles(); initFaithMatchLevel(0); go("faithMatch"); }   // always from Level 1
   else if(id === "dovePeace"){ initDovePeace(); go("dovePeace"); }
@@ -7026,10 +7029,42 @@ function jlGenerate(s, until){
     jl.plats.push({x: JL_W / 2, y: cfg.goal - 14, kind: "n", base: JL_W / 2, ph: 0, broken: false, fall: 0});
   }
 }
+// Steering by tilting the phone (2026-10-24, per Dan, to try): tilt it to the left and Jacob goes left, to the right and he goes right, faster the further it is tilted. The LEFT / RIGHT buttons
+// no longer steer while the tilt is working (they only light up to show which way he is going); if the phone has no tilt sensor or it is switched off (a computer, or "no" to the question on an
+// iPhone) they steer as before. Keyboard arrows always work. The tilt is read from the phone's own orientation angles (beta, gamma): the sideways lean of gravity across the screen.
+var JL_TILT_FULL = 20, JL_TILT_DEAD = 2.5;                                    // degrees of tilt for full speed; degrees that count as level
+var jlTilt = {on: false, at: 0, v: 0, d: 0, asked: false};
+function jlTiltOn(){ return jlTilt.on && performance.now() - jlTilt.at < 1500; }
+function jlTiltEvent(e){
+  if(typeof e.gamma !== "number" || typeof e.beta !== "number") return;       // a computer sends one empty reading
+  var rad = Math.PI / 180, ang = 0;
+  try { ang = (screen.orientation && typeof screen.orientation.angle === "number") ? screen.orientation.angle : (typeof window.orientation === "number" ? (360 - window.orientation) % 360 : 0); } catch(err){}
+  var cb = Math.cos(e.beta * rad), right;
+  if(ang === 90) right = Math.sin(e.beta * rad);
+  else if(ang === 270) right = -Math.sin(e.beta * rad);
+  else { right = Math.sin(e.gamma * rad) * Math.max(-1, Math.min(1, cb / .45)); if(ang === 180) right = -right; }     // held upright the angles lose their meaning, so the tilt fades out as the phone gets vertical
+  var deg = Math.asin(Math.max(-1, Math.min(1, right))) / rad;
+  jlTilt.v += (deg - jlTilt.v) * .4;                                           // a little smoothing: the sensor shakes
+  var a = Math.abs(jlTilt.v), mag = a <= JL_TILT_DEAD ? 0 : Math.min(1, (a - JL_TILT_DEAD) / (JL_TILT_FULL - JL_TILT_DEAD));
+  jlTilt.d = jlTilt.v < 0 ? -mag : mag;
+  jlTilt.on = true; jlTilt.at = performance.now();
+}
+var jlTiltAttached = false;
+function jlTiltAttach(){ if(jlTiltAttached) return; jlTiltAttached = true; window.addEventListener("deviceorientation", jlTiltEvent); }
+// called from the START MISSION tap: an iPhone only lets a page read the sensor after the player says yes, and only when asked from a tap
+function jlTiltEnable(){
+  try {
+    if(typeof DeviceOrientationEvent === "undefined") return;
+    if(typeof DeviceOrientationEvent.requestPermission === "function"){
+      DeviceOrientationEvent.requestPermission().then(function(r){ if(r === "granted") jlTiltAttach(); }).catch(function(){});
+    } else jlTiltAttach();
+  } catch(err){}
+}
 function jlDir(){
-  var l = jlKeys.l, r = jlKeys.r, k;
-  for(k in jlHold){ if(jlHold[k] < 0) l = true; else if(jlHold[k] > 0) r = true; }
-  return (r ? 1 : 0) - (l ? 1 : 0);
+  var l = jlKeys.l, r = jlKeys.r, k, tilt = jlTiltOn();
+  if(!tilt) for(k in jlHold){ if(jlHold[k] < 0) l = true; else if(jlHold[k] > 0) r = true; }
+  var d = (r ? 1 : 0) - (l ? 1 : 0);
+  return d || (tilt ? jlTilt.d : 0);
 }
 function jlLoseChance(s, why){
   s.chances = jlChancesLeft(s) - 1;
@@ -7109,7 +7144,7 @@ function jlMissStep(s, dt){
   if(feet - 17 > jl.ch || jl.missT > 3){
     jl.mode = "ohno"; jl.ohT = 0;
     s.chances = jlChancesLeft(s) - 1;
-    pixSfxPlay(s.chances <= 0 ? "fmLast" : "fmMiss", true);
+    pixSfxPlay("jlFall", true);
     saveState(); render();                                                      // the hearts, and the message (the screen shows it while jl.mode is "ohno")
   }
 }
@@ -7220,6 +7255,7 @@ function jlLoop(now){
   if(state.screen !== "jacobLadder" || !s){ jlRaf = 0; return; }
   var dt = Math.min(.05, (now - jl.last_t) / 1000); jl.last_t = now;
   if(s.status === "playing" && !s.interlude && !s.busy) jlStep(s, dt);
+  jlPaintHeld();
   jlDraw();
   jlRaf = requestAnimationFrame(jlLoop);
 }
@@ -7258,8 +7294,11 @@ function jlRelease(e){ delete jlHold[e.pointerId]; jlPaintHeld(); }
 document.addEventListener("pointerup", function(e){ if(jlHold[e.pointerId] !== undefined){ delete jlHold[e.pointerId]; jlPaintHeld(); } }, true);        // wherever the finger lifts
 document.addEventListener("pointercancel", function(e){ if(jlHold[e.pointerId] !== undefined){ delete jlHold[e.pointerId]; jlPaintHeld(); } }, true);
 function jlPaintHeld(){
-  var d = jlDir(), l = document.getElementById("jlL"), r = document.getElementById("jlR");
+  var d = jlDir(), l = document.getElementById("jlL"), r = document.getElementById("jlR"), bar = document.querySelector(".jlBar"), tilt = jlTiltOn();
+  if(bar) bar.classList.toggle("tilt", tilt);
   if(l) l.classList.toggle("held", d < 0); if(r) r.classList.toggle("held", d > 0);
+  if(tilt){ if(l) l.style.background = d < 0 ? "rgba(255,255,255," + (.1 + .25 * -d).toFixed(2) + ")" : ""; if(r) r.style.background = d > 0 ? "rgba(255,255,255," + (.1 + .25 * d).toFixed(2) + ")" : ""; }
+  else { if(l) l.style.background = ""; if(r) r.style.background = ""; }
 }
 document.addEventListener("keydown", function(e){
   if(state.screen !== "jacobLadder") return;
@@ -7722,7 +7761,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 ZF";
+var APP_BUILD = "2026-10-24 ZG";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
