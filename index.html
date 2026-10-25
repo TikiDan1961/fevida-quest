@@ -602,7 +602,7 @@
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .pixMission > .dpTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* the whole screen flaps the dove (the red X, above it, still works) */
   /* Fruits of the Spirit (2026-10-24): a 6 x 6 board of cream squares with the fruit laid over them as pictures of their own, so that they can slide; the 8 words and their counts below. */
-  .fsBoardWrap{position:relative;width:min(100%,380px,calc(100vh - 395px));width:min(100%,380px,calc(100dvh - 395px));margin:4px auto 0;}
+  .fsBoardWrap{position:relative;width:min(100%,380px,calc(100vh - 460px));width:min(100%,380px,calc(100dvh - 460px));margin:4px auto 0;}
   .fsBoard{box-sizing:border-box;padding:4px;overflow:hidden;background:#744828;border:4px solid #FFC93A;border-radius:12px;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   .fsInner{--cell:50px;--pad:5px;--img:40px;position:relative;width:calc(var(--cell) * 6);height:calc(var(--cell) * 6);margin:0 auto;touch-action:none;cursor:grab;}      /* fsFit sets --cell to a whole number of pixels */
@@ -617,6 +617,12 @@
   /* the grapes: their picture itself was moved a picture-pixel left and one up (2026-10-24), so they need no nudge here */
   .fsFruit[data-t="8"] img{top:var(--n2);}                                         /* the watermelon, two pixels down */
   .fsFruit.grab img{transform:scale(1.12);}
+  .fsFruit.hint::before{content:"";position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:3px solid #FFF07A;box-shadow:0 0 0 3px #FF9F1C,0 0 14px 5px rgba(255,200,60,.9);border-radius:6px;animation:fsHint .55s ease-in-out infinite alternate;z-index:3;}
+  @keyframes fsHint{from{opacity:.45;}to{opacity:1;}}
+  .fsHintBtn{margin-left:6px;cursor:pointer;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1rem;letter-spacing:.04em;line-height:1;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    padding:6px 14px 5px;background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 2px 0 rgba(255,255,255,.4);}
+  .fsHintBtn:active{box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 14px 6px rgba(110,190,255,.85);}
+  .fsHintBtn:disabled{opacity:.5;filter:grayscale(.4);cursor:default;}
   .fsFruit.sel::before{content:"";position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:3px solid #fff;box-shadow:0 0 0 3px #3A8FE8;border-radius:6px;}
   .fsFruit.pop{animation:fsPop .3s ease-out forwards;z-index:2;}
   .fsFruit.fresh{animation:fsFresh .4s ease-out;}
@@ -636,6 +642,11 @@
   .fsWord img{width:36px;height:36px;image-rendering:pixelated;filter:grayscale(.55) opacity(.7);}
   .fsWord span{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;line-height:1.15;white-space:nowrap;}
   .fsWord .fsCnt{font-size:1.25rem;color:#7A6A4E;} .fsWord .fsNm{font-size:.7rem;color:#A8977A;letter-spacing:0;}
+  @media (max-height:740px){      /* shorter phones: a smaller words window, so the board can stay big */
+    .fsBoardWrap{width:min(100%,380px,calc(100vh - 415px));width:min(100%,380px,calc(100dvh - 415px));}
+    .fsFound{margin-top:8px;padding:5px 6px 6px;} .fsFound b{font-size:.85rem;margin-bottom:3px;}
+    .fsWords{gap:4px 2px;} .fsWord img{width:28px;height:28px;} .fsWord .fsCnt{font-size:1.05rem;} .fsWord .fsNm{font-size:.65rem;}
+  }
   .fsWord.on img{filter:none;}
   .fsWord.on .fsCnt{color:#FFC93A;text-shadow:2px 0 #1B1F3B,-2px 0 #1B1F3B,0 2px #1B1F3B,0 -2px #1B1F3B;}
   .fsWord.on .fsNm{color:#C98A12;}
@@ -1022,7 +1033,7 @@ var T = {
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
       jacobLadder:{d:"Bounce Jacob up the rungs to the gate of heaven.", h:["Jacob bounces by himself. Hold the LEFT or RIGHT button to steer him (touching the sky does nothing). He bounces off the edges of the sky. The bar on the right fills up as he climbs.", "He only lands on a rung when he is coming down. In round 1 the rungs stay still; in round 2 some slide slowly and in round 3 more of them slide a little faster. Some break after one bounce, and a winged rung throws him very high.", "In rounds 2 and 3 storm clouds drift about: touching one costs a chance. So does missing the rungs and falling off the bottom: OH NO!!!! comes up, and then you start the climb again from the bottom with an empty height bar. You have 3 chances. Reach the gate of heaven in all 3 rounds, each a higher climb, to win."]},
-      fruitsSpirit:{d:"Match fruit to collect the fruits of the Spirit.", h:["Put your finger on a fruit and swipe toward a neighbor to swap them. A swap has to make a row or column of 3 or more of the same fruit, or the two slide back. (You can also tap a fruit and then a neighbor.)", "Each fruit stands for one of the fruits of the Spirit. The words below the board count how many of each fruit you have collected, such as 3/5, and light up when you have them all.", "Light up all 8 words to finish a level. Match 4 or more in a line to make a flickering Spirit flame. The flame is a wild piece: put it next to two matching fruit in a line, as the third piece, and the whole row or column they are in clears, with a bonus sound. There are 3 levels, each asking for more of every fruit."]},
+      fruitsSpirit:{d:"Match fruit to collect the fruits of the Spirit.", h:["Put your finger on a fruit and swipe toward a neighbor to swap them. A swap has to make a row or column of 3 or more of the same fruit, or the two slide back. (You can also tap a fruit and then a neighbor.)", "Each fruit stands for one of the fruits of the Spirit. The words below the board count how many of each fruit you have collected, such as 3/5, and light up when you have them all.", "Light up all 8 words to finish a level. Match 4 or more in a line to make a flickering Spirit flame. The flame is a wild piece: put it next to two matching fruit in a line, as the third piece, and the whole row or column they are in clears, with a bonus sound. Stuck? Tap HINT (3 in each level) to light up the tiles of one match you can make. There are 3 levels, each asking for more of every fruit."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 5 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. In the last round the wind pushes the dove around too. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
       prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap the TAP button when a bead is in the ring (tapping the sky does nothing). Some beads come close together, so tap quickly, once for each bead.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Round 1 has 20 beads, round 2 has 30 and round 3 has 40, and they move twice as fast each round. Finish all 3 rounds to win."]},
@@ -1103,7 +1114,7 @@ var T = {
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
     fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swipe a fruit toward a neighbor to swap them and match 3 or more. Collect every fruit to light up all the words.",
-    fs_found:"COLLECT EACH FRUIT", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
+    fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
@@ -1172,7 +1183,7 @@ var T = {
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
       jacobLadder:{d:"Haz rebotar a Jacob por los peldaños hasta la puerta del cielo.", h:["Jacob rebota solo. Mantén pulsado el botón IZQUIERDA o DERECHA para moverlo (tocar el cielo no hace nada). Rebota en los bordes del cielo. La barra de la derecha se llena a medida que sube.", "Solo cae sobre un peldaño cuando va bajando. En la ronda 1 los peldaños no se mueven; en la ronda 2 algunos se deslizan despacio y en la ronda 3 más de ellos se deslizan un poco más rápido. Algunos se rompen después de un rebote, y uno con alas lo lanza muy alto.", "En las rondas 2 y 3 hay nubes de tormenta: tocar una cuesta una oportunidad, y fallar los peldaños y caer por abajo también: aparece ¡AY, NO!!!! y luego empiezas la subida otra vez desde abajo, con la barra de altura vacía. Tienes 3 oportunidades. Llega a la puerta del cielo en las 3 rondas, cada una más alta, para ganar."]},
-      fruitsSpirit:{d:"Combina frutas para reunir los frutos del Espíritu.", h:["Pon el dedo sobre una fruta y desliza hacia una vecina para cambiarlas. El cambio tiene que formar una fila o columna de 3 o más frutas iguales, o las dos vuelven a su lugar. (También puedes tocar una fruta y luego una vecina.)", "Cada fruta representa uno de los frutos del Espíritu. Las palabras debajo del tablero cuentan cuántas has reunido de cada una, por ejemplo 3/5, y se encienden cuando las tienes todas.", "Enciende las 8 palabras para terminar un nivel. Junta 4 o más en línea para crear una llama del Espíritu que parpadea. La llama es una pieza comodín: ponla junto a dos frutas iguales en línea, como la tercera pieza, y toda la fila o columna donde están desaparece, con un sonido de bonificación. Hay 3 niveles, y cada uno pide más de cada fruta."]},
+      fruitsSpirit:{d:"Combina frutas para reunir los frutos del Espíritu.", h:["Pon el dedo sobre una fruta y desliza hacia una vecina para cambiarlas. El cambio tiene que formar una fila o columna de 3 o más frutas iguales, o las dos vuelven a su lugar. (También puedes tocar una fruta y luego una vecina.)", "Cada fruta representa uno de los frutos del Espíritu. Las palabras debajo del tablero cuentan cuántas has reunido de cada una, por ejemplo 3/5, y se encienden cuando las tienes todas.", "Enciende las 8 palabras para terminar un nivel. Junta 4 o más en línea para crear una llama del Espíritu que parpadea. La llama es una pieza comodín: ponla junto a dos frutas iguales en línea, como la tercera pieza, y toda la fila o columna donde están desaparece, con un sonido de bonificación. ¿No ves ninguna? Toca PISTA (3 en cada nivel) para iluminar las fichas de una combinación posible. Hay 3 niveles, y cada uno pide más de cada fruta."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 5 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. En la última, además, el viento empuja a la paloma. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca el botón TOCAR cuando una cuenta esté dentro del aro (tocar el cielo no hace nada). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. La ronda 1 tiene 20 cuentas, la ronda 2 tiene 30 y la ronda 3 tiene 40, y van el doble de rápido en cada ronda. Termina las 3 rondas para ganar."]},
@@ -1252,7 +1263,7 @@ var T = {
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
     fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
-    fs_found:"REÚNE CADA FRUTA", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
+    fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
@@ -6701,7 +6712,7 @@ function fsStartRound(s){
   fsQueue = []; fsRevealing = false;
   s.goals = []; for(var t = 0; t < FS_TYPES; t++) s.goals.push({got: 0, need: FS_NEED[s.round], done: false, shown: false});
   s.board = fsNewBoard(fsWeights(s.goals));
-  s.sel = -1; s.busy = false; s.interlude = null; s.intro = true;
+  s.sel = -1; s.busy = false; s.interlude = null; s.intro = true; s.hints = FS_HINTS;
 }
 // ---- the screen's pictures: the fruit are their own elements, laid over the cream squares, so that they can slide ----
 function fsSetXY(el, x, y){ el.style.setProperty("--x", x); el.style.setProperty("--y", y); }
@@ -6861,10 +6872,38 @@ function fsPlay(s, frames, done){
   }
   next();
 }
+// ---- the HINT button (2026-10-25, per Dan): 3 in each level. It lights up the tiles of ONE match that can be made: a random one of the swaps that work; the lit tiles are where they are now
+// (the two that stay and the one that has to be moved in), and they stay lit until the next swap.
+function fsHintsLeft(s){ return typeof s.hints === "number" ? s.hints : FS_HINTS; }
+function fsClearHint(){
+  var list = document.querySelectorAll("#fsLayer .fsFruit.hint");
+  for(var i = 0; i < list.length; i++) list[i].classList.remove("hint");
+}
+function fsPickHint(b){                                                      // the squares (as they are now) of one match that a swap could make, or null
+  var moves = fsMoves(b); if(!moves.length) return null;
+  var mv = moves[Math.floor(Math.random() * moves.length)], a1 = mv[0], a2 = mv[1];
+  var runs = fsRuns(fsSwapped(b, a1, a2)).filter(function(r){ return r.cells.indexOf(a1) !== -1 || r.cells.indexOf(a2) !== -1; });
+  if(!runs.length) return null;
+  var run = runs[Math.floor(Math.random() * runs.length)];
+  return run.cells.map(function(c){ return c === a1 ? a2 : c === a2 ? a1 : c; });
+}
+function fsHint(){
+  var s = state.session.fruitsSpirit;
+  if(!s || s.busy || s.interlude || s.status !== "playing" || fsHintsLeft(s) <= 0) return;
+  var cells = fsPickHint(s.board); if(!cells) return;
+  fsClearHint();
+  if(s.sel !== -1 && fsEls[s.sel]) fsEls[s.sel].classList.remove("sel");
+  s.sel = -1;
+  cells.forEach(function(i){ if(fsEls[i]) fsEls[i].classList.add("hint"); });
+  s.hints = fsHintsLeft(s) - 1; saveState();
+  var btn = document.getElementById("fsHintBtn");
+  if(btn){ btn.textContent = t("fs_hint") + " (" + s.hints + ")"; btn.disabled = s.hints <= 0; }
+}
 function fsSwap(a, b){
   var s = state.session.fruitsSpirit;
   if(!s || s.busy || s.interlude || s.status !== "playing") return;
   if(s.sel !== -1 && fsEls[s.sel]) fsEls[s.sel].classList.remove("sel");
+  fsClearHint();
   s.sel = -1; s.busy = true; fsBound = s;
   pixSfxPlay("tap", false);
   var res = fsResolve(s.board, a, b, fsWeights(s.goals));
@@ -6889,6 +6928,7 @@ function fsSwap(a, b){
   });
 }
 var FS_ROUNDS_COUNT = 3;
+var FS_HINTS = 3;                                                          // hints in each level (2026-10-25, per Dan)
 // ---- the player's fingers: a swipe from a fruit towards a neighbor, or a tap on a fruit and then on a neighbor ----
 function fsCellAt(e){
   var inner = document.getElementById("fsInner"); if(!inner) return -1;
@@ -6958,7 +6998,8 @@ function screenFruitsSpirit(){
   }
   return pixShell('<h2 class="pixMTitle">' + t("fruitsSpiritName") + '</h2>' +
     '<div class="pixNote">' + t("fs_intro") + '</div>' +
-    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, FS_ROUNDS_COUNT) + '</span></div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, FS_ROUNDS_COUNT) + '</span>' +
+      '<button class="fsHintBtn" id="fsHintBtn" onclick="fsHint()"' + (fsHintsLeft(s) <= 0 ? ' disabled' : '') + '>' + t("fs_hint") + ' (' + fsHintsLeft(s) + ')</button></div>' +
     '<div class="fsBoardWrap"><div class="fsBoard"><div class="fsInner" id="fsInner" onpointerdown="fsDown(event)" onpointermove="fsMove(event)" onpointerup="fsUp(event)" onpointercancel="fsCancel()">' +
       '<div class="fsGrid">' + cells + '</div><div class="fsLayer" id="fsLayer">' + fruit + '</div></div></div></div>' +
     '<div class="fsFound"><b>' + t("fs_found") + '</b><div class="fsWords">' + words + '</div></div>' +
@@ -7730,7 +7771,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 A";
+var APP_BUILD = "2026-10-25 B";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
