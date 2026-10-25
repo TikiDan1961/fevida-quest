@@ -6348,16 +6348,14 @@ function dpStep(s, dt){
   if(!dp.doneAt && dp.passed >= DP_CLOUDS) dp.doneAt = dp.t;
   if(dp.doneAt){
     var since = dp.t - dp.doneAt;
-    if(s.round >= DP_ROUNDS.length - 1){
-      if(since > .9){ dp.scene = {t: 0, landed: false}; }       // the last round ends with the dove flying to Noah's Ark
-      return;
-    }
-    // rounds 1 and 2 (2026-10-25, per Dan): the dove settles in the middle, then flies off the right side of the sky, and only then does ROUND X COMPLETED! come up
+    // every round (2026-10-25, per Dan; round 3 too): the dove settles in the middle, then flies off the right side of the sky, and only then does ROUND X COMPLETED! come up
+    // (after round 3, Noah's Ark: the scene begins, and the dove flies in again from the top left)
     if(since > .35){
       var nowMs = performance.now();
       dp.x += (.45 + 1.3 * (since - .35)) * dt;
       if(nowMs - dp.flapAt > 200) dp.flapAt = nowMs;                    // flapping as it goes
       if(dp.x > 1.14){
+        if(s.round >= DP_ROUNDS.length - 1){ dp.scene = {t: 0, landed: false}; return; }       // the last round ends with the dove flying to Noah's Ark
         s.interlude = {n: s.round + 1, phase: "msg", award: false, final: false};     // ROUND X COMPLETED!
         saveState(); render();
       }
@@ -6503,11 +6501,11 @@ function dpDrawScene(ctx, cw, ch){
     ctx.fillStyle = "#2A62B4"; ctx.fillRect(i, y2, 1, ch - y2);
   }
   // the dove: along a curve from the top left corner down to the roof of the ark, flapping, then perched
-  var roofTop = cy0 - roofH, endX = cx0 + Math.floor(Wc / 2) - 14, endY = roofTop - 20;
+  var roofTop = cy0 - roofH, endX = cx0 + Math.floor(Wc / 2) - 7, endY = roofTop - 10;      // (the dove is drawn at its in-game size, 15 x 10, 2026-10-25, per Dan; it was twice that)
   var P0 = [-.14 * cw, .1 * ch], P1 = [.3 * cw, -.02 * ch], P2 = [.3 * cw, .36 * ch], P3 = [endX, endY];
   var p = Math.max(0, Math.min(1, (t - .6) / 3.2)), e = p * p * (3 - 2 * p), q = 1 - e;
   var dx = q * q * q * P0[0] + 3 * q * q * e * P1[0] + 3 * q * e * e * P2[0] + e * e * e * P3[0], dy = q * q * q * P0[1] + 3 * q * q * e * P1[1] + 3 * q * e * e * P2[1] + e * e * e * P3[1];
-  dpSprite(ctx, p < 1 ? (Math.floor(t * 7) % 2 ? DP_UP : DP_DOWN) : DP_DOWN, Math.round(dx), Math.round(dy), false, 2);
+  dpSprite(ctx, p < 1 ? (Math.floor(t * 7) % 2 ? DP_UP : DP_DOWN) : DP_DOWN, Math.round(dx), Math.round(dy), false, 1);
   if(t > 3.8){                                                              // sparkles round the ark
     ctx.fillStyle = "#FFFFFF";
     for(k = 0; k < 7; k++){
@@ -7877,7 +7875,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 Q";
+var APP_BUILD = "2026-10-25 R";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
