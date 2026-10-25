@@ -642,7 +642,7 @@
   /* Jacob's Ladder (2026-10-24): the sky is one low-resolution canvas stretched up with hard pixels; the controls are two halves of a bar. */
   .jlArea{width:min(100%,380px);margin:0 auto;}
   .jlPlay{display:flex;gap:10px;align-items:stretch;}
-  .jlStage{flex:1;min-width:0;position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 315px),460px);height:clamp(230px,calc(100dvh - 315px),460px);border:4px solid #FFC93A;border-radius:16px;
+  .jlStage{flex:1;min-width:0;position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 369px),460px);height:clamp(230px,calc(100dvh - 369px),460px);border:4px solid #FFC93A;border-radius:16px;
     box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;background:#78BDFF;}
   .jlCanvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
   .jlMeter{flex:none;position:relative;width:30px;box-sizing:border-box;overflow:hidden;border:4px solid #FFC93A;border-radius:16px;background:#35507F;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);}
@@ -651,7 +651,7 @@
   .jlOhNo{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:5;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FF5A5A;
     text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,3px 3px #fff,-3px -3px #fff,3px -3px #fff,-3px 3px #fff,5px 5px 0 #1B1F3B;animation:jlOh .22s steps(2) infinite;}
   @keyframes jlOh{0%{transform:translate(-2px,0) rotate(-2deg);}100%{transform:translate(2px,0) rotate(2deg);}}
-  .jlBar{display:flex;margin-top:10px;box-sizing:border-box;height:54px;border:4px solid #1B1F3B;border-radius:18px;background:#3A8FE8;box-shadow:inset 0 0 0 3px #1C4E9A;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .jlBar{display:flex;margin-top:10px;box-sizing:border-box;height:108px;border:4px solid #1B1F3B;border-radius:18px;background:#3A8FE8;box-shadow:inset 0 0 0 3px #1C4E9A;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;}
   .jlHalf{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;border:0;background:none;padding:0;margin:0;cursor:pointer;touch-action:none;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;letter-spacing:.04em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
   .jlHalf + .jlHalf{border-left:4px solid #1B1F3B;}
@@ -661,7 +661,7 @@
   .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
-  .pbStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 315px),460px);height:clamp(230px,calc(100dvh - 315px),460px);border:4px solid #FFC93A;border-radius:16px;
+  .pbStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 369px),460px);height:clamp(230px,calc(100dvh - 369px),460px);border:4px solid #FFC93A;border-radius:16px;
     box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;
     background:
       radial-gradient(circle at 12% 14%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 84% 9%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 26% 38%,#cfd6ff 0 1px,transparent 1.5px),
@@ -691,6 +691,8 @@
   .pbFb.perfect{color:#FFE680;} .pbFb.good{color:#B8F2A0;} .pbFb.early,.pbFb.miss{color:#FF8A8A;}
   @keyframes pbFb{0%{opacity:1;transform:translateY(6px);}15%{opacity:1;transform:translateY(0);}70%{opacity:1;}100%{opacity:0;transform:translateY(-6px);}}
   .pbBar{margin-top:10px;}
+  .msBar.pbBar{height:108px;}      /* (2026-10-25, per Dan) the bottom buttons of Pray the Beads and Jacob's Ladder are twice as tall: 108px, was 54 */
+  @media (max-height:700px){ .msBar.pbBar,.jlBar{height:88px;} }
   /* Mustard Seed (2026-10-23): the garden board, the stage guide and the swipe bar. The whole area takes the swipe. */
   .msHud{display:flex;align-items:center;justify-content:space-between;gap:6px;width:min(100%,380px);margin:0 auto 6px;}
   .msHud .pixNote{margin:0;font-size:.875rem;}
@@ -5678,7 +5680,7 @@ var PB_CHANCES = 3;
 // (2026-10-24, per Dan: the speed doubles each round, so the beads move 2 and then 4 times as fast as in round 1. gap = ms for a bead to travel the usual distance to the next one, which
 // is how far apart they are drawn, so it halves each round. Taps would then come too fast to make, so no two beads are less than PB_MIN_MS apart, and a tap counts for at least
 // PB_MIN_WINDOW ms either side of the beat even when the ring is passed quicker than that.) beads = how many, after the large one.
-var PB_ROUNDS = [{gap: 760, beads: 20}, {gap: 380, beads: 30}, {gap: 190, beads: 40}];
+var PB_ROUNDS = [{gap: 700, beads: 20}, {gap: 380, beads: 30}, {gap: 215, beads: 40}];      // (2026-10-25, per Dan: round 1 a little faster, was 760, and round 3 a little slower, was 190)
 var PB_MIN_MS = {normal: 300, burst: 220};
 var PB_MIN_WINDOW = {good: 110, perfect: 55};
 var PB_FIRST_MS = 1500;                                                    // the first bead is never sooner than this after the round starts
@@ -7021,7 +7023,7 @@ function jlGenerate(s, until){
     var lastY = last.y, thisY = jl.nextY;
     if(cfg.storm && jl.count > 3 && Math.random() < cfg.storm){                  // a storm cloud between this rung and the next, away from the two
       var sx = Math.max(14, Math.min(JL_W - 14, x + (x < JL_W / 2 ? 1 : -1) * jlRand(34, 70)));
-      jl.storms.push({x: sx, y: jl.nextY + 18, dx: (Math.random() < .5 ? -1 : 1) * jlRand(8, 16)});
+      jl.storms.push({x: sx, y: jl.nextY + 18, dx: (Math.random() < .5 ? -1 : 1) * jlRand(16, 32)});
     }
     var gapNext = jlRand(cfg.gap[0], cfg.gap[1]);
     if(kind === "c") gapNext = Math.min(gapNext, Math.max(8, 60 - (thisY - lastY)));            // a rung that breaks must not be the only way up: the rung after it is in reach of the one before it
@@ -7728,7 +7730,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-24 ZI";
+var APP_BUILD = "2026-10-25 A";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
