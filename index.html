@@ -607,6 +607,7 @@
   .dpCanvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
   .dpReady{position:absolute;left:0;right:0;top:58%;text-align:center;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
+  .pixMission > .pbTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* until the first tap of a round, the whole screen starts it (the red X, above it, still works) */
   .pixMission > .dpTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* the whole screen flaps the dove (the red X, above it, still works) */
   /* Fruits of the Spirit (2026-10-24): a 6 x 6 board of cream squares with the fruit laid over them as pictures of their own, so that they can slide; the 8 words and their counts below. */
   .fsBoardWrap{position:relative;width:min(100%,380px,calc(100vh - 460px));width:min(100%,380px,calc(100dvh - 460px));margin:4px auto 0;}
@@ -5722,6 +5723,7 @@ var PB_ROOM = .02;                                                         // th
 var PB_PERFECT_ZONE = .045;                                                // a bead this near the middle of the ring is Perfect
 var PB_SHOW_LAG = 40, PB_START_WAIT = 800;
 var PB_GRACE = 60;                                                         // ms a bead is not yet counted as missed after its window, for a tap that is still on its way to the game
+var pbWaiting = true;                                                        // a round does not start until the player taps the screen (2026-10-25, per Dan), as in Dove of Peace
 var pbStartAt = 0, pbRaf = 0, pbLastT = 0, pbBound = null, pbBoundRound = -1, pbLastTapAt = 0;
 // the string: a curve from the top of the stage down to the cross (all in % of the stage), measured so that beads a steady time apart are an even distance apart
 var PB_PATH = (function(){
@@ -5806,7 +5808,17 @@ function pbBeginRound(s){
     s.at.push(i === 0 ? Math.max(PB_FIRST * cfg.gap, PB_FIRST_MS) : s.at[i - 1] + Math.max(cfg.gap * f, floor));       // when it reaches the ring, ms after the start
   }
   s.fb = null; s.busy = false; s.interlude = null;
-  pbStartAt = performance.now() + PB_START_WAIT; pbBound = s; pbBoundRound = s.round; pbLastTapAt = 0;
+  pbStartAt = Infinity; pbWaiting = true;                                  // the clock starts at the player's first tap (pbStart)
+  pbBound = s; pbBoundRound = s.round; pbLastTapAt = 0;
+}
+// the first tap on the screen starts the round: the beads begin to come after a short wait
+function pbStart(){
+  var s = state.session.prayBeads;
+  if(!s || s.status !== "playing" || s.interlude || s.busy || !s.res || !pbWaiting) return;
+  if(pixAudioStale) pixReviveOnTap();
+  pbWaiting = false; pbStartAt = performance.now() + PB_START_WAIT; pbLastT = performance.now();
+  var rd = document.getElementById("pbReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
+  var all = document.querySelector(".pbTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
 }
 function initPrayBeads(){
   var s = {v: 3, round: 0, chances: PB_CHANCES, res: [], fb: null, busy: false, status: "playing", interlude: null};
@@ -5872,7 +5884,7 @@ function pbMiss(i){
 }
 function pbTap(){
   var s = state.session.prayBeads;
-  if(!s || s.status !== "playing" || s.interlude || s.busy || !s.res) return;
+  if(!s || s.status !== "playing" || s.interlude || s.busy || !s.res || pbWaiting) return;
   if(pixAudioStale) pixReviveOnTap();
   var now = performance.now(), touched = pixDownT;
   if(!(touched > 0) || touched > now || now - touched > 400) touched = now;      // no usable touch time
@@ -5929,13 +5941,14 @@ function screenPrayBeads(){
   return pixShell('<h2 class="pixMTitle">' + t("prayBeadsName") + '</h2>' +
     '<div class="pixNote">' + t("pb_intro") + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, PB_ROUNDS.length) + '</span>' + chancesHeartsHtml(Math.max(0, pbChancesLeft(s)), PB_CHANCES) + '</div>' +
+    (pbWaiting ? '<div class="pbTapAll" onclick="pbStart()"></div>' : '') +
     '<div class="pbArea">' +
       '<div class="pbStage" id="pbStage">' +
         '<svg class="pbString" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="' + pts.join(" ") + ' 50,90"/></svg>' +
         '<div class="pbCrux"></div>' +
         '<div class="pbLabel"><b>' + label + '</b><i>' + sub + '</i></div>' +
         '<div class="pbCross' + (s.fb && (s.fb.k === "perfect" || s.fb.k === "good") ? ' flash' : '') + '"></div>' +
-        beads + fb +
+        beads + fb + (pbWaiting ? '<div class="dpReady" id="pbReady">' + t("dp_ready") + '</div>' : '') +
       '</div>' +
       '<button class="msBar pbBar" data-sfx="own" onclick="pbTap()"><span>' + t("pb_tap") + '</span></button>' +
     '</div>' +
@@ -6535,7 +6548,7 @@ function dpDrawScene(ctx, cw, ch){
 }
 function dpSceneStep(s, dt){
   var sc = dp.scene; sc.t += dt;
-  if(!sc.landed && sc.t > 3.8){ sc.landed = true; pixSfxPlay("missionDone", true); }          // (sound_effect_11, the Mission Complete sound, instead of the Faith Match sound: 2026-10-25, per Dan)
+  if(!sc.landed && sc.t > 3.8){ sc.landed = true; pixSfxPlay("clCatch", true); }          // (sound_effect_1, the Catch the Light catch sound, 2026-10-25, per Dan: first sound_effect_11, then this one)
   if(sc.t > 6.4){
     s.interlude = {n: s.round + 1, phase: "msg", award: false, final: true};     // ROUND 3 COMPLETED!, then the Mission Complete screen
     saveState(); render();
@@ -7892,7 +7905,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 T";
+var APP_BUILD = "2026-10-25 U";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
