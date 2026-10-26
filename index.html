@@ -4185,9 +4185,11 @@ function clInterlude(){
 // SLIDE band, the layer stays until the finger lifts and steers the hands itself (and the window-level listeners above carry on with it too).
 // (2026-10-25, per Dan: on the phone a tap did nothing, after the layer had been given pointer handlers instead of a click.) The layer listens for the pointer, the touch and the click, whichever
 // comes first starts the round, and the start never depends on the steering part working.
+var clLayerBorn = 0;      // when the start layer was drawn: the rest of the touch that opened the game (its lift, its click) is not a tap on it
 function clGo(ev){
   var s = state.session.catchLight;
   if(!clWaiting || !s || s.status !== "playing" || s.interlude) return;
+  if(performance.now() - clLayerBorn < 350) return;
   clWaiting = false;
   var rd = document.getElementById("clReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
   var all = document.querySelector(".clTapAll"), steer = false;
@@ -4208,7 +4210,8 @@ function clLayerMove(ev){
   clPtrX = ev.clientX;
   if(!clFading && state.screen === "catchLight") clMoveHandTo(ev.clientX);
 }
-function clLayerEnd(ev){ if(ev.pointerId === clPtrId){ clDragging = false; clPtrId = null; } clLayerGone(); }
+// (the lift of the finger that touched START MISSION lands on this layer, which has just appeared under it: it must not take the layer away before the round has been started, 2026-10-25)
+function clLayerEnd(ev){ if(clWaiting) return; if(ev.pointerId === clPtrId){ clDragging = false; clPtrId = null; } clLayerGone(); }
 function clStart(){
   if(clRunning) return;
   clRunning = true;
@@ -4276,6 +4279,7 @@ function screenCatchLight(){
   }
 
   var levelCfg = CL_LEVELS[s.level];
+  if(clWaiting) clLayerBorn = performance.now();
   return pixShell((clWaiting ? '<div class="clTapAll" onpointerdown="clGo(event)" ontouchstart="clGo(event)" onclick="clGo(event)" onpointermove="clLayerMove(event)" onpointerup="clLayerEnd(event)" onpointercancel="clLayerEnd(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
     '<div class="pixNote">' + t("cl_intro") + '</div>' +
     '<div class="pixHud">' +
@@ -8004,7 +8008,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 ZD";
+var APP_BUILD = "2026-10-25 ZF";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
