@@ -392,7 +392,7 @@
   .pixMission .pixIntroTitle{margin:0 0 12px;padding:0 8px;font-size:2rem;}
   @media (max-height:640px){ .pixMission .pixIntroTitle{font-size:1.75rem;margin-bottom:8px;} .pixMission .pixIntroMid{padding-top:0;} }
   .pixGuide{text-align:left;}
-  .pixGuideDesc{margin:0 0 12px;font-weight:700;font-size:1.125rem;line-height:1.25;}
+  .pixGuideDesc{margin:0 0 12px;font-weight:700;font-size:1.125rem;line-height:1.25;text-align:center;}      /* the first, bold sentence is centred across the window (2026-10-25, per Dan) */
   .pixGuide ul{margin:0;padding:0;list-style:none;}
   .pixGuide li{position:relative;margin:0 0 9px;padding-left:20px;font-weight:500;font-size:1rem;line-height:1.28;color:#3d4d96;}
   .pixGuide li:last-child{margin-bottom:0;}
@@ -6535,7 +6535,7 @@ function dpDrawScene(ctx, cw, ch){
 }
 function dpSceneStep(s, dt){
   var sc = dp.scene; sc.t += dt;
-  if(!sc.landed && sc.t > 3.8){ sc.landed = true; pixSfxPlay("fmMatch", true); }
+  if(!sc.landed && sc.t > 3.8){ sc.landed = true; pixSfxPlay("missionDone", true); }          // (sound_effect_11, the Mission Complete sound, instead of the Faith Match sound: 2026-10-25, per Dan)
   if(sc.t > 6.4){
     s.interlude = {n: s.round + 1, phase: "msg", award: false, final: true};     // ROUND 3 COMPLETED!, then the Mission Complete screen
     saveState(); render();
@@ -7892,7 +7892,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 S";
+var APP_BUILD = "2026-10-25 T";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
