@@ -839,7 +839,7 @@
   .pixMission .clIcon::before{content:"";position:absolute;left:-16px;top:-16px;right:-16px;bottom:-16px;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle,rgba(255,244,170,.9) 0,rgba(255,214,90,.5) 36%,rgba(255,214,90,0) 70%);animation:clGlow .55s ease-in-out infinite alternate;}
   @keyframes clGlow{from{opacity:.55;transform:scale(.88);}to{opacity:1;transform:scale(1.18);}}
-  .pixMission > .clTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* until the first tap of a round, the whole screen starts it (the red X, above it, still works) */
+  .pixMission > .clTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;}      /* until the first tap of a round, the whole screen starts it (the red X, above it, still works) */
   .pixMission .clField .dpReady{top:50%;transform:translateY(-50%);}
   .pixMission .clIcon{position:absolute;top:-50px;width:32px;height:32px;background:url("tiles/icons48/ic_catchLight.png") center / 100% 100% no-repeat;image-rendering:auto;user-select:none;pointer-events:none;}
   .pixMission .clHands{position:absolute;bottom:4px;width:78px;height:40px;background:url("tiles/hands3.png") center / 100% 100% no-repeat;image-rendering:pixelated;transform:translateX(-50%);user-select:none;pointer-events:none;}
@@ -4180,16 +4180,30 @@ function clInterlude(){
     });
 }
 
-// the first tap on the screen starts the round
-function clGo(){
+// the first tap on the screen starts the round. (2026-10-25, per Dan: the hands did not follow the finger that started the round, and it had to be lifted and put down again.) The
+// layer that takes the tap used to be taken away at once, and a finger that goes on touching a thing that has gone is not heard by anything else. Now, when the touch began on the
+// SLIDE band, the layer stays until the finger lifts and steers the hands itself (and the window-level listeners above carry on with it too).
+function clGo(ev){
   var s = state.session.catchLight;
   if(!clWaiting || !s || s.status !== "playing" || s.interlude) return;
   if(pixAudioStale) pixReviveOnTap();
   clWaiting = false;
   var rd = document.getElementById("clReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
-  var all = document.querySelector(".clTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
+  var all = document.querySelector(".clTapAll");
+  if(ev && ev.pointerId !== undefined && clInBand(ev)){
+    clDragging = true; clPtrId = ev.pointerId; clPtrX = ev.clientX;
+    try { if(all) all.setPointerCapture(ev.pointerId); } catch(e){}
+    setTimeout(clLayerGone, 20000);                                         // (a touch whose end is never heard)
+  } else clLayerGone();
   if(!clRunning && s.phase === "playing") clStart();
 }
+function clLayerGone(){ var all = document.querySelector(".clTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all); }
+function clLayerMove(ev){
+  if(!clDragging || ev.pointerId !== clPtrId) return;
+  clPtrX = ev.clientX;
+  if(!clFading && state.screen === "catchLight") clMoveHandTo(ev.clientX);
+}
+function clLayerEnd(ev){ if(ev.pointerId === clPtrId){ clDragging = false; clPtrId = null; } clLayerGone(); }
 function clStart(){
   if(clRunning) return;
   clRunning = true;
@@ -4257,7 +4271,7 @@ function screenCatchLight(){
   }
 
   var levelCfg = CL_LEVELS[s.level];
-  return pixShell((clWaiting ? '<div class="clTapAll" onclick="clGo()"></div>' : '') + '<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
+  return pixShell((clWaiting ? '<div class="clTapAll" onpointerdown="clGo(event)" onpointermove="clLayerMove(event)" onpointerup="clLayerEnd(event)" onpointercancel="clLayerEnd(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
     '<div class="pixNote">' + t("cl_intro") + '</div>' +
     '<div class="pixHud">' +
       '<span class="pixNote" id="clLevel">' + t("cl_level")(s.level+1, CL_LEVELS.length) + '</span>' +
@@ -7985,7 +7999,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 ZB";
+var APP_BUILD = "2026-10-25 ZC";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
