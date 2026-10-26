@@ -4195,11 +4195,15 @@ function clInterlude(){
 // SLIDE band, the layer stays until the finger lifts and steers the hands itself (and the window-level listeners above carry on with it too).
 // (2026-10-25, per Dan: on the phone a tap did nothing, after the layer had been given pointer handlers instead of a click.) The layer listens for the pointer, the touch and the click, whichever
 // comes first starts the round, and the start never depends on the steering part working.
-var clLayerBorn = 0;      // when the start layer was drawn: the rest of the touch that opened the game (its lift, its click) is not a tap on it
+// The tail of the touch that opened the game (its lift, its click) must not start the round: a click only counts after a pointer or touch has come down on the layer (clTouched). This replaced a
+// 0.35 s guard that was worked out from the clock (2026-10-25, per Dan: after the phone slept between levels 7 and 8 the message could not be got past). And whatever the layer does, ANY new
+// touch on the screen while the message is up starts the round too (the listener under the function).
+var clTouched = false;
 function clGo(ev){
   var s = state.session.catchLight;
   if(!clWaiting || !s || s.status !== "playing" || s.interlude) return;
-  if(performance.now() - clLayerBorn < 350) return;
+  if(ev && ev.type === "click" && !clTouched) return;
+  if(ev && (ev.type === "pointerdown" || ev.type === "touchstart")) clTouched = true;
   clWaiting = false;
   var rd = document.getElementById("clReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
   var all = document.querySelector(".clTapAll"), steer = false;
@@ -4214,6 +4218,11 @@ function clGo(ev){
   if(!steer) clLayerGone();
   if(!clRunning && s.phase === "playing") clStart();
 }
+document.addEventListener("pointerdown", function(e){
+  if(state.screen !== "catchLight" || !clWaiting) return;
+  if(e.target && e.target.closest && e.target.closest(".exitBar, .exitBtn")) return;          // the red X is not a tap to start
+  clGo(e);
+}, true);
 function clLayerGone(){ var all = document.querySelector(".clTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all); }
 function clLayerMove(ev){
   if(!clDragging || ev.pointerId !== clPtrId) return;
@@ -4289,7 +4298,7 @@ function screenCatchLight(){
   }
 
   var levelCfg = CL_LEVELS[s.level];
-  if(clWaiting) clLayerBorn = performance.now();
+  if(clWaiting) clTouched = false;
   return pixShell((clWaiting ? '<div class="clTapAll" onpointerdown="clGo(event)" ontouchstart="clGo(event)" onclick="clGo(event)" onpointermove="clLayerMove(event)" onpointerup="clLayerEnd(event)" onpointercancel="clLayerEnd(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
     '<div class="pixNote">' + t("cl_intro") + '</div>' +
     '<div class="pixHud">' +
@@ -5932,6 +5941,11 @@ function pbStart(){
   var rd = document.getElementById("pbReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
   var all = document.querySelector(".pbTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
 }
+document.addEventListener("pointerdown", function(e){          // any new touch while the message is up starts the round, whatever the layer does (as in Catch the Light and Jacob's Ladder)
+  if(state.screen !== "prayBeads" || !pbWaiting) return;
+  if(e.target && e.target.closest && e.target.closest(".exitBar, .exitBtn")) return;
+  pbStart();
+}, true);
 function initPrayBeads(){
   var s = {v: 3, round: 0, chances: PB_CHANCES, res: [], fb: null, busy: false, status: "playing", interlude: null};
   state.session.prayBeads = s;
@@ -7275,10 +7289,10 @@ var JL_ROUNDS = [
   {goal: 2400, gap: [30, 54], moving: .4, mspeed: 1.3, mamp: 26, crumble: .25, wing: .06, storm: .12}];      // and more slide a little faster in round 3 (about 34))
 var JL_G = 560, JL_V0 = 280, JL_VX = 92, JL_RW = 26, JL_HW = 7, JL_KICK = 130, JL_KICKDECAY = 6, JL_LOCK = .2, JL_RAMP = .12;       // JL_RAMP: seconds to go from standing still to the top speed (and back) when a button is touched or let go (2026-10-25, per Dan)                         // gravity and bounce speed (pixels a second): a bounce goes 70 pixels up; steering speed; a rung's width
 var JL_OHNO = 1.9;                                                           // seconds the OH NO!!!! message stays up (2026-10-24, per Dan), with everything frozen
-var JL_MISS = .5, JL_INV = 1.1;                                               // how far below his highest he may fall (of the screen's height) before it is a miss, i.e. below every rung that is left; seconds of flicker after a storm
+var JL_MISS = .5, JL_INV = 1.5;                                               // how far below his highest he may fall (of the screen's height) before it is a miss, i.e. below every rung that is left; seconds of flicker after a storm
 var JL_BODY = {W: "#FFFFFF", H: "#6E4624", S: "#FAD6B0", R: "#3A6FD8", K: "#281E1E", G: "#FFC93A", B: "#6E4624"};
 var jlWaiting = true;      // a round does not start until the player taps the screen (2026-10-25, per Dan), as in Dove of Peace, Pray the Beads and Catch the Light; a climb that starts again after a fall does not wait
-var jlLayerBorn = 0;       // when the start layer was drawn: the rest of the touch that opened the game (its lift, its click) is not a tap on it
+var jlTouched = false;     // a click only starts the round after a pointer or touch has come down on the layer (the tail of the touch that opened the game is not a tap)
 var jl = null, jlBound = null, jlBoundRound = -1, jlRaf = 0, jlHold = {}, jlKeys = {l: false, r: false};
 function jlChancesLeft(s){ return typeof s.chances === "number" ? s.chances : JL_CHANCES; }
 function jlRand(a, b){ return a + Math.random() * (b - a); }
@@ -7320,7 +7334,7 @@ function jlGenerate(s, until){
     jl.last = kind; jl.count++;
     var lastY = last.y, thisY = jl.nextY;
     // (2026-10-25, per Dan) two storm clouds are never closer together than one screen's height (jl.ch, the height of the sky on this phone)
-    if(cfg.storm && jl.count > 3 && Math.random() < cfg.storm && (typeof jl.lastStormY !== "number" || jl.nextY + 18 - jl.lastStormY >= jl.ch)){                  // a storm cloud between this rung and the next, away from the two
+    if(cfg.storm && jl.count > 3 && Math.random() < cfg.storm && (typeof jl.lastStormY !== "number" || jl.nextY + 18 - jl.lastStormY >= jl.ch) && jl.nextY + 18 <= cfg.goal - jl.ch){          // (and none within one screen height of the goal height, 2026-10-25, per Dan)                  // a storm cloud between this rung and the next, away from the two
       var sx = Math.max(14, Math.min(JL_W - 14, x + (x < JL_W / 2 ? 1 : -1) * jlRand(34, 70)));
       jl.lastStormY = jl.nextY + 18;
       jl.storms.push({x: sx, y: jl.nextY + 18, dx: (Math.random() < .5 ? -1 : 1) * jlRand(16, 32)});
@@ -7402,7 +7416,7 @@ function jlStep(s, dt){
   if(jl.inv <= 0){
     for(i = 0; i < jl.storms.length; i++){
       var sc = jl.storms[i], sdx = Math.abs(jl.x - sc.x);
-      if(sdx < 13 && Math.abs((jl.y + 8) - sc.y) < 10){ jl.inv = JL_INV; jl.vy = Math.min(jl.vy, 0); jlLoseChance(s, "storm"); return; }
+      if(sdx < 13 && Math.abs((jl.y + 8) - sc.y) < 10){ jl.inv = JL_INV; jlLoseChance(s, "storm"); return; }          // (2026-10-25, per Dan: a hit costs a chance but Jacob goes on through the cloud; before, his speed was cut to nothing going up, and the cloud was like a ceiling. The flicker is 1.5 s now, it was 1.1)
     }
   }
   // below every rung that is left: it is a miss. The sky stops following him and he falls on, off the bottom of the screen.
@@ -7535,13 +7549,19 @@ function jlLoop(now){
 function jlGo(ev){
   var s = state.session.jacobLadder;
   if(!jlWaiting || !s || s.status !== "playing" || s.interlude) return;
-  if(performance.now() - jlLayerBorn < 350) return;
+  if(ev && ev.type === "click" && !jlTouched) return;
+  if(ev && (ev.type === "pointerdown" || ev.type === "touchstart")) jlTouched = true;
   jlWaiting = false;
   try { if(pixAudioStale) pixReviveOnTap(); } catch(e){}
   var rd = document.getElementById("jlReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
   var all = document.querySelector(".jlTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
   if(jl) jl.last_t = performance.now();
 }
+document.addEventListener("pointerdown", function(e){          // any new touch while the message is up starts the round, whatever the layer does
+  if(state.screen !== "jacobLadder" || !jlWaiting) return;
+  if(e.target && e.target.closest && e.target.closest(".exitBar, .exitBtn")) return;
+  jlGo(e);
+}, true);
 function jlLoopStart(){
   if(jlRaf) return;
   if(jl) jl.last_t = performance.now();
@@ -7621,7 +7641,7 @@ function screenJacobLadder(){
   if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("jacobLadderName") + '</h2><div class="pixChances">' + hearts + '</div>' + pixRoundDoneHtml(s.interlude), "pixLower");
   if(!jl || jlBound !== s || jlBoundRound !== s.round){ jlHold = {}; jlBegin(s); }          // a round that was saved in the middle starts again
   var cfg = JL_ROUNDS[s.round], pct = Math.round(100 * Math.max(0, Math.min(1, jl.top / cfg.goal)));
-  if(jlWaiting) jlLayerBorn = performance.now();
+  if(jlWaiting) jlTouched = false;
   return pixShell((jlWaiting ? '<div class="jlTapAll" onpointerdown="jlGo(event)" ontouchstart="jlGo(event)" onclick="jlGo(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("jacobLadderName") + '</h2>' +
     '<div class="pixNote">' + t("jl_intro") + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, JL_ROUNDS.length) + '</span>' + hearts + '</div>' +
@@ -8042,7 +8062,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 ZR";
+var APP_BUILD = "2026-10-26 A";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
