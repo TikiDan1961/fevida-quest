@@ -7289,6 +7289,7 @@ var JL_ROUNDS = [
   {goal: 2400, gap: [30, 54], moving: .4, mspeed: 1.3, mamp: 26, crumble: .25, wing: .06, storm: .12}];      // and more slide a little faster in round 3 (about 34))
 var JL_G = 560, JL_V0 = 280, JL_VX = 92, JL_RW = 26, JL_HW = 7, JL_KICK = 130, JL_KICKDECAY = 6, JL_LOCK = .2, JL_RAMP = .12;       // JL_RAMP: seconds to go from standing still to the top speed (and back) when a button is touched or let go (2026-10-25, per Dan)                         // gravity and bounce speed (pixels a second): a bounce goes 70 pixels up; steering speed; a rung's width
 var JL_OHNO = 1.9;                                                           // seconds the OH NO!!!! message stays up (2026-10-24, per Dan), with everything frozen
+var JL_STORM_V = [10, 20];                                                    // how fast a storm cloud drifts sideways, in sky pixels a second (2026-10-26, per Dan: slower; it was 16 to 32, and 8 to 16 before that)
 var JL_MISS = .5, JL_INV = 1.5;                                               // how far below his highest he may fall (of the screen's height) before it is a miss, i.e. below every rung that is left; seconds of flicker after a storm
 var JL_BODY = {W: "#FFFFFF", H: "#6E4624", S: "#FAD6B0", R: "#3A6FD8", K: "#281E1E", G: "#FFC93A", B: "#6E4624"};
 var jlWaiting = true;      // a round does not start until the player taps the screen (2026-10-25, per Dan), as in Dove of Peace, Pray the Beads and Catch the Light; a climb that starts again after a fall does not wait
@@ -7337,7 +7338,7 @@ function jlGenerate(s, until){
     if(cfg.storm && jl.count > 3 && Math.random() < cfg.storm && (typeof jl.lastStormY !== "number" || jl.nextY + 18 - jl.lastStormY >= jl.ch) && jl.nextY + 18 <= cfg.goal - jl.ch){          // (and none within one screen height of the goal height, 2026-10-25, per Dan)                  // a storm cloud between this rung and the next, away from the two
       var sx = Math.max(14, Math.min(JL_W - 14, x + (x < JL_W / 2 ? 1 : -1) * jlRand(34, 70)));
       jl.lastStormY = jl.nextY + 18;
-      jl.storms.push({x: sx, y: jl.nextY + 18, dx: (Math.random() < .5 ? -1 : 1) * jlRand(16, 32)});
+      jl.storms.push({x: sx, y: jl.nextY + 18, dx: (Math.random() < .5 ? -1 : 1) * jlRand(JL_STORM_V[0], JL_STORM_V[1])});
     }
     var gapNext = jlRand(cfg.gap[0], cfg.gap[1]);
     if(kind === "c") gapNext = Math.min(gapNext, Math.max(8, 60 - (thisY - lastY)));            // a rung that breaks must not be the only way up: the rung after it is in reach of the one before it
@@ -8062,7 +8063,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 A";
+var APP_BUILD = "2026-10-26 B";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
