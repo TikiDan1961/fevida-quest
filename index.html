@@ -1797,7 +1797,10 @@ var PIX_SFX = {
   jlFall:{url:"sounds/sfx_jl_fall.wav", gain:0.3},          // falling off the bottom of the sky (2026-10-24, per Dan): sound_effect_16, peak 0.99, in place of the Faith Match miss / last-chance sounds
   // the pilgrim going in at the church door, on the Main Menu and in each round of Pilgrim's Road (2026-10-26, per Dan): "Church Bell.wav" from the Non 8-Bit Sounds folder, 12 s of its
   // 15 (the rest is silence), mono, 16-bit, 32 kHz so it is 0.75 MB instead of 4. The next screen waits for it to finish (pixAfterSfx).
-  churchBell:{url:"sounds/sfx_church_bell.wav", gain:1.2}
+  churchBell:{url:"sounds/sfx_church_bell.wav", gain:1.2},
+  // tapping a sheep on the Main Menu (2026-10-26, per Dan): "Sheep Baa 1.wav" or "Sheep Baa 2.wav" (Non 8-Bit Sounds folder, 1 s each, peak 0.37), picked at random, in place of the button sound
+  sheepBaa1:{url:"sounds/sfx_sheep_baa1.wav", gain:1.0},
+  sheepBaa2:{url:"sounds/sfx_sheep_baa2.wav", gain:1.0}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -2340,7 +2343,7 @@ var PETS = [
 ];
 var petState = {}, petsRaf = 0;   // petState keeps where each one is, so a redraw of the screen doesn't move them
 function petHtml(p){
-  return '<div class="pixPet" id="' + p.id + '" role="button" aria-label="Sheep" onclick="petTap(\'' + p.id + '\')" style="width:' + (p.w / SCENE_W * 100) + '%;aspect-ratio:' + p.w + '/' + p.h + '"><div class="petFlip"><div class="petSprite ' + p.kind + '"></div></div></div>';
+  return '<div class="pixPet" id="' + p.id + '" role="button" aria-label="Sheep" data-sfx="own" onclick="petTap(\'' + p.id + '\')" style="width:' + (p.w / SCENE_W * 100) + '%;aspect-ratio:' + p.w + '/' + p.h + '"><div class="petFlip"><div class="petSprite ' + p.kind + '"></div></div></div>';
 }
 function petRand(a, b){ return a + Math.random() * (b - a); }
 function petPlace(p, el){
@@ -2458,6 +2461,7 @@ function petTap(id){
   var el = document.getElementById(id); if(!el) return;
   el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop");
   setTimeout(function(){ el.classList.remove("hop"); }, 450);
+  pixSfxPlayHeld(Math.random() < 0.5 ? "sheepBaa1" : "sheepBaa2", false);        // a random one of the two baa sounds (the button sound is switched off on the sheep: data-sfx="own")
   pilgrimSay(t("sheepSays"), el, 2200);
 }
 function pilgrimHide(){
@@ -5322,6 +5326,10 @@ function wtUp(){
     s.busy = true;
     pixSfxPlay("fmMatch", true);
     wtPaint("ok");
+    path.forEach(function(i){                                              // every letter of the word sparkles (2026-10-26, per Dan: the burst of Fruits of the Spirit)
+      var q = wtDrag.rects && wtDrag.rects[i];
+      if(q) pixBurst(Math.round(q.l + q.w / 2), Math.round(q.t + q.h / 2), .55, 14);
+    });
     setTimeout(function(){
       wtDrag = null;
       var s2 = state.session.wordTrail;
@@ -5737,6 +5745,8 @@ function msShow(s, res, landed){
   if(!res.goalAt && !over) s.busy = false;
   saveState(); render();
   if(res.goalAt){
+    var gt = document.querySelector(".msTile.goal");                      // the finished plant sparkles (2026-10-26, per Dan: the same burst as a word in Fruits of the Spirit)
+    if(gt){ var gr = gt.getBoundingClientRect(); pixBurst(Math.round(gr.left + gr.width / 2), Math.round(gr.top + gr.height / 2), .8, 22); }
     setTimeout(function(){                                                 // the goal plant is picked
       if(state.session.mustardSeed !== s || state.screen !== "mustardSeed") return;
       s.cols[res.goalAt[0]].splice(res.goalAt[1], 1); s.got++; s.goalKey = "";
@@ -7024,12 +7034,17 @@ function fsWordBurst(ty){
   var r = w.getBoundingClientRect(), cx = Math.round(r.left + r.width / 2), cy = Math.round(r.top + r.height / 2);
   w.classList.remove("pop"); void w.offsetWidth; w.classList.add("pop");
   setTimeout(function(){ w.classList.remove("pop"); }, 700);
-  var box = document.createElement("div"), cols = ["#FFC93A", "#FFF3A0", "#FFFFFF", "#FF9F1C", "#52C246", "#FFE45E"], html = "", k;
+  pixBurst(cx, cy, 1, 28);
+}
+// The sparkle burst of Fruits of the Spirit (a word lighting up), at a point of the screen: two rings and a spray of gold and green squares. scale makes it smaller for a small tile,
+// count is how many squares fly. Also used for a finished Mustard Seed plant and the letters of a found Word Trail word (2026-10-26, per Dan).
+function pixBurst(cx, cy, scale, count){
+  var box = document.createElement("div"), cols = ["#FFC93A", "#FFF3A0", "#FFFFFF", "#FF9F1C", "#52C246", "#FFE45E"], html = "", k, rs = Math.round(20 * scale);
   box.className = "fsBurst";
-  for(k = 0; k < 2; k++) html += '<b style="left:' + cx + 'px;top:' + cy + 'px"></b>';
-  for(k = 0; k < 28; k++){
-    var a = Math.random() * 6.2832, d = 40 + Math.random() * 85, sz = 4 + Math.floor(Math.random() * 4) * 2;      // whole pixels, like the rest of the game
-    html += '<i style="left:' + (cx - sz / 2) + 'px;top:' + (cy - sz / 2) + 'px;width:' + sz + 'px;height:' + sz + 'px;background:' + cols[k % cols.length] + ';--dx:' + Math.round(Math.cos(a) * d) + 'px;--dy:' + Math.round(Math.sin(a) * d + 12) + 'px;animation-duration:' + (.7 + Math.random() * .5).toFixed(2) + 's"></i>';
+  for(k = 0; k < 2; k++) html += '<b style="left:' + cx + 'px;top:' + cy + 'px;width:' + rs + 'px;height:' + rs + 'px;margin:' + (-rs / 2) + 'px 0 0 ' + (-rs / 2) + 'px"></b>';
+  for(k = 0; k < count; k++){
+    var a = Math.random() * 6.2832, d = (40 + Math.random() * 85) * scale, sz = 4 + Math.floor(Math.random() * 4) * 2;      // whole pixels, like the rest of the game
+    html += '<i style="left:' + (cx - sz / 2) + 'px;top:' + (cy - sz / 2) + 'px;width:' + sz + 'px;height:' + sz + 'px;background:' + cols[k % cols.length] + ';--dx:' + Math.round(Math.cos(a) * d) + 'px;--dy:' + Math.round(Math.sin(a) * d + 12 * scale) + 'px;animation-duration:' + (.7 + Math.random() * .5).toFixed(2) + 's"></i>';
   }
   box.innerHTML = html; document.body.appendChild(box);
   setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 1500);
@@ -8090,7 +8105,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 K";
+var APP_BUILD = "2026-10-26 M";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
