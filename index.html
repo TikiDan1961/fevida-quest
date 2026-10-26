@@ -4183,18 +4183,23 @@ function clInterlude(){
 // the first tap on the screen starts the round. (2026-10-25, per Dan: the hands did not follow the finger that started the round, and it had to be lifted and put down again.) The
 // layer that takes the tap used to be taken away at once, and a finger that goes on touching a thing that has gone is not heard by anything else. Now, when the touch began on the
 // SLIDE band, the layer stays until the finger lifts and steers the hands itself (and the window-level listeners above carry on with it too).
+// (2026-10-25, per Dan: on the phone a tap did nothing, after the layer had been given pointer handlers instead of a click.) The layer listens for the pointer, the touch and the click, whichever
+// comes first starts the round, and the start never depends on the steering part working.
 function clGo(ev){
   var s = state.session.catchLight;
   if(!clWaiting || !s || s.status !== "playing" || s.interlude) return;
-  if(pixAudioStale) pixReviveOnTap();
   clWaiting = false;
   var rd = document.getElementById("clReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
-  var all = document.querySelector(".clTapAll");
-  if(ev && ev.pointerId !== undefined && clInBand(ev)){
-    clDragging = true; clPtrId = ev.pointerId; clPtrX = ev.clientX;
-    try { if(all) all.setPointerCapture(ev.pointerId); } catch(e){}
-    setTimeout(clLayerGone, 20000);                                         // (a touch whose end is never heard)
-  } else clLayerGone();
+  var all = document.querySelector(".clTapAll"), steer = false;
+  try { if(pixAudioStale) pixReviveOnTap(); } catch(e0){}
+  try {
+    if(ev && ev.pointerId !== undefined && ev.type === "pointerdown" && clInBand(ev)){
+      clDragging = true; clPtrId = ev.pointerId; clPtrX = ev.clientX; steer = true;
+      try { if(all) all.setPointerCapture(ev.pointerId); } catch(e){}
+      setTimeout(clLayerGone, 20000);                                       // (a touch whose end is never heard)
+    }
+  } catch(e1){}
+  if(!steer) clLayerGone();
   if(!clRunning && s.phase === "playing") clStart();
 }
 function clLayerGone(){ var all = document.querySelector(".clTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all); }
@@ -4271,7 +4276,7 @@ function screenCatchLight(){
   }
 
   var levelCfg = CL_LEVELS[s.level];
-  return pixShell((clWaiting ? '<div class="clTapAll" onpointerdown="clGo(event)" onpointermove="clLayerMove(event)" onpointerup="clLayerEnd(event)" onpointercancel="clLayerEnd(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
+  return pixShell((clWaiting ? '<div class="clTapAll" onpointerdown="clGo(event)" ontouchstart="clGo(event)" onclick="clGo(event)" onpointermove="clLayerMove(event)" onpointerup="clLayerEnd(event)" onpointercancel="clLayerEnd(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
     '<div class="pixNote">' + t("cl_intro") + '</div>' +
     '<div class="pixHud">' +
       '<span class="pixNote" id="clLevel">' + t("cl_level")(s.level+1, CL_LEVELS.length) + '</span>' +
@@ -7999,7 +8004,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 ZC";
+var APP_BUILD = "2026-10-25 ZD";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
