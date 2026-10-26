@@ -1712,11 +1712,19 @@ function pixCtx(){
 // gain with a squared curve, which feels even to the ear (100 = the loudness the sounds were mixed at).
 // The music slider's 100% is the loudness the slider's 20% used to give (2026-10-22, per Dan), so the whole slider now lives in the useful range.
 var PIX_MUSIC_MAX = 0.04;     // = 0.2 squared
+var pixMusicDuck = 1;         // the music is turned down by this factor while a game wants its notes heard over it (Pray the Beads, 2026-10-25, per Dan: half)
 function pixVolGain(kind){
   var v = kind === "music" ? state.volMusic : state.volSfx;
   if(typeof v !== "number") v = kind === "music" ? 60 : 45;
   var g = Math.pow(Math.max(0, Math.min(100, v)) / 100, 2);
-  return kind === "music" ? g * PIX_MUSIC_MAX : g;
+  return kind === "music" ? g * PIX_MUSIC_MAX * pixMusicDuck : g;
+}
+function pixSetMusicDuck(f){
+  if(pixMusicDuck === f) return;
+  pixMusicDuck = f;
+  var ctx = pixAudioCtx;
+  if(!ctx || !ctx.__pixBus || !ctx.__pixBus.music) return;
+  try { ctx.__pixBus.music.gain.setTargetAtTime(pixVolGain("music"), ctx.currentTime, .12); } catch(e){ ctx.__pixBus.music.gain.value = pixVolGain("music"); }      // a smooth dip, not a jump
 }
 function pixBus(ctx, kind){
   if(!ctx.__pixBus) ctx.__pixBus = {};
@@ -5711,7 +5719,11 @@ var PB_CHANCES = 3;
 // (2026-10-24, per Dan: the speed doubles each round, so the beads move 2 and then 4 times as fast as in round 1. gap = ms for a bead to travel the usual distance to the next one, which
 // is how far apart they are drawn, so it halves each round. Taps would then come too fast to make, so no two beads are less than PB_MIN_MS apart, and a tap counts for at least
 // PB_MIN_WINDOW ms either side of the beat even when the ring is passed quicker than that.) beads = how many, after the large one.
-var PB_ROUNDS = [{gap: 600}, {gap: 540}, {gap: 450}];      // (2026-10-25, per Dan: round 1 faster, was 700, and round 3 slower, was 380; round 2 as it was)      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
+// Spacing (2026-10-25, per Dan): round 1 is as it was (PB_APART and PB_BURST below); round 2 has its beads closer together, and more groups of close beads, and round 3 closer still. apart = how far
+// from the last bead a bead comes, in usual gaps; burst = how often a bead is followed by a group of close ones, how many, and how close.
+var PB_ROUNDS = [{gap: 600},      // (2026-10-25, per Dan: round 1 faster, was 700, and round 3 slower, was 380; round 2 as it was)
+  {gap: 540, apart: [.8, 1.7], burst: {chance: .5, count: [1, 4], apart: [.55, .75]}},
+  {gap: 450, apart: [.7, 1.3], burst: {chance: .65, count: [2, 5], apart: [.5, .7]}}];      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
 var PB_MIN_MS = {normal: 300, burst: 220};
 var PB_MIN_WINDOW = {good: 110, perfect: 55};
 var PB_FIRST_MS = 1500;                                                    // the first bead is never sooner than this after the round starts
@@ -5792,19 +5804,25 @@ function pbFit(){
   }
 }
 window.addEventListener("resize", function(){ if(state.screen === "prayBeads") pbFit(); });
+// the music is at half volume while the beads are moving, back to normal at every other time (waiting for the first tap, between rounds, game over, any other screen)
+function pbDuckSync(){
+  var s = state.session.prayBeads;
+  var on = state.screen === "prayBeads" && s && s.status === "playing" && !s.interlude && !pbWaiting && !!s.res;
+  pixSetMusicDuck(on ? .5 : 1);
+}
 function pbChancesLeft(s){ return typeof s.chances === "number" ? s.chances : PB_CHANCES; }
 function pbBeginRound(s){
-  var cfg = PB_ROUNDS[s.round], n = pbCount(s);
+  var cfg = PB_ROUNDS[s.round], n = pbCount(s), ap = cfg.apart || PB_APART, bu = cfg.burst || PB_BURST;
   s.res = []; s.at = [];
   var burst = 0;
   for(var i = 0; i < n; i++){
     s.res.push(0);                                                         // 0 still to come, 1 Perfect, 2 Good, 3 missed
     var f, floor = PB_MIN_MS.normal;
     if(i === 0) f = 0;
-    else if(burst > 0){ f = PB_BURST.apart[0] + Math.random() * (PB_BURST.apart[1] - PB_BURST.apart[0]); burst--; floor = PB_MIN_MS.burst; }
+    else if(burst > 0){ f = bu.apart[0] + Math.random() * (bu.apart[1] - bu.apart[0]); burst--; floor = PB_MIN_MS.burst; }
     else {
-      f = PB_APART[0] + Math.random() * (PB_APART[1] - PB_APART[0]);
-      if(Math.random() < PB_BURST.chance) burst = PB_BURST.count[0] + Math.floor(Math.random() * (PB_BURST.count[1] - PB_BURST.count[0] + 1));
+      f = ap[0] + Math.random() * (ap[1] - ap[0]);
+      if(Math.random() < bu.chance) burst = bu.count[0] + Math.floor(Math.random() * (bu.count[1] - bu.count[0] + 1));
     }
     s.at.push(i === 0 ? Math.max(PB_FIRST * cfg.gap, PB_FIRST_MS) : s.at[i - 1] + Math.max(cfg.gap * f, floor));       // when it reaches the ring, ms after the start
   }
@@ -5818,6 +5836,7 @@ function pbStart(){
   if(!s || s.status !== "playing" || s.interlude || s.busy || !s.res || !pbWaiting) return;
   if(pixAudioStale) pixReviveOnTap();
   pbWaiting = false; pbStartAt = performance.now() + PB_START_WAIT; pbLastT = performance.now();
+  pbDuckSync();
   var rd = document.getElementById("pbReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
   var all = document.querySelector(".pbTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
 }
@@ -7906,7 +7925,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 V";
+var APP_BUILD = "2026-10-25 W";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -8161,6 +8180,7 @@ function render(){
   if(state.screen === "mustardSeed"){ msFit(); msLoopStart(); }
   if(state.screen === "prayBeads" && state.session.prayBeads && state.session.prayBeads.interlude && !pixRoundRunning.prayBeads) pbInterlude();
   if(state.screen === "prayBeads"){ pbFit(); pbPlace(); pbLoopStart(); }
+  pbDuckSync();                                                           // (also puts the music back to normal when any other screen comes up)
   if(state.screen === "pilgrimRoad" && state.session.pilgrimRoad && state.session.pilgrimRoad.interlude && !pixRoundRunning.pilgrimRoad) prInterlude();
   if(state.screen === "dovePeace" && state.session.dovePeace && state.session.dovePeace.interlude && !pixRoundRunning.dovePeace) dpInterlude();
   if(state.screen === "dovePeace"){ dpDraw(); dpLoopStart(); }
