@@ -95,8 +95,10 @@
      is bundled with the app so it works offline. It is only crisp at whole
      multiples of 8px (16, 24, 32), so sizes below are 1rem = 16px, 1.5rem = 24px,
      2rem = 32px. */
-  /* The pixel font's own "5" looks like an S, so a one-glyph font with a clean pixel 5 sits in front of it. */
-  @font-face{font-family:"FeYVida Five";src:url("tiles/FeYVidaFive.ttf") format("truetype");font-weight:400 700;font-style:normal;unicode-range:U+0035;font-display:block;}
+  /* The game's font is Jersey 10 (2026-10-26, per Dan: Pixelify Sans was hard to read, its C looked like an O; SIL Open Font License, tiles/Jersey10-OFL.txt), bundled so it works offline.
+     It has one weight, declared as 400 to 700 so the phone does not fake a bold one. Its letters are smaller than Pixelify Sans's for the same size, so size-adjust makes them 120%: every
+     font-size in this file stays as it was. Pixelify Sans stays in the font lists as a fallback and is only fetched if Jersey 10 cannot be. (The old one-glyph "5" font, tiles/FeYVidaFive.ttf, is not needed any more.) */
+  @font-face{font-family:"Jersey 10";src:url("tiles/Jersey10.ttf") format("truetype");font-weight:400 700;font-style:normal;size-adjust:120%;font-display:block;}
   @font-face{font-family:"Pixelify Sans";src:url("tiles/PixelifySans.ttf") format("truetype");font-weight:400 700;font-style:normal;font-display:block;}
   /* Language screen (2026-10-19, per the client's reference image): a pixel-art
      church scene fills the screen, the small logo and QUEST sit in the sky, and a
@@ -104,9 +106,9 @@
      is 125x140 pixels, drawn at the full width of the screen. */
   .pixHome{position:relative;min-height:100dvh;margin:calc(-1 * (env(safe-area-inset-top,0px) + 18px)) -18px calc(-1 * (env(safe-area-inset-bottom,0px) + 22px));padding:calc(env(safe-area-inset-top,0px) + 8px) 0 14px;display:flex;flex-direction:column;align-items:center;
     /* The scene sits 34px below the top (sky colour fills the gap and grass fills below it) so QUEST has clear room above the church cross. */
-    background:url("tiles/scene_church.png") center top 34px / 100% auto no-repeat,linear-gradient(#4FB0F2 0,#4FB0F2 150px,#52B043 150px);image-rendering:pixelated;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;}
+    background:url("tiles/scene_church.png") center top 34px / 100% auto no-repeat,linear-gradient(#4FB0F2 0,#4FB0F2 150px,#52B043 150px);image-rendering:pixelated;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;}
   .pixLogoSmall{display:block;width:192px;height:auto;image-rendering:pixelated;}
-  .pixQuest{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:4rem;line-height:1;letter-spacing:.04em;margin:0;color:#FFC93A;
+  .pixQuest{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:4rem;line-height:1;letter-spacing:.04em;margin:0;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 7px 0 #1b2a6b,3px 7px 0 #1b2a6b,-3px 7px 0 #1b2a6b;}
   .pixCard{width:calc(100% - 28px);max-width:420px;background:#fff;border-radius:18px;padding:14px 16px 12px;text-align:center;box-shadow:0 5px 0 rgba(0,0,0,.28);color:#1E2F7A;}
   .pixCardTitle{font-weight:700;font-size:1.5rem;letter-spacing:.03em;line-height:1.1;}
@@ -118,7 +120,7 @@
   .pixQr .tr{right:0;top:0;border-right-width:5px;border-top-width:5px;border-top-right-radius:6px;}
   .pixQr .bl{left:0;bottom:0;border-left-width:5px;border-bottom-width:5px;border-bottom-left-radius:6px;}
   .pixQr .br{right:0;bottom:0;border-right-width:5px;border-bottom-width:5px;border-bottom-right-radius:6px;}
-  .btn.pixBtn{width:min(78%,260px);margin:0 auto 10px;padding:8px 12px 6px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.2;letter-spacing:.06em;border-radius:12px;border:3px solid #1E6B2B;border-bottom-width:6px;background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);box-shadow:inset 0 3px 0 rgba(255,255,255,.4);transition:none;}
+  .btn.pixBtn{width:min(78%,260px);margin:0 auto 10px;padding:8px 12px 6px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.2;letter-spacing:.06em;border-radius:12px;border:3px solid #1E6B2B;border-bottom-width:6px;background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);box-shadow:inset 0 3px 0 rgba(255,255,255,.4);transition:none;}
   .btn.pixBtn.secondary{border-color:#1C4E9A;background:#3A93E8;}
   /* Pressed: the button sinks and lights up -- a hard light ring plus a soft glow in its own colour (2026-10-19, per Dan). */
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
@@ -142,8 +144,8 @@
   @keyframes cwTicketPop{0%{transform:scale(0);opacity:0;}65%{transform:scale(1.18);opacity:1;}100%{transform:scale(1);opacity:1;}}
   @keyframes cwTicketGlow{0%{filter:drop-shadow(0 0 5px rgba(255,230,120,.8));}100%{filter:drop-shadow(0 0 16px rgba(255,240,150,1));}}
   .pixWelcomeCard{padding:18px 18px 20px;}
-  .pixWelTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 10px;}
-  .pixWelBody{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1.25rem;line-height:1.3;letter-spacing:.01em;color:#2A3A78;margin:0;}
+  .pixWelTitle{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1.15;letter-spacing:.02em;color:#1E2F7A;margin:0 0 10px;}
+  .pixWelBody{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:500;font-size:1.25rem;line-height:1.3;letter-spacing:.01em;color:#2A3A78;margin:0;}
   /* Same box as the language screen's white card (width and side padding), so the buttons land in the same place and size. */
   .pixBtnDock{width:calc(100% - 28px);max-width:420px;padding:0 16px 12px;}
   /* The welcome buttons carry longer words in a smaller type, but keep the language buttons' exact box (51.8px tall). */
@@ -172,14 +174,14 @@
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .appTile img.spr{width:48px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
   .appIcon:active .appTile{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.9);}
-  .appName{margin-top:9px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.1;color:#fff;
+  .appName{margin-top:9px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.1;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
-  .appTag{margin-top:3px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.75rem;letter-spacing:.03em;color:#FFC93A;text-transform:lowercase;}
+  .appTag{margin-top:3px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.75rem;letter-spacing:.03em;color:#FFC93A;text-transform:lowercase;}
   .appTag::first-letter{text-transform:uppercase;}
   .miniGrid{display:grid;grid-template-columns:32px 32px;gap:0;}
   .appTile .miniGrid img.spr{width:32px;height:32px;image-rendering:auto;}
   .countBadge{position:absolute;top:-9px;right:-12px;min-width:34px;padding:2px 6px;border-radius:12px;background:#D6343A;border:3px solid #fff;color:#fff;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
   .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
     display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}
   /* (2026-10-25, per Dan) an icon that cannot be opened is grey: the locked Golden Ticket, the coming-soon missions, and all the icons while the pilgrim is talking and walking */
@@ -196,12 +198,12 @@
   .folderPanel{position:relative;width:100%;max-width:420px;max-height:86%;overflow-y:auto;background:#223A8C;border:4px solid #FFC93A;border-radius:22px;
     padding:14px 12px 18px;box-shadow:0 6px 0 rgba(0,0,0,.35);transform-origin:var(--ox,50%) var(--oy,50%);animation:folderPop .24s ease-out;}
   @keyframes folderPop{from{transform:scale(.2);opacity:0;}to{transform:scale(1);opacity:1;}}
-  .folderTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.08em;text-transform:uppercase;color:#FFC93A;text-align:center;margin:2px 0 16px;}
+  .folderTitle{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.08em;text-transform:uppercase;color:#FFC93A;text-align:center;margin:2px 0 16px;}
   .folderGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 4px;}
   .folderGrid .appName{font-size:.8125rem;overflow-wrap:anywhere;}
   @media (max-width:340px){ .folderGrid .appName{font-size:.75rem;} }
   .folderClose{position:absolute;top:8px;right:10px;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .folderClose:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
   .expandClone{position:fixed;z-index:100;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;
@@ -265,7 +267,7 @@
   .pixMenu.pilgrimBusy .homeGrid,.pixMenu.pilgrimBusy .backBtn,.pixMenu.pilgrimBusy .pilgrim,.pixMenu.pilgrimBusy .pixPet{pointer-events:none;}   /* while the pilgrim talks and walks after a badge */
   .pixMenu.pilgrimBusy .appIcon .appTile::before{pointer-events:none;}      /* the middle of each tile asks for taps on its own (above), so it is switched off here too (2026-10-23, per Dan) */
   .pilgrimBubble{position:absolute;z-index:3;display:none;box-sizing:border-box;max-width:80%;padding:8px 12px;background:#fff;color:#1E2F7A;border:3px solid #1B1F3B;border-radius:10px;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.25;text-align:center;box-shadow:0 3px 0 rgba(20,30,90,.35);
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.25;text-align:center;box-shadow:0 3px 0 rgba(20,30,90,.35);
     pointer-events:auto;cursor:pointer;transform-origin:var(--tail,50%) 100%;}
   .pilgrimBubble.show{display:block;animation:bubblePop .18s ease-out;}
   .pilgrimBubble::after{content:"";position:absolute;top:100%;left:var(--tail,50%);width:9px;height:9px;margin:-6px 0 0 -7px;background:#fff;border-right:3px solid #1B1F3B;border-bottom:3px solid #1B1F3B;transform:rotate(45deg);}
@@ -294,12 +296,12 @@
     .pixHome.pixSky > .backBtn{left:10px;width:38px;height:38px;}
     .backBtn img{width:28px;height:28px;}
   }
-  .pixMenuTitle{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;line-height:1.1;letter-spacing:.02em;text-align:center;margin:2px 0 8px;color:#FFC93A;
+  .pixMenuTitle{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;line-height:1.1;letter-spacing:.02em;text-align:center;margin:2px 0 8px;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
   .pixMenu .progressWrap{margin:6px 0 16px;}
   .pixMenu .progressBar{height:24px;border:3px solid #1E2F7A;border-radius:12px;background:#fff;}
   .pixMenu .progressFill{background:#FFC93A;}
-  .pixMenu .progressLabel{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:1rem;color:#fff;opacity:1;margin-top:6px;text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
+  .pixMenu .progressLabel{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:1rem;color:#fff;opacity:1;margin-top:6px;text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
   /* Shorter phones: shrink the card (QR 145px -> 116px, whole 4px per module) so the
      church stays visible above it. */
   @media (max-height:740px){
@@ -344,7 +346,7 @@
   .missionTile .tag{display:block;font-size:.6rem;letter-spacing:.05em;color:var(--gold);margin-top:3px;}
   /* Messages ("Earn 500 Quest Points...", "Coming soon!") are drawn like the blue pixel buttons: the same frame and 8-bit lettering (2026-10-20, per Dan) */
   .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);transform:translateX(-50%);box-sizing:border-box;width:max-content;max-width:min(88vw,360px);text-align:center;
-    padding:10px 18px 12px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.2;letter-spacing:.04em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    padding:10px 18px 12px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.2;letter-spacing:.04em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 4px 0 rgba(20,30,90,.25);
     z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;}
   .toast.show{opacity:1;}
@@ -353,14 +355,14 @@
   .exitBar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);height:0;z-index:20;}
   /* Same red pixel X as the Passport's close button (2026-10-19, per Dan). */
   .exitBtn{position:absolute;top:-14px;left:-6px;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .exitBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
 
   /* Pixel-style mission screens (2026-10-20, per Dan) -- Faith Flash first. Same sky and clouds as the Home Screen, a cream pixel card,
      and answer buttons built like the language buttons (glow + press sound). Everything is scoped to .pixMission so the other
      missions keep their current look until they are done too. */
-  .pixMission .pixMTitle{margin:6px 0 10px;padding:0 46px;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
+  .pixMission .pixMTitle{margin:6px 0 10px;padding:0 46px;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
   /* Faith Match and Faith Flash sit 40px lower on the screen (2026-10-20, per Dan); the title is the first thing on both, so they line up */
   .pixMission.pixLower{padding-top:calc(env(safe-area-inset-top,0px) + 58px);}
@@ -371,10 +373,10 @@
   .pixPip.now{background:#fff;}
   .pixPip.bad{background:#D6343A;}
   .pixPaper{background:#FFF3D6;color:#1E2F7A;border:4px solid #1B1F3B;border-radius:14px;box-shadow:inset 0 0 0 4px #FFC93A,0 6px 0 rgba(20,30,90,.4);padding:20px 18px;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;text-align:center;}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;text-align:center;}
   .pixQ{font-weight:600;font-size:1.25rem;line-height:1.3;}
   .pixAnsList{display:flex;flex-direction:column;gap:10px;margin:18px 0 6px;}
-  .pixAns{display:block;width:100%;box-sizing:border-box;min-height:52px;padding:8px 12px 10px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.15;letter-spacing:.03em;
+  .pixAns{display:block;width:100%;box-sizing:border-box;min-height:52px;padding:8px 12px 10px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.15;letter-spacing:.03em;
     text-align:center;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .pixAns:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .pixAns.correct{background:#52C246;border-color:#1E6B2B;}
@@ -405,7 +407,7 @@
   /* Sacred Sudoku: stained-glass pictures instead of numbers */
   .sdBar{display:flex;align-items:center;justify-content:space-between;margin:2px 6px 0;}
   .sdBar .pixNote{margin:0;}
-  .sdHint{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+  .sdHint{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     padding:5px 12px 8px;background:#52C246;border:3px solid #1E6B2B;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .sdHint{white-space:nowrap;}
   .sdHint:disabled{filter:saturate(.3) brightness(.85);cursor:default;}
@@ -432,7 +434,7 @@
   .sdBig .sdPick{width:38px;height:38px;}
   .sdBig .sdCell{background-size:92% 92%;}
   .sdPick{width:42px;height:42px;padding:0;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:8px;background:#FFFDED center / 82% 82% no-repeat;image-rendering:pixelated;cursor:pointer;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
   .sdPick:active{box-shadow:0 0 0 3px #DCEEFF,0 0 14px 5px rgba(110,190,255,.85);}
   /* Emoji Bible Stories */
   .pixEmoji{display:flex;justify-content:center;align-items:center;gap:6px;min-height:48px;}   /* the clues are pixel pictures (24 x 24, shown at 2x), the same on every phone */
@@ -443,7 +445,7 @@
   /* taller slots with more room between them, and the words centred in the frame (2026-10-23, per Dan); the 7-event round is a little tighter so it still fits */
   .tlSlots{display:flex;flex-direction:column;gap:12px;margin:8px 0 10px;}
   .tlSlot{position:relative;display:flex;align-items:center;justify-content:center;height:46px;box-sizing:border-box;padding:0 30px;border:3px solid #1B1F3B;border-radius:10px;background:rgba(255,255,255,.35);
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;color:#1E2F7A;}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;color:#1E2F7A;}
   .tlSlot.placed{background:#FFF3D6;box-shadow:inset 0 0 0 2px #FFC93A;}
   .tlNum{position:absolute;left:8px;top:50%;margin-top:-10px;width:20px;height:20px;border-radius:4px;background:#1B1F3B;color:#fff;display:grid;place-items:center;font-size:.8rem;}
   .tlTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;}
@@ -451,7 +453,7 @@
   .tlSlots.seven .tlSlot{height:36px;}
   .tlIcon{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;margin-right:6px;}
   .tlCards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
-  .tlCard{display:flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:4px 6px 8px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;
+  .tlCard{display:flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:4px 6px 8px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;
     line-height:1.1;letter-spacing:.02em;text-align:center;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;
     box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .tlCard .tlIcon{margin:0;font-size:1.1rem;}
@@ -476,7 +478,7 @@
   @keyframes lcPulse{from{opacity:.7;}to{opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .lcFlame,.lcZone.lit .lcGlow{animation:none;} }
   .lcGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 4px;}
-  .lcIntent{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:84px;padding:8px 6px 10px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;
+  .lcIntent{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:84px;padding:8px 6px 10px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;
     font-size:1rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;
     box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .lcIntent img{width:36px;height:36px;image-rendering:pixelated;}
@@ -537,7 +539,7 @@
   .pixWuIntro{margin:0 0 14px;font-weight:600;font-size:1.0625rem;line-height:1.3;}
   .pixWuRow{display:flex;gap:4px;justify-content:center;flex-wrap:nowrap;}
   .pixSlot{flex:1 1 0;min-width:0;max-width:38px;height:46px;box-sizing:border-box;border:3px solid #1B1F3B;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;color:#1E2F7A;box-shadow:inset 0 3px 0 rgba(30,47,122,.12);}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;color:#1E2F7A;box-shadow:inset 0 3px 0 rgba(30,47,122,.12);}
   .pixSlot.filled{background:#FFC93A;}
   /* Word Unscramble's bar: SKIP | Level X of X (centred) | HINT */
   .wuBar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:2px 4px 0;}
@@ -549,7 +551,7 @@
   .pixWuRow.correct .pixSlot{background:#52C246;border-color:#1E6B2B;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);}
   .pixWuRow.wrong .pixSlot{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
   .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;margin:20px 0 6px;}   /* one row, even for 6 letters: the tiles shrink a little to fit */
-  .pixTile{flex:1 1 0;min-width:0;max-width:46px;width:auto;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
+  .pixTile{flex:1 1 0;min-width:0;max-width:46px;width:auto;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
     color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .pixTile:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .pixTile.used{pointer-events:none;background:rgba(27,31,59,.22);border-color:rgba(27,31,59,.4);color:transparent;text-shadow:none;box-shadow:none;}
@@ -560,7 +562,7 @@
     .pixTile{height:46px;}
   }
   /* The other missions in the same pixel style (2026-10-20, per Dan): outlined notes, pixel hearts, card-back tiles, framed stages. */
-  .pixNote{margin:2px 0 8px;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:1rem;line-height:1.25;color:#fff;
+  .pixNote{margin:2px 0 8px;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:1rem;line-height:1.25;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .pixNote.bad{color:#FFC2BD;}
   .pixNote.good{color:#FFE680;font-size:1.25rem;}
@@ -569,14 +571,14 @@
   .wtGrid{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));width:min(100%,max(220px,calc(100vh - 360px)),380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;
     container-type:inline-size;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;}
   .wtCell{aspect-ratio:1/1;padding:2px 2px 4px;box-sizing:border-box;pointer-events:none;min-width:0;}     /* no overflow:hidden: it cut off the tile's bottom edge (2026-10-23, per Dan's phone picture) */
-  .wtCell i{display:flex;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;font-style:normal;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;
+  .wtCell i{display:flex;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;font-style:normal;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;
     font-size:1.125rem;font-size:clamp(12px,calc(43cqw / var(--n,8)),28px);color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 2px 0 rgba(20,30,90,.35);}
   .wtCell.sel i{background:#FFC93A;box-shadow:inset 0 -3px 0 rgba(139,90,0,.3),0 0 0 2px #FFF6C0,0 0 10px 3px rgba(255,236,120,.8);}
   .wtCell.ok i{background:#52C246;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.3);}
   .wtCell.bad i{background:#E85A5A;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.3);}
   .wtLine{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
   .wtLine polyline{fill:none;stroke:#F58B2A;stroke-opacity:.8;stroke-linecap:round;stroke-linejoin:round;}
-  .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
+  .wtTrace{height:1.9rem;line-height:1.9rem;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.14em;color:#FFE680;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   /* Pilgrim's Road (2026-10-24): grass tiles with road on them, the pilgrim and the church at the two ends. A tile is turned by turning its svg. */
   .prBoard{position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:2px;box-sizing:border-box;padding:4px;width:min(100%,380px,calc(100vh - 330px));width:min(100%,380px,calc(100dvh - 330px));margin:0 auto;
@@ -597,16 +599,16 @@
   .prChurchImg{position:absolute;right:8%;top:10%;width:56%;image-rendering:pixelated;pointer-events:none;}
   .prTile.won .prChurchImg{animation:prGlow .5s ease-in-out 3;}
   @keyframes prGlow{0%,100%{filter:none;}50%{filter:drop-shadow(0 0 6px #FFF3A0) brightness(1.2);}}
-  .prLegend{display:flex;justify-content:space-between;width:min(100%,380px);margin:8px auto 0;padding:0 6px;box-sizing:border-box;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8rem;color:#FFC93A;
+  .prLegend{display:flex;justify-content:space-between;width:min(100%,380px);margin:8px auto 0;padding:0 6px;box-sizing:border-box;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8rem;color:#FFC93A;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
-  .prTurns{text-align:center;margin-top:10px;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#fff;
+  .prTurns{text-align:center;margin-top:10px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   /* Dove of Peace (2026-10-24): the sky is one low-resolution canvas (about a third of the stage's size) that is stretched up with hard pixels, so everything drawn on it is 8-bit. */
   .dpArea{width:min(100%,380px);margin:0 auto;}
   .dpStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 260px),520px);height:clamp(230px,calc(100dvh - 260px),520px);border:4px solid #FFC93A;border-radius:16px;
     box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;background:#7CC4FF;}
   .dpCanvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
-  .dpReady{position:absolute;left:0;right:0;top:58%;text-align:center;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;color:#fff;
+  .dpReady{position:absolute;left:0;right:0;top:58%;text-align:center;pointer-events:none;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .pbStage .dpReady{top:50%;transform:translateY(-50%);}      /* the "Tap anywhere to start!" message sits in the exact middle of the play area (2026-10-25, per Dan; the dove's game keeps its lower spot) */
   .pixMission > .jlTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* until the first tap of a round, the whole screen starts it (the red X, above it, still works) */
@@ -631,7 +633,7 @@
   .fsFruit.grab img{transform:scale(1.12);}
   .fsFruit.hint::before{content:"";position:absolute;left:1px;top:1px;right:1px;bottom:1px;box-sizing:border-box;border:4px solid #FF1FA3;background:rgba(255,31,163,.24);box-shadow:0 0 0 2px #fff,0 0 0 4px #5B0F55,0 0 16px 6px rgba(255,31,163,.85);border-radius:7px;animation:fsHint .5s ease-in-out infinite alternate;z-index:3;}      /* hot pink with a white and a dark ring: nothing else on the board is that colour (2026-10-25, per Dan: the yellow one blended in) */
   @keyframes fsHint{from{opacity:.55;}to{opacity:1;}}
-  .fsHintBtn{margin-left:6px;cursor:pointer;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1rem;letter-spacing:.04em;line-height:1;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+  .fsHintBtn{margin-left:6px;cursor:pointer;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1rem;letter-spacing:.04em;line-height:1;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     padding:6px 14px 5px;background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 2px 0 rgba(255,255,255,.4);}
   .fsHintBtn:active{box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 14px 6px rgba(110,190,255,.85);}
   .fsHintBtn:disabled{opacity:.5;filter:grayscale(.4);cursor:default;}
@@ -644,17 +646,17 @@
   @keyframes fsPop2{0%{transform:scale(.4);}60%{transform:scale(1.3);}100%{transform:scale(1);}}
   @keyframes fsFresh{0%{opacity:0;}100%{opacity:1;}}
   @keyframes fsGlow{0%,100%{filter:drop-shadow(0 0 2px #FFC93A);}50%{filter:drop-shadow(0 0 7px #FFF3A0) brightness(1.15);}}
-  .fsPopup{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:6;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FFF496;
+  .fsPopup{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:6;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FFF496;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b;animation:fsPopup 1.25s ease-out forwards;}
-  .fsShuffleMsg{position:absolute;left:0;right:0;top:50%;margin-top:-1.4rem;text-align:center;pointer-events:none;z-index:7;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.4rem;letter-spacing:.06em;line-height:1;color:#fff;
+  .fsShuffleMsg{position:absolute;left:0;right:0;top:50%;margin-top:-1.4rem;text-align:center;pointer-events:none;z-index:7;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.4rem;letter-spacing:.06em;line-height:1;color:#fff;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 6px 0 rgba(0,0,0,.35);}      /* SHUFFLING over the board while the fruit move to new squares (2026-10-25, per Dan; it stays still: the bounce was taken out) */
   @keyframes fsPopup{0%{opacity:0;transform:scale(.6);}15%{opacity:1;transform:scale(1.1);}80%{opacity:1;}100%{opacity:0;transform:translateY(-10px);}}
   .fsFound{width:min(100%,380px);box-sizing:border-box;margin:10px auto 0;padding:8px 6px 10px;border:4px solid #1B1F3B;border-radius:16px;background:#F8ECC8;text-align:center;}
-  .fsFound b{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1rem;color:#96642A;margin-bottom:6px;}
+  .fsFound b{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-size:1rem;color:#96642A;margin-bottom:6px;}
   .fsWords{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 2px;}
   .fsWord{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:0;}
   .fsWord img{width:36px;height:36px;image-rendering:pixelated;filter:grayscale(.55) opacity(.7);}
-  .fsWord span{display:block;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;line-height:1.15;white-space:nowrap;}
+  .fsWord span{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;line-height:1.15;white-space:nowrap;}
   .fsWord .fsCnt{font-size:1.25rem;color:#7A6A4E;} .fsWord .fsNm{font-size:.7rem;color:#A8977A;letter-spacing:0;}
   @media (max-height:740px){      /* shorter phones: a smaller words window, so the board can stay big */
     .fsBoardWrap{width:min(100%,380px,calc(100vh - 415px));width:min(100%,380px,calc(100dvh - 415px));}
@@ -682,17 +684,17 @@
   .jlMeter{flex:none;position:relative;width:30px;box-sizing:border-box;overflow:hidden;border:4px solid #FFC93A;border-radius:16px;background:#35507F;box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);}
   .jlMeterFill{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#9BF07A,#3CB84A);border-top:3px solid #E8FFD8;transition:height .12s linear;}
   .jlMeterGate{position:absolute;left:50%;top:5px;margin-left:-8px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid #FFC93A;filter:drop-shadow(1px 1px 0 #1B1F3B);}
-  .jlOhNo{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:5;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FF5A5A;
+  .jlOhNo{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:5;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FF5A5A;
     text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,3px 3px #fff,-3px -3px #fff,3px -3px #fff,-3px 3px #fff,5px 5px 0 #1B1F3B;animation:jlOh .22s steps(2) infinite;}
   @keyframes jlOh{0%{transform:translate(-2px,0) rotate(-2deg);}100%{transform:translate(2px,0) rotate(2deg);}}
   .jlBar{display:flex;margin-top:10px;box-sizing:border-box;height:108px;border:4px solid #1B1F3B;border-radius:18px;background:#3A8FE8;box-shadow:inset 0 0 0 3px #1C4E9A;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;}
   .jlHalf{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;border:0;background:none;padding:0;margin:0;cursor:pointer;touch-action:none;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;letter-spacing:.04em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;letter-spacing:.04em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
   .jlHalf + .jlHalf{border-left:4px solid #1B1F3B;}
   .jlHalf i{width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);}
   .jlHalf.l i{border-right:16px solid #FFC93A;} .jlHalf.r i{border-left:16px solid #FFC93A;}
   .jlHalf.held{background:rgba(255,255,255,.22);}
-  .optBuild{margin:14px auto 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
+  .optBuild{margin:14px auto 0;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
   .pbStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(230px,calc(100vh - 369px),460px);height:clamp(230px,calc(100dvh - 369px),460px);border:4px solid #FFC93A;border-radius:16px;
@@ -717,14 +719,16 @@
   .pbCrux::after{left:0;top:26%;width:100%;height:22%;}
   .pbCross.flash{animation:pbRing .35s ease-out;}
   @keyframes pbRing{0%{transform:translate(-50%,-50%) scale(1.3);box-shadow:0 0 18px 6px rgba(255,236,130,.95);}100%{transform:translate(-50%,-50%) scale(1);box-shadow:none;}}
-  .pbLabel{position:absolute;left:5%;top:4%;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#fff;line-height:1.35;
+  .pbLabel{position:absolute;left:5%;top:4%;pointer-events:none;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#fff;line-height:1.35;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b;}
   .pbLabel b{display:block;font-size:1rem;font-weight:700;} .pbLabel i{display:block;font-style:normal;font-size:1.25rem;color:#FFE680;}
-  .pbFb{position:absolute;left:5%;top:64%;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.3rem;opacity:0;animation:pbFb .9s ease-out forwards;
+  .pbFb{position:absolute;left:5%;top:64%;pointer-events:none;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.3rem;opacity:0;animation:pbFb .9s ease-out forwards;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .pbFb.perfect{color:#FFE680;} .pbFb.good{color:#B8F2A0;} .pbFb.early,.pbFb.miss{color:#FF8A8A;}
   @keyframes pbFb{0%{opacity:1;transform:translateY(6px);}15%{opacity:1;transform:translateY(0);}70%{opacity:1;}100%{opacity:0;transform:translateY(-6px);}}
   .pbBar{margin-top:10px;}
+  .msBar.msDropBar{height:84px;}      /* (2026-10-26, per Dan) DROP TILE in Mustard Seed is taller: 84px, was 54 (msFit keeps it halfway between the grid and the bottom of the screen) */
+  @media (max-height:700px){ .msBar.msDropBar{height:68px;} }
   .msBar.pbBar{height:108px;}      /* (2026-10-25, per Dan) the bottom buttons of Pray the Beads and Jacob's Ladder are twice as tall: 108px, was 54 */
   @media (max-height:700px){ .msBar.pbBar,.jlBar{height:88px;} }
   /* Mustard Seed (2026-10-23): the garden board, the stage guide and the swipe bar. The whole area takes the swipe. */
@@ -765,7 +769,7 @@
   .msArrow{flex:none;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #FFC93A;filter:drop-shadow(1px 1px 0 #1B1F3B);}
   .msBar:active{box-shadow:inset 0 0 0 3px #1C4E9A,0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .msBar{display:flex;width:100%;cursor:pointer;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;height:54px;padding:0 22px;background:#3A8FE8;border:4px solid #1B1F3B;border-radius:18px;box-shadow:inset 0 0 0 3px #1C4E9A;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.06em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.06em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
   @media (max-height:700px){ .msBar{height:44px;font-size:1.25rem;margin-top:6px;} }
   /* Word Groups (2026-10-23): n x n frames. A word's size follows the width of a frame and the longest word on the board (--n, --m), so every word fits across. */
   .wgBoard{position:relative;display:flex;flex-direction:column;width:min(100%,380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;container-type:inline-size;
@@ -777,12 +781,12 @@
   .wgGroup.done{background:var(--gc);border-color:#1B1F3B;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.2),0 3px 0 rgba(20,30,90,.35);}
   .wgGroup.pop{animation:wgWinIn .3s ease-out;}      /* only a window that has just appeared slides in, not every window on each redraw */
   @keyframes wgWinIn{0%{transform:scale(.94);opacity:.2;}100%{transform:none;opacity:1;}}
-  .wgLabel{height:1.4rem;line-height:1.4rem;text-align:center;white-space:nowrap;overflow:hidden;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.0625rem;letter-spacing:.04em;color:#fff;visibility:hidden;
+  .wgLabel{height:1.4rem;line-height:1.4rem;text-align:center;white-space:nowrap;overflow:hidden;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.0625rem;letter-spacing:.04em;color:#fff;visibility:hidden;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .wgGroup.done .wgLabel{visibility:visible;}
   .wgGroup.done .wgCell{background:#FFF8E6;cursor:default;box-shadow:inset 0 -3px 0 rgba(27,31,59,.15);}
   .wgCell{aspect-ratio:1.35/1;min-width:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:12px;
-    box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 3px 0 rgba(20,30,90,.35);font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#1B1F3B;cursor:grab;
+    box-shadow:inset 0 -3px 0 rgba(27,31,59,.18),0 3px 0 rgba(20,30,90,.35);font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;color:#1B1F3B;cursor:grab;
     font-size:11px;font-size:clamp(7px,calc(((100cqw - 22px) / var(--n) - 8px) / (var(--m) * .7)),19px);}
   .wgCell span{white-space:nowrap;pointer-events:none;}
   .wgCell.pending{background:rgba(255,255,255,.16);border-color:rgba(27,31,59,.22);box-shadow:none;color:transparent;}
@@ -796,7 +800,7 @@
   @media (max-width:340px){ .wgGroup{padding:1px 3px 4px;border-width:2px;} .wgRow{gap:4px;} .wgCell{font-size:clamp(6.5px,calc(((100cqw - 14px) / var(--n) - 6px) / (var(--m) * .82)),19px);} }
   @media (max-height:700px){ .wgCell{aspect-ratio:1.6/1;} .wgGroup{margin-bottom:4px;padding-bottom:4px;} .wgLabel{height:1.25rem;line-height:1.25rem;} }      /* shorter screens: the biggest board still fits */
   .wtWords{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 8px;margin:2px 4px 8px;}
-  .wtWord{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;letter-spacing:.06em;color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;padding:2px 9px 4px;box-shadow:0 2px 0 rgba(20,30,90,.35);}
+  .wtWord{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;letter-spacing:.06em;color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;padding:2px 9px 4px;box-shadow:0 2px 0 rgba(20,30,90,.35);}
   @media (max-height:640px){ .wtTrace{height:1.5rem;line-height:1.5rem;font-size:1.125rem;} .wtGrid{width:min(100%,max(200px,calc(100vh - 330px)),380px);} }
   .pixChances{display:flex;align-items:center;justify-content:center;gap:4px 10px;flex-wrap:wrap;margin:0 0 10px;}
   .pixChances .pixNote{margin:0;}
@@ -808,7 +812,7 @@
   .pixResBody.pixFirst{margin-top:0;}
   .pixKindRow{display:flex;gap:10px;margin:0 0 10px;}
   .pixKindRow .pixAns{flex:1;}
-  .pixCountdown{margin:14px 0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:5rem;line-height:1;color:#FFC93A;
+  .pixCountdown{margin:14px 0;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:5rem;line-height:1;color:#FFC93A;
     text-shadow:4px 0 #1b2a6b,-4px 0 #1b2a6b,0 4px #1b2a6b,0 -4px #1b2a6b,4px 4px #1b2a6b,-4px -4px #1b2a6b,4px -4px #1b2a6b,-4px 4px #1b2a6b,0 7px 0 #1b2a6b;}
   .pixHud{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:0 2px;}
   .pixHud .pixNote{margin:0;font-size:.9375rem;}
@@ -853,7 +857,7 @@
   .pixMission .clSlideZone{position:relative;flex:none;margin:-10px 0 2px;padding:10px 0;touch-action:none;user-select:none;-webkit-user-select:none;}
   .pixMission .clSlideZone::after{content:"";position:absolute;left:0;right:0;top:100%;height:100vh;}
   .pixMission.clScreen .btn.pixBtn{position:relative;z-index:1;}
-  .pixMission .clSlideTxt{font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.12em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B;pointer-events:none;}
+  .pixMission .clSlideTxt{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.12em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B;pointer-events:none;}
   .pixMission .clArrow{width:0;height:0;border-top:13px solid transparent;border-bottom:13px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);pointer-events:none;}
   .pixMission .clArrow.l{border-right:18px solid #FFC93A;}
   .pixMission .clArrow.r{border-left:18px solid #FFC93A;}
@@ -940,10 +944,10 @@
   .pixPassport{height:100dvh;min-height:0;}
   .passHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;}
   .passHeadSpace{width:44px;flex:none;}
-  .passTitle{flex:1;margin:0;text-align:center;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
+  .passTitle{flex:1;margin:0;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
     text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
   .passClose{flex:none;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .passClose:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
   .passportBook{background:#FFF3D6;color:#1E2F7A;border:4px solid #1B1F3B;border-radius:14px;box-shadow:inset 0 0 0 4px #FFC93A,0 6px 0 rgba(20,30,90,.4);flex:1;min-height:280px;overflow:hidden;position:relative;}
@@ -955,7 +959,7 @@
      MISSION X BADGE line in the middle of the room above the badge, then the badge with its name, then room of the same size below, so the badge block is centred on the page. */
   .passportPage{flex-shrink:0;box-sizing:border-box;padding:0 18px;text-align:center;display:grid;grid-template-rows:1fr auto 1fr;justify-items:center;
     background:#FFF3D6 url("tiles/passport_bg.png") center / 100% 100% no-repeat;image-rendering:pixelated;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;}
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;}
   .pxNoteZone{align-self:center;display:flex;align-items:center;justify-content:center;}
   .pxBadgeBlock{display:flex;flex-direction:column;align-items:center;}
   .pxNote{font-weight:700;font-size:1.3rem;line-height:1.15;letter-spacing:.06em;color:#1E2F7A;text-shadow:0 2px 0 rgba(255,255,255,.75);}
@@ -966,7 +970,7 @@
   .pxBadgeMission{margin-top:6px;font-weight:500;font-size:1rem;color:#5666a8;}
   .passportNav{display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px;}
   .navArrow{width:56px;height:48px;border:3px solid #1B1F3B;border-radius:12px;background:#FFC93A;color:#1B1F3B;cursor:pointer;
-    font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;padding:0 0 3px;
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;padding:0 0 3px;
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.45);}
   .navArrow:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.9);}
   .dots{display:flex;gap:6px;justify-content:center;margin:12px 0 2px;flex-wrap:wrap;}
@@ -1795,8 +1799,8 @@ var PIX_SFX = {
   jlCrumble:{url:"sounds/sfx_jl_crumble.wav", gain:0.45},   // peak 0.56
   jlSuper:{url:"sounds/sfx_jl_super.wav", gain:0.4},        // peak 0.70
   jlFall:{url:"sounds/sfx_jl_fall.wav", gain:0.3},          // falling off the bottom of the sky (2026-10-24, per Dan): sound_effect_16, peak 0.99, in place of the Faith Match miss / last-chance sounds
-  // the pilgrim going in at the church door, on the Main Menu and in each round of Pilgrim's Road (2026-10-26, per Dan): "Church Bell.wav" from the Non 8-Bit Sounds folder, 6 s of its
-  // 15, faded out from 3.5 s (2026-10-26, per Dan: 12 s was too long to wait), mono, 16-bit, 32 kHz so it is 0.4 MB instead of 4. The next screen waits for it to finish (pixAfterSfx).
+  // the pilgrim going in at the church door, on the Main Menu and in each round of Pilgrim's Road (2026-10-26, per Dan): "Church Bell.wav" from the Non 8-Bit Sounds folder, 4.5 s of its
+  // 15, faded out from 2.5 s (2026-10-26, per Dan: 12 s, then 6 s, were too long to wait), mono, 16-bit, 32 kHz so it is 0.3 MB instead of 4. The next screen waits for it to finish (pixAfterSfx).
   churchBell:{url:"sounds/sfx_church_bell.wav", gain:1.2},
   // tapping a sheep on the Main Menu (2026-10-26, per Dan): "Sheep Baa 1.wav" or "Sheep Baa 2.wav" (Non 8-Bit Sounds folder, 1 s each, peak 0.37), picked at random, in place of the button sound
   sheepBaa1:{url:"sounds/sfx_sheep_baa1.wav", gain:1.0},
@@ -5741,7 +5745,7 @@ function msShow(s, res, landed){
   s.cols = res.cols; s.merged = res.grown; s.dropped = landed;
   var over = !res.goalAt && msFull(s.cols, s.rows);
   s.goalKey = res.goalAt ? res.goalAt[0] + "," + res.goalAt[1] : "";
-  pixSfxPlay(over ? "fmLast" : (res.merges ? "fmMatch" : "fmFirst"), true);
+  pixSfxPlay(over ? "fmLast" : (res.goalAt ? "clCatch" : (res.merges ? "fmMatch" : "fmFirst")), true);          // a goal plant: sound_effect_1 (2026-10-26, per Dan)
   if(!res.goalAt && !over) s.busy = false;
   saveState(); render();
   if(res.goalAt){
@@ -5824,7 +5828,7 @@ function screenMustardSeed(){
       '<div class="msTrack" id="msTrack" style="--n:' + n + ';--r:' + s.rows + '">' + new Array(n + 1).join('<i class="msTrackCell"></i>') + '<div class="msMover" id="msMover"' + (s.busy ? ' style="visibility:hidden"' : '') + '>' + msTileHtml(s.cur) + '</div></div>' +
       '<div class="msBoard" id="msBoard" style="--n:' + n + ';--r:' + s.rows + ';grid-template-columns:repeat(' + n + ',minmax(0,1fr))">' + board + '</div>' +
       '<div class="msLegend">' + legend + '</div>' +
-      '<button class="msBar" data-sfx="own" onclick="msDropNow()"><span>' + t("ms_dropBtn") + '</span></button>' +
+      '<button class="msBar msDropBar" data-sfx="own" onclick="msDropNow()"><span>' + t("ms_dropBtn") + '</span></button>' +
     '</div>' +
     '<div class="spacer"></div>', "pixLower msScreen");
 }
@@ -8105,7 +8109,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 N";
+var APP_BUILD = "2026-10-26 Q";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
