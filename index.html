@@ -607,6 +607,7 @@
   .dpCanvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
   .dpReady{position:absolute;left:0;right:0;top:58%;text-align:center;pointer-events:none;font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.2rem;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
+  .pbStage .dpReady{top:50%;transform:translateY(-50%);}      /* the "Tap anywhere to start!" message sits in the exact middle of the play area (2026-10-25, per Dan; the dove's game keeps its lower spot) */
   .pixMission > .pbTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* until the first tap of a round, the whole screen starts it (the red X, above it, still works) */
   .pixMission > .dpTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* the whole screen flaps the dove (the red X, above it, still works) */
   /* Fruits of the Spirit (2026-10-24): a 6 x 6 board of cream squares with the fruit laid over them as pictures of their own, so that they can slide; the 8 words and their counts below. */
@@ -7905,7 +7906,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 U";
+var APP_BUILD = "2026-10-25 V";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
