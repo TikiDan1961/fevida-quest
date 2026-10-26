@@ -7903,6 +7903,7 @@ function pzUp(ev){
     if(prog) prog.textContent = t("pz_pieces")(s.placed.length, pzCtx.n);
     if(s.placed.length >= pzCtx.n){
       s.status = "solved"; saveState();
+      pixSfxPlay("fmFanfare", false);                                  // a finished puzzle: sound_effect_3 (2026-10-26, per Dan), the fanfare Faith Match plays too
       setTimeout(function(){ if(state.screen === "stainedGlass") render(); }, 250);
     } else {
       saveState();
@@ -7984,7 +7985,7 @@ function screenStainedGlass(){
   var solved = s.status === "solved", lastLevel = s.round >= PZ_LEVELS.length - 1;
   // Also covers a page reload during the "solved" hold: the pending timer is
   // gone, so schedule the advance again whenever this view is drawn.
-  if(solved && !pzAdvancing){ pzAdvancing = true; setTimeout(pzAdvance, PZ_SOLVED_MS); }
+  if(solved && !pzAdvancing){ pzAdvancing = true; setTimeout(function(){ pixAfterSfx("fmFanfare", pzAdvance); }, PZ_SOLVED_MS); }       // (ROUND X COMPLETED! waits until the fanfare has finished)
 
   var g = pzBuild(s), img = s.imgs[s.round];
   pzCtx = {n:g.n, pw:g.pw, ph:g.ph, m:g.m, pieces:g.pieces, H:g.H};
@@ -8116,7 +8117,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 U";
+var APP_BUILD = "2026-10-26 V";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
