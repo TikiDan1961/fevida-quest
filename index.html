@@ -1037,7 +1037,7 @@ var T = {
     faithFlashName:"Faith Flash", faithMatchName:"Faith Match", beTheLightName:"Be the Light",
     stainedGlassName:"Stained-Glass Puzzle", chooseJoyName:"Choose Joy",
     done:"DONE",
-    ff_intro:"Get through 3 rounds of 10 questions to earn your badge! You have 5 chances.", ff_round:function(n,total){return "Round "+n+" of "+total;}, ff_roundDone:function(n){return "ROUND "+n+" COMPLETED!";}, ff_awarded:"AWARDED!",
+    ff_intro:"Get through 3 rounds of 10 questions to earn your badge! You have 3 chances.", ff_round:function(n,total){return "Round "+n+" of "+total;}, ff_roundDone:function(n){return "ROUND "+n+" COMPLETED!";}, ff_awarded:"AWARDED!",
     nextQuestion:"NEXT QUESTION", collectAward:"COLLECT AWARD", playAgain:"PLAY AGAIN", tryAgain:"TRY AGAIN",
     ff_resultsTitlePass:"Perfect Score!", ff_resultsTitlePass2:"Well Done!", ff_resultsTitleFail:"So Close!",
     ff_resultsBodyPass:"You answered all 30 questions correctly!", ff_resultsBodyPass2:"You made it through all 30 questions!",
@@ -1050,7 +1050,7 @@ var T = {
     // the instruction screen shown before each game (2026-10-22, per Dan): d = what the game is, h = how to play (a drafted list for the client to approve)
     startMission:"START MISSION",
     guides:{
-      faithFlash:{d:"Answer questions about the Catholic faith to earn your badge.", h:["Tap the right answer for each question.", "Finish 3 rounds of 10 questions.", "You have 5 chances. A wrong answer costs one, and a lost chance is given back after each round."]},
+      faithFlash:{d:"Answer questions about the Catholic faith to earn your badge.", h:["Tap the right answer for each question.", "Finish 3 rounds of 10 questions.", "You have 3 chances. A wrong answer costs one, and a lost chance is given back after each round."]},
       faithMatch:{d:"Flip the tiles and find all the matching pairs.", h:["Tap two tiles to turn them over.", "A match stays face up. If they do not match, they flip back and you lose a chance.", "Match every pair to clear a level. Clear all 3 levels to win."]},
       stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "Finish all 4 puzzles to win."]},
       followLight:{d:"Watch the tiles light up, then play the same notes back.", h:["Listen to the hymn notes and watch the tiles that light up.", "Tap the same tiles in the same order. Tap REPEAT to see the pattern again.", "A wrong tap costs a chance. You have 3 in all. Finish all 8 levels to win."]},
@@ -1188,7 +1188,7 @@ var T = {
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
     stainedGlassName:"Rompecabezas de Vitral", chooseJoyName:"Elige la Alegría",
     done:"COMPLETADO",
-    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 5 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
+    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 3 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
     nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
     ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitlePass2:"¡Bien Hecho!", ff_resultsTitleFail:"¡Tan Cerca!",
     ff_resultsBodyPass:"¡Respondiste las 30 preguntas correctamente!", ff_resultsBodyPass2:"¡Superaste las 30 preguntas!",
@@ -1200,7 +1200,7 @@ var T = {
     chancesLeft:"Oportunidades restantes:",
     startMission:"COMENZAR MISIÓN",
     guides:{
-      faithFlash:{d:"Responde preguntas sobre la fe católica para ganar tu insignia.", h:["Toca la respuesta correcta de cada pregunta.", "Termina 3 rondas de 10 preguntas.", "Tienes 5 oportunidades. Una respuesta incorrecta cuesta una, y al terminar cada ronda se te devuelve la que perdiste."]},
+      faithFlash:{d:"Responde preguntas sobre la fe católica para ganar tu insignia.", h:["Toca la respuesta correcta de cada pregunta.", "Termina 3 rondas de 10 preguntas.", "Tienes 3 oportunidades. Una respuesta incorrecta cuesta una, y al terminar cada ronda se te devuelve la que perdiste."]},
       faithMatch:{d:"Voltea las fichas y encuentra todos los pares.", h:["Toca dos fichas para voltearlas.", "Si hacen pareja, se quedan descubiertas. Si no, se voltean de nuevo y pierdes una oportunidad.", "Empareja todos los pares para pasar de nivel. Supera los 3 niveles para ganar."]},
       stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
@@ -2769,7 +2769,7 @@ var FAITH_FLASH_ROUNDS = 3;
 function ffRounds(s){ return Math.ceil(s.order.length / FAITH_FLASH_ROUND_SIZE); }
 function ffRound(s){ return Math.floor(s.index / FAITH_FLASH_ROUND_SIZE); }
 // Three chances, shown as hearts just like Faith Match (2026-10-20, per Dan): a wrong answer costs one, and the game ends when the last is gone.
-var FF_CHANCES = 5;   // 5 chances for the whole game (2026-10-21, per Dan; it was 3, then 8)
+var FF_CHANCES = 3;   // 3 chances for the whole game (2026-10-25, per Dan; it was 5 since 2026-10-21, before that 3, then 8)
 function ffChancesLeft(s){ return typeof s.chances === "number" ? s.chances : FF_CHANCES; }
 
 // Where the right answer sits (2026-10-23, per Dan: it must appear randomly in all three positions). A plain shuffle can leave it in the same spot
@@ -6255,6 +6255,7 @@ function prTurn(r, c){
   var reach = prPaint(s);
   if(reach.won){
     s.busy = true;                                                         // the road is done: the pilgrim walks it, then ROUND X COMPLETED!
+    pixSfxPlay("clCatch", false);                                          // the road is finished: sound_effect_1 (2026-10-25, per Dan)
     saveState();
     prWalk(s, function(){
       var s2 = state.session.pilgrimRoad;
@@ -7300,8 +7301,10 @@ function jlGenerate(s, until){
     jl.plats.push({x: x, y: jl.nextY, kind: kind, base: x, ph: jlRand(0, 6.28), broken: false, fall: 0});
     jl.last = kind; jl.count++;
     var lastY = last.y, thisY = jl.nextY;
-    if(cfg.storm && jl.count > 3 && Math.random() < cfg.storm){                  // a storm cloud between this rung and the next, away from the two
+    // (2026-10-25, per Dan) two storm clouds are never closer together than one screen's height (jl.ch, the height of the sky on this phone)
+    if(cfg.storm && jl.count > 3 && Math.random() < cfg.storm && (typeof jl.lastStormY !== "number" || jl.nextY + 18 - jl.lastStormY >= jl.ch)){                  // a storm cloud between this rung and the next, away from the two
       var sx = Math.max(14, Math.min(JL_W - 14, x + (x < JL_W / 2 ? 1 : -1) * jlRand(34, 70)));
+      jl.lastStormY = jl.nextY + 18;
       jl.storms.push({x: sx, y: jl.nextY + 18, dx: (Math.random() < .5 ? -1 : 1) * jlRand(16, 32)});
     }
     var gapNext = jlRand(cfg.gap[0], cfg.gap[1]);
@@ -8009,7 +8012,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 ZH";
+var APP_BUILD = "2026-10-25 ZK";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
