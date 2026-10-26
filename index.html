@@ -951,9 +951,14 @@
      2 extra "phantom" clone slides for the wrap animation (see screenPassport),
      so both widths are set inline per-render from PASSPORT_TRACK_SLOTS instead. */
   .passportTrack{display:flex;height:100%;}
-  .passportPage{flex-shrink:0;box-sizing:border-box;padding:22px 18px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  /* (2026-10-26, per Dan) each page has a pixel-art picture behind it (tiles/passport_bg.png: sunburst, stars, clouds, a thin gold frame), and its three parts sit in three rows: the
+     MISSION X BADGE line in the middle of the room above the badge, then the badge with its name, then room of the same size below, so the badge block is centred on the page. */
+  .passportPage{flex-shrink:0;box-sizing:border-box;padding:0 18px;text-align:center;display:grid;grid-template-rows:1fr auto 1fr;justify-items:center;
+    background:#FFF3D6 url("tiles/passport_bg.png") center / 100% 100% no-repeat;image-rendering:pixelated;
     font-family:"FeYVida Five","Pixelify Sans",ui-monospace,monospace;}
-  .pxNote{font-weight:600;font-size:.875rem;letter-spacing:.06em;color:#1E2F7A;opacity:.8;margin-bottom:12px;}
+  .pxNoteZone{align-self:center;display:flex;align-items:center;justify-content:center;}
+  .pxBadgeBlock{display:flex;flex-direction:column;align-items:center;}
+  .pxNote{font-weight:700;font-size:1.3rem;line-height:1.15;letter-spacing:.06em;color:#1E2F7A;text-shadow:0 2px 0 rgba(255,255,255,.75);}
   .badge8{width:192px;height:192px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
   .badge8Locked{width:192px;height:192px;border-radius:50%;background:#C9CFDD;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 6px #AEB6C8;}
   .badge8Locked img{width:96px;height:96px;image-rendering:pixelated;}
@@ -1090,7 +1095,7 @@ var T = {
     missionBadge:function(n){return "MISSION "+n+" BADGE";},
     badgeLocked:"???",
     ticketTitle:"Golden Ticket Unlocked!",
-    ticketBody:"Show this screen to a Fe y Vida booth staff member to play for a prize!",
+    ticketBody:"Show this screen to a Fe y Vida booth staff member to collect a prize!",
     clearTicket:"CLEAR TICKET",
     themeFaith:"Faith", themeLove:"God's Love", themeLight:"Be a Light to the World",
     themeUnity:"Unity", themeHope:"Hope",
@@ -1240,7 +1245,7 @@ var T = {
     missionBadge:function(n){return "INSIGNIA MISIÓN "+n;},
     badgeLocked:"???",
     ticketTitle:"¡Boleto Dorado Desbloqueado!",
-    ticketBody:"¡Muestra esta pantalla a un miembro del personal de Fe y Vida para jugar por un premio!",
+    ticketBody:"¡Muestra esta pantalla a un miembro del personal de Fe y Vida para reclamar un premio!",
     clearTicket:"BORRAR BOLETO",
     themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé Luz para el Mundo",
     themeUnity:"Unidad", themeHope:"Esperanza",
@@ -7999,10 +8004,9 @@ function passportTouchEnd(ev){
   else if(dx < -40) passportNav(1);
 }
 
-// TEMPORARY test aid (2026-10-19, per Dan): while true, every Passport badge page shows its badge as
-// earned, so all ten 8-bit badges can be checked. Set to false for the real thing (then only badges
-// a player has won appear, the rest show a padlock).
-var PASSPORT_SHOW_ALL = true;
+// Test aid (2026-10-19, per Dan): while true, every Passport badge page shows its badge as earned, so all the 8-bit badges can be checked.
+// Set to false on 2026-10-26, per Dan: now only the badges a player has won appear, and the rest show a padlock.
+var PASSPORT_SHOW_ALL = false;
 
 // The pixel-art version of a mission's badge: tiles/badges96/b96_<name>.png (96x96 pixels and 48 colours, made from the artwork in the
 // Badges folder; finer than the first 48x48 set, 2026-10-22, per Dan, so the pictures are easier to make out), shown at 2x.
@@ -8012,11 +8016,13 @@ function passportPageInner(page){
   if(page < MISSIONS.length){
     var m = MISSIONS[page];
     var earned = PASSPORT_SHOW_ALL || state.missions[m.id].badge;
-    return '<div class="pxNote">' + t("missionBadge")(page+1) + '</div>' +
+    return '<div class="pxNoteZone"><div class="pxNote">' + t("missionBadge")(page+1) + '</div></div>' +
+      '<div class="pxBadgeBlock">' +
       (earned ? '<img class="badge8" src="' + badge8Src(m) + '" alt="">'
               : '<div class="badge8Locked"><img src="tiles/icons48/ic_lock.png" alt=""></div>') +
       '<div class="pxBadgeName">' + (earned ? t(m.themeKey) : t("badgeLocked")) + '</div>' +
-      '<div class="pxBadgeMission">' + t(m.nameKey) + '</div>';
+      '<div class="pxBadgeMission">' + t(m.nameKey) + '</div>' +
+      '</div><div></div>';
   }
   return "";            // (the Joyous Photo page that used to follow the badges is gone: the photo is taken at the booth now, 2026-10-22, per Dan)
 }
@@ -8063,7 +8069,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 B";
+var APP_BUILD = "2026-10-26 E";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
