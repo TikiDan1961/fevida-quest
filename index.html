@@ -158,8 +158,8 @@
   .homeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 2px;margin:22px 0 10px;}
   @media (max-width:340px){
     .homeGrid .appTile{width:62px;height:62px;}
-    .homeGrid .miniGrid{grid-template-columns:26px 26px;}
-    .homeGrid .appTile .miniGrid img.spr{width:26px;height:26px;image-rendering:auto;}
+    .homeGrid .miniGrid{grid-template-columns:24px 24px;}
+    .homeGrid .appTile .miniGrid img.spr{width:24px;height:24px;image-rendering:pixelated;}
   }
   .appIcon{display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;}
   /* Only the icon itself (its tile and its name) takes a tap or lights up -- not the empty space around it in its grid cell, so a tap between
@@ -179,7 +179,9 @@
   .appTag{margin-top:3px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.75rem;letter-spacing:.03em;color:#FFC93A;text-transform:lowercase;}
   .appTag::first-letter{text-transform:uppercase;}
   .miniGrid{display:grid;grid-template-columns:32px 32px;gap:0;}
-  .appTile .miniGrid img.spr{width:32px;height:32px;image-rendering:auto;}
+  /* (2026-10-26, per Dan: sharper, still pixelated) the four little pictures on the Missions icon were smoothed (image-rendering:auto), which blurred them; they are drawn blocky now, like the rest.
+     The icons are 16 x 16 pixel pictures stored at 48 x 48 (3 x 3 each), so 32px (24px on small phones) gives every picture pixel a whole number of screen pixels on a 2x or 3x screen. */
+  .appTile .miniGrid img.spr{width:32px;height:32px;image-rendering:pixelated;}
   .countBadge{position:absolute;top:-9px;right:-12px;min-width:34px;padding:2px 6px;border-radius:12px;background:#D6343A;border:3px solid #fff;color:#fff;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
   .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
@@ -289,7 +291,7 @@
   .pixSky > *:not(.pixSkyClouds){position:relative;z-index:1;}
   .pixHome.pixSky > .backBtn{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:5;width:42px;height:42px;padding:0 0 3px;display:flex;align-items:center;justify-content:center;
     border:3px solid #1B1F3B;border-radius:12px;background:#3A93E8;cursor:pointer;box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
-  .backBtn img{width:32px;height:32px;image-rendering:auto;pointer-events:none;}
+  .backBtn img{width:32px;height:32px;image-rendering:pixelated;pointer-events:none;}
   .backBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #DCEEFF,0 0 16px 6px rgba(110,190,255,.85);}
   @media (max-width:340px){   /* keeps the title clear of the back icon on the smallest phones */
     .pixMenu .pixMenuTitle{font-size:1.625rem;}
@@ -872,7 +874,7 @@
   @media (max-height:640px){
     .pixHearts img{width:18px;height:16px;}
     .pixBigTile{width:88px;height:88px;margin-bottom:8px;}
-    .pixBigTile img{width:64px;height:64px;image-rendering:auto;}
+    .pixBigTile img{width:64px;height:64px;image-rendering:pixelated;}
     .pixCountdown{font-size:4rem;margin:8px 0;}
     .pixMission .matchGrid{margin:6px 0;}
     .pixMission .flMsg{margin-top:4px;}
@@ -885,7 +887,7 @@
   /* Options screen: two volume sliders on a cream card (2026-10-20, per Dan) */
   .optCard{display:flex;flex-direction:column;gap:22px;padding:22px 18px 24px;text-align:left;}
   .optHead{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .optIcon{width:32px;height:32px;image-rendering:auto;flex:none;}
+  .optIcon{width:32px;height:32px;image-rendering:pixelated;flex:none;}
   .optLabel{flex:1;font-weight:700;font-size:1.25rem;line-height:1.1;}
   .optValue{font-weight:700;font-size:1.25rem;min-width:3.4ch;text-align:right;}
   .pixRange{-webkit-appearance:none;appearance:none;display:block;width:100%;height:34px;margin:0;background:transparent;cursor:pointer;touch-action:pan-y;}
@@ -8109,7 +8111,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 Q";
+var APP_BUILD = "2026-10-26 R";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
