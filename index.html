@@ -137,7 +137,7 @@
   .cwPilgrim{position:absolute;aspect-ratio:11/15;}
   .cwSprite{width:100%;height:100%;background:url("tiles/pilgrim_back.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:pilgrimBreath 1.8s steps(1) infinite;}
   .cwPilgrim.walking .cwSprite{animation:pilgrimStep .5s steps(1) infinite,pilgrimBob .5s steps(1) infinite;}
-  .cwTicket{position:absolute;display:none;image-rendering:pixelated;}
+  .cwTicket{position:absolute;display:none;image-rendering:auto;}      /* the ticket is a smooth 640 x 640 picture (tiles/golden_ticket.png), no longer the 48 x 48 pixel icon (2026-10-25, per Dan) */
   .cwTicket.show{display:block;animation:cwTicketPop .45s ease-out 1,cwTicketGlow 1s ease-in-out .45s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,230,120,.95));}
   @keyframes cwTicketPop{0%{transform:scale(0);opacity:0;}65%{transform:scale(1.18);opacity:1;}100%{transform:scale(1);opacity:1;}}
   @keyframes cwTicketGlow{0%{filter:drop-shadow(0 0 5px rgba(255,230,120,.8));}100%{filter:drop-shadow(0 0 16px rgba(255,240,150,1));}}
@@ -483,6 +483,7 @@
   .lcIntent:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
   .pixMission .pixResMid{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}
   .pixResBadge{display:block;width:144px;height:144px;margin:0 auto 10px;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
+  .pixTicketBig{display:block;width:min(86%,290px);height:auto;margin:-4px auto 6px;image-rendering:auto;filter:drop-shadow(0 0 10px rgba(255,214,90,.9));animation:cwTicketGlow 1s ease-in-out infinite alternate;}      /* the smooth Golden Ticket picture on its screen, glowing softly */
   .pixResTitle{font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:.02em;}
   .pixResBody{margin:10px 0 0;font-weight:500;font-size:1.0625rem;line-height:1.3;color:#3d4d96;}
   .pixScore{margin-top:12px;font-weight:700;font-size:1.25rem;color:#1E2F7A;}
@@ -2505,11 +2506,11 @@ function pilgrimEnter(el){
 // later the Main Menu comes back with the Golden Ticket icon unlocked. The scene is laid over the picture in picture pixels (125 x 270), so everything
 // stays on the aisle at any screen size.
 var CW = {W: 125, H: 270, x: 62.5, yStart: 274, yEnd: 206, dur: 4400, ticketAt: .75, ticketMs: 2000, scaleNear: 2.3, scaleFar: .55, ticketScale: 2, ticketY: 90};
-function cwPreload(){ ["tiles/pilgrim_back.png", "tiles/icons48/ic_goldenTicket.png", "tiles/church_interior2.png"].forEach(function(src){ var im = new Image(); im.src = src; }); }
+function cwPreload(){ ["tiles/pilgrim_back.png", "tiles/golden_ticket.png", "tiles/church_interior2.png"].forEach(function(src){ var im = new Image(); im.src = src; }); }
 function screenChurchWalk(){
   var ts = CW.ticketScale;
   return '<div class="screen pixHome pixChurch cwScreen"><div class="cwScene" id="cwScene">' +
-    '<img class="cwTicket" id="cwTicket" src="tiles/icons48/ic_goldenTicket.png" alt="" style="left:' + ((CW.x - 24 * ts) / CW.W * 100) + '%;top:' + ((CW.ticketY - 24 * ts) / CW.H * 100) + '%;width:' + (48 * ts / CW.W * 100) + '%">' +
+    '<img class="cwTicket" id="cwTicket" src="tiles/golden_ticket.png" alt="" style="left:' + ((CW.x - 24 * ts) / CW.W * 100) + '%;top:' + ((CW.ticketY - 24 * ts) / CW.H * 100) + '%;width:' + (48 * ts / CW.W * 100) + '%">' +
     '<div class="cwPilgrim walking" id="cwPilgrim"><div class="cwSprite"></div></div>' +
   '</div></div>';
 }
@@ -2717,9 +2718,9 @@ function grantMission(id, missionState){
 
 // The Mission Completed screen in the 8-bit look (2026-10-22, per Dan): the pixel sky, the mission's name, and a cream card with the badge, the
 // "Mission Complete!" message and what was won, like the other result screens.
-// No RETURN TO MAIN MENU button (2026-10-23, per Dan): the screen shows for 2 seconds and the Main Menu comes by itself (see awardAutoReturn, which
+// No RETURN TO MAIN MENU button (2026-10-23, per Dan): the screen shows for 2.5 seconds (it was 2) and the Main Menu comes by itself (see awardAutoReturn, which
 // render() calls).
-var AWARD_SHOW_MS = 2000, awardTimer = 0, awardTimerFor = null;
+var AWARD_SHOW_MS = 2500, awardTimer = 0, awardTimerFor = null;      // (2.5 s since 2026-10-25, per Dan; it was 2 s)
 function awardAutoReturn(){
   if(state.screen !== "award"){ clearTimeout(awardTimer); awardTimer = 0; return; }
   if(awardTimer) return;                                   // already counting (a redraw of the same screen does not restart it)
@@ -6735,6 +6736,7 @@ function fsFlameStart(){
   FS_FLAME.forEach(function(n){ var im = new Image(); im.src = "tiles/fruits/" + n + ".png"; });
   if(!fsFlameIv) fsFlameIv = setInterval(fsFlameTick, FS_FLAME_MS);
 }
+var FS_LAST_NAME_MS = 1000, FS_BEAT_MS = 250, fsRevealAt = 0;      // how long the last word's name is shown before ROUND X COMPLETED!, and the beat after it
 var fsQueue = [], fsRevealing = false;                                      // the words to light up, one at a time (2026-10-24, per Dan: two finished in one swap showed only the first)                                               // the fruit picture at each square, and the swipe being made
 function fsWeights(goals){                                                   // the fruit still needed turns up 3 times as often as the rest
   var w = [];
@@ -6995,7 +6997,7 @@ function fsWordBurst(ty){
 }
 function fsPump(s){
   if(fsRevealing || !fsQueue.length || !fsAlive(s)) return;
-  fsRevealing = true;
+  fsRevealing = true; fsRevealAt = performance.now();
   var ty = fsQueue.shift();
   s.goals[ty - 1].shown = true; fsPaintWords(s); fsWordBurst(ty);
   fsPopup(t("fs_names")[ty - 1] + "!"); pixSfxPlay("ticket", false);
@@ -7082,6 +7084,8 @@ function fsPlay(s, frames, done){
       fsEls = next2;
       void document.getElementById("fsInner").offsetWidth;
       wait = Math.round(fsDrop(movers, FS_STAGGER.fall) * 1000) + 90;                                   // held until the last one has landed
+    } else if(f.kind === "shuffle" && s.goals.every(function(g){ return g.done; })){
+      wait = 0;                                                              // the round is won: no shuffling now, the message comes next (2026-10-25, per Dan: less waiting before ROUND X COMPLETED!)
     } else if(f.kind === "shuffle"){                                         // no swap left that works: every fruit slides to another square
       wait = 1200; fsShuffleMsg(wait - 100); fsShuffleSound(.9);                                  // (SHUFFLING over the board while they do)
       if(f.perm){
@@ -7134,6 +7138,7 @@ function fsHint(){
   cells.forEach(function(i){ if(fsEls[i]) fsEls[i].classList.add("hint"); });
   s.hints = fsHintsLeft(s) - 1; saveState();
   fsPaintHintBtn(s);
+  pixSfxPlay("clCatch", false);                                             // a hint is used: sound_effect_1 (2026-10-25, per Dan)
 }
 function fsSwap(a, b){
   var s = state.session.fruitsSpirit;
@@ -7153,12 +7158,14 @@ function fsSwap(a, b){
     if(s.goals.every(function(g){ return g.done; })){
       (function finish(){
         if(!fsAlive(s)) return;
-        if(fsQueue.length || fsRevealing){ setTimeout(finish, 150); return; }       // the last names are still to be shown
+        // (2026-10-25, per Dan: less waiting before ROUND X COMPLETED!) the last name is shown for about a second, and then, after a short beat, the message comes up: about 1.2 s after the
+        // last word lights up, where it used to be about 2.5 s (the name's whole 1.55 s hold, and then 0.9 s more)
+        if(fsQueue.length || (fsRevealing && performance.now() - fsRevealAt < FS_LAST_NAME_MS)){ setTimeout(finish, 60); return; }       // the last names are still to be shown
         setTimeout(function(){
           if(!fsAlive(s)) return;
           s.busy = false; s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= FS_ROUNDS_COUNT - 1};     // ROUND X COMPLETED!
           saveState(); render();
-        }, 900);
+        }, FS_BEAT_MS);
       })();
     } else { s.busy = false; saveState(); }
   });
@@ -7235,7 +7242,7 @@ function screenFruitsSpirit(){
   return pixShell('<h2 class="pixMTitle">' + t("fruitsSpiritName") + '</h2>' +
     '<div class="pixNote">' + t("fs_intro") + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, FS_ROUNDS_COUNT) + '</span>' +
-      '<button class="fsHintBtn" id="fsHintBtn" onclick="fsHint()"' + (fsHintsLeft(s) <= 0 ? ' disabled' : '') + '>' + t("fs_hint") + ' (' + fsHintsLeft(s) + ')</button></div>' +
+      '<button class="fsHintBtn" id="fsHintBtn" data-sfx="own" onclick="fsHint()"' + (fsHintsLeft(s) <= 0 ? ' disabled' : '') + '>' + t("fs_hint") + ' (' + fsHintsLeft(s) + ')</button></div>' +
     '<div class="fsBoardWrap"><div class="fsBoard"><div class="fsInner" id="fsInner" onpointerdown="fsDown(event)" onpointermove="fsMove(event)" onpointerup="fsUp(event)" onpointercancel="fsCancel()">' +
       '<div class="fsGrid">' + cells + '</div><div class="fsLayer" id="fsLayer">' + fruit + '</div></div></div></div>' +
     '<div class="fsFound"><b>' + t("fs_found") + '</b><div class="fsWords">' + words + '</div></div>' +
@@ -8012,7 +8019,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 ZK";
+var APP_BUILD = "2026-10-25 ZP";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -8077,22 +8084,14 @@ function clearTicket(){
   go("mainMenu");
 }
 
+// The Golden Ticket screen (2026-10-25, per Dan): the 8-bit look of the other screens (pixel sky, the name above a cream window, a pixel button), the smooth ticket picture in the window,
+// and no CLEAR TICKET button any more (clearTicket above is kept but nothing calls it). MAIN MENU is a plain, non-destructive go("mainMenu") (nothing about points / missions / badges changes).
 function screenGoldenTicket(){
-  return '<div class="screen center">' +
-    '<div class="spacer"></div>' +
-    '<h1>' + t("ticketTitle") + '</h1>' +
-    '<div class="ticketBox"><div class="tk">🎟️</div><strong>FE Y VIDA QUEST</strong></div>' +
-    '<p>' + t("ticketBody") + '</p>' +
-    '<div class="spacer"></div>' +
-    '<button class="btn gold" onclick="clearTicket()">' + t("clearTicket") + '</button>' +
-    // Added 2026-09-29, per Dan — previously CLEAR TICKET was the only way
-    // off this screen, which meant actually using it (even just to look) was
-    // destructive. This one is a plain, non-destructive go('mainMenu') —
-    // nothing about points/missions/badges changes — so a player who reaches
-    // the Golden Ticket early (5 of 10 missions) can back out and keep
-    // playing the remaining ones.
-    '<button class="btn outline" onclick="go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
-  '</div>';
+  return pixShell('<div class="pixResMid"><h2 class="pixMTitle pixIntroTitle">' + t("goldenTicketLabel") + '</h2><div class="pixPaper">' +
+      '<img class="pixTicketBig" src="tiles/golden_ticket.png" alt="" decoding="sync">' +
+      '<div class="pixResTitle">' + t("ticketTitle") + '</div>' +
+      '<p class="pixResBody">' + t("ticketBody") + '</p>' +
+    '</div></div>' + pixBtnHtml(t("mainMenu"), "go('mainMenu')", true), "pixLower");
 }
 
 /* ---------- Render ---------- */
