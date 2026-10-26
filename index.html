@@ -1339,10 +1339,9 @@ function t(key){ var lang = state.lang || "en"; return T[lang][key]; }
 var MISSIONS = [
   {id:"faithFlash", icon:"⚡", badgeImg:"tiles/badge_faith.png", nameKey:"faithFlashName", themeKey:"themeFaith"},
   {id:"faithMatch", icon:"🃏", badgeImg:"tiles/badge_love.png", nameKey:"faithMatchName", themeKey:"themeLove"},
-  // Dove of Peace (2026-10-24, per Dan) replaced Be the Light, here in the list. Borrows the Grace badge (a dove) until its own (Peace) is drawn: add tiles/badge_peace.png and
-  // tiles/badges96/b96_peace.png, then change badgeImg here. (Be the Light, screenBeTheLight, is still in this file but nothing opens it: to bring it back, put
+  // Dove of Peace (2026-10-24, per Dan) replaced Be the Light, here in the list. Uses the Forgiveness badge (2026-10-26, per Dan; no art of its own). (Be the Light, screenBeTheLight, is still in this file but nothing opens it: to bring it back, put
   // {id:"beTheLight", icon:"🔦", badgeImg:"tiles/badge_light.png", nameKey:"beTheLightName", themeKey:"themeLight"} back in this list and its startMission line.)
-  {id:"dovePeace", icon:"🕊️", badgeImg:"tiles/badge_grace.png", nameKey:"dovePeaceName", themeKey:"themePeace"},
+  {id:"dovePeace", icon:"🕊️", badgeImg:"tiles/badge_forgiveness.png", nameKey:"dovePeaceName", themeKey:"themePeace"},
   // Stained-Glass Puzzle replaced Service Sprint in this slot (2026-10-19, per
   // Dan). It reuses Service Sprint's old badge art (tiles/badge_friendship.png)
   // until a dedicated "Unity" badge exists; swap badgeImg when it does.
@@ -1361,41 +1360,31 @@ var MISSIONS = [
   {id:"followLight", icon:"🕹️", badgeImg:"tiles/badge_holiness.png", nameKey:"followLightName", themeKey:"themeHoliness"},
   {id:"wordUnscramble", icon:"🔤", badgeImg:"tiles/badge_grace.png", nameKey:"wordUnscrambleName", themeKey:"themeGrace"},
   {id:"catchLight", icon:"✨", badgeImg:"tiles/badge_salvation.png", nameKey:"catchLightName", themeKey:"themeSalvation"},
-  // Pilgrim's Road (2026-10-24, per Dan) replaced Acts of Kindness, here in the list. Borrows the Hope badge (the road's end) until its own (Perseverance) is drawn: add
-  // tiles/badge_perseverance.png and tiles/badges96/b96_perseverance.png, then change badgeImg here. (Acts of Kindness's Forgiveness badge, tiles/badge_forgiveness.png, is
-  // now unused. The Acts of Kindness game itself, screenKindnessSort and the rest, is still in this file but nothing opens it: to bring it back, put
+  // Pilgrim's Road (2026-10-24, per Dan) replaced Acts of Kindness, here in the list. Has its own Perseverance badge (2026-10-26). (The Acts of Kindness game itself, screenKindnessSort and the rest, is still in this file but nothing opens it: to bring it back, put
   // {id:"kindnessSort", icon:"🤲", badgeImg:"tiles/badge_forgiveness.png", nameKey:"kindnessSortName", themeKey:"themeForgiveness"} back in this list, "kindnessSort" in
   // GUIDE_MISSIONS and its startMission line.)
-  {id:"pilgrimRoad", icon:"⛪", badgeImg:"tiles/badge_hope.png", nameKey:"pilgrimRoadName", themeKey:"themePerseverance"},
-  // Fruits of the Spirit (2026-10-24, per Dan) replaced Hidden Blessings in this slot. It borrows the Mercy badge (Hidden Blessings's) until its own is drawn: add
-  // tiles/badge_spirit.png and tiles/badges96/b96_spirit.png, then change badgeImg here. (Hidden Blessings, screenHiddenBlessings and the rest, is still in this file but nothing opens
+  {id:"pilgrimRoad", icon:"⛪", badgeImg:"tiles/badge_perseverance.png", nameKey:"pilgrimRoadName", themeKey:"themePerseverance"},
+  // Fruits of the Spirit (2026-10-24, per Dan) replaced Hidden Blessings in this slot. Has its own Spirit badge (2026-10-26). (Hidden Blessings, screenHiddenBlessings and the rest, is still in this file but nothing opens
   // it: to bring it back, put {id:"hiddenBlessings", icon:"🔍", badgeImg:"tiles/badge_mercy.png", nameKey:"hiddenBlessingsName", themeKey:"themeMercy"} back in this list,
   // "hiddenBlessings" in GUIDE_MISSIONS and its startMission line.)
-  {id:"fruitsSpirit", icon:"🍇", badgeImg:"tiles/badge_mercy.png", nameKey:"fruitsSpiritName", themeKey:"themeSpirit"},
-  // Jacob's Ladder (2026-10-24, per Dan) replaced Light a Candle in this slot. It borrows Light a Candle's badge (Light to the World) until its own is drawn: add
-  // tiles/badge_ladder.png and tiles/badges96/b96_ladder.png, then change badgeImg here. (Light a Candle, screenLightCandle and the rest, is still in this file but nothing opens
+  {id:"fruitsSpirit", icon:"🍇", badgeImg:"tiles/badge_spirit.png", nameKey:"fruitsSpiritName", themeKey:"themeSpirit"},
+  // Jacob's Ladder (2026-10-24, per Dan) replaced Light a Candle in this slot. Uses the Light badge (2026-10-26, per Dan; no art of its own). (Light a Candle, screenLightCandle and the rest, is still in this file but nothing opens
   // it: to bring it back, put {id:"lightCandle", icon:"🕯️", badgeImg:"tiles/badge_light.png", nameKey:"lightCandleName", themeKey:"themePrayer"} back in this list,
   // "lightCandle" in GUIDE_MISSIONS and its startMission line.)
   {id:"jacobLadder", icon:"🪜", badgeImg:"tiles/badge_light.png", nameKey:"jacobLadderName", themeKey:"themeHeaven"},
-  // Emoji Bible Stories and Life of Jesus Timeline (2026-10-21, per Dan). Also borrowing badges until their own art is drawn: Scripture reuses the
-  // Faith badge (an open Bible) and Discipleship the Salvation badge; add tiles/badge_scripture.png / badge_discipleship.png (and badges96/b96_...) later.
-  {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_faith.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
-  {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_salvation.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"},
-  // Sacred Sudoku (2026-10-21, per Dan) replaced Light the Windows, whose tap order was too hard to see (which had replaced Path of Light). Borrows the
-  // Hope (anchor) badge until its own is drawn: add tiles/badge_wisdom.png and tiles/badges96/b96_wisdom.png, then change badgeImg here.
-  {id:"sacredSudoku", icon:"🔢", badgeImg:"tiles/badge_hope.png", nameKey:"sudokuName", themeKey:"themeWisdom"},
-  // Word Trail (2026-10-23, per Dan): it took the place of the first "TBD" tile. Borrows the Holiness badge until its own (Truth) is drawn: add
-  // tiles/badge_truth.png and tiles/badges96/b96_truth.png, then change badgeImg here.
-  {id:"wordTrail", icon:"🔠", badgeImg:"tiles/badge_holiness.png", nameKey:"wordTrailName", themeKey:"themeTruth"},
-  // Word Groups (2026-10-23, per Dan): took the place of the second "TBD" tile. Borrows the Mercy badge until its own (Understanding) is drawn: add
-  // tiles/badge_understanding.png and tiles/badges96/b96_understanding.png, then change badgeImg here.
+  // Emoji Bible Stories and Life of Jesus Timeline (2026-10-21, per Dan). Own Scripture and Discipleship badges since 2026-10-26.
+  {id:"emojiStories", icon:"📖", badgeImg:"tiles/badge_scripture.png", nameKey:"emojiStoriesName", themeKey:"themeScripture"},
+  {id:"jesusTimeline", icon:"⏳", badgeImg:"tiles/badge_discipleship.png", nameKey:"jesusTimelineName", themeKey:"themeDiscipleship"},
+  // Sacred Sudoku (2026-10-21, per Dan) replaced Light the Windows, whose tap order was too hard to see (which had replaced Path of Light). Own Wisdom badge since 2026-10-26.
+  {id:"sacredSudoku", icon:"🔢", badgeImg:"tiles/badge_wisdom.png", nameKey:"sudokuName", themeKey:"themeWisdom"},
+  // Word Trail (2026-10-23, per Dan): it took the place of the first "TBD" tile. Own Truth badge since 2026-10-26.
+  {id:"wordTrail", icon:"🔠", badgeImg:"tiles/badge_truth.png", nameKey:"wordTrailName", themeKey:"themeTruth"},
+  // Word Groups (2026-10-23, per Dan): took the place of the second "TBD" tile. Uses the Mercy badge (2026-10-26, per Dan; no art of its own).
   {id:"wordGroups", icon:"🗂️", badgeImg:"tiles/badge_mercy.png", nameKey:"wordGroupsName", themeKey:"themeUnderstanding"},
-  // Mustard Seed (2026-10-23, per Dan): took the place of the third "TBD" tile. Borrows the Faith badge (a mustard seed is the parable's picture of faith) until its own
-  // (Growth) is drawn: add tiles/badge_growth.png and tiles/badges96/b96_growth.png, then change badgeImg here.
-  {id:"mustardSeed", icon:"🌱", badgeImg:"tiles/badge_faith.png", nameKey:"mustardSeedName", themeKey:"themeGrowth"},
-  // Pray the Beads (2026-10-23, per Dan): took the place of the last "TBD" tile. Borrows the Grace badge (the dove) until its own art is drawn: add tiles/badge_beads.png
-  // and tiles/badges96/b96_beads.png, then change badgeImg here.
-  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_grace.png", nameKey:"prayBeadsName", themeKey:"themePrayer"}
+  // Mustard Seed (2026-10-23, per Dan): took the place of the third "TBD" tile. Own Growth badge since 2026-10-26.
+  {id:"mustardSeed", icon:"🌱", badgeImg:"tiles/badge_growth.png", nameKey:"mustardSeedName", themeKey:"themeGrowth"},
+  // Pray the Beads (2026-10-23, per Dan): took the place of the last "TBD" tile. Own Prayer badge since 2026-10-26.
+  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_beads.png", nameKey:"prayBeadsName", themeKey:"themePrayer"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -8094,7 +8083,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 G";
+var APP_BUILD = "2026-10-26 H";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
