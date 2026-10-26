@@ -1712,7 +1712,7 @@ function pixCtx(){
 // gain with a squared curve, which feels even to the ear (100 = the loudness the sounds were mixed at).
 // The music slider's 100% is the loudness the slider's 20% used to give (2026-10-22, per Dan), so the whole slider now lives in the useful range.
 var PIX_MUSIC_MAX = 0.04;     // = 0.2 squared
-var pixMusicDuck = 1;         // the music is turned down by this factor while a game wants its notes heard over it (Pray the Beads, 2026-10-25, per Dan: half)
+var pixMusicDuck = 1;         // the music is turned down by this factor while a game wants its notes heard over it (Pray the Beads, 2026-10-25, per Dan: first half, then none at all)
 function pixVolGain(kind){
   var v = kind === "music" ? state.volMusic : state.volSfx;
   if(typeof v !== "number") v = kind === "music" ? 60 : 45;
@@ -5722,8 +5722,8 @@ var PB_CHANCES = 3;
 // Spacing (2026-10-25, per Dan): round 1 is as it was (PB_APART and PB_BURST below); round 2 has its beads closer together, and more groups of close beads, and round 3 closer still. apart = how far
 // from the last bead a bead comes, in usual gaps; burst = how often a bead is followed by a group of close ones, how many, and how close.
 var PB_ROUNDS = [{gap: 600},      // (2026-10-25, per Dan: round 1 faster, was 700, and round 3 slower, was 380; round 2 as it was)
-  {gap: 540, apart: [.8, 1.7], burst: {chance: .5, count: [1, 4], apart: [.55, .75]}},
-  {gap: 450, apart: [.7, 1.3], burst: {chance: .65, count: [2, 5], apart: [.5, .7]}}];      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
+  {gap: 540, apart: [.95, 1.9], burst: {chance: .4, count: [1, 3], apart: [.6, .85]}},      // (later the same day, per Dan: more distance again; round 3 had been too hard)
+  {gap: 450, apart: [.85, 1.6], burst: {chance: .5, count: [1, 3], apart: [.6, .8]}}];      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
 var PB_MIN_MS = {normal: 300, burst: 220};
 var PB_MIN_WINDOW = {good: 110, perfect: 55};
 var PB_FIRST_MS = 1500;                                                    // the first bead is never sooner than this after the round starts
@@ -5804,11 +5804,12 @@ function pbFit(){
   }
 }
 window.addEventListener("resize", function(){ if(state.screen === "prayBeads") pbFit(); });
-// the music is at half volume while the beads are moving, back to normal at every other time (waiting for the first tap, between rounds, game over, any other screen)
+// the music is OFF while the beads are moving (2026-10-25, per Dan), and comes back to its own volume when the last bead of the round has been dealt with (tapped, or missed), and at every
+// other time too (waiting for the first tap, between rounds, game over, any other screen)
 function pbDuckSync(){
   var s = state.session.prayBeads;
-  var on = state.screen === "prayBeads" && s && s.status === "playing" && !s.interlude && !pbWaiting && !!s.res;
-  pixSetMusicDuck(on ? .5 : 1);
+  var on = state.screen === "prayBeads" && s && s.status === "playing" && !s.interlude && !pbWaiting && !!s.res && s.res.indexOf(0) !== -1;
+  pixSetMusicDuck(on ? 0 : 1);
 }
 function pbChancesLeft(s){ return typeof s.chances === "number" ? s.chances : PB_CHANCES; }
 function pbBeginRound(s){
@@ -5877,6 +5878,7 @@ function pbLoop(now){
     }
   }
   pbPlace();
+  pbDuckSync();
   pbRaf = requestAnimationFrame(pbLoop);
 }
 function pbLoopStart(){
@@ -7925,7 +7927,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 W";
+var APP_BUILD = "2026-10-25 X";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
