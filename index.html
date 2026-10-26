@@ -154,6 +154,7 @@
   .btn.pixBtn.pixBtnLg{font-size:1.5rem;padding-top:2px;}
   .btn.pixBtn.pixBtnMd{font-size:1.25rem;}
   .btn.pixBtn.pixBtnSm{font-size:1rem;letter-spacing:.04em;}
+  .btn.pixBtn.pixBtnSm.pixBtnBig{font-size:1.5rem;letter-spacing:.06em;}      /* (2026-10-26, per Dan) START MISSION, MISSION COMPLETED and MAIN MENU have larger text: the size of the big buttons (1.25rem on short screens, below) */
   /* Home screen icons, the Missions folder and the expanding tile (2026-10-19, per Dan) */
   .homeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 2px;margin:22px 0 10px;}
   @media (max-width:340px){
@@ -314,6 +315,7 @@
     .pixBtnDock{padding:0 14px 6px;}
     .btn.pixBtn.pixBtnLg,.btn.pixBtn.pixBtnMd,.btn.pixBtn.pixBtnSm{height:43px;padding:1px 12px 0;}
     .btn.pixBtn.pixBtnLg{font-size:1.25rem;padding-top:1px;}
+    .btn.pixBtn.pixBtnSm.pixBtnBig{font-size:1.25rem;}
     .pixQuest{font-size:3rem;margin-top:0;}
     .pixCard{padding:10px 14px 6px;}
     .pixQr{width:148px;height:148px;margin:6px auto 8px;padding:12px;}
@@ -2220,7 +2222,9 @@ function cloudsHtml(){
   return layer("cl1", 100) + layer("cl2", 60) + layer("cl3", 34);
 }
 
-function iconSpr(name){ return '<img class="spr" src="tiles/icons48/ic_' + name + '.png" alt="">'; }
+// (2026-10-26, per Dan: icons made of pixels should not have clean diagonal lines) the Main Menu and Missions window icons come from tiles/icons48p: copies of tiles/icons48 snapped to a coarse
+// grid, every picture pixel 3 x 3 of the 48 x 48, so slopes show as steps (Word Trail and Word Groups, which only have straight edges, and the Options music / sound icons keep their original drawing).
+function iconSpr(name){ return '<img class="spr" src="tiles/icons48p/ic_' + name + '.png" alt="">'; }
 
 function appIconHtml(o){
   return '<div class="appIcon' + (o.cls ? ' ' + o.cls : '') + '" role="button" onclick="' + o.onclick + '">' +
@@ -2685,7 +2689,7 @@ function screenMainMenu(){
     appIconHtml({onclick:"openFromIcon(this,'options')", bg:ICON_BG.options, inner:iconSpr("options"), label:t("optionsLabel")});
   return '<div class="screen pixHome pixSky pixMenu">' +
     cloudsHtml() +
-    '<button class="backBtn" onclick="goBackToWelcome()" aria-label="' + t("backLabel") + '"><img src="tiles/icons48/ic_back.png" alt=""></button>' +
+    '<button class="backBtn" onclick="goBackToWelcome()" aria-label="' + t("backLabel") + '"><img src="tiles/icons48p/ic_back.png" alt=""></button>' +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
     '<div class="progressWrap">' +
       '<div class="progressBar"><div class="progressFill" style="width:' + pct + '%"></div></div>' +
@@ -2966,8 +2970,9 @@ function missionById(id){ return MISSIONS.filter(function(m){ return m.id === id
 function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission pixLower' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
 
 // a pixel button with the glow and the press sound; secondary = the blue one
+function pixBigLabel(label){ return label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu"); }
 function pixBtnHtml(label, js, secondary){
-  return '<button class="btn pixBtn pixBtnSm' + (secondary ? ' secondary' : '') + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '">' + label + '</button>';
+  return '<button class="btn pixBtn pixBtnSm' + (pixBigLabel(label) ? ' pixBtnBig' : '') + (secondary ? ' secondary' : '') + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '">' + label + '</button>';
 }
 
 // A won / lost screen: the mission's name, a cream card (with the 8-bit badge when won), then the buttons.
@@ -3023,7 +3028,7 @@ function screenFaithFlash(){
       '</div></div>' +
       (pass ?'<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffCollectAward()">' + t("collectAward") + '</button>'
             : '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffPlayAgain()">' + t("playAgain") + '</button>') +
-      '<button class="btn pixBtn secondary pixBtnSm"' + press + 'onclick="pixClickSfx();go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
+      '<button class="btn pixBtn secondary pixBtnSm pixBtnBig"' + press + 'onclick="pixClickSfx();go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
     '</div>';
   }
 
@@ -8111,7 +8116,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 R";
+var APP_BUILD = "2026-10-26 U";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
