@@ -7899,6 +7899,7 @@ function pzUp(ev){
     var svg = document.getElementById("pzSvg"), firstLoose = svg.querySelector(".pzPiece:not(.locked)");
     if(firstLoose && firstLoose !== d.el) svg.insertBefore(d.el, firstLoose);
     s.placed.push(d.id);
+    pixSfxPlay("clCatch", false);                                      // a piece clicks into place: sound_effect_1 (2026-10-26, per Dan; the last piece also starts the fanfare below)
     var prog = document.getElementById("pzProgress");
     if(prog) prog.textContent = t("pz_pieces")(s.placed.length, pzCtx.n);
     if(s.placed.length >= pzCtx.n){
@@ -8117,7 +8118,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 V";
+var APP_BUILD = "2026-10-26 W";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
