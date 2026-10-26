@@ -827,9 +827,20 @@
   .pixMission .flMsg{min-height:1.3em;margin-top:8px;}
   /* the play area is only for watching (2026-10-22, per Dan): the lights fall inside .clField, which sits inside the gold edge so nothing crosses it,
      and the finger slides on the SLIDE band below */
-  .pixMission .clStage{position:relative;flex:1;min-height:150px;margin:8px 0 8px;background:#1E2F7A url("tiles/stars_tile.png") 0 0 / 96px 96px;image-rendering:pixelated;
+  /* (2026-10-25, per Dan) the painted stars are muted a little (a blue veil over them), and a few stars twinkle brighter now and then (.clTwinkles, below) */
+  .pixMission .clStage{position:relative;flex:1;min-height:150px;margin:8px 0 8px;background-color:#1E2F7A;background-image:linear-gradient(rgba(30,47,122,.42),rgba(30,47,122,.42)),url("tiles/stars_tile.png");background-size:auto,96px 96px;background-repeat:repeat;image-rendering:pixelated;
     border:4px solid #1B1F3B;border-radius:14px;box-shadow:inset 0 0 0 4px #FFC93A,0 6px 0 rgba(20,30,90,.4);overflow:hidden;touch-action:none;}
   .pixMission .clField{position:absolute;left:4px;top:4px;right:4px;bottom:4px;overflow:hidden;border-radius:6px;}
+  .pixMission .clTwinkles{position:absolute;left:4px;top:4px;right:4px;bottom:4px;overflow:hidden;pointer-events:none;}
+  .pixMission .clTwinkles i{position:absolute;width:3px;height:3px;margin:-1px 0 0 -1px;opacity:0;background:#fff;box-shadow:-3px 0 #fff,3px 0 #fff,0 -3px #fff,0 3px #fff,0 0 8px 3px rgba(255,255,255,.8);animation:clTw 3s linear infinite;}
+  .pixMission .clTwinkles i.y{background:#FFF2A8;box-shadow:-3px 0 #FFF2A8,3px 0 #FFF2A8,0 -3px #FFF2A8,0 3px #FFF2A8,0 0 8px 3px rgba(255,236,140,.8);}
+  @keyframes clTw{0%,60%{opacity:0;transform:scale(.5);}72%{opacity:1;transform:scale(1.2);}88%{opacity:.65;transform:scale(1);}100%{opacity:0;transform:scale(.5);}}
+  /* the light that falls glows as it falls (2026-10-25, per Dan): a soft pulsing halo round it */
+  .pixMission .clIcon::before{content:"";position:absolute;left:-16px;top:-16px;right:-16px;bottom:-16px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(255,244,170,.9) 0,rgba(255,214,90,.5) 36%,rgba(255,214,90,0) 70%);animation:clGlow .55s ease-in-out infinite alternate;}
+  @keyframes clGlow{from{opacity:.55;transform:scale(.88);}to{opacity:1;transform:scale(1.18);}}
+  .pixMission > .clTapAll{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}      /* until the first tap of a round, the whole screen starts it (the red X, above it, still works) */
+  .pixMission .clField .dpReady{top:50%;transform:translateY(-50%);}
   .pixMission .clIcon{position:absolute;top:-50px;width:32px;height:32px;background:url("tiles/icons48/ic_catchLight.png") center / 100% 100% no-repeat;image-rendering:auto;user-select:none;pointer-events:none;}
   .pixMission .clHands{position:absolute;bottom:4px;width:78px;height:40px;background:url("tiles/hands3.png") center / 100% 100% no-repeat;image-rendering:pixelated;transform:translateX(-50%);user-select:none;pointer-events:none;}
   .pixMission .clSlide{flex:none;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;height:56px;margin:0;padding:0 16px;background:#2B4BA8;border:4px solid #1B1F3B;border-radius:14px;
@@ -2004,7 +2015,32 @@ function pixReviveOnTap(ev){
   }
   pixAudioStale = false;
   if(!pixFreshAudio()) pixAudioStale = true;       // not made (a moment ago one was, or none could be): still not trusted, so the next touch tries again
+  else if(pixReviveQueue.length){ var q = pixReviveQueue; pixReviveQueue = []; q.forEach(function(job){ job(); }); }      // the sounds that were waiting for the new engine
 }
+// A sound that is made by the finger going down while the engine is not trusted (the first answer in Faith Flash after the phone slept) would play into a dead engine. It waits for the
+// new engine, which is made when the finger lifts, and plays then; if that does not happen within 0.7 s it plays anyway. (2026-10-25, per Dan)
+var pixReviveQueue = [];
+function pixSfxPlayHeld(name, exclusive){
+  if(!pixAudioStale){ pixSfxPlay(name, exclusive); return; }
+  var done = false, job = function(){ if(done) return; done = true; pixSfxPlay(name, exclusive); };
+  pixReviveQueue.push(job); setTimeout(job, 700);
+}
+// A fix for "no sounds after the phone slept" in Faith Flash (2026-10-25, per Dan). An answer there counts the moment the finger TOUCHES it, and the screen is drawn again at once, so the button the
+// finger is on is thrown away before the finger lifts. The touchend / pointerup of that touch are then sent to a button that is no longer on the page, and an event for a thrown-away element never
+// reaches `document`: so pixReviveOnTap above never heard the end of the touch, the new sound engine was never made, and every sound stayed dead for good. So when the finger goes down while the
+// engine is not trusted, the end of that same touch is also listened for on the touched element itself, which still gets it.
+function pixArmRevive(e){
+  var c = pixAudioCtx; if(!c) return;
+  if(!pixAudioStale && c.state !== "interrupted") return;
+  var el = e.target; if(!el || !el.addEventListener) return;
+  var fire = function(ev){
+    el.removeEventListener("touchend", fire, true); el.removeEventListener("pointerup", fire, true);
+    pixReviveOnTap(ev);
+  };
+  el.addEventListener("touchend", fire, true); el.addEventListener("pointerup", fire, true);
+  setTimeout(function(){ el.removeEventListener("touchend", fire, true); el.removeEventListener("pointerup", fire, true); }, 15000);      // a touch that never ends cleanly
+}
+document.addEventListener("pointerdown", pixArmRevive, true);
 // ---- every button counts the moment the finger touches it (2026-10-23, per Dan) ----
 // Before, a button did its work when the finger was lifted (the "click"). Now a touch on anything with an onclick runs that onclick at once, and the
 // click that follows when the finger lifts is swallowed, so nothing happens twice. Screens that already act on the touch themselves (the Faith Match
@@ -2777,7 +2813,7 @@ function ffAnswer(choiceIdx){
   else s.chances = ffChancesLeft(s) - 1;
   var lastChance = !isCorrect && s.chances <= 0;
   // the same sounds as Faith Match: a match, a miss, or the last chance used
-  pixSfxPlay(isCorrect ? "fmMatch" : (lastChance ? "fmLast" : "fmMiss"), true);
+  pixSfxPlayHeld(isCorrect ? "fmMatch" : (lastChance ? "fmLast" : "fmMiss"), true);
   saveState(); render();
   // After a moment to see the answer the game moves on by itself, so the player is never asked to tap NEXT QUESTION with nothing to tap it for:
   // the results show when the last chance is lost or the last question of the game is answered, and the next round starts after the last
@@ -3893,13 +3929,14 @@ var clFading = false;       // true from the miss until the level restarts
 // (clEndRound) or completes a level (still mid-round, but only touches the
 // HUD text, not a full re-render).
 var clRunning = false; // true only while the spawn/tick intervals are live
+var clWaiting = true;  // a round does not start until the player taps the screen (2026-10-25, per Dan), as in Dove of Peace and Pray the Beads
 var clTimers = {spawn:null, tick:null, falls:[]};
 var clActiveIcons = []; // {el, resolved} for every light currently in flight
 var clHandX = 0; // current hand center, in px relative to the stage
 var clDragging = false;
 
 function initCatchLight(){
-  clDragging = false;
+  clDragging = false; clWaiting = true;
   state.session.catchLight = {level:0, spawnedInLevel:0, resolvedInLevel:0, caughtInLevel:0, misses:0, status:"playing", phase:"playing"};
   saveState();
 }
@@ -4137,12 +4174,22 @@ function clInterlude(){
       s.interlude = null;
       s.level++;
       s.spawnedInLevel = 0; s.resolvedInLevel = 0; s.caughtInLevel = 0;
-      s.phase = "playing";
+      s.phase = "playing"; clWaiting = true;      // the next round waits for a tap
       saveState();
-      render();                                  // the render()-hook starts the new level's lights
+      render();                                  // the render()-hook starts the new level's lights, once the screen has been tapped
     });
 }
 
+// the first tap on the screen starts the round
+function clGo(){
+  var s = state.session.catchLight;
+  if(!clWaiting || !s || s.status !== "playing" || s.interlude) return;
+  if(pixAudioStale) pixReviveOnTap();
+  clWaiting = false;
+  var rd = document.getElementById("clReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
+  var all = document.querySelector(".clTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
+  if(!clRunning && s.phase === "playing") clStart();
+}
 function clStart(){
   if(clRunning) return;
   clRunning = true;
@@ -4179,6 +4226,17 @@ function clCollectAward(){ state.session.catchLight = null; grantMission("catchL
 function clTryAgain(){ initCatchLight(); go("catchLight"); }
 function clQuit(){ clClearTimers(); clDragging = false; state.session.catchLight = null; go("mainMenu"); }
 
+// a dozen small stars that twinkle brighter at random: each flashes now and then, and each time a flash is over it turns up somewhere else (see the animationiteration listener)
+function clTwinkleHtml(){
+  var h = "";
+  for(var k = 0; k < 12; k++) h += '<i class="' + (k % 3 === 0 ? 'y' : '') + '" style="left:' + (4 + Math.random() * 92).toFixed(1) + '%;top:' + (4 + Math.random() * 92).toFixed(1) + '%;animation-duration:' + (2.2 + Math.random() * 3.2).toFixed(2) + 's;animation-delay:-' + (Math.random() * 5).toFixed(2) + 's"></i>';
+  return h;
+}
+document.addEventListener("animationiteration", function(e){
+  var el = e.target;
+  if(e.animationName !== "clTw" || !el.parentNode || !el.parentNode.classList || !el.parentNode.classList.contains("clTwinkles")) return;
+  el.style.left = (4 + Math.random() * 92).toFixed(1) + "%"; el.style.top = (4 + Math.random() * 92).toFixed(1) + "%";
+}, true);
 function screenCatchLight(){
   var s = state.session.catchLight;
   if(!s){ initCatchLight(); s = state.session.catchLight; }
@@ -4199,14 +4257,14 @@ function screenCatchLight(){
   }
 
   var levelCfg = CL_LEVELS[s.level];
-  return pixShell('<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
+  return pixShell((clWaiting ? '<div class="clTapAll" onclick="clGo()"></div>' : '') + '<h2 class="pixMTitle">' + t("catchLightName") + '</h2>' +
     '<div class="pixNote">' + t("cl_intro") + '</div>' +
     '<div class="pixHud">' +
       '<span class="pixNote" id="clLevel">' + t("cl_level")(s.level+1, CL_LEVELS.length) + '</span>' +
       '<span class="pixNote" id="clScore">' + t("cl_caught")(s.caughtInLevel, levelCfg.count) + '</span>' +
       '<span id="clHearts">' + chancesHeartsHtml(Math.max(0, CL_MAX_MISSES - s.misses), CL_MAX_MISSES) + '</span>' +
     '</div>' +
-    '<div class="clStage" id="clStage"><div class="clField" id="clField"><div class="clHands" id="clHands"></div></div></div>' +
+    '<div class="clStage" id="clStage"><div class="clTwinkles">' + clTwinkleHtml() + '</div><div class="clField" id="clField"><div class="clHands" id="clHands"></div>' + (clWaiting ? '<div class="dpReady" id="clReady">' + t("dp_ready") + '</div>' : '') + '</div></div>' +
     '<div class="clSlideZone" id="clSlide"><div class="clSlide"><span class="clArrow l"></span><span class="clSlideTxt">' + t("cl_slide") + '</span><span class="clArrow r"></span></div></div>', "clScreen");
 }
 
@@ -7927,7 +7985,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 X";
+var APP_BUILD = "2026-10-25 Z";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -8198,7 +8256,7 @@ function render(){
   var clSession = state.session.catchLight;
   if(state.screen === "catchLight" && clSession && clSession.status === "playing"){
     if(clSession.phase === "ready") clSession.phase = "playing";     // a game saved while the old GET READY screen was up just starts
-    if(clSession.phase === "playing" && !clRunning && !clSession.interlude) clStart();
+    if(clSession.phase === "playing" && !clRunning && !clSession.interlude && !clWaiting) clStart();
   }
 }
 
