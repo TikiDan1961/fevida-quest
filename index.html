@@ -1795,8 +1795,8 @@ var PIX_SFX = {
   jlCrumble:{url:"sounds/sfx_jl_crumble.wav", gain:0.45},   // peak 0.56
   jlSuper:{url:"sounds/sfx_jl_super.wav", gain:0.4},        // peak 0.70
   jlFall:{url:"sounds/sfx_jl_fall.wav", gain:0.3},          // falling off the bottom of the sky (2026-10-24, per Dan): sound_effect_16, peak 0.99, in place of the Faith Match miss / last-chance sounds
-  // the pilgrim going in at the church door, on the Main Menu and in each round of Pilgrim's Road (2026-10-26, per Dan): "Church Bell.wav" from the Non 8-Bit Sounds folder, 12 s of its
-  // 15 (the rest is silence), mono, 16-bit, 32 kHz so it is 0.75 MB instead of 4. The next screen waits for it to finish (pixAfterSfx).
+  // the pilgrim going in at the church door, on the Main Menu and in each round of Pilgrim's Road (2026-10-26, per Dan): "Church Bell.wav" from the Non 8-Bit Sounds folder, 6 s of its
+  // 15, faded out from 3.5 s (2026-10-26, per Dan: 12 s was too long to wait), mono, 16-bit, 32 kHz so it is 0.4 MB instead of 4. The next screen waits for it to finish (pixAfterSfx).
   churchBell:{url:"sounds/sfx_church_bell.wav", gain:1.2},
   // tapping a sheep on the Main Menu (2026-10-26, per Dan): "Sheep Baa 1.wav" or "Sheep Baa 2.wav" (Non 8-Bit Sounds folder, 1 s each, peak 0.37), picked at random, in place of the button sound
   sheepBaa1:{url:"sounds/sfx_sheep_baa1.wav", gain:1.0},
@@ -8105,7 +8105,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 M";
+var APP_BUILD = "2026-10-26 N";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
