@@ -4022,6 +4022,11 @@ function clPointerDown(ev){
 // finger that is still down carries on steering the hands in the next round, from wherever it is.
 var clPtrId = null, clPtrX = 0;
 function clWinMove(ev){
+  // A mouse (the computer demo, 2026-10-26, per Dan) steers the hands just by moving over the screen, no button held; a finger still has to slide on the band.
+  if(ev.pointerType === "mouse" && !clWaiting && !clFading && state.screen === "catchLight"){
+    var sm = state.session.catchLight;
+    if(sm && sm.status === "playing"){ clPtrX = ev.clientX; clMoveHandTo(ev.clientX); return; }
+  }
   if(!clDragging || ev.pointerId !== clPtrId) return;
   if(ev.pointerType === "mouse" && ev.buttons === 0){ clDragging = false; return; }       // a mouse button let go somewhere we did not hear about
   clPtrX = ev.clientX;
@@ -8083,7 +8088,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 H";
+var APP_BUILD = "2026-10-26 I";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
