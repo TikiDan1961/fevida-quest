@@ -2872,6 +2872,7 @@ function pixRoundRun(key, getSession, giveAward, finish){
     if(award){
       s.interlude.phase = "award"; s.interlude.award = true;
       saveState(); render();
+      pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
     }
     setTimeout(done, Math.max(soundMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
   }, FF_INTERLUDE_AWARD_MS);
@@ -2911,6 +2912,7 @@ function ffInterlude(){
       s.chances = ffChancesLeft(s) + 1;
       s.interlude.phase = "award"; s.interlude.award = true;
       saveState(); render();
+      pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
     }
     setTimeout(finish, Math.max(fanfareMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
   }, FF_INTERLUDE_AWARD_MS);
@@ -8008,7 +8010,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-25 ZF";
+var APP_BUILD = "2026-10-25 ZG";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
