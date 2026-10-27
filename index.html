@@ -8781,6 +8781,7 @@ function hglStep(dt){
 function hglPaint(){
   var cv = document.getElementById("hglCanvas"); if(!cv || !hgl) return;
   var x = cv.getContext("2d");
+  x.clearRect(0, 0, hgl.W, hgl.H);                                  // (the sky of the picture has no pixels of its own, so the last picture must be wiped or what flew over it stays)
   x.drawImage(hgl.bg, 0, 0);
   function line(pts, col, withEnd){
     var carry = 0, k;
@@ -9534,7 +9535,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 AK";
+var APP_BUILD = "2026-10-27 AL";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
