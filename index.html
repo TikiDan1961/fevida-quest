@@ -7773,9 +7773,10 @@ var HG_COLORS = [
   {id:"green",  c:"#46C24E", l:"#A4F27C", d:"#1F7A2C"},
   {id:"blue",   c:"#3A8FE8", l:"#9BD0FF", d:"#1E5099"},
   {id:"indigo", c:"#4B3FB0", l:"#9A8FF0", d:"#2A2075"},
-  {id:"purple", c:"#B04FD8", l:"#E3A6FF", d:"#6A2090"}
+  {id:"purple", c:"#B04FD8", l:"#E3A6FF", d:"#6A2090"},
+  {id:"pink",   c:"#FF73BA", l:"#FFC2E2", d:"#B8286F"}
 ];
-// Every round has the same garden (2026-10-26, per Dan): n = 4 patches along each side, so 16 flowers in the 7 colours, each colour at least twice; only the bees change. bees = how many bees must reach their flowers, live = most bees flying at once, gap = seconds between bees coming in,
+// Every round has the same garden (2026-10-26, per Dan): n = 4 patches along each side, so 16 flowers in the 8 colours, each colour exactly twice and the two as far apart as they can be; only the bees change. bees = how many bees must reach their flowers, live = most bees flying at once, gap = seconds between bees coming in,
 // speed = how fast a bee flies on its own (picture pixels a second), head / stem / patchH / front / pathX / pathY / stemW = sizes of the flowers (a flower head, its short stem) and the patches in picture pixels
 var HG_ROUNDS = [
   {n: 4, bees: 4,  live: 4, gap: 2.6, speed: 12, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
@@ -7789,6 +7790,7 @@ var HG_MARGIN = 11;            // the room each side of the garden for the hedge
 var HG_RING = 8;               // the hedge and the fence round the garden (picture pixels)
 var HG_MAXFRAC = 1.35;         // the dotted line is this much of the picture's width at most (it was .45; three times as long, 2026-10-26, per Dan)
 var HG_CRASH_MS = 1800;
+var HG_HOVER = 3;              // seconds a bee hovers by its flower once it has got there
 var hg = null, hgBound = null, hgBoundRound = -1, hgRaf = 0, hgWaiting = true, hgTouched = false, hgSprites = {};
 function hgRand(a, b){ return a + Math.random() * (b - a); }
 function hgShuffle(a){ a = a.slice(); for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t0 = a[i]; a[i] = a[j]; a[j] = t0; } return a; }
@@ -7799,15 +7801,42 @@ function initHopeGarden(){
   hgBegin(state.session.hopeGarden);
   saveState();
 }
-// the colours of this round's flowers and bees: every bee has at least one flower of its colour
+// The 16 flowers are the 8 colours, each twice (2026-10-26, per Dan), and the two flowers of a colour are as far apart as the garden allows: the pairing of the 16 squares with the
+// greatest total distance is worked out once (a search over all pairings), then turned or flipped at random so the garden is not the same every time.
+var hgPairs = null;
+function hgBestPairs(){
+  if(hgPairs) return hgPairs;
+  var n = 4, N = n * n, full = (1 << N) - 1, best = {}, pick = {};
+  function d(p, q){ var dr = Math.floor(p / n) - Math.floor(q / n), dc = p % n - q % n; return Math.sqrt(dr * dr + dc * dc); }
+  function f(mask){
+    if(mask === full) return 0;
+    if(best[mask] !== undefined) return best[mask];
+    var i = 0; while(mask & (1 << i)) i++;
+    var top = -1, bj = -1, j;
+    for(j = i + 1; j < N; j++){ if(mask & (1 << j)) continue; var v = d(i, j) + f(mask | (1 << i) | (1 << j)); if(v > top + 1e-9){ top = v; bj = j; } }
+    best[mask] = top; pick[mask] = bj; return top;
+  }
+  f(0);
+  var mask = 0, out = [];
+  while(mask !== full){ var i = 0; while(mask & (1 << i)) i++; var j = pick[mask]; out.push([i, j]); mask |= (1 << i) | (1 << j); }
+  hgPairs = out; return out;
+}
 function hgPickColors(cfg){
-  var total = cfg.n * cfg.n, ids = [0, 1, 2, 3, 4, 5, 6], f = [], b, i;
-  var per = Math.floor(total / 7);                          // 16 flowers: every colour twice, and two more at random
-  for(i = 0; i < per; i++) f = f.concat(ids);
-  while(f.length < total) f.push(Math.floor(Math.random() * 7));
-  if(cfg.bees <= 7) b = hgShuffle(ids).slice(0, cfg.bees);   // 4 bees: four different colours; 8 and 12: every colour, and the rest at random
-  else { b = ids.slice(); while(b.length < cfg.bees) b.push(Math.floor(Math.random() * 7)); }
-  return {f: hgShuffle(f), b: hgShuffle(b)};
+  var n = cfg.n, N = n * n, nc = HG_COLORS.length, ids = [], i, k, f = [], b;
+  for(i = 0; i < nc; i++) ids.push(i);
+  var flip = Math.floor(Math.random() * 8), cols = hgShuffle(ids);
+  function mapCell(p){                                                           // turn / flip the garden at random
+    var r = Math.floor(p / n), c = p % n, t0;
+    if(flip & 1) c = n - 1 - c;
+    if(flip & 2) r = n - 1 - r;
+    if(flip & 4){ t0 = r; r = c; c = t0; }
+    return r * n + c;
+  }
+  for(i = 0; i < N; i++) f.push(0);
+  hgBestPairs().forEach(function(pr, idx){ f[mapCell(pr[0])] = cols[idx % nc]; f[mapCell(pr[1])] = cols[idx % nc]; });
+  if(cfg.bees <= nc) b = hgShuffle(ids).slice(0, cfg.bees);                      // 4 bees: four different colours; 8: one of each; 12: one of each and four more at random
+  else { b = ids.slice(); while(b.length < cfg.bees) b.push(Math.floor(Math.random() * nc)); }
+  return {f: f, b: hgShuffle(b)};
 }
 // a new round: the picture is laid out (hgLayout) once the canvas has been measured (hgFit)
 function hgBegin(s){
@@ -7962,7 +7991,8 @@ function hgArrive(b){
   var home = null;
   hg.flowers.forEach(function(f){ if(f.ci === b.ci && Math.sqrt((f.x - b.x) * (f.x - b.x) + (f.y - b.y) * (f.y - b.y)) <= f.r && !home) home = f; });
   if(!home){ hgFree(b); return; }
-  b.state = "done"; hg.delivered++; home.pulse = .6;
+  b.state = "home"; b.home = home; b.t0 = hg.t; b.a0 = Math.atan2(b.y - home.y, b.x - home.x); b.x0 = b.x; b.y0 = b.y;       // it hovers by its flower for 3 seconds (2026-10-26, per Dan), then goes
+  hg.delivered++; home.pulse = .6;
   hgBurst(home.x, home.y, HG_COLORS[b.ci]);
   pixSfxPlay("clCatch", false);
   var cn = document.getElementById("hgCount"); if(cn) cn.textContent = hg.delivered + "/" + hg.total;
@@ -7990,6 +8020,10 @@ function hgStep(s, dt){
       if(b.x < -12 || b.x > W + 12 || b.y < -12 || b.y > H + 12){ b.state = "gone"; b.wait = hgRand(.9, 1.8); }       // it has flown off the screen: it comes back from another edge
     } else if(b.state === "gone"){
       b.wait -= dt; if(b.wait <= 0) hgSpawn(b);
+    } else if(b.state === "home"){
+      var hf = b.home, el = hg.t - b.t0, ang = b.a0 + el * 2.6, rr = hf.D / 2 + 3, tx = hf.x + Math.cos(ang) * rr, ty = hf.y + Math.sin(ang) * rr * .8, k2 = Math.min(1, el / .35);
+      b.x = b.x0 + (tx - b.x0) * k2; b.y = b.y0 + (ty - b.y0) * k2; b.face = -Math.sin(ang) >= 0 ? 1 : -1;
+      if(el >= HG_HOVER){ b.state = "done"; hgBurst(b.x, b.y, HG_COLORS[b.ci]); }
     } else if(b.state === "follow"){
       var remain = (b.sp || cfg.speed) * HG_FOLLOW * dt;
       while(remain > 0 && b.path && b.seg < b.path.length){
@@ -8010,7 +8044,7 @@ function hgStep(s, dt){
   }
   hg.flowers.forEach(function(f){ if(f.pulse > 0) f.pulse = Math.max(0, f.pulse - dt); });
   hgParticles(dt);
-  if(hg.mode === "play" && hg.delivered >= hg.total){
+  if(hg.mode === "play" && hg.delivered >= hg.total && !hg.bees.some(function(b){ return b.state === "home"; })){
     hg.mode = "done"; hg.drag = null;
     setTimeout(function(){
       if(state.screen !== "hopeGarden" || state.session.hopeGarden !== s || s.interlude) return;
@@ -8069,7 +8103,7 @@ function hgDraw(){
     var last = pts[pts.length - 1]; x.fillStyle = "#FFFFFF"; x.fillRect(Math.round(last.x) - 1, Math.round(last.y) - 1, 3, 3); x.fillStyle = col.c; x.fillRect(Math.round(last.x), Math.round(last.y), 1, 1);
   }
   // the bees, over everything
-  var bees = hg.bees.filter(function(b){ return b.state === "free" || b.state === "hover" || b.state === "follow"; }).sort(function(a, b){ return a.y - b.y; });
+  var bees = hg.bees.filter(function(b){ return b.state === "free" || b.state === "hover" || b.state === "follow" || b.state === "home"; }).sort(function(a, b){ return a.y - b.y; });
   bees.forEach(function(b){
     var fr = Math.floor(b.ph) % 2, sp = hgBeeSprite(b.ci, fr, b.face), hov = b.state === "hover" ? Math.round(Math.sin(hg.t * 12)) : 0;
     x.fillStyle = "rgba(40,24,8,.28)"; x.fillRect(Math.round(b.x) - 4, Math.round(b.y) + 7, 8, 1);
@@ -8698,7 +8732,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AS";
+var APP_BUILD = "2026-10-26 AT";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
