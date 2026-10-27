@@ -8115,9 +8115,9 @@ function hgDraw(){
     leaf(dir, ly); leaf(-dir, ly);                      // a second branch on the other side of the stem, at the same height (2026-10-26, per Dan)
     x.drawImage(hgHeadSprite(f.ci, f.D), Math.round(f.x - f.D / 2), Math.round(f.y - f.D / 2) + bob);
   });
-  // the line being drawn
-  if(hg.drag){
-    var col = HG_COLORS[hg.drag.bee.ci], pts = hg.drag.pts, carry = 0, k;
+  // the lines: the one being drawn, and those of the bees flying along theirs (a line stays until its bee has got to the end of it, 2026-10-26, per Dan)
+  function line(pts, col, withEnd){
+    var carry = 0, k;
     for(k = 1; k < pts.length; k++){
       var ax = pts[k - 1].x, ay = pts[k - 1].y, bx = pts[k].x, by = pts[k].y, d = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)), pos = carry;
       while(pos <= d){
@@ -8127,8 +8127,10 @@ function hgDraw(){
       }
       carry = pos - d;
     }
-    var last = pts[pts.length - 1]; x.fillStyle = "#FFFFFF"; x.fillRect(Math.round(last.x) - 1, Math.round(last.y) - 1, 3, 3); x.fillStyle = col.c; x.fillRect(Math.round(last.x), Math.round(last.y), 1, 1);
+    if(withEnd){ var last = pts[pts.length - 1]; x.fillStyle = "#FFFFFF"; x.fillRect(Math.round(last.x) - 1, Math.round(last.y) - 1, 3, 3); x.fillStyle = col.c; x.fillRect(Math.round(last.x), Math.round(last.y), 1, 1); }
   }
+  hg.bees.forEach(function(b){ if(b.state === "follow" && b.path) line(b.path, HG_COLORS[b.ci], false); });
+  if(hg.drag) line(hg.drag.pts, HG_COLORS[hg.drag.bee.ci], true);
   // the bees, over everything
   var bees = hg.bees.filter(function(b){ return b.state === "free" || b.state === "hover" || b.state === "follow" || b.state === "home"; }).sort(function(a, b){ return a.y - b.y; });
   bees.forEach(function(b){
@@ -8764,7 +8766,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AZ";
+var APP_BUILD = "2026-10-26 BA";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
