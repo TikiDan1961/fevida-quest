@@ -7832,7 +7832,7 @@ function hgLayout(){
     var x0 = Math.round(gx + c * cw + (cw - pw) / 2), y0 = Math.round(gy + r * ch + pathY / 2), ci = hg.fcols[r * n + c];
     var pTop = y0 + D + stem;
     hg.patches.push({x: x0, y: pTop, w: pw, h: ph, front: front});
-    hg.flowers.push({ci: ci, x: Math.round(x0 + pw / 2), y: Math.round(y0 + D / 2), D: D, r: D / 2 + 3, stemTop: y0 + D - 1, stemBot: pTop + 2, stemW: cfg.stemW, pulse: 0, row: r});
+    hg.flowers.push({ci: ci, x: Math.round(x0 + pw / 2), y: Math.round(y0 + D / 2), D: D, r: D / 2 + 3, stemTop: y0 + D - 1, stemBot: pTop + Math.round(ph / 2), stemW: cfg.stemW, pulse: 0, row: r});
   }
   // the bees: the first comes in a moment after the round starts, the rest as there is room
   hg.bees = hg.bcols.map(function(ci, i){ return {id: i, ci: ci, x: -20, y: -20, vx: 0, vy: 0, state: "queued", path: null, seg: 0, wait: 0, face: 1, ph: Math.random() * 6}; });
@@ -8698,7 +8698,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AR";
+var APP_BUILD = "2026-10-26 AS";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
