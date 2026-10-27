@@ -7782,7 +7782,7 @@ var HG_ROUNDS = [
   {n: 4, bees: 8,  live: 4, gap: 2.4, speed: 13, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
   {n: 4, bees: 12, live: 4, gap: 2.2, speed: 14, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
 ];
-var HG_FOLLOW = 78;            // how fast a bee flies along its line
+var HG_FOLLOW = 1.5;           // a bee flies along its line this many times as fast as it flies on its own (a little faster, 2026-10-26, per Dan; it was about 6 times as fast)
 var HG_TAP = 16;               // how close (picture pixels) a touch must be to a bee to pick it
 var HG_COLL = 4.5;             // two bees closer than this have crashed (the numbers above were set by playing 80 rounds each with a pretend player who reacts in 0.5 to 1 s and takes about a second to draw a line: it loses about 1 round in 20 to 1 in 10)
 var HG_MARGIN = 11;            // the room each side of the garden for the hedge and the fence
@@ -7952,11 +7952,11 @@ function hgSpawn(b){
     tries++;
   } while(tries < 14 && hgNear(x, y, 28, b));
   var g = hg.garden, tx = hgRand(g.x + 8, g.x + g.w - 8), ty = hgRand(g.y + 8, g.y + g.h - 8), dx = tx - x, dy = ty - y, d = Math.sqrt(dx * dx + dy * dy) || 1, sp = cfg.speed * hgRand(.9, 1.15);
-  b.x = x; b.y = y; b.vx = dx / d * sp; b.vy = dy / d * sp; b.state = "free"; b.path = null; b.face = b.vx >= 0 ? 1 : -1;
+  b.sp = sp; b.x = x; b.y = y; b.vx = dx / d * sp; b.vy = dy / d * sp; b.state = "free"; b.path = null; b.face = b.vx >= 0 ? 1 : -1;
 }
 function hgFree(b){            // a bee that did not reach its flower flies off in a random direction
   var cfg = HG_ROUNDS[state.session.hopeGarden.round], a = Math.random() * Math.PI * 2, sp = cfg.speed * hgRand(.9, 1.15);
-  b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.state = "free"; b.path = null; if(Math.abs(b.vx) > .5) b.face = b.vx >= 0 ? 1 : -1;
+  b.sp = sp; b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.state = "free"; b.path = null; if(Math.abs(b.vx) > .5) b.face = b.vx >= 0 ? 1 : -1;
 }
 function hgArrive(b){
   var home = null;
@@ -7991,7 +7991,7 @@ function hgStep(s, dt){
     } else if(b.state === "gone"){
       b.wait -= dt; if(b.wait <= 0) hgSpawn(b);
     } else if(b.state === "follow"){
-      var remain = HG_FOLLOW * dt;
+      var remain = (b.sp || cfg.speed) * HG_FOLLOW * dt;
       while(remain > 0 && b.path && b.seg < b.path.length){
         var tp = b.path[b.seg], dx = tp.x - b.x, dy = tp.y - b.y, d = Math.sqrt(dx * dx + dy * dy);
         if(Math.abs(dx) > .15) b.face = dx >= 0 ? 1 : -1;
@@ -8698,7 +8698,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AP";
+var APP_BUILD = "2026-10-26 AQ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
