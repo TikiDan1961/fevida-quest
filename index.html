@@ -231,6 +231,16 @@
   .hgRetry{flex:none;width:76px;height:50px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;border:4px solid #1B4A52;border-bottom-width:6px;border-radius:14px;background:#2FA6A0;box-shadow:inset 0 0 0 2px #7FE0DA;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;line-height:.9;letter-spacing:.04em;color:#fff;text-transform:uppercase;text-shadow:1px 1px 0 #1B4A52;}
   .hgRetry svg{width:20px;height:20px;display:block;}
+  /* PLEASE ROTATE YOUR PHONE (2026-10-27, per Dan): the whole app is played upright, so a phone turned on its side shows this message and nothing else, on every screen that is not listed in
+     LANDSCAPE_OK_SCREENS (the new landscape Hope Garden will be listed there). Only a phone-sized touch screen on its side counts: a computer window that is wider than it is tall does not. */
+  .rotateMsg{display:none;position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;box-sizing:border-box;padding:12px 24px;background:#1D2350;color:#fff;text-align:center;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;}
+  .rotateText{font-size:1.75rem;line-height:1.1;letter-spacing:.06em;color:#FFC93A;text-shadow:3px 3px 0 #0D1030;}
+  .rotateSub{font-size:1.125rem;line-height:1.1;letter-spacing:.05em;color:#BFD0FF;}
+  .rotatePhone{position:relative;width:34px;height:56px;box-sizing:border-box;border:4px solid #fff;border-radius:8px;background:#3A8FE8;box-shadow:0 0 0 3px #0D1030;animation:rotateHint 2.4s ease-in-out infinite;}
+  .rotatePhone::after{content:"";position:absolute;left:50%;bottom:4px;width:8px;height:3px;margin-left:-4px;background:#fff;}
+  @keyframes rotateHint{0%,25%{transform:rotate(90deg);}60%,100%{transform:rotate(0deg);}}
+  @media (orientation:landscape) and (max-height:500px) and (pointer:coarse){ body:not(.landscapeOK) .rotateMsg{display:flex;} }
   .pixHome.pixSky > .hgMenuIcon{position:absolute;z-index:6;visibility:hidden;left:0;top:300px;margin:0;}
   .pixMenu.pilgrimBusy .hgMenuIcon{filter:grayscale(1);opacity:.55;pointer-events:none;}
 
@@ -1074,6 +1084,7 @@
 </head>
 <body>
 <div id="app"></div>
+<div id="rotateMsg" class="rotateMsg" role="alert"><div class="rotatePhone"></div><div class="rotateText" id="rotateText">PLEASE ROTATE YOUR PHONE</div><div class="rotateSub" id="rotateSub"></div></div>
 <script>
 "use strict";
 
@@ -8945,7 +8956,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 D";
+var APP_BUILD = "2026-10-27 E";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -9071,6 +9082,15 @@ function exitMission(){
   }
 }
 
+var LANDSCAPE_OK_SCREENS = [];        // screens played on their side: none yet (the landscape Hope Garden, when it is built, goes here)
+function rotateMsgUpdate(){
+  document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1);
+  var tx = document.getElementById("rotateText"), sub = document.getElementById("rotateSub");
+  if(!tx || !sub) return;
+  var es = state.lang === "es", unset = !state.lang;
+  tx.textContent = es ? "POR FAVOR, GIRA TU TELÉFONO" : "PLEASE ROTATE YOUR PHONE";
+  sub.textContent = unset ? "POR FAVOR, GIRA TU TELÉFONO" : "";             // before a language is chosen both are shown
+}
 function render(){
   var app = document.getElementById("app");
   var html;
@@ -9113,6 +9133,7 @@ function render(){
   var isNewScreen = state.screen !== lastRenderedScreen;
   var enteringPassportFresh = state.screen === "passport" && isNewScreen;
   lastRenderedScreen = state.screen;
+  rotateMsgUpdate();
   var wasSky = !!app.querySelector(".screen.pixSky");     // the screen being replaced was a sky screen
   app.innerHTML = exitBarHtml() + html;
   if(isNewScreen){
