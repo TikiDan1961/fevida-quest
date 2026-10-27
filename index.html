@@ -203,6 +203,33 @@
   .hgOhNo{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:5;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FF5A5A;
     text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,3px 3px #fff,-3px -3px #fff,3px -3px #fff,-3px 3px #fff,5px 5px 0 #1B1F3B;animation:jlOh .22s steps(2) infinite;}
   /* the Hope Garden icon on the Main Menu sits on the scene beside the church; hgPlaceMenuIcon puts it in line with the left-most icon of the row above */
+  /* Hope Garden layout (2026-10-26, per Dan, from the Bee Line concept picture): a top bar (title banner, level ribbon, 3 stars, count badge over mountains and a church), the fenced garden,
+     and a bottom banner (Anamaria's picture and the instruction) over the green main button and a TRY AGAIN button */
+  .hgScreen .hgTop{position:relative;width:100%;height:122px;flex:none;margin-top:2px;}
+  .hgScenery{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
+  .hgBanner{position:absolute;left:calc(50% - 12px);top:0;transform:translateX(-50%);min-width:178px;text-align:center;padding:4px 12px 5px;background:linear-gradient(#41A24E,#2A7A36);border:4px solid #1B3A22;border-radius:14px;box-shadow:inset 0 0 0 2px #7BD26F,0 4px 0 rgba(20,40,20,.45);}
+  .hgTitle{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1;letter-spacing:.04em;color:#FFE45E;text-transform:uppercase;white-space:nowrap;
+    text-shadow:2px 2px 0 #1B3A22,-2px -2px 0 #1B3A22,2px -2px 0 #1B3A22,-2px 2px 0 #1B3A22,0 3px 0 #1B3A22;}
+  .hgSub{display:inline-block;margin-top:3px;padding:0 10px;background:#FFF3D6;border:2px solid #1B3A22;border-radius:10px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;line-height:1.2;color:#2A7A36;white-space:nowrap;}
+  .hgRibbon{position:absolute;left:50%;top:80px;transform:translateX(-50%);padding:1px 24px 0;background:linear-gradient(#FFE56B,#F2B21E);border:3px solid #7A4A0A;border-radius:6px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;line-height:1.2;letter-spacing:.08em;color:#5A2E00;text-transform:uppercase;box-shadow:0 3px 0 rgba(60,30,0,.35);white-space:nowrap;}
+  .hgStars{position:absolute;left:12px;top:70px;display:flex;gap:1px;}
+  .hgStars svg{width:28px;height:28px;display:block;filter:drop-shadow(0 2px 0 rgba(20,40,20,.35));}
+  .hgBadge{position:absolute;right:12px;top:6px;min-width:64px;text-align:center;padding:2px 8px 3px;background:#FFF8E1;border:3px solid #1B3A22;border-radius:12px;box-shadow:0 3px 0 rgba(20,40,20,.4);}
+  .hgBadge span{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;line-height:1.1;letter-spacing:.06em;color:#2A7A36;text-transform:uppercase;}
+  .hgBadge b{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.625rem;line-height:1;color:#1B3A22;}
+  .hgScreen .hgArea{margin-top:0;}
+  .hgBottom{width:min(100%,380px);margin:10px auto 0;box-sizing:border-box;padding:0 6px;}
+  .hgInfo{display:flex;align-items:center;gap:10px;padding:6px 10px 6px 6px;background:#FFF8E1;border:4px solid #1B3A22;border-radius:14px;box-shadow:inset 0 0 0 2px #FFE9A8,0 4px 0 rgba(20,40,20,.4);}
+  .hgAva{flex:none;width:54px;height:54px;border-radius:50%;border:3px solid #1B3A22;overflow:hidden;background:#BFE3FF;}
+  .hgAva img{display:block;width:100%;height:100%;object-fit:cover;}
+  .hgInfoText{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.15;color:#1B3A22;text-transform:uppercase;}
+  .hgBtns{display:flex;gap:10px;margin-top:8px;align-items:stretch;}
+  .hgMain{flex:1;display:flex;align-items:center;justify-content:center;height:50px;box-sizing:border-box;border:4px solid #1E6B2B;border-bottom-width:6px;border-radius:14px;background:#52C246;box-shadow:inset 0 0 0 2px #8BE07F;
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.06em;color:#fff;text-transform:uppercase;text-shadow:2px 2px 0 #1E6B2B;}
+  .hgMain.on{background:#3E9B3A;color:#D8F5D0;}
+  .hgRetry{flex:none;width:76px;height:50px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;border:4px solid #1B4A52;border-bottom-width:6px;border-radius:14px;background:#2FA6A0;box-shadow:inset 0 0 0 2px #7FE0DA;
+    font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.8125rem;line-height:.9;letter-spacing:.04em;color:#fff;text-transform:uppercase;text-shadow:1px 1px 0 #1B4A52;}
+  .hgRetry svg{width:20px;height:20px;display:block;}
   .pixHome.pixSky > .hgMenuIcon{position:absolute;z-index:6;visibility:hidden;left:0;top:300px;margin:0;}
   .pixMenu.pilgrimBusy .hgMenuIcon{filter:grayscale(1);opacity:.55;pointer-events:none;}
 
@@ -1172,7 +1199,7 @@ var T = {
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
-    hopeGardenName:"Hope Garden", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
+    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hg_level:function(n){return "Level "+n;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
     hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
     hg_guide:{d:"Colored bees are buzzing into the garden. Guide each one to a flower that is the same color as the bee.", h:["Tap a bee, then drag your finger toward a flower of the same color. A dotted line shows the way, but it only reaches so far.",
       "Lift your finger and the bee flies along the line. If it lands on its flower, it is home!", "A bee that misses flies off in a random direction. Tap it again to guide it back.", "Keep the bees apart! If two bees bump into each other, the round is lost.", "Bring every bee home to finish all 3 rounds."]},
@@ -1325,7 +1352,7 @@ var T = {
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
-    hopeGardenName:"Jardín de la Esperanza", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
+    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hg_level:function(n){return "Nivel "+n;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
     hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
     hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
       "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas! Si dos abejas chocan, pierdes la ronda.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
@@ -7749,16 +7776,17 @@ var HG_COLORS = [
   {id:"purple", c:"#B04FD8", l:"#E3A6FF", d:"#6A2090"}
 ];
 // n = patches along each side, bees = how many bees must reach their flowers, kinds = how many colours, live = most bees flying at once, gap = seconds between bees coming in,
-// speed = how fast a bee flies on its own (picture pixels a second), head / patchH / front / pathX / pathY / stemW = sizes of the flowers and patches in picture pixels
+// speed = how fast a bee flies on its own (picture pixels a second), head / stem / patchH / front / pathX / pathY / stemW = sizes of the flowers (a flower head, its short stem) and the patches in picture pixels
 var HG_ROUNDS = [
-  {n: 2, bees: 4,  kinds: 4, live: 4, gap: 2.6, speed: 12, head: 21, patchH: 16, front: 4, pathX: 9, pathY: 10, stemW: 3},
-  {n: 3, bees: 8,  kinds: 7, live: 4, gap: 2.4, speed: 13, head: 15, patchH: 11, front: 3, pathX: 7, pathY: 8,  stemW: 2},
-  {n: 4, bees: 12, kinds: 7, live: 4, gap: 2.2, speed: 14, head: 11, patchH: 8,  front: 3, pathX: 5, pathY: 6,  stemW: 2}
+  {n: 2, bees: 4,  kinds: 4, live: 4, gap: 2.6, speed: 12, head: 25, stem: 6, patchH: 18, front: 4, pathX: 9, pathY: 10, stemW: 3},
+  {n: 3, bees: 8,  kinds: 7, live: 4, gap: 2.4, speed: 13, head: 19, stem: 5, patchH: 12, front: 3, pathX: 7, pathY: 8,  stemW: 2},
+  {n: 4, bees: 12, kinds: 7, live: 4, gap: 2.2, speed: 14, head: 15, stem: 4, patchH: 8,  front: 3, pathX: 4, pathY: 6,  stemW: 2}
 ];
 var HG_FOLLOW = 78;            // how fast a bee flies along its line
 var HG_TAP = 16;               // how close (picture pixels) a touch must be to a bee to pick it
 var HG_COLL = 4.5;             // two bees closer than this have crashed (the numbers above were set by playing 80 rounds each with a pretend player who reacts in 0.5 to 1 s and takes about a second to draw a line: it loses about 1 round in 20 to 1 in 10)
-var HG_MARGIN = 7;             // the meadow round the garden
+var HG_MARGIN = 11;            // the room each side of the garden for the hedge and the fence
+var HG_RING = 8;               // the hedge and the fence round the garden (picture pixels)
 var HG_MAXFRAC = .45;          // the dotted line is this much of the picture's width at most
 var HG_CRASH_MS = 1800;
 var hg = null, hgBound = null, hgBoundRound = -1, hgRaf = 0, hgWaiting = true, hgTouched = false, hgSprites = {};
@@ -7792,14 +7820,19 @@ function hgBegin(s){
 }
 function hgLayout(){
   var s = state.session.hopeGarden, cfg = HG_ROUNDS[s.round], W = hg.W, H = hg.H, n = cfg.n, m = HG_MARGIN;
-  var gx = m, gy = m, gw = W - 2 * m, gh = H - 2 * m, cw = gw / n, ch = gh / n, D = cfg.head;
-  var pw = Math.floor(cw - cfg.pathX), ph = cfg.patchH, stem = Math.max(6, Math.floor(ch - cfg.pathY - D - ph - cfg.front)), r, c;
-  hg.garden = {x: gx, y: gy, w: gw, h: gh};
+  var D = cfg.head, ph = cfg.patchH, stem = cfg.stem, pathY = cfg.pathY, front = cfg.front, r, c;
+  // the garden is only as tall as its flowers need and sits in the middle of the picture, with meadow above and below for the bees; a short phone squeezes the patches, then the paths
+  var room = H - 2 * (HG_RING + 3);
+  while(n * (D + stem + ph + front + pathY) > room && ph > 5) ph--;
+  while(n * (D + stem + ph + front + pathY) > room && pathY > 3) pathY--;
+  var gw = W - 2 * m, cw = gw / n, ch = D + stem + ph + front + pathY, gh = ch * n, gx = m, gy = Math.round((H - gh) / 2);
+  var pw = Math.floor(cw - cfg.pathX);
+  hg.garden = {x: gx, y: gy, w: gw, h: gh, n: n, cw: cw, ch: ch, pathX: cfg.pathX, pathY: pathY};
   hg.flowers = []; hg.patches = [];
   for(r = 0; r < n; r++) for(c = 0; c < n; c++){
-    var x0 = Math.round(gx + c * cw + (cw - pw) / 2), y0 = Math.round(gy + r * ch + cfg.pathY / 2), ci = hg.fcols[r * n + c];
+    var x0 = Math.round(gx + c * cw + (cw - pw) / 2), y0 = Math.round(gy + r * ch + pathY / 2), ci = hg.fcols[r * n + c];
     var pTop = y0 + D + stem;
-    hg.patches.push({x: x0, y: pTop, w: pw, h: ph, front: cfg.front});
+    hg.patches.push({x: x0, y: pTop, w: pw, h: ph, front: front});
     hg.flowers.push({ci: ci, x: Math.round(x0 + pw / 2), y: Math.round(y0 + D / 2), D: D, r: D / 2 + 3, stemTop: y0 + D - 1, stemBot: pTop + 2, stemW: cfg.stemW, pulse: 0, row: r});
   }
   // the bees: the first comes in a moment after the round starts, the rest as there is room
@@ -7809,14 +7842,34 @@ function hgLayout(){
 }
 // the ground never changes in a round, so it is drawn once into a picture of its own
 function hgHash(x, y, k){ var h = (x * 374761393 + y * 668265263 + k * 1442695041) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967295; }
+function hgHedge(x, rx, ry, rw, rh, seed){
+  var i, j;
+  x.fillStyle = "#2F8F3E"; x.fillRect(rx, ry, rw, rh);
+  for(j = 0; j < rh; j++) for(i = 0; i < rw; i++){
+    var h = hgHash(rx + i, ry + j, seed);
+    if(h < .14){ x.fillStyle = "#25762F"; x.fillRect(rx + i, ry + j, 1, 1); }
+    else if(h > .86){ x.fillStyle = "#4DB454"; x.fillRect(rx + i, ry + j, 2, 1); }
+    else if(h > .975){ x.fillStyle = "#FFE45E"; x.fillRect(rx + i, ry + j, 1, 1); }
+  }
+  x.fillStyle = "#1F5E28"; x.fillRect(rx, ry, rw, 1); x.fillRect(rx, ry + rh - 1, rw, 1); x.fillRect(rx, ry, 1, rh); x.fillRect(rx + rw - 1, ry, 1, rh);
+}
 function hgDrawGround(){
   var W = hg.W, H = hg.H, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-  var x = cv.getContext("2d"), i, j, g = hg.garden;
-  x.fillStyle = "#79CE57"; x.fillRect(0, 0, W, H);                                           // the meadow round the garden
+  var x = cv.getContext("2d"), i, j, k, g = hg.garden, R = HG_RING, fx = g.x - R, fy = g.y - R, fw = g.w + 2 * R, fh = g.h + 2 * R;
+  x.fillStyle = "#79CE57"; x.fillRect(0, 0, W, H);                                           // the meadow round the fence
   for(j = 0; j < H; j++) for(i = 0; i < W; i++){ var h = hgHash(i, j, 1); if(h < .06){ x.fillStyle = "#6AC04A"; x.fillRect(i, j, 1, 1); } else if(h > .965){ x.fillStyle = "#93E070"; x.fillRect(i, j, 1, 1); } }
+  var fl = ["#FFFFFF", "#FF8FB8", "#FFE45E", "#C49CFF"];
+  for(k = 0; k < Math.floor(W * H / 90); k++){                                                // little flowers in the meadow
+    var px = 2 + Math.floor(hgHash(k, 1, 7) * (W - 4)), py = 2 + Math.floor(hgHash(k, 2, 7) * (H - 4));
+    if(px > fx - 3 && px < fx + fw + 3 && py > fy - 3 && py < fy + fh + 3) continue;
+    x.fillStyle = fl[k % 4]; x.fillRect(px, py - 1, 1, 3); x.fillRect(px - 1, py, 3, 1); x.fillStyle = "#FFD23A"; x.fillRect(px, py, 1, 1);
+  }
+  hgHedge(x, fx + 2, fy + 2, fw - 4, fh - 4, 11);                                              // the hedge all the way round inside the fence
   x.fillStyle = "#9B6B3A"; x.fillRect(g.x - 1, g.y - 1, g.w + 2, g.h + 2);                  // the dirt paths: the whole garden, the patches sit on it
   x.fillStyle = "#C99B64"; x.fillRect(g.x, g.y, g.w, g.h);
   for(j = g.y; j < g.y + g.h; j++) for(i = g.x; i < g.x + g.w; i++){ var h2 = hgHash(i, j, 2); if(h2 < .09){ x.fillStyle = "#B78650"; x.fillRect(i, j, 1, 1); } else if(h2 > .94){ x.fillStyle = "#DDB27C"; x.fillRect(i, j, 1, 1); } }
+  var bw = Math.max(4, g.pathX - 1), bh = Math.max(4, g.pathY - 1), cx, cy;
+  for(cy = 1; cy < g.n; cy++) for(cx = 1; cx < g.n; cx++) hgHedge(x, Math.round(g.x + cx * g.cw - bw / 2), Math.round(g.y + cy * g.ch - bh / 2), bw, bh, 12);       // a little bush where two paths cross
   hg.patches.forEach(function(p){
     x.fillStyle = "rgba(60,36,16,.35)"; x.fillRect(p.x + 1, p.y + p.h + p.front, p.w, 2);   // its shadow on the path
     x.fillStyle = "#7A4F2A"; x.fillRect(p.x, p.y + p.h, p.w, p.front);                      // the dirt side you can see from above
@@ -7826,6 +7879,13 @@ function hgDrawGround(){
     for(j = 1; j < p.h; j++) for(i = 1; i < p.w - 1; i++){ var h3 = hgHash(p.x + i, p.y + j, 3); if(h3 < .1){ x.fillStyle = "#68CC58"; x.fillRect(p.x + i, p.y + j, 1, 1); } else if(h3 > .93){ x.fillStyle = "#3C9A3A"; x.fillRect(p.x + i, p.y + j, 1, 1); } }
     x.fillStyle = "#6FD460"; x.fillRect(p.x + 1, p.y + 1, p.w - 2, 1);
   });
+  // the wooden fence: two rails and a post every 8 pixels
+  var wood = "#C98A52", woodD = "#8A5A2E", woodL = "#E8B67C";
+  [[fx, fy, fw, 2], [fx, fy + fh - 2, fw, 2], [fx, fy, 2, fh], [fx + fw - 2, fy, 2, fh]].forEach(function(r){ x.fillStyle = wood; x.fillRect(r[0], r[1], r[2], r[3]); x.fillStyle = woodD; if(r[2] > r[3]) x.fillRect(r[0], r[1] + r[3] - 1, r[2], 1); else x.fillRect(r[0] + r[2] - 1, r[1], 1, r[3]); });
+  function post(px2, py2){ x.fillStyle = woodD; x.fillRect(px2 - 1, py2 - 2, 4, 6); x.fillStyle = wood; x.fillRect(px2, py2 - 2, 2, 6); x.fillStyle = woodL; x.fillRect(px2, py2 - 2, 2, 1); }
+  for(i = fx; i <= fx + fw - 3; i += 8){ post(i, fy); post(i, fy + fh - 2); }
+  post(fx + fw - 2, fy); post(fx + fw - 2, fy + fh - 2);
+  for(j = fy + 8; j < fy + fh - 4; j += 8){ post(fx, j); post(fx + fw - 2, j); }
   hg.bg = cv;
 }
 
@@ -7833,19 +7893,34 @@ function hgDrawGround(){
 function hgHeadSprite(ci, D){
   var key = "h" + ci + "_" + D; if(hgSprites[key]) return hgSprites[key];
   var col = HG_COLORS[ci], cv = document.createElement("canvas"); cv.width = cv.height = D;
-  var x = cv.getContext("2d"), mid = (D - 1) / 2, inner = D - 2, pr = Math.max(2, inner * .27), pd = inner / 2 - pr + .3, cr = Math.max(1.6, inner * .2), sh = [], i, j, k;
-  for(j = 0; j < D; j++){ sh.push([]); for(i = 0; i < D; i++) sh[j].push(0); }
+  var x = cv.getContext("2d"), mid = (D - 1) / 2, R = (D - 2) / 2, np = D >= 24 ? 8 : 6, a = R * .5, pd = R - a + .15, b = pd * Math.tan(Math.PI / np) * 1.12 + .35, cr = Math.max(1.7, R * .27);
+  var id = [], vv = [], i, j, k;                       // id = which petal a pixel belongs to (-1 none, -2 the centre), vv = how far out in its petal
+  for(j = 0; j < D; j++){ id.push([]); vv.push([]); for(i = 0; i < D; i++){ id[j].push(-1); vv[j].push(9); } }
   for(j = 0; j < D; j++) for(i = 0; i < D; i++){
-    var dx = i - mid, dy = j - mid, isP = false;
-    for(k = 0; k < 6; k++){ var a = k * Math.PI / 3 + Math.PI / 6, px = Math.cos(a) * pd, py = Math.sin(a) * pd; if((dx - px) * (dx - px) + (dy - py) * (dy - py) <= pr * pr) isP = true; }
-    if(dx * dx + dy * dy <= cr * cr) sh[j][i] = 2; else if(isP) sh[j][i] = 1;
+    var dx = i - mid, dy = j - mid, best = 9, bk = -1;
+    for(k = 0; k < np; k++){
+      var th = k * 2 * Math.PI / np - Math.PI / 2, u = dx * Math.cos(th) + dy * Math.sin(th) - pd, w = -dx * Math.sin(th) + dy * Math.cos(th), v = (u / a) * (u / a) + (w / b) * (w / b);
+      if(v < best){ best = v; bk = k; }
+    }
+    if(dx * dx + dy * dy <= cr * cr){ id[j][i] = -2; vv[j][i] = 0; }
+    else if(best <= 1){ id[j][i] = bk; vv[j][i] = best; }
   }
   var centre = (col.id === "yellow" || col.id === "orange") ? "#8A4B14" : "#FFE27A";
-  function at(i2, j2){ return (i2 >= 0 && j2 >= 0 && i2 < D && j2 < D) ? sh[j2][i2] : 0; }
+  function at(i2, j2){ return (i2 >= 0 && j2 >= 0 && i2 < D && j2 < D) ? id[j2][i2] : -1; }
+  var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
   for(j = 0; j < D; j++) for(i = 0; i < D; i++){
-    var v = sh[j][i]; if(!v){ if(at(i + 1, j) || at(i - 1, j) || at(i, j + 1) || at(i, j - 1)){ x.fillStyle = "#1B1F3B"; x.fillRect(i, j, 1, 1); } continue; }
-    var d2 = (i - mid) + (j - mid);
-    x.fillStyle = v === 2 ? centre : (d2 <= -pd * .9 ? col.l : ((!at(i + 1, j + 1) || (!at(i + 1, j) && !at(i, j + 1))) ? col.d : col.c));
+    var me = id[j][i], near = false, sep = false, d;
+    for(d = 0; d < 4; d++){
+      var o = at(i + dirs[d][0], j + dirs[d][1]);
+      if(o !== -1) near = true;
+      if(me >= 0 && o >= 0 && o !== me && vv[j + dirs[d][1]][i + dirs[d][0]] < vv[j][i]) sep = true;           // a thin dark line between two petals
+    }
+    if(me === -1){ if(near){ x.fillStyle = "#1B1F3B"; x.fillRect(i, j, 1, 1); } continue; }
+    if(me === -2) x.fillStyle = centre;
+    else if(sep) x.fillStyle = col.d;
+    else if(vv[j][i] > .55 && (i - mid) + (j - mid) > R * .3) x.fillStyle = col.d;                              // the lower right rim of a petal is shaded
+    else if(vv[j][i] < .45 && (i - mid) + (j - mid) < R * .1) x.fillStyle = col.l;                               // the upper left is lit
+    else x.fillStyle = col.c;
     x.fillRect(i, j, 1, 1);
   }
   hgSprites[key] = cv; return cv;
@@ -7892,7 +7967,7 @@ function hgArrive(b){
   b.state = "done"; hg.delivered++; home.pulse = .6;
   hgBurst(home.x, home.y, HG_COLORS[b.ci]);
   pixSfxPlay("clCatch", false);
-  var cn = document.getElementById("hgCount"); if(cn) cn.textContent = t("hg_home")(hg.delivered, hg.total);
+  var cn = document.getElementById("hgCount"); if(cn) cn.textContent = hg.delivered + "/" + hg.total;
 }
 function hgBurst(x, y, col){
   var k, cols = [col.c, col.l, "#FFFFFF", "#FFE45E"];
@@ -8023,10 +8098,32 @@ function hgFit(){
   var cv = document.getElementById("hgCanvas"), st = document.getElementById("hgStage"), s = state.session.hopeGarden;
   if(!cv || !st || !hg || !s) return;
   var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-  st.style.height = Math.max(240, Math.floor(vh - st.getBoundingClientRect().top - 32)) + "px";          // the garden takes all the room under the heading
+  var bot = document.querySelector(".hgBottom");
+  st.style.height = Math.max(220, Math.floor(vh - st.getBoundingClientRect().top - (bot ? bot.offsetHeight + 10 : 0) - 24)) + "px";          // the garden takes the room between the top bar and the bottom banner
   var W = Math.max(60, Math.floor(st.clientWidth / HG_SCALE)), H = Math.max(80, Math.floor(st.clientHeight / HG_SCALE));
   cv.width = W; cv.height = H; cv.style.width = (W * HG_SCALE) + "px"; cv.style.height = (H * HG_SCALE) + "px";
   if(hg.W !== W || hg.H !== H || !hg.ready){ hg.W = W; hg.H = H; hg.drag = null; hgLayout(); }
+  hgDrawScenery();
+}
+// the sky behind the title: mountains, hills and a little church
+function hgDrawScenery(){
+  var cv = document.getElementById("hgScenery"); if(!cv) return;
+  var x = cv.getContext("2d"), W = cv.width, H = cv.height, i, j;
+  x.clearRect(0, 0, W, H);
+  function tri(cx, base, hgt, half, col, snow){ for(var r = 0; r < hgt; r++){ var w = Math.round(half * (r + 1) / hgt); x.fillStyle = r < snow ? "#FFFFFF" : col; x.fillRect(cx - w, base - hgt + r, 2 * w + 1, 1); } }
+  tri(20, 32, 26, 17, "#8CB0D8", 7); tri(54, 32, 20, 14, "#9CBFE2", 5); tri(90, 32, 28, 18, "#86AAD2", 8); tri(120, 32, 18, 12, "#9CBFE2", 4);
+  for(i = 0; i < W; i++){ var y1 = 29 + Math.round(2 * Math.sin(i / 8)); x.fillStyle = "#7BD05A"; x.fillRect(i, y1, 1, H - y1); var y2 = 33 + Math.round(2 * Math.sin(i / 6 + 2)); x.fillStyle = "#5DBB4A"; x.fillRect(i, y2, 1, H - y2); }
+  function tree(tx, ty){ x.fillStyle = "#1F5E28"; x.fillRect(tx - 2, ty - 4, 5, 5); x.fillStyle = "#2F8F3E"; x.fillRect(tx - 1, ty - 5, 3, 5); x.fillStyle = "#6E4624"; x.fillRect(tx, ty + 1, 1, 2); }
+  tree(8, 33); tree(14, 35); tree(70, 34); tree(76, 36); tree(116, 34); tree(124, 36);
+  var cx0 = 100, cy0 = 30;                                                                    // the church
+  x.fillStyle = "#1B1F3B"; x.fillRect(cx0 - 5, cy0 - 7, 11, 9); x.fillStyle = "#F4ECD8"; x.fillRect(cx0 - 4, cy0 - 6, 9, 8);
+  x.fillStyle = "#1B1F3B"; x.fillRect(cx0 - 2, cy0 - 14, 5, 8); x.fillStyle = "#F4ECD8"; x.fillRect(cx0 - 1, cy0 - 13, 3, 7);
+  x.fillStyle = "#C0392B"; x.fillRect(cx0 - 2, cy0 - 17, 5, 3); x.fillRect(cx0 - 1, cy0 - 19, 3, 2); x.fillRect(cx0, cy0 - 21, 1, 2);
+  x.fillStyle = "#7A4A2A"; x.fillRect(cx0 - 1, cy0 - 3, 3, 5); x.fillStyle = "#4A8FE0"; x.fillRect(cx0 - 3, cy0 - 5, 1, 2); x.fillRect(cx0 + 3, cy0 - 5, 1, 2);
+  x.fillStyle = "#FFFFFF"; [[30, 6], [31, 6], [32, 6], [29, 7], [30, 7], [31, 7], [32, 7], [33, 7], [64, 4], [65, 4], [66, 4], [63, 5], [64, 5], [65, 5], [66, 5], [67, 5]].forEach(function(c){ x.fillRect(c[0], c[1], 1, 1); });
+}
+function hgStarSvg(on){
+  return '<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M12 1.5l3 7 7.5.6-5.7 4.9 1.8 7.3L12 17.3 5.4 21.3l1.8-7.3L1.5 9.1 9 8.5z" fill="' + (on ? "#FFD23A" : "#C5CEDB") + '" stroke="#1B3A22" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 }
 window.addEventListener("resize", function(){ if(state.screen === "hopeGarden"){ hgFit(); hgDraw(); } });
 
@@ -8074,6 +8171,7 @@ function hgGo(ev){
   try { if(pixAudioStale) pixReviveOnTap(); } catch(e){}
   var rd = document.getElementById("hgReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
   var all = document.querySelector(".hgTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
+  var mb = document.getElementById("hgMainBtn"); if(mb){ mb.className = "hgMain on"; mb.textContent = t("hg_playing"); }
   if(hg) hg.last_t = performance.now();
 }
 document.addEventListener("pointerdown", function(e){
@@ -8116,22 +8214,27 @@ function screenHopeGarden(){
   if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("hopeGardenName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
   if(!hg || hgBound !== s || hgBoundRound !== s.round) hgBegin(s);          // a round that was saved in the middle starts again
   if(hgWaiting) hgTouched = false;
-  return pixShell((hgWaiting ? '<div class="jlTapAll hgTapAll" onpointerdown="hgGo(event)" ontouchstart="hgGo(event)" onclick="hgGo(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("hopeGardenName") + '</h2>' +
-    '<div class="pixNote">' + t("hg_intro") + '</div>' +
-    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, HG_ROUNDS.length) + '</span><span class="pixNote" id="hgCount">' + t("hg_home")(hg.delivered, hg.total) + '</span></div>' +
+  var stars = [0, 1, 2].map(function(k){ return hgStarSvg(k < s.round); }).join("");
+  return pixShell((hgWaiting ? '<div class="jlTapAll hgTapAll" onpointerdown="hgGo(event)" ontouchstart="hgGo(event)" onclick="hgGo(event)"></div>' : '') +
+    '<div class="hgTop"><canvas class="hgScenery" id="hgScenery" width="130" height="40"></canvas>' +
+      '<div class="hgBanner"><div class="hgTitle"' + (t("hopeGardenName").length > 14 ? ' style="font-size:1rem;letter-spacing:.02em"' : '') + '>' + t("hopeGardenName") + '</div><div class="hgSub">' + t("hg_sub") + '</div></div>' +
+      '<div class="hgRibbon">' + t("hg_level")(s.round + 1) + '</div><div class="hgStars">' + stars + '</div>' +
+      '<div class="hgBadge"><span>' + t("hg_beesLabel") + '</span><b id="hgCount">' + hg.delivered + '/' + hg.total + '</b></div></div>' +
     '<div class="hgArea"><div class="hgStage" id="hgStage"><canvas class="hgCanvas" id="hgCanvas" width="100" height="100" onpointerdown="hgDown(event)" onpointermove="hgMove(event)" oncontextmenu="return false"></canvas>' +
       (hgWaiting ? '<div class="dpReady" id="hgReady">' + t("dp_ready") + '</div>' : '') + '</div></div>' +
-    '<div class="spacer"></div>', "pixLower msScreen");
+    '<div class="hgBottom"><div class="hgInfo"><div class="hgAva"><img src="tiles/anamaria.png" alt="" onerror="this.onerror=null;this.src=\'tiles/anamaria_placeholder.png\'"></div><div class="hgInfoText">' + t("hg_intro") + '</div></div>' +
+      '<div class="hgBtns"><div class="' + (hgWaiting ? 'hgMain' : 'hgMain on') + '" id="hgMainBtn">' + (hgWaiting ? t("hg_startBtn") : t("hg_playing")) + '</div>' +
+        '<button class="hgRetry" onclick="hgRetry()" aria-label="' + t("tryAgain") + '"><svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M12 4a8 8 0 1 0 7.6 10.5h-3A5.2 5.2 0 1 1 12 6.8c1.4 0 2.7.6 3.7 1.5L13 11h7V4l-2.5 2.5A8 8 0 0 0 12 4z" fill="#fff"/></svg><span>' + t("tryAgain") + '</span></button></div></div>' +
+    '<div class="spacer"></div>', "pixLower msScreen hgScreen");
 }
 
-// the Main Menu icon: beside the church, in line with the left-most icon of the row above (2026-10-26, per Dan)
+// the Main Menu icon: in line with the left-most icon of the row above, and just under it (it was level with the church, 2026-10-26, per Dan)
 function hgPlaceMenuIcon(){
   var wrap = document.getElementById("hgMenuIcon"), first = document.querySelector(".homeGrid .appIcon"), glow = document.querySelector(".churchGlow"), scr = document.querySelector(".pixMenu");
   if(!wrap || !first || !glow || !scr) return;
   var sr = scr.getBoundingClientRect(), fr = first.getBoundingClientRect(), gr = glow.getBoundingClientRect(), tile = wrap.querySelector(".appTile");
   wrap.style.width = fr.width + "px"; wrap.style.left = (fr.left - sr.left) + "px";
-  var wr = wrap.getBoundingClientRect(), tr = tile ? tile.getBoundingClientRect() : wr;
-  wrap.style.top = Math.round(gr.top - 4 - sr.top - (tr.top - wr.top) - tr.height / 2) + "px";           // the middle of the icon is level with the church's tower
+  wrap.style.top = Math.round(fr.bottom - sr.top + 6) + "px";           // just under the Missions icon and its name (2026-10-26, per Dan: much closer to the row above)
   wrap.style.visibility = "visible";
 }
 window.addEventListener("resize", function(){ if(state.screen === "mainMenu") hgPlaceMenuIcon(); });
@@ -8545,7 +8648,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AD";
+var APP_BUILD = "2026-10-26 AH";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
