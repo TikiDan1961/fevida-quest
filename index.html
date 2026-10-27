@@ -7781,7 +7781,7 @@ var HG_COLORS = [
 var HG_ROUNDS = [
   {n: 4, bees: 4,  live: 4, gap: 2.6, speed: 12, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
   {n: 4, bees: 8,  live: 4, gap: 2.4, speed: 13, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
-  {n: 4, bees: 12, live: 4, gap: 2.2, speed: 14, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
+  {n: 4, bees: 12, live: 3, gap: 2.8, speed: 12, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
 ];
 var HG_FOLLOW = 1.5;           // a bee flies along its line this many times as fast as it flies on its own (a little faster, 2026-10-26, per Dan; it was about 6 times as fast)
 var HG_TAP = 16;               // how close (picture pixels) a touch must be to a bee to pick it
@@ -7970,8 +7970,9 @@ function hgBeeSprite(ci, frame, face){
 
 // ---- the bees ----
 function hgLive(){ return hg.bees.filter(function(b){ return b.state === "free" || b.state === "hover" || b.state === "follow" || b.state === "gone"; }).length; }
-function hgInPlay(b){ return (b.state === "free" || b.state === "hover" || b.state === "follow") && b.x >= 0 && b.x <= hg.W && b.y >= 0 && b.y <= hg.H; }
-function hgNear(x, y, d, except){ return hg.bees.some(function(b){ return b !== except && (b.state === "free" || b.state === "hover" || b.state === "follow") && Math.abs(b.x - x) < d && Math.abs(b.y - y) < d; }); }
+function hgInPlay(b){ return (b.state === "free" || b.state === "hover" || b.state === "follow" || b.state === "home") &&   // (a bee hovering by its flower can be crashed into too, 2026-10-26, per Dan: the next bee of that colour must go to the other flower)
+     b.x >= 0 && b.x <= hg.W && b.y >= 0 && b.y <= hg.H; }
+function hgNear(x, y, d, except){ return hg.bees.some(function(b){ return b !== except && (b.state === "free" || b.state === "hover" || b.state === "follow" || b.state === "home") && Math.abs(b.x - x) < d && Math.abs(b.y - y) < d; }); }
 // a bee comes in from a random edge, flying towards a random spot in the garden
 function hgSpawn(b){
   var cfg = HG_ROUNDS[state.session.hopeGarden.round], W = hg.W, H = hg.H, tries = 0, x, y, e;
@@ -8021,7 +8022,8 @@ function hgStep(s, dt){
     } else if(b.state === "gone"){
       b.wait -= dt; if(b.wait <= 0) hgSpawn(b);
     } else if(b.state === "home"){
-      var hf = b.home, el = hg.t - b.t0, ang = b.a0 + el * 2.6, rr = hf.D / 2 + 3, tx = hf.x + Math.cos(ang) * rr, ty = hf.y + Math.sin(ang) * rr * .8, k2 = Math.min(1, el / .35);
+      var hf = b.home, el = hg.t - b.t0,        // (it circles tightly over the flower: a wide circle made every bee passing by a crash)
+           ang = b.a0 + el * 2.6, rr = 3, tx = hf.x + Math.cos(ang) * rr, ty = hf.y + Math.sin(ang) * rr * .8, k2 = Math.min(1, el / .35);
       b.x = b.x0 + (tx - b.x0) * k2; b.y = b.y0 + (ty - b.y0) * k2; b.face = -Math.sin(ang) >= 0 ? 1 : -1;
       if(el >= HG_HOVER){ b.state = "done"; hgBurst(b.x, b.y, HG_COLORS[b.ci]); }
     } else if(b.state === "follow"){
@@ -8732,7 +8734,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AT";
+var APP_BUILD = "2026-10-26 AV";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
