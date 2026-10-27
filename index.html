@@ -205,16 +205,18 @@
   /* the Hope Garden icon on the Main Menu sits on the scene beside the church; hgPlaceMenuIcon puts it in line with the left-most icon of the row above */
   /* Hope Garden layout (2026-10-26, per Dan, from the Bee Line concept picture): a top bar (title banner, level ribbon, 3 stars, count badge over mountains and a church), the fenced garden,
      and a bottom banner (Anamaria's picture and the instruction) over the green main button and a TRY AGAIN button */
-  .hgScreen .hgTop{position:relative;width:100%;height:122px;flex:none;margin-top:2px;}
+  .hgScreen .hgTop{position:relative;width:100%;height:150px;flex:none;margin-top:2px;}
+  .hgCameo{position:absolute;left:50%;top:0;transform:translateX(-50%);z-index:2;width:46px;height:46px;box-sizing:border-box;border-radius:50%;border:3px solid #1B3A22;overflow:hidden;background:#BFE3FF;box-shadow:0 3px 0 rgba(20,40,20,.4);}
+  .hgCameo img{display:block;width:100%;height:100%;object-fit:cover;}
   .hgScenery{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
-  .hgBanner{position:absolute;left:calc(50% - 12px);top:0;transform:translateX(-50%);min-width:178px;text-align:center;padding:4px 12px 5px;background:linear-gradient(#41A24E,#2A7A36);border:4px solid #1B3A22;border-radius:14px;box-shadow:inset 0 0 0 2px #7BD26F,0 4px 0 rgba(20,40,20,.45);}
+  .hgBanner{position:absolute;left:calc(50% - 12px);top:40px;transform:translateX(-50%);min-width:178px;text-align:center;padding:4px 12px 5px;background:linear-gradient(#41A24E,#2A7A36);border:4px solid #1B3A22;border-radius:14px;box-shadow:inset 0 0 0 2px #7BD26F,0 4px 0 rgba(20,40,20,.45);}
   .hgTitle{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.75rem;line-height:1;letter-spacing:.04em;color:#FFE45E;text-transform:uppercase;white-space:nowrap;
     text-shadow:2px 2px 0 #1B3A22,-2px -2px 0 #1B3A22,2px -2px 0 #1B3A22,-2px 2px 0 #1B3A22,0 3px 0 #1B3A22;}
   .hgSub{display:inline-block;margin-top:3px;padding:0 10px;background:#FFF3D6;border:2px solid #1B3A22;border-radius:10px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;line-height:1.2;color:#2A7A36;white-space:nowrap;}
-  .hgRibbon{position:absolute;left:50%;top:80px;transform:translateX(-50%);padding:1px 24px 0;background:linear-gradient(#FFE56B,#F2B21E);border:3px solid #7A4A0A;border-radius:6px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;line-height:1.2;letter-spacing:.08em;color:#5A2E00;text-transform:uppercase;box-shadow:0 3px 0 rgba(60,30,0,.35);white-space:nowrap;}
-  .hgStars{position:absolute;left:12px;top:70px;display:flex;gap:1px;}
+  .hgRibbon{position:absolute;left:50%;top:116px;transform:translateX(-50%);padding:1px 24px 0;background:linear-gradient(#FFE56B,#F2B21E);border:3px solid #7A4A0A;border-radius:6px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;line-height:1.2;letter-spacing:.08em;color:#5A2E00;text-transform:uppercase;box-shadow:0 3px 0 rgba(60,30,0,.35);white-space:nowrap;}
+  .hgStars{position:absolute;left:12px;top:104px;display:flex;gap:1px;}
   .hgStars svg{width:28px;height:28px;display:block;filter:drop-shadow(0 2px 0 rgba(20,40,20,.35));}
-  .hgBadge{position:absolute;right:12px;top:6px;min-width:64px;text-align:center;padding:2px 8px 3px;background:#FFF8E1;border:3px solid #1B3A22;border-radius:12px;box-shadow:0 3px 0 rgba(20,40,20,.4);}
+  .hgBadge{position:absolute;right:12px;top:14px;min-width:64px;text-align:center;padding:2px 8px 3px;background:#FFF8E1;border:3px solid #1B3A22;border-radius:12px;box-shadow:0 3px 0 rgba(20,40,20,.4);}
   .hgBadge span{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;line-height:1.1;letter-spacing:.06em;color:#2A7A36;text-transform:uppercase;}
   .hgBadge b{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.625rem;line-height:1;color:#1B3A22;}
   .hgScreen .hgArea{margin-top:0;}
@@ -1199,7 +1201,7 @@ var T = {
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
-    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hg_level:function(n){return "Level "+n;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
+    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hg_level:function(n){return "Round "+n;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
     hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
     hg_guide:{d:"Colored bees are buzzing into the garden. Guide each one to a flower that is the same color as the bee.", h:["Tap a bee, then drag your finger toward a flower of the same color. A dotted line shows the way, but it only reaches so far.",
       "Lift your finger and the bee flies along the line. If it lands on its flower, it is home!", "A bee that misses flies off in a random direction. Tap it again to guide it back.", "Keep the bees apart! If two bees bump into each other, the round is lost.", "Bring every bee home to finish all 3 rounds."]},
@@ -1352,7 +1354,7 @@ var T = {
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
-    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hg_level:function(n){return "Nivel "+n;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
+    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hg_level:function(n){return "Ronda "+n;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
     hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
     hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
       "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas! Si dos abejas chocan, pierdes la ronda.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
@@ -8104,22 +8106,79 @@ function hgFit(){
   if(hg.W !== W || hg.H !== H || !hg.ready){ hg.W = W; hg.H = H; hg.drag = null; hgLayout(); }
   hgDrawScenery();
 }
-// the sky behind the title: mountains, hills and a little church
+// the scenery behind the title: snowy mountains, rolling hills with trees and flowers, and a little church with a winding path (2026-10-26, per Dan: a better church, hills and trees)
 function hgDrawScenery(){
   var cv = document.getElementById("hgScenery"); if(!cv) return;
-  var x = cv.getContext("2d"), W = cv.width, H = cv.height, i, j;
+  var x = cv.getContext("2d"), W = cv.width, H = cv.height, i, j, k;
   x.clearRect(0, 0, W, H);
-  function tri(cx, base, hgt, half, col, snow){ for(var r = 0; r < hgt; r++){ var w = Math.round(half * (r + 1) / hgt); x.fillStyle = r < snow ? "#FFFFFF" : col; x.fillRect(cx - w, base - hgt + r, 2 * w + 1, 1); } }
-  tri(20, 32, 26, 17, "#8CB0D8", 7); tri(54, 32, 20, 14, "#9CBFE2", 5); tri(90, 32, 28, 18, "#86AAD2", 8); tri(120, 32, 18, 12, "#9CBFE2", 4);
-  for(i = 0; i < W; i++){ var y1 = 29 + Math.round(2 * Math.sin(i / 8)); x.fillStyle = "#7BD05A"; x.fillRect(i, y1, 1, H - y1); var y2 = 33 + Math.round(2 * Math.sin(i / 6 + 2)); x.fillStyle = "#5DBB4A"; x.fillRect(i, y2, 1, H - y2); }
-  function tree(tx, ty){ x.fillStyle = "#1F5E28"; x.fillRect(tx - 2, ty - 4, 5, 5); x.fillStyle = "#2F8F3E"; x.fillRect(tx - 1, ty - 5, 3, 5); x.fillStyle = "#6E4624"; x.fillRect(tx, ty + 1, 1, 2); }
-  tree(8, 33); tree(14, 35); tree(70, 34); tree(76, 36); tree(116, 34); tree(124, 36);
-  var cx0 = 100, cy0 = 30;                                                                    // the church
-  x.fillStyle = "#1B1F3B"; x.fillRect(cx0 - 5, cy0 - 7, 11, 9); x.fillStyle = "#F4ECD8"; x.fillRect(cx0 - 4, cy0 - 6, 9, 8);
-  x.fillStyle = "#1B1F3B"; x.fillRect(cx0 - 2, cy0 - 14, 5, 8); x.fillStyle = "#F4ECD8"; x.fillRect(cx0 - 1, cy0 - 13, 3, 7);
-  x.fillStyle = "#C0392B"; x.fillRect(cx0 - 2, cy0 - 17, 5, 3); x.fillRect(cx0 - 1, cy0 - 19, 3, 2); x.fillRect(cx0, cy0 - 21, 1, 2);
-  x.fillStyle = "#7A4A2A"; x.fillRect(cx0 - 1, cy0 - 3, 3, 5); x.fillStyle = "#4A8FE0"; x.fillRect(cx0 - 3, cy0 - 5, 1, 2); x.fillRect(cx0 + 3, cy0 - 5, 1, 2);
-  x.fillStyle = "#FFFFFF"; [[30, 6], [31, 6], [32, 6], [29, 7], [30, 7], [31, 7], [32, 7], [33, 7], [64, 4], [65, 4], [66, 4], [63, 5], [64, 5], [65, 5], [66, 5], [67, 5]].forEach(function(c){ x.fillRect(c[0], c[1], 1, 1); });
+  function R(c, a, b, w, h){ x.fillStyle = c; x.fillRect(a, b, w, h); }
+  function hs(a, b, c){ return hgHash(a, b, c); }
+  function mount(cx, base, hgt, half, lit, shade, snowL, snowS){
+    for(var xx = cx - half; xx <= cx + half; xx++){
+      var d = Math.abs(xx - cx), top = Math.round(base - hgt * (1 - d / half)), snow = hgt * .3 + 1.5 * Math.sin(xx * 1.7) + (xx % 3 === 0 ? 1 : 0);
+      for(var yy = top; yy < base; yy++){
+        var onSnow = (yy - top) < snow, left = xx <= cx;
+        R(onSnow ? (left ? snowL : snowS) : (left ? lit : shade), xx, yy, 1, 1);
+        if(!onSnow && left === false && (xx + yy) % 5 === 0) R("#7C9FC6", xx, yy, 1, 1);          // rock texture on the shaded side
+      }
+    }
+  }
+  mount(24, 38, 30, 20, "#A8C6E8", "#85A8D0", "#FFFFFF", "#D4E4F6");
+  mount(66, 38, 34, 24, "#A0BFE4", "#7FA2CC", "#FFFFFF", "#D0E0F4");
+  mount(104, 38, 26, 18, "#AECBEA", "#8AACD4", "#FFFFFF", "#D6E6F7");
+  mount(46, 38, 20, 14, "#B8D2EC", "#94B4DA", "#FFFFFF", "#DCE9F8");
+  // far hills, then near hills
+  for(i = 0; i < W; i++){
+    var y1 = 33 + Math.round(2.2 * Math.sin(i / 9) + 1.2 * Math.sin(i / 4.3)); R("#4FA64B", i, y1, 1, H - y1); R("#6ACA5C", i, y1, 1, 1);
+    var y2 = 39 + Math.round(2 * Math.sin(i / 7 + 2) + Math.sin(i / 3.1)); R("#6FD05A", i, y2, 1, H - y2); R("#9DEB7C", i, y2, 1, 1);
+    if(hs(i, 3, 5) > .86) R("#5DBE4C", i, y2 + 2 + Math.floor(hs(i, 4, 5) * 6), 2, 1);
+  }
+  // the path up to the church, winding
+  var pts = [[12, 49], [22, 48], [32, 47], [42, 46], [52, 46], [62, 47], [72, 47], [82, 46], [92, 46], [102, 46], [109, 46]];
+  for(k = 0; k < pts.length - 1; k++){
+    var ax = pts[k][0], ay = pts[k][1], bx = pts[k + 1][0], by = pts[k + 1][1], st = Math.max(Math.abs(bx - ax), Math.abs(by - ay));
+    for(j = 0; j <= st; j++){ var px = Math.round(ax + (bx - ax) * j / st), py = Math.round(ay + (by - ay) * j / st), wd = 2 + Math.round((49 - py) / 10); R("#E9D3A0", px - wd, py, wd * 2 + 1, 2); R("#D2B87E", px - wd, py + 1, wd * 2 + 1, 1); }
+  }
+  // trees
+  function round(cx, base, r){
+    R("#6E4624", cx - 1, base - 4, 2, 5); R("#4A2E14", cx, base - 4, 1, 5);
+    var cy = base - 4 - r;
+    for(j = -r - 1; j <= r + 1; j++) for(i = -r - 1; i <= r + 1; i++){
+      var d2 = i * i + j * j;
+      if(d2 <= (r + 1) * (r + 1) + 1){
+        var c = "#1F5E28";
+        if(d2 <= r * r + r * .6){ c = "#2F8F3E"; if(i + j > r * .55) c = "#25772F"; else if(i + j < -r * .6) c = "#4DB454"; else if((i * 3 + j * 5 + cx) % 7 === 0) c = "#3FA64A"; }
+        R(c, cx + i, cy + j, 1, 1);
+      }
+    }
+    R("#FFFFFF", cx - 1, cy - 1, 1, 1);
+  }
+  function pine(cx, base, h){
+    R("#6E4624", cx, base - 2, 1, 3);
+    for(var t = 0; t < 3; t++){
+      var top = base - 2 - h + Math.round(t * h / 3.4), w = 1 + t + Math.round(h / 6), rows = Math.round(h / 2.6);
+      for(j = 0; j < rows; j++){ var ww = Math.round(w * (j + 1) / rows); R("#1B5E32", cx - ww - 1, top + j, 2 * ww + 3, 1); R("#2E8B4A", cx - ww, top + j, ww + 1, 1); R("#1F7A3A", cx + 1, top + j, ww, 1); }
+    }
+  }
+  round(8, 49, 6); round(20, 50, 5); pine(31, 49, 14); pine(37, 50, 10);
+  round(60, 41, 3); round(70, 41, 3); pine(76, 41, 9); round(87, 42, 4);
+  round(124, 49, 5); pine(98, 50, 9); round(90, 49, 3);
+  // flowers and bushes on the near hill
+  var fc = ["#FFFFFF", "#FF8FB8", "#FFE45E", "#C49CFF"];
+  for(k = 0; k < 34; k++){ var fx2 = 2 + Math.floor(hs(k, 1, 9) * (W - 4)), fy2 = 42 + Math.floor(hs(k, 2, 9) * (H - 44)); R(fc[k % 4], fx2, fy2, 1, 1); if(k % 3 === 0) R("#FFD23A", fx2, fy2 - 1, 1, 1); }
+  // the church, on the hill to the right (small: the room under the count badge)
+  var cx = 112, B = 46;
+  R("#C9BFA6", cx - 7, B, 15, 1); R("#B5AA8E", cx - 6, B + 1, 13, 1);                                  // its steps
+  R("#1B1F3B", cx - 7, B - 8, 10, 8); R("#F6EEDA", cx - 6, B - 7, 8, 7); R("#DCCFB0", cx + 1, B - 7, 1, 7);                  // the hall
+  for(j = 0; j < 3; j++){ R("#1B1F3B", cx - 8 + j, B - 11 + j, 12 - 2 * j, 1); R("#C0392B", cx - 7 + j, B - 10 + j, 10 - 2 * j, 1); R("#962A20", cx - 2 + Math.floor(j / 2), B - 10 + j, 5 - 2 * j + 1, 1); }   // its roof
+  R("#1B1F3B", cx + 3, B - 15, 7, 15); R("#F6EEDA", cx + 4, B - 14, 5, 14); R("#DCCFB0", cx + 8, B - 14, 1, 14);              // the tower
+  R("#1B1F3B", cx + 5, B - 13, 3, 4); R("#3A2A1A", cx + 6, B - 12, 1, 3); R("#F2C14E", cx + 6, B - 10, 1, 1);                 // the bell opening
+  for(j = 0; j < 5; j++){ var sw = Math.round(3 * (j + 1) / 5); R("#1B1F3B", cx + 6 - sw - 1, B - 20 + j, 2 * sw + 3, 1); R("#C0392B", cx + 6 - sw, B - 20 + j, sw + 1, 1); R("#962A20", cx + 7, B - 20 + j, sw, 1); }   // the steeple
+  R("#FFE45E", cx + 6, B - 24, 1, 5); R("#FFE45E", cx + 5, B - 23, 3, 1);                                                // the cross
+  R("#4A8FE0", cx - 5, B - 6, 1, 3); R("#BFE3FF", cx - 5, B - 6, 1, 1); R("#4A8FE0", cx, B - 6, 1, 3); R("#BFE3FF", cx, B - 6, 1, 1);        // the windows
+  R("#1B1F3B", cx - 3, B - 5, 3, 5); R("#7A4A2A", cx - 2, B - 4, 1, 4); R("#9A6438", cx - 1, B - 4, 1, 4);                    // the door
+  // a bird or two
+  [[30, 10], [44, 6]].forEach(function(b2){ R("#FFFFFF", b2[0], b2[1], 1, 1); R("#FFFFFF", b2[0] + 2, b2[1], 1, 1); R("#FFFFFF", b2[0] + 1, b2[1] + 1, 1, 1); });
 }
 function hgStarSvg(on){
   return '<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M12 1.5l3 7 7.5.6-5.7 4.9 1.8 7.3L12 17.3 5.4 21.3l1.8-7.3L1.5 9.1 9 8.5z" fill="' + (on ? "#FFD23A" : "#C5CEDB") + '" stroke="#1B3A22" stroke-width="1.8" stroke-linejoin="round"/></svg>';
@@ -8215,15 +8274,13 @@ function screenHopeGarden(){
   if(hgWaiting) hgTouched = false;
   var stars = [0, 1, 2].map(function(k){ return hgStarSvg(k < s.round); }).join("");
   return pixShell((hgWaiting ? '<div class="jlTapAll hgTapAll" onpointerdown="hgGo(event)" ontouchstart="hgGo(event)" onclick="hgGo(event)"></div>' : '') +
-    '<div class="hgTop"><canvas class="hgScenery" id="hgScenery" width="130" height="40"></canvas>' +
+    '<div class="hgTop"><canvas class="hgScenery" id="hgScenery" width="130" height="50"></canvas>' +
+      '<div class="hgCameo"><img src="tiles/anamaria.png" alt="" onerror="this.onerror=null;this.src=\'tiles/anamaria_placeholder.png\'"></div>' +
       '<div class="hgBanner"><div class="hgTitle"' + (t("hopeGardenName").length > 14 ? ' style="font-size:1rem;letter-spacing:.02em"' : '') + '>' + t("hopeGardenName") + '</div><div class="hgSub">' + t("hg_sub") + '</div></div>' +
       '<div class="hgRibbon">' + t("hg_level")(s.round + 1) + '</div><div class="hgStars">' + stars + '</div>' +
       '<div class="hgBadge"><span>' + t("hg_beesLabel") + '</span><b id="hgCount">' + hg.delivered + '/' + hg.total + '</b></div></div>' +
     '<div class="hgArea"><div class="hgStage" id="hgStage"><canvas class="hgCanvas" id="hgCanvas" width="100" height="100" onpointerdown="hgDown(event)" onpointermove="hgMove(event)" oncontextmenu="return false"></canvas>' +
       (hgWaiting ? '<div class="dpReady" id="hgReady">' + t("dp_ready") + '</div>' : '') + '</div></div>' +
-    '<div class="hgBottom">' +
-      '<div class="hgBtns"><div class="hgAva"><img src="tiles/anamaria.png" alt="" onerror="this.onerror=null;this.src=\'tiles/anamaria_placeholder.png\'"></div><div class="' + (hgWaiting ? 'hgMain' : 'hgMain on') + '" id="hgMainBtn">' + (hgWaiting ? t("hg_startBtn") : t("hg_playing")) + '</div>' +
-        '<button class="hgRetry" onclick="hgRetry()" aria-label="' + t("tryAgain") + '"><svg viewBox="0 0 24 24" shape-rendering="crispEdges"><path d="M12 4a8 8 0 1 0 7.6 10.5h-3A5.2 5.2 0 1 1 12 6.8c1.4 0 2.7.6 3.7 1.5L13 11h7V4l-2.5 2.5A8 8 0 0 0 12 4z" fill="#fff"/></svg><span>' + t("tryAgain") + '</span></button></div></div>' +
     '<div class="spacer"></div>', "pixLower msScreen hgScreen");
 }
 
@@ -8647,7 +8704,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AJ";
+var APP_BUILD = "2026-10-26 AL";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
