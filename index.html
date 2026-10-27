@@ -194,6 +194,18 @@
   .appIcon.soon .appTile{filter:grayscale(1);opacity:.55;}
   .appIcon.soon .appName{opacity:.85;}
   .pixMenu.pilgrimBusy .homeGrid .appIcon{filter:grayscale(1);opacity:.55;}
+  /* Hope Garden (2026-10-26, per Dan): the garden is a canvas drawn at 3 x 3 screen pixels to the picture pixel (sized in hgFit); no buttons under it */
+  .hgArea{width:min(100%,380px);margin:0 auto;}
+  .hgStage{position:relative;overflow:hidden;box-sizing:border-box;height:clamp(260px,calc(100vh - 262px),640px);height:clamp(260px,calc(100dvh - 262px),640px);display:flex;align-items:center;justify-content:center;border:4px solid #FFC93A;border-radius:16px;
+    box-shadow:0 0 0 4px #1B1F3B,0 5px 0 4px rgba(20,30,90,.4);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;background:#79CE57;touch-action:none;}
+  .hgCanvas{display:block;flex:none;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;touch-action:none;}
+  .hgStage .dpReady{top:50%;transform:translateY(-50%);}
+  .hgOhNo{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;z-index:5;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2.1rem;color:#FF5A5A;
+    text-shadow:3px 0 #fff,-3px 0 #fff,0 3px #fff,0 -3px #fff,3px 3px #fff,-3px -3px #fff,3px -3px #fff,-3px 3px #fff,5px 5px 0 #1B1F3B;animation:jlOh .22s steps(2) infinite;}
+  /* the Hope Garden icon on the Main Menu sits on the scene beside the church; hgPlaceMenuIcon puts it in line with the left-most icon of the row above */
+  .pixHome.pixSky > .hgMenuIcon{position:absolute;z-index:6;visibility:hidden;left:0;top:300px;margin:0;}
+  .pixMenu.pilgrimBusy .hgMenuIcon{filter:grayscale(1);opacity:.55;pointer-events:none;}
+
   .appIcon.done .appTile{filter:saturate(.65);}
   .pixHome.pixSky > .folderOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:18px;
     background:rgba(10,20,70,.55);animation:folderFade .2s ease-out;}
@@ -1160,6 +1172,10 @@ var T = {
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
+    hopeGardenName:"Hope Garden", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
+    hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
+    hg_guide:{d:"Colored bees are buzzing into the garden. Guide each one to a flower that is the same color as the bee.", h:["Tap a bee, then drag your finger toward a flower of the same color. A dotted line shows the way, but it only reaches so far.",
+      "Lift your finger and the bee flies along the line. If it lands on its flower, it is home!", "A bee that misses flies off in a random direction. Tap it again to guide it back.", "Keep the bees apart! If two bees bump into each other, the round is lost.", "Bring every bee home to finish all 3 rounds."]},
     fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swipe a fruit toward a neighbor to swap them and match 3 or more. Collect every fruit to light up all the words.",
     fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_shuffling:"SHUFFLING", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
@@ -1309,6 +1325,10 @@ var T = {
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
+    hopeGardenName:"Jardín de la Esperanza", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
+    hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
+    hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
+      "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas! Si dos abejas chocan, pierdes la ronda.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
     fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
     fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
@@ -1633,7 +1653,7 @@ function defaultState(){
     },
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null, dovePeace:null, fruitsSpirit:null, jacobLadder:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null, dovePeace:null, fruitsSpirit:null, jacobLadder:null, hopeGarden:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -2208,7 +2228,7 @@ var COMING_SOON_MISSIONS = [
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", dovePeace:"#4FA6F0", fruitsSpirit:"#8E4FB8", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
-  emojiStories:"#F5D9A8", lightCandle:"#26305F", jacobLadder:"#6FB7F5", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", pilgrimRoad:"#58B04A", tbd:"#AEB6C8",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jacobLadder:"#6FB7F5", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", hopeGarden:"#7ACB5A", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", pilgrimRoad:"#58B04A", tbd:"#AEB6C8",
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
@@ -2697,6 +2717,7 @@ function screenMainMenu(){
     '</div>' +
     '<div class="homeGrid">' + icons + '</div>' +
     pilgrimSceneHtml() +
+    '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeGardenName")}) + '</div>' +
     folderHtml() +
   '</div>';
 }
@@ -2970,7 +2991,7 @@ function missionById(id){ return MISSIONS.filter(function(m){ return m.id === id
 function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission pixLower' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
 
 // a pixel button with the glow and the press sound; secondary = the blue one
-function pixBigLabel(label){ return label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu"); }
+function pixBigLabel(label){ return label === t("hg_play") || label === t("tryAgain") || label === t("playAgain") || label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu"); }
 function pixBtnHtml(label, js, secondary){
   return '<button class="btn pixBtn pixBtnSm' + (pixBigLabel(label) ? ' pixBtnBig' : '') + (secondary ? ' secondary' : '') + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '">' + label + '</button>';
 }
@@ -7709,6 +7730,412 @@ function screenJacobLadder(){
     '<div class="spacer"></div>', "pixLower msScreen");
 }
 
+/* ---------- Hope Garden ---------- */
+
+// Hope Garden (2026-10-26, per Dan) is a bonus game, NOT a mission: its icon sits on the Main Menu beside the church, and it gives no points, no badge and does not move the pilgrim.
+// A garden seen from slightly above: patches of grass, one flower on each, with dirt paths between them. Coloured bees fly in from the edges of the screen; the player taps a bee and drags
+// a finger towards a flower of the bee's own colour. A dotted line (only so long) is drawn, and when the finger lifts the bee flies exactly along it. A bee that ends on its own flower is
+// done; one that ends anywhere else flies off in a random direction until it leaves the screen (it then comes back from another edge) or the player taps it and guides it again.
+// A round is won when every bee (4 / 8 / 12) has been brought to its flower. Two bees touching each other loses the round (TRY AGAIN plays the same round again). No chances, no timer.
+// The garden is a small pixel picture (the canvas is drawn at 1 pixel = 3 x 3 screen pixels, like the icons).
+var HG_SCALE = 3;
+var HG_COLORS = [
+  {id:"red",    c:"#E03A3A", l:"#FF9A8A", d:"#8E1F2A"},
+  {id:"orange", c:"#F28C28", l:"#FFC878", d:"#9A5010"},
+  {id:"yellow", c:"#FFD23A", l:"#FFF08A", d:"#A8800A"},
+  {id:"green",  c:"#46C24E", l:"#A4F27C", d:"#1F7A2C"},
+  {id:"blue",   c:"#3A8FE8", l:"#9BD0FF", d:"#1E5099"},
+  {id:"indigo", c:"#4B3FB0", l:"#9A8FF0", d:"#2A2075"},
+  {id:"purple", c:"#B04FD8", l:"#E3A6FF", d:"#6A2090"}
+];
+// n = patches along each side, bees = how many bees must reach their flowers, kinds = how many colours, live = most bees flying at once, gap = seconds between bees coming in,
+// speed = how fast a bee flies on its own (picture pixels a second), head / patchH / front / pathX / pathY / stemW = sizes of the flowers and patches in picture pixels
+var HG_ROUNDS = [
+  {n: 2, bees: 4,  kinds: 4, live: 4, gap: 2.6, speed: 12, head: 21, patchH: 16, front: 4, pathX: 9, pathY: 10, stemW: 3},
+  {n: 3, bees: 8,  kinds: 7, live: 4, gap: 2.4, speed: 13, head: 15, patchH: 11, front: 3, pathX: 7, pathY: 8,  stemW: 2},
+  {n: 4, bees: 12, kinds: 7, live: 4, gap: 2.2, speed: 14, head: 11, patchH: 8,  front: 3, pathX: 5, pathY: 6,  stemW: 2}
+];
+var HG_FOLLOW = 78;            // how fast a bee flies along its line
+var HG_TAP = 16;               // how close (picture pixels) a touch must be to a bee to pick it
+var HG_COLL = 4.5;             // two bees closer than this have crashed (the numbers above were set by playing 80 rounds each with a pretend player who reacts in 0.5 to 1 s and takes about a second to draw a line: it loses about 1 round in 20 to 1 in 10)
+var HG_MARGIN = 7;             // the meadow round the garden
+var HG_MAXFRAC = .45;          // the dotted line is this much of the picture's width at most
+var HG_CRASH_MS = 1800;
+var hg = null, hgBound = null, hgBoundRound = -1, hgRaf = 0, hgWaiting = true, hgTouched = false, hgSprites = {};
+function hgRand(a, b){ return a + Math.random() * (b - a); }
+function hgShuffle(a){ a = a.slice(); for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t0 = a[i]; a[i] = a[j]; a[j] = t0; } return a; }
+function hgMax(){ return Math.round(hg.W * HG_MAXFRAC); }
+
+function initHopeGarden(){
+  state.session.hopeGarden = {v: 1, round: 0, status: "playing", interlude: null};
+  hgBegin(state.session.hopeGarden);
+  saveState();
+}
+// the colours of this round's flowers and bees: every bee has at least one flower of its colour
+function hgPickColors(cfg){
+  var total = cfg.n * cfg.n, ids = [0, 1, 2, 3, 4, 5, 6], f = [], b = [], i;
+  if(cfg.kinds < 7){ ids = hgShuffle(ids).slice(0, cfg.kinds); return {f: hgShuffle(ids), b: hgShuffle(ids)}; }
+  var per = Math.floor(total / 7);
+  for(i = 0; i < per; i++) f = f.concat(ids);
+  while(f.length < total) f.push(Math.floor(Math.random() * 7));
+  b = ids.slice();
+  while(b.length < cfg.bees) b.push(Math.floor(Math.random() * 7));
+  return {f: hgShuffle(f), b: hgShuffle(b)};
+}
+// a new round: the picture is laid out (hgLayout) once the canvas has been measured (hgFit)
+function hgBegin(s){
+  var cfg = HG_ROUNDS[s.round], cols = hgPickColors(cfg);
+  hg = {W: 0, H: 0, fcols: cols.f, bcols: cols.b, flowers: [], bees: [], delivered: 0, total: cfg.bees, particles: [], t: 0, mode: "play", crash: null, drag: null,
+        nextSpawn: 0.6, flash: 0, last_t: performance.now(), bg: null, ready: false};
+  hgWaiting = true; hgTouched = false;
+  hgBound = s; hgBoundRound = s.round;
+}
+function hgLayout(){
+  var s = state.session.hopeGarden, cfg = HG_ROUNDS[s.round], W = hg.W, H = hg.H, n = cfg.n, m = HG_MARGIN;
+  var gx = m, gy = m, gw = W - 2 * m, gh = H - 2 * m, cw = gw / n, ch = gh / n, D = cfg.head;
+  var pw = Math.floor(cw - cfg.pathX), ph = cfg.patchH, stem = Math.max(6, Math.floor(ch - cfg.pathY - D - ph - cfg.front)), r, c;
+  hg.garden = {x: gx, y: gy, w: gw, h: gh};
+  hg.flowers = []; hg.patches = [];
+  for(r = 0; r < n; r++) for(c = 0; c < n; c++){
+    var x0 = Math.round(gx + c * cw + (cw - pw) / 2), y0 = Math.round(gy + r * ch + cfg.pathY / 2), ci = hg.fcols[r * n + c];
+    var pTop = y0 + D + stem;
+    hg.patches.push({x: x0, y: pTop, w: pw, h: ph, front: cfg.front});
+    hg.flowers.push({ci: ci, x: Math.round(x0 + pw / 2), y: Math.round(y0 + D / 2), D: D, r: D / 2 + 3, stemTop: y0 + D - 1, stemBot: pTop + 2, stemW: cfg.stemW, pulse: 0, row: r});
+  }
+  // the bees: the first comes in a moment after the round starts, the rest as there is room
+  hg.bees = hg.bcols.map(function(ci, i){ return {id: i, ci: ci, x: -20, y: -20, vx: 0, vy: 0, state: "queued", path: null, seg: 0, wait: 0, face: 1, ph: Math.random() * 6}; });
+  hgDrawGround();
+  hg.ready = true;
+}
+// the ground never changes in a round, so it is drawn once into a picture of its own
+function hgHash(x, y, k){ var h = (x * 374761393 + y * 668265263 + k * 1442695041) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967295; }
+function hgDrawGround(){
+  var W = hg.W, H = hg.H, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  var x = cv.getContext("2d"), i, j, g = hg.garden;
+  x.fillStyle = "#79CE57"; x.fillRect(0, 0, W, H);                                           // the meadow round the garden
+  for(j = 0; j < H; j++) for(i = 0; i < W; i++){ var h = hgHash(i, j, 1); if(h < .06){ x.fillStyle = "#6AC04A"; x.fillRect(i, j, 1, 1); } else if(h > .965){ x.fillStyle = "#93E070"; x.fillRect(i, j, 1, 1); } }
+  x.fillStyle = "#9B6B3A"; x.fillRect(g.x - 1, g.y - 1, g.w + 2, g.h + 2);                  // the dirt paths: the whole garden, the patches sit on it
+  x.fillStyle = "#C99B64"; x.fillRect(g.x, g.y, g.w, g.h);
+  for(j = g.y; j < g.y + g.h; j++) for(i = g.x; i < g.x + g.w; i++){ var h2 = hgHash(i, j, 2); if(h2 < .09){ x.fillStyle = "#B78650"; x.fillRect(i, j, 1, 1); } else if(h2 > .94){ x.fillStyle = "#DDB27C"; x.fillRect(i, j, 1, 1); } }
+  hg.patches.forEach(function(p){
+    x.fillStyle = "rgba(60,36,16,.35)"; x.fillRect(p.x + 1, p.y + p.h + p.front, p.w, 2);   // its shadow on the path
+    x.fillStyle = "#7A4F2A"; x.fillRect(p.x, p.y + p.h, p.w, p.front);                      // the dirt side you can see from above
+    x.fillStyle = "#5E3C20"; x.fillRect(p.x, p.y + p.h + p.front - 1, p.w, 1);
+    x.fillStyle = "#4CB347"; x.fillRect(p.x, p.y, p.w, p.h);                                  // the grass on top
+    x.fillStyle = "#3C9A3A"; x.fillRect(p.x, p.y, p.w, 1); x.fillRect(p.x, p.y, 1, p.h); x.fillRect(p.x + p.w - 1, p.y, 1, p.h);
+    for(j = 1; j < p.h; j++) for(i = 1; i < p.w - 1; i++){ var h3 = hgHash(p.x + i, p.y + j, 3); if(h3 < .1){ x.fillStyle = "#68CC58"; x.fillRect(p.x + i, p.y + j, 1, 1); } else if(h3 > .93){ x.fillStyle = "#3C9A3A"; x.fillRect(p.x + i, p.y + j, 1, 1); } }
+    x.fillStyle = "#6FD460"; x.fillRect(p.x + 1, p.y + 1, p.w - 2, 1);
+  });
+  hg.bg = cv;
+}
+
+// ---- pictures ----
+function hgHeadSprite(ci, D){
+  var key = "h" + ci + "_" + D; if(hgSprites[key]) return hgSprites[key];
+  var col = HG_COLORS[ci], cv = document.createElement("canvas"); cv.width = cv.height = D;
+  var x = cv.getContext("2d"), mid = (D - 1) / 2, inner = D - 2, pr = Math.max(2, inner * .27), pd = inner / 2 - pr + .3, cr = Math.max(1.6, inner * .2), sh = [], i, j, k;
+  for(j = 0; j < D; j++){ sh.push([]); for(i = 0; i < D; i++) sh[j].push(0); }
+  for(j = 0; j < D; j++) for(i = 0; i < D; i++){
+    var dx = i - mid, dy = j - mid, isP = false;
+    for(k = 0; k < 6; k++){ var a = k * Math.PI / 3 + Math.PI / 6, px = Math.cos(a) * pd, py = Math.sin(a) * pd; if((dx - px) * (dx - px) + (dy - py) * (dy - py) <= pr * pr) isP = true; }
+    if(dx * dx + dy * dy <= cr * cr) sh[j][i] = 2; else if(isP) sh[j][i] = 1;
+  }
+  var centre = (col.id === "yellow" || col.id === "orange") ? "#8A4B14" : "#FFE27A";
+  function at(i2, j2){ return (i2 >= 0 && j2 >= 0 && i2 < D && j2 < D) ? sh[j2][i2] : 0; }
+  for(j = 0; j < D; j++) for(i = 0; i < D; i++){
+    var v = sh[j][i]; if(!v){ if(at(i + 1, j) || at(i - 1, j) || at(i, j + 1) || at(i, j - 1)){ x.fillStyle = "#1B1F3B"; x.fillRect(i, j, 1, 1); } continue; }
+    var d2 = (i - mid) + (j - mid);
+    x.fillStyle = v === 2 ? centre : (d2 <= -pd * .9 ? col.l : ((!at(i + 1, j + 1) || (!at(i + 1, j) && !at(i, j + 1))) ? col.d : col.c));
+    x.fillRect(i, j, 1, 1);
+  }
+  hgSprites[key] = cv; return cv;
+}
+// the bee, facing right, in two wing positions; the other way round is made by turning it
+var HG_BEE = [
+  ["...oo..oo...", "..owwoowwo..", "..owwoowwo..", "...oooooo...", ".obbkbbkbbo.", "obbbkbbkbbbo", "obbbkbbkbbeo", ".obbkbbkbbo.", "..oooooooo.."],
+  ["............", "...owwwwo...", "..owwwwwwo..", "...oooooo...", ".obbkbbkbbo.", "obbbkbbkbbbo", "obbbkbbkbbeo", ".obbkbbkbbo.", "..oooooooo.."]
+];
+function hgBeeSprite(ci, frame, face){
+  var key = "b" + ci + "_" + frame + "_" + face; if(hgSprites[key]) return hgSprites[key];
+  var rows = HG_BEE[frame], w = rows[0].length, h = rows.length, cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  var x = cv.getContext("2d"), col = HG_COLORS[ci], pal = {o: "#1B1F3B", w: "#FFFFFF", b: col.c, k: "#2A1A2A", e: "#1B1F3B"}, i, j;
+  for(j = 0; j < h; j++) for(i = 0; i < w; i++){
+    var ch = rows[j].charAt(i); if(ch === ".") continue;
+    x.fillStyle = pal[ch]; x.fillRect(face > 0 ? i : w - 1 - i, j, 1, 1);
+  }
+  hgSprites[key] = cv; return cv;
+}
+
+// ---- the bees ----
+function hgLive(){ return hg.bees.filter(function(b){ return b.state === "free" || b.state === "hover" || b.state === "follow" || b.state === "gone"; }).length; }
+function hgInPlay(b){ return (b.state === "free" || b.state === "hover" || b.state === "follow") && b.x >= 0 && b.x <= hg.W && b.y >= 0 && b.y <= hg.H; }
+function hgNear(x, y, d, except){ return hg.bees.some(function(b){ return b !== except && (b.state === "free" || b.state === "hover" || b.state === "follow") && Math.abs(b.x - x) < d && Math.abs(b.y - y) < d; }); }
+// a bee comes in from a random edge, flying towards a random spot in the garden
+function hgSpawn(b){
+  var cfg = HG_ROUNDS[state.session.hopeGarden.round], W = hg.W, H = hg.H, tries = 0, x, y, e;
+  do {
+    e = Math.random() * (2 * W + 2 * H);
+    if(e < W){ x = hgRand(10, W - 10); y = -7; } else if(e < W + H){ x = W + 7; y = hgRand(10, H - 10); } else if(e < 2 * W + H){ x = hgRand(10, W - 10); y = H + 7; } else { x = -7; y = hgRand(10, H - 10); }
+    tries++;
+  } while(tries < 14 && hgNear(x, y, 28, b));
+  var g = hg.garden, tx = hgRand(g.x + 8, g.x + g.w - 8), ty = hgRand(g.y + 8, g.y + g.h - 8), dx = tx - x, dy = ty - y, d = Math.sqrt(dx * dx + dy * dy) || 1, sp = cfg.speed * hgRand(.9, 1.15);
+  b.x = x; b.y = y; b.vx = dx / d * sp; b.vy = dy / d * sp; b.state = "free"; b.path = null; b.face = b.vx >= 0 ? 1 : -1;
+}
+function hgFree(b){            // a bee that did not reach its flower flies off in a random direction
+  var cfg = HG_ROUNDS[state.session.hopeGarden.round], a = Math.random() * Math.PI * 2, sp = cfg.speed * hgRand(.9, 1.15);
+  b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.state = "free"; b.path = null; if(Math.abs(b.vx) > .5) b.face = b.vx >= 0 ? 1 : -1;
+}
+function hgArrive(b){
+  var home = null;
+  hg.flowers.forEach(function(f){ if(f.ci === b.ci && Math.sqrt((f.x - b.x) * (f.x - b.x) + (f.y - b.y) * (f.y - b.y)) <= f.r && !home) home = f; });
+  if(!home){ hgFree(b); return; }
+  b.state = "done"; hg.delivered++; home.pulse = .6;
+  hgBurst(home.x, home.y, HG_COLORS[b.ci]);
+  pixSfxPlay("clCatch", false);
+  var cn = document.getElementById("hgCount"); if(cn) cn.textContent = t("hg_home")(hg.delivered, hg.total);
+}
+function hgBurst(x, y, col){
+  var k, cols = [col.c, col.l, "#FFFFFF", "#FFE45E"];
+  for(k = 0; k < 16; k++){ var a = Math.random() * 6.2832, sp = hgRand(14, 44); hg.particles.push({x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 8, t: 0, life: hgRand(.45, .9), c: cols[k % cols.length]}); }
+}
+
+function hgStep(s, dt){
+  var cfg = HG_ROUNDS[s.round], W = hg.W, H = hg.H;
+  hg.t += dt;
+  if(hg.mode === "crash"){ hg.crash.t += dt; hg.flash = Math.max(0, hg.flash - dt * 1.5); hgParticles(dt); return; }
+  if(hg.mode === "done"){ hgParticles(dt); return; }
+  // bees come in, one every cfg.gap seconds while there are not too many in the air
+  hg.nextSpawn -= dt;
+  if(hg.nextSpawn <= 0){
+    var q = hg.bees.filter(function(b){ return b.state === "queued"; })[0];
+    if(q && hgLive() < cfg.live){ hgSpawn(q); hg.nextSpawn = cfg.gap; } else if(!q) hg.nextSpawn = 1; else hg.nextSpawn = .4;
+  }
+  hg.bees.forEach(function(b){
+    b.ph += dt * 22;
+    if(b.state === "free"){
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      if(b.x < -12 || b.x > W + 12 || b.y < -12 || b.y > H + 12){ b.state = "gone"; b.wait = hgRand(.9, 1.8); }       // it has flown off the screen: it comes back from another edge
+    } else if(b.state === "gone"){
+      b.wait -= dt; if(b.wait <= 0) hgSpawn(b);
+    } else if(b.state === "follow"){
+      var remain = HG_FOLLOW * dt;
+      while(remain > 0 && b.path && b.seg < b.path.length){
+        var tp = b.path[b.seg], dx = tp.x - b.x, dy = tp.y - b.y, d = Math.sqrt(dx * dx + dy * dy);
+        if(Math.abs(dx) > .15) b.face = dx >= 0 ? 1 : -1;
+        if(d <= remain){ b.x = tp.x; b.y = tp.y; remain -= d; b.seg++; }
+        else { b.x += dx / d * remain; b.y += dy / d * remain; remain = 0; }
+      }
+      if(b.path && b.seg >= b.path.length) hgArrive(b);
+    }
+  });
+  // two bees touching: the round is lost
+  var i, j, bs = hg.bees;
+  for(i = 0; i < bs.length && hg.mode === "play"; i++) for(j = i + 1; j < bs.length; j++){
+    if(!hgInPlay(bs[i]) || !hgInPlay(bs[j])) continue;
+    var cx = bs[i].x - bs[j].x, cy = bs[i].y - bs[j].y;
+    if(cx * cx + cy * cy < HG_COLL * HG_COLL){ hgCrash(s, bs[i], bs[j]); break; }
+  }
+  hg.flowers.forEach(function(f){ if(f.pulse > 0) f.pulse = Math.max(0, f.pulse - dt); });
+  hgParticles(dt);
+  if(hg.mode === "play" && hg.delivered >= hg.total){
+    hg.mode = "done"; hg.drag = null;
+    setTimeout(function(){
+      if(state.screen !== "hopeGarden" || state.session.hopeGarden !== s || s.interlude) return;
+      s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= HG_ROUNDS.length - 1};
+      saveState(); render();
+    }, 900);
+  }
+}
+function hgParticles(dt){
+  hg.particles.forEach(function(p){ p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 40 * dt; });
+  hg.particles = hg.particles.filter(function(p){ return p.t < p.life; });
+}
+function hgCrash(s, a, b){
+  hg.mode = "crash"; hg.crash = {a: a, b: b, t: 0, x: (a.x + b.x) / 2, y: (a.y + b.y) / 2}; hg.flash = .55; hg.drag = null;
+  if(a.state === "hover") a.state = "free";
+  if(b.state === "hover") b.state = "free";
+  hgBurst(hg.crash.x, hg.crash.y, {c: "#FF5A5A", l: "#FFB0A0"});
+  pixSfxPlay("jlFall", true);
+  var st = document.getElementById("hgStage");
+  if(st){ var el = document.createElement("div"); el.className = "hgOhNo"; el.textContent = t("hg_bump"); st.appendChild(el); }
+  setTimeout(function(){
+    if(state.screen !== "hopeGarden" || state.session.hopeGarden !== s || s.status !== "playing") return;
+    s.status = "failed"; saveState(); render();
+  }, HG_CRASH_MS);
+}
+
+// ---- drawing ----
+function hgDraw(){
+  var cv = document.getElementById("hgCanvas"), s = state.session.hopeGarden;
+  if(!cv || !hg || !hg.ready || !s) return;
+  var x = cv.getContext("2d"), W = hg.W, H = hg.H;
+  x.drawImage(hg.bg, 0, 0);
+  // flowers, row by row
+  hg.flowers.forEach(function(f){
+    var bob = f.pulse > 0 ? -Math.round(Math.sin(f.pulse / .6 * Math.PI) * 3) : 0, sw = Math.floor(f.stemW / 2);
+    x.fillStyle = "#1B1F3B"; x.fillRect(f.x - sw - 1, f.stemTop + bob, f.stemW + 2, f.stemBot - f.stemTop - bob);
+    x.fillStyle = "#2E9B3A"; x.fillRect(f.x - sw, f.stemTop + bob, f.stemW, f.stemBot - f.stemTop - bob);
+    x.fillStyle = "#58D05C"; x.fillRect(f.x - sw, f.stemTop + bob, 1, f.stemBot - f.stemTop - bob);
+    var ly = Math.round((f.stemTop + f.stemBot) / 2), lw = Math.max(3, Math.round(f.D / 4)), dir = f.row % 2 ? -1 : 1, lx = dir > 0 ? f.x + Math.ceil(f.stemW / 2) : f.x - sw - lw;
+    x.fillStyle = "#1B1F3B"; x.fillRect(lx - 1, ly - 1, lw + 2, 4); x.fillStyle = "#46C24E"; x.fillRect(lx, ly, lw, 2); x.fillStyle = "#2E9B3A"; x.fillRect(lx, ly + 1, lw, 1);
+    x.drawImage(hgHeadSprite(f.ci, f.D), Math.round(f.x - f.D / 2), Math.round(f.y - f.D / 2) + bob);
+  });
+  // the line being drawn
+  if(hg.drag){
+    var col = HG_COLORS[hg.drag.bee.ci], pts = hg.drag.pts, carry = 0, k;
+    for(k = 1; k < pts.length; k++){
+      var ax = pts[k - 1].x, ay = pts[k - 1].y, bx = pts[k].x, by = pts[k].y, d = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)), pos = carry;
+      while(pos <= d){
+        var px = Math.round(ax + (bx - ax) * pos / (d || 1)), py = Math.round(ay + (by - ay) * pos / (d || 1));
+        x.fillStyle = "#1B1F3B"; x.fillRect(px - 2, py - 2, 4, 4); x.fillStyle = col.c; x.fillRect(px - 1, py - 1, 2, 2); x.fillStyle = col.l; x.fillRect(px - 1, py - 1, 1, 1);
+        pos += 6;
+      }
+      carry = pos - d;
+    }
+    var last = pts[pts.length - 1]; x.fillStyle = "#FFFFFF"; x.fillRect(Math.round(last.x) - 1, Math.round(last.y) - 1, 3, 3); x.fillStyle = col.c; x.fillRect(Math.round(last.x), Math.round(last.y), 1, 1);
+  }
+  // the bees, over everything
+  var bees = hg.bees.filter(function(b){ return b.state === "free" || b.state === "hover" || b.state === "follow"; }).sort(function(a, b){ return a.y - b.y; });
+  bees.forEach(function(b){
+    var fr = Math.floor(b.ph) % 2, sp = hgBeeSprite(b.ci, fr, b.face), hov = b.state === "hover" ? Math.round(Math.sin(hg.t * 12)) : 0;
+    x.fillStyle = "rgba(40,24,8,.28)"; x.fillRect(Math.round(b.x) - 4, Math.round(b.y) + 7, 8, 1);
+    x.drawImage(sp, Math.round(b.x - sp.width / 2), Math.round(b.y - sp.height / 2) + hov);
+    if(b.state === "hover"){            // four white corners show which bee is being guided
+      var bx2 = Math.round(b.x), by2 = Math.round(b.y); x.fillStyle = "#FFFFFF";
+      x.fillRect(bx2 - 9, by2 - 8, 3, 1); x.fillRect(bx2 - 9, by2 - 8, 1, 3); x.fillRect(bx2 + 7, by2 - 8, 3, 1); x.fillRect(bx2 + 9, by2 - 8, 1, 3);
+      x.fillRect(bx2 - 9, by2 + 8, 3, 1); x.fillRect(bx2 - 9, by2 + 6, 1, 3); x.fillRect(bx2 + 7, by2 + 8, 3, 1); x.fillRect(bx2 + 9, by2 + 6, 1, 3);
+    }
+  });
+  hg.particles.forEach(function(p){ x.fillStyle = p.c; x.fillRect(Math.round(p.x), Math.round(p.y), 2, 2); });
+  if(hg.flash > 0){ x.fillStyle = "rgba(255,60,60," + Math.min(.45, hg.flash).toFixed(2) + ")"; x.fillRect(0, 0, W, H); }
+}
+function hgLoop(now){
+  var s = state.session.hopeGarden;
+  if(state.screen !== "hopeGarden" || !s || !hg){ hgRaf = 0; return; }
+  var dt = Math.min(.05, (now - hg.last_t) / 1000); hg.last_t = now;
+  if(s.status === "playing" && !s.interlude && hg.ready && !hgWaiting) hgStep(s, dt);
+  hgDraw();
+  hgRaf = requestAnimationFrame(hgLoop);
+}
+function hgLoopStart(){ if(hgRaf) return; if(hg) hg.last_t = performance.now(); hgRaf = requestAnimationFrame(hgLoop); }
+// the picture is measured from the room the stage has: whole picture pixels, each 3 x 3 screen pixels
+function hgFit(){
+  var cv = document.getElementById("hgCanvas"), st = document.getElementById("hgStage"), s = state.session.hopeGarden;
+  if(!cv || !st || !hg || !s) return;
+  var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  st.style.height = Math.max(240, Math.floor(vh - st.getBoundingClientRect().top - 32)) + "px";          // the garden takes all the room under the heading
+  var W = Math.max(60, Math.floor(st.clientWidth / HG_SCALE)), H = Math.max(80, Math.floor(st.clientHeight / HG_SCALE));
+  cv.width = W; cv.height = H; cv.style.width = (W * HG_SCALE) + "px"; cv.style.height = (H * HG_SCALE) + "px";
+  if(hg.W !== W || hg.H !== H || !hg.ready){ hg.W = W; hg.H = H; hg.drag = null; hgLayout(); }
+}
+window.addEventListener("resize", function(){ if(state.screen === "hopeGarden"){ hgFit(); hgDraw(); } });
+
+// ---- the finger ----
+function hgPt(ev){
+  var cv = document.getElementById("hgCanvas"), r = cv.getBoundingClientRect();
+  return {x: Math.max(0, Math.min(hg.W, (ev.clientX - r.left) * hg.W / r.width)), y: Math.max(0, Math.min(hg.H, (ev.clientY - r.top) * hg.H / r.height))};
+}
+function hgDown(ev){
+  var s = state.session.hopeGarden;
+  if(!hg || !s || !hg.ready || s.status !== "playing" || s.interlude || hgWaiting || hg.mode !== "play" || hg.drag) return;
+  ev.preventDefault();
+  var p = hgPt(ev), best = null, bd = HG_TAP;
+  hg.bees.forEach(function(b){ if(b.state !== "free") return; var d = Math.sqrt((b.x - p.x) * (b.x - p.x) + (b.y - p.y) * (b.y - p.y)); if(d < bd){ bd = d; best = b; } });
+  if(!best) return;
+  if(pixAudioStale) pixReviveOnTap();
+  try { document.getElementById("hgCanvas").setPointerCapture(ev.pointerId); } catch(e){}
+  best.state = "hover";                                           // it waits where it is while its line is drawn
+  hg.drag = {bee: best, id: ev.pointerId, pts: [{x: best.x, y: best.y}], len: 0};
+  pixSfxPlay("fmFirst", true);
+}
+function hgMove(ev){
+  var d0 = hg && hg.drag; if(!d0 || ev.pointerId !== d0.id) return;
+  var p = hgPt(ev), last = d0.pts[d0.pts.length - 1], dx = p.x - last.x, dy = p.y - last.y, d = Math.sqrt(dx * dx + dy * dy), max = hgMax();
+  if(d < 2.5 || d0.len >= max) return;
+  if(d0.len + d > max){ var k = (max - d0.len) / d; p = {x: last.x + dx * k, y: last.y + dy * k}; d = max - d0.len; }       // the line only reaches so far
+  d0.pts.push(p); d0.len += d;
+}
+function hgUp(ev){
+  var d0 = hg && hg.drag; if(!d0 || (ev && ev.pointerId !== undefined && ev.pointerId !== d0.id)) return;
+  hg.drag = null;
+  var b = d0.bee; if(b.state !== "hover") return;
+  if(d0.len < 5){ b.state = "free"; return; }                      // only a tap: the bee flies on as it was
+  b.state = "follow"; b.path = d0.pts; b.seg = 1;
+}
+window.addEventListener("pointerup", hgUp, true);
+window.addEventListener("pointercancel", hgUp, true);
+// the first tap of a round starts it (the same layer as in Jacob's Ladder)
+function hgGo(ev){
+  var s = state.session.hopeGarden;
+  if(!hgWaiting || !s || s.status !== "playing" || s.interlude) return;
+  if(ev && ev.type === "click" && !hgTouched) return;
+  if(ev && (ev.type === "pointerdown" || ev.type === "touchstart")) hgTouched = true;
+  hgWaiting = false;
+  try { if(pixAudioStale) pixReviveOnTap(); } catch(e){}
+  var rd = document.getElementById("hgReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd);
+  var all = document.querySelector(".hgTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all);
+  if(hg) hg.last_t = performance.now();
+}
+document.addEventListener("pointerdown", function(e){
+  if(state.screen !== "hopeGarden" || !hgWaiting) return;
+  if(e.target && e.target.closest && e.target.closest(".exitBar, .exitBtn")) return;
+  hgGo(e);
+}, true);
+
+// ---- screens ----
+function hgOpen(){ state.session.hopeGarden = null; hg = null; go("hopeGardenIntro"); }
+function hgStart(){ initHopeGarden(); go("hopeGarden"); }
+function hgTryAgain(){ initHopeGarden(); render(); }                                                   // PLAY AGAIN after winning: from round 1
+function hgRetry(){ var s = state.session.hopeGarden; if(!s) return; s.status = "playing"; s.interlude = null; hgBegin(s); saveState(); render(); }      // TRY AGAIN after a crash: the same round
+
+function hgQuit(){ state.session.hopeGarden = null; hg = null; go("mainMenu"); }
+function hgInterlude(){
+  pixRoundRun("hopeGarden", function(){ return state.session.hopeGarden; }, null, function(s2){
+    if(s2.interlude.final){ s2.interlude = null; s2.status = "won"; saveState(); render(); return; }
+    s2.round++; s2.interlude = null; hgBegin(s2);
+    saveState(); render();
+  });
+}
+function screenHopeGardenIntro(){
+  var g = t("hg_guide"), steps = g.h.map(function(line){ return '<li>' + line + '</li>'; }).join("");
+  return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("hopeGardenName") + '</h2>' +
+    '<div class="pixPaper pixGuide"><p class="pixGuideDesc">' + g.d + '</p><ul>' + steps + '</ul></div></div>' +
+    pixBtnHtml(t("hg_play"), "hgStart()"), "pixLower");
+}
+function screenHopeGarden(){
+  var s = state.session.hopeGarden;
+  if(!s || s.v !== 1){ initHopeGarden(); s = state.session.hopeGarden; }
+  if(s.status === "failed"){
+    return pixResultHtml("hopeGardenName", {cls:"pixLower", title:t("hg_failTitle"), body:t("hg_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "hgRetry()") + pixBtnHtml(t("mainMenu"), "hgQuit()", true)});
+  }
+  if(s.status === "won"){
+    return pixResultHtml("hopeGardenName", {cls:"pixLower", title:t("hg_winTitle"), body:t("hg_winBody"),
+      buttons:pixBtnHtml(t("playAgain"), "hgTryAgain()") + pixBtnHtml(t("mainMenu"), "hgQuit()", true)});
+  }
+  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("hopeGardenName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
+  if(!hg || hgBound !== s || hgBoundRound !== s.round) hgBegin(s);          // a round that was saved in the middle starts again
+  if(hgWaiting) hgTouched = false;
+  return pixShell((hgWaiting ? '<div class="jlTapAll hgTapAll" onpointerdown="hgGo(event)" ontouchstart="hgGo(event)" onclick="hgGo(event)"></div>' : '') + '<h2 class="pixMTitle">' + t("hopeGardenName") + '</h2>' +
+    '<div class="pixNote">' + t("hg_intro") + '</div>' +
+    '<div class="pixChances"><span class="pixNote">' + t("fm_level")(s.round + 1, HG_ROUNDS.length) + '</span><span class="pixNote" id="hgCount">' + t("hg_home")(hg.delivered, hg.total) + '</span></div>' +
+    '<div class="hgArea"><div class="hgStage" id="hgStage"><canvas class="hgCanvas" id="hgCanvas" width="100" height="100" onpointerdown="hgDown(event)" onpointermove="hgMove(event)" oncontextmenu="return false"></canvas>' +
+      (hgWaiting ? '<div class="dpReady" id="hgReady">' + t("dp_ready") + '</div>' : '') + '</div></div>' +
+    '<div class="spacer"></div>', "pixLower msScreen");
+}
+
+// the Main Menu icon: beside the church, in line with the left-most icon of the row above (2026-10-26, per Dan)
+function hgPlaceMenuIcon(){
+  var wrap = document.getElementById("hgMenuIcon"), first = document.querySelector(".homeGrid .appIcon"), glow = document.querySelector(".churchGlow"), scr = document.querySelector(".pixMenu");
+  if(!wrap || !first || !glow || !scr) return;
+  var sr = scr.getBoundingClientRect(), fr = first.getBoundingClientRect(), gr = glow.getBoundingClientRect(), tile = wrap.querySelector(".appTile");
+  wrap.style.width = fr.width + "px"; wrap.style.left = (fr.left - sr.left) + "px";
+  var wr = wrap.getBoundingClientRect(), tr = tile ? tile.getBoundingClientRect() : wr;
+  wrap.style.top = Math.round(gr.top - 4 - sr.top - (tr.top - wr.top) - tr.height / 2) + "px";           // the middle of the icon is level with the church's tower
+  wrap.style.visibility = "visible";
+}
+window.addEventListener("resize", function(){ if(state.screen === "mainMenu") hgPlaceMenuIcon(); });
+
 /* ---------- Stained-Glass Puzzle ---------- */
 
 // Replaced Service Sprint (2026-10-19, per Dan), then turned from a sliding
@@ -8118,7 +8545,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AA";
+var APP_BUILD = "2026-10-26 AD";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -8204,8 +8631,8 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["missionIntro","faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder"];
-var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder","hopeGardenIntro","hopeGarden"];
+var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved","won"];
 
 function exitBarHtml(){
   if(EXIT_SCREENS.indexOf(state.screen) === -1) return "";
@@ -8238,6 +8665,7 @@ function exitMission(){
     case "dovePeace": dpQuit(); break;
     case "fruitsSpirit": fsQuit(); break;
     case "jacobLadder": jlQuit(); break;
+    case "hopeGardenIntro": case "hopeGarden": hgQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -8274,6 +8702,8 @@ function render(){
     case "dovePeace": html = screenDovePeace(); break;
     case "fruitsSpirit": html = screenFruitsSpirit(); break;
     case "jacobLadder": html = screenJacobLadder(); break;
+    case "hopeGardenIntro": html = screenHopeGardenIntro(); break;
+    case "hopeGarden": html = screenHopeGarden(); break;
     case "churchWalk": html = screenChurchWalk(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
@@ -8373,6 +8803,9 @@ function render(){
   if(state.screen === "jacobLadder"){ jlFit(); jlDraw(); jlLoopStart(); }
   if(state.screen === "fruitsSpirit" && state.session.fruitsSpirit && state.session.fruitsSpirit.interlude && !pixRoundRunning.fruitsSpirit) fsInterlude();
   if(state.screen === "fruitsSpirit" && state.session.fruitsSpirit && !state.session.fruitsSpirit.interlude) fsBind();
+  if(state.screen === "hopeGarden" && state.session.hopeGarden && state.session.hopeGarden.interlude && !pixRoundRunning.hopeGarden) hgInterlude();
+  if(state.screen === "hopeGarden"){ hgFit(); hgDraw(); hgLoopStart(); }
+  if(state.screen === "mainMenu") hgPlaceMenuIcon();
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
