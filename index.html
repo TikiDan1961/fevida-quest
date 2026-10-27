@@ -2341,9 +2341,10 @@ function openFolder(icon){
 }
 function closeFolder(){ state.folderOpen = false; saveState(); render(); }
 
+var MENU_ICON_MISSION = "chooseJoy";      // the mission whose icon is in the sky on the Main Menu, right of the church (2026-10-27, per Dan), not in the Missions window
 function folderHtml(){
   if(!state.folderOpen) return "";
-  var items = MISSIONS.map(function(m){
+  var items = MISSIONS.filter(function(m){ return m.id !== MENU_ICON_MISSION; }).map(function(m){
     var done = state.missions[m.id].done;
     return appIconHtml({onclick:"openMission('" + m.id + "')", bg:ICON_BG[m.id], cls:done ? "done" : "", inner:iconSpr(m.id),
       label:t(m.nameKey), badge:done ? '<span class="doneBadge">&#10003;</span>' : ""});
@@ -2756,12 +2757,13 @@ function goBackToWelcome(){ go("welcome"); }
 
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
-  var doneCount = MISSIONS.filter(function(m){ return state.missions[m.id].done; }).length;
+  var inFolder = MISSIONS.filter(function(m){ return m.id !== MENU_ICON_MISSION; });
+  var doneCount = inFolder.filter(function(m){ return state.missions[m.id].done; }).length;
   var unlocked = goldenTicketUnlocked();
   var mini = ["faithFlash", "faithMatch", "dovePeace", "stainedGlass"].map(function(id){ return iconSpr(id); }).join("");
   var icons =
     appIconHtml({onclick:"openFolder(this)", bg:"rgba(255,255,255,.42)", cls:"folderIcon", inner:'<div class="miniGrid">' + mini + '</div>',
-      label:t("missionsFolder"), badge:'<span class="countBadge">' + doneCount + '/' + MISSIONS.length + '</span>'}) +
+      label:t("missionsFolder"), badge:'<span class="countBadge">' + doneCount + '/' + inFolder.length + '</span>'}) +
     appIconHtml({onclick:"openFromIcon(this,'passport')", bg:ICON_BG.passport, inner:iconSpr("passport"), label:t("passport")}) +
     appIconHtml({onclick:unlocked ? "openFromIcon(this,'goldenTicket')" : "ticketLocked()", bg:unlocked ? ICON_BG.goldenTicket : ICON_BG.lock,
       cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")}) +
@@ -2778,6 +2780,8 @@ function screenMainMenu(){
     pilgrimSceneHtml() +
     '<div class="pixDoveLayer"><div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div></div>' +
     '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeGardenName")}) + '</div>' +
+    '<div class="hgMenuIcon" id="cjMenuIcon">' + appIconHtml({onclick:"openMission('" + MENU_ICON_MISSION + "')", bg:ICON_BG[MENU_ICON_MISSION], cls:state.missions[MENU_ICON_MISSION].done ? "done" : "", inner:iconSpr(MENU_ICON_MISSION),
+      label:t(missionById(MENU_ICON_MISSION).nameKey), badge:state.missions[MENU_ICON_MISSION].done ? '<span class="doneBadge">&#10003;</span>' : ""}) + '</div>' +
     folderHtml() +
   '</div>';
 }
@@ -8557,14 +8561,18 @@ function screenHopeGarden(){
     '<div class="spacer"></div>', "pixLower msScreen hgScreen");
 }
 
-// the Main Menu icon: in line with the right-most icon of the row above (Options), on the right side of the church, and just under it (2026-10-27, per Dan; it was under the left-most one, 2026-10-26, and level with the church before that)
+// The two icons in the sky under the row of four, each just under its icon and its name: Hope Garden under the left-most (Missions), on the left of the church steeple, and Choose Joy under the right-most (Options),
+// on the right of it (2026-10-27, per Dan; Hope Garden was level with the church, then under Missions 2026-10-26, then under Options for a day).
 function hgPlaceMenuIcon(){
-  var row = document.querySelectorAll(".homeGrid .appIcon"), wrap = document.getElementById("hgMenuIcon"), first = row[row.length - 1], glow = document.querySelector(".churchGlow"), scr = document.querySelector(".pixMenu");
-  if(!wrap || !first || !glow || !scr) return;
-  var sr = scr.getBoundingClientRect(), fr = first.getBoundingClientRect(), gr = glow.getBoundingClientRect(), tile = wrap.querySelector(".appTile");
-  wrap.style.width = fr.width + "px"; wrap.style.left = (fr.left - sr.left) + "px";
-  wrap.style.top = Math.round(fr.bottom - sr.top + 6) + "px";           // just under the Missions icon and its name (2026-10-26, per Dan: much closer to the row above)
-  wrap.style.visibility = "visible";
+  var row = document.querySelectorAll(".homeGrid .appIcon"), scr = document.querySelector(".pixMenu"); if(!row.length || !scr) return;
+  var sr = scr.getBoundingClientRect();
+  [["hgMenuIcon", row[0]], ["cjMenuIcon", row[row.length - 1]]].forEach(function(p){
+    var wrap = document.getElementById(p[0]); if(!wrap) return;
+    var fr = p[1].getBoundingClientRect();
+    wrap.style.width = fr.width + "px"; wrap.style.left = (fr.left - sr.left) + "px";
+    wrap.style.top = Math.round(fr.bottom - sr.top + 6) + "px";           // just under the icon above and its name (2026-10-26, per Dan: much closer to the row above)
+    wrap.style.visibility = "visible";
+  });
 }
 window.addEventListener("resize", function(){ if(state.screen === "mainMenu") hgPlaceMenuIcon(); });
 
@@ -9565,7 +9573,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 AR";
+var APP_BUILD = "2026-10-27 AS";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
