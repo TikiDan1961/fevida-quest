@@ -304,7 +304,9 @@
   @keyframes glowPulseLit{from{opacity:.45;}to{opacity:.85;}}
   .pixSpark{position:absolute;left:46.8%;top:.21%;width:5.6%;image-rendering:pixelated;animation:sparkBlink 2.6s steps(1) infinite;}
   @keyframes sparkBlink{0%{opacity:0;}55%{opacity:1;}65%{opacity:.35;}75%{opacity:1;}85%{opacity:0;}100%{opacity:0;}}
-  .pixDove{position:absolute;left:-14%;top:5%;width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-delay:-3s;}
+  /* The dove flies across the whole screen, in front of the icons in the sky (2026-10-27, per Dan), and never takes a tap: the layer lets every touch through to the icons below it. */
+  .pixHome.pixSky > .pixDoveLayer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none;z-index:8;}
+  .pixDove{position:absolute;left:-14%;top:185px;width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-delay:-3s;pointer-events:none;}
   @keyframes doveFly{0%{left:-14%;}55%{left:112%;}100%{left:112%;}}
   .pixDoveBob{width:100%;height:100%;animation:doveBob 3.2s ease-in-out infinite alternate;}
   @keyframes doveBob{from{transform:translateY(-35%);}to{transform:translateY(35%);}}
@@ -2482,7 +2484,6 @@ function pilgrimSceneHtml(extra){
     '<img class="pixSceneArt" src="tiles/scene_world3.png" alt="">' +
     '<div class="churchGlow' + (lit ? ' lit' : '') + '"></div>' +
     '<img class="pixSpark" src="tiles/spark.png" alt="">' +
-    '<div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div>' +
     PETS.map(petHtml).join("") +
     '<img class="pixFenceFront" src="tiles/fence_front3.png" alt="">' +
     '<div class="pilgrim" id="pilgrim" role="button" aria-label="Pilgrim" onclick="pilgrimTap()"><div class="pilgrimFlip"><div class="pilgrimSprite"></div></div></div>' +
@@ -2775,6 +2776,7 @@ function screenMainMenu(){
     '</div>' +
     '<div class="homeGrid">' + icons + '</div>' +
     pilgrimSceneHtml() +
+    '<div class="pixDoveLayer"><div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div></div>' +
     '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeGardenName")}) + '</div>' +
     folderHtml() +
   '</div>';
@@ -8555,9 +8557,9 @@ function screenHopeGarden(){
     '<div class="spacer"></div>', "pixLower msScreen hgScreen");
 }
 
-// the Main Menu icon: in line with the left-most icon of the row above, and just under it (it was level with the church, 2026-10-26, per Dan)
+// the Main Menu icon: in line with the right-most icon of the row above (Options), on the right side of the church, and just under it (2026-10-27, per Dan; it was under the left-most one, 2026-10-26, and level with the church before that)
 function hgPlaceMenuIcon(){
-  var wrap = document.getElementById("hgMenuIcon"), first = document.querySelector(".homeGrid .appIcon"), glow = document.querySelector(".churchGlow"), scr = document.querySelector(".pixMenu");
+  var row = document.querySelectorAll(".homeGrid .appIcon"), wrap = document.getElementById("hgMenuIcon"), first = row[row.length - 1], glow = document.querySelector(".churchGlow"), scr = document.querySelector(".pixMenu");
   if(!wrap || !first || !glow || !scr) return;
   var sr = scr.getBoundingClientRect(), fr = first.getBoundingClientRect(), gr = glow.getBoundingClientRect(), tile = wrap.querySelector(".appTile");
   wrap.style.width = fr.width + "px"; wrap.style.left = (fr.left - sr.left) + "px";
@@ -8620,7 +8622,7 @@ var HGL_IN = [0, 2, 4, 6];            // the colours that come: red and yellow b
 // after one has gone (landed, or flown off) the next of its colour waits a while: HGL_DELAYS[round] seconds, shorter with each round. One that flies off without landing has to come again.
 var HGL_ROUNDS = [{need: {0: 4, 2: 4, 4: 2, 6: 2}}];
 var HGL_DELAYS = [2.5, 2, 1.5];
-var HGL_BF_SPEED = 17, HGL_WARN_S = 1.4;     // butterflies fly a little slower than bees; a signal shows this long before the bee or butterfly comes in
+var HGL_BF_SPEED = HGL_SPEED / 2, HGL_WARN_S = 1.4;     // butterflies fly half the speed of bees (2026-10-27, per Dan); a signal shows this long before the bee or butterfly comes in
 function hglIsBee(ci){ return ci === 0 || ci === 2; }
 // Where and which way a bee or butterfly will come in is chosen first, and a small circle of its colour with an arrow in it shows that spot, the arrow pointing the way it will fly.
 function hglPlan(ci){
@@ -9535,7 +9537,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 AL";
+var APP_BUILD = "2026-10-27 AN";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
