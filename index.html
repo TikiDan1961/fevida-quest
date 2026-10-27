@@ -7869,8 +7869,7 @@ function hgDrawGround(){
   x.fillStyle = "#9B6B3A"; x.fillRect(g.x - 1, g.y - 1, g.w + 2, g.h + 2);                  // the dirt paths: the whole garden, the patches sit on it
   x.fillStyle = "#C99B64"; x.fillRect(g.x, g.y, g.w, g.h);
   for(j = g.y; j < g.y + g.h; j++) for(i = g.x; i < g.x + g.w; i++){ var h2 = hgHash(i, j, 2); if(h2 < .09){ x.fillStyle = "#B78650"; x.fillRect(i, j, 1, 1); } else if(h2 > .94){ x.fillStyle = "#DDB27C"; x.fillRect(i, j, 1, 1); } }
-  var bw = Math.max(4, g.pathX - 1), bh = Math.max(4, g.pathY - 1), cx, cy;
-  for(cy = 1; cy < g.n; cy++) for(cx = 1; cx < g.n; cx++) hgHedge(x, Math.round(g.x + cx * g.cw - bw / 2), Math.round(g.y + cy * g.ch - bh / 2), bw, bh, 12);       // a little bush where two paths cross
+  // (the little bushes where two paths cross were taken out, 2026-10-26, per Dan: they looked like mistakes in the dirt)
   hg.patches.forEach(function(p){
     x.fillStyle = "rgba(60,36,16,.35)"; x.fillRect(p.x + 1, p.y + p.h + p.front, p.w, 2);   // its shadow on the path
     x.fillStyle = "#7A4F2A"; x.fillRect(p.x, p.y + p.h, p.w, p.front);                      // the dirt side you can see from above
@@ -8054,7 +8053,7 @@ function hgDraw(){
     x.fillStyle = "#58D05C"; x.fillRect(f.x - sw, f.stemTop + bob, 1, f.stemBot - f.stemTop - bob);
     var ly = Math.round((f.stemTop + f.stemBot) / 2) - 1, lw = Math.max(3, Math.round(f.D / 4)), dir = f.row % 2 ? -1 : 1;
     function leaf(d, yy){ var lx = d > 0 ? f.x + Math.ceil(f.stemW / 2) : f.x - sw - lw; x.fillStyle = "#1B1F3B"; x.fillRect(lx - 1, yy - 1, lw + 2, 4); x.fillStyle = "#46C24E"; x.fillRect(lx, yy, lw, 2); x.fillStyle = "#2E9B3A"; x.fillRect(lx, yy + 1, lw, 1); }
-    leaf(dir, ly); leaf(-dir, ly + 2);                  // a second branch on the other side of the stem, a little lower (2026-10-26, per Dan)
+    leaf(dir, ly); leaf(-dir, ly);                      // a second branch on the other side of the stem, at the same height (2026-10-26, per Dan)
     x.drawImage(hgHeadSprite(f.ci, f.D), Math.round(f.x - f.D / 2), Math.round(f.y - f.D / 2) + bob);
   });
   // the line being drawn
@@ -8705,7 +8704,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AN";
+var APP_BUILD = "2026-10-26 AO";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
