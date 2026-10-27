@@ -214,6 +214,7 @@
     text-shadow:2px 2px 0 #1B3A22,-2px -2px 0 #1B3A22,2px -2px 0 #1B3A22,-2px 2px 0 #1B3A22,0 3px 0 #1B3A22;}
   .hgSub{display:inline-block;margin-top:3px;padding:0 10px;background:#FFF3D6;border:2px solid #1B3A22;border-radius:10px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;line-height:1.2;color:#2A7A36;white-space:nowrap;}
   .hgRibbon{position:absolute;left:50%;top:86px;transform:translateX(-50%);padding:1px 24px 0;background:linear-gradient(#FFE56B,#F2B21E);border:3px solid #7A4A0A;border-radius:6px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;line-height:1.2;letter-spacing:.08em;color:#5A2E00;text-transform:uppercase;box-shadow:0 3px 0 rgba(60,30,0,.35);white-space:nowrap;}
+  .hgHearts{position:absolute;left:50%;top:120px;transform:translateX(-50%);line-height:0;filter:drop-shadow(0 2px 0 rgba(20,40,20,.45));}
   .hgBadge{position:absolute;right:12px;top:14px;min-width:64px;text-align:center;padding:2px 8px 3px;background:#FFF8E1;border:3px solid #1B3A22;border-radius:12px;box-shadow:0 3px 0 rgba(20,40,20,.4);}
   .hgBadge span{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;line-height:1.1;letter-spacing:.06em;color:#2A7A36;text-transform:uppercase;}
   .hgBadge b{display:block;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.625rem;line-height:1;color:#1B3A22;}
@@ -1200,7 +1201,7 @@ var T = {
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
     hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hg_level:function(n,total){return "Round "+n+"/"+total;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
-    hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
+    hg_noChances:"NO CHANCES LEFT!", hg_outTitle:"Out of Chances!", hg_outBody:"Too many bees flew away. Try again!", hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
     hg_guide:{d:"Colored bees are buzzing into the garden. Guide each one to a flower that is the same color as the bee.", h:["Tap a bee, then drag your finger toward a flower of the same color. A dotted line shows the way, but it only reaches so far.",
       "Lift your finger and the bee flies along the line. If it lands on its flower, it is home!", "A bee that misses flies off in a random direction. Tap it again to guide it back.", "Keep the bees apart! If two bees bump into each other, the round is lost.", "Bring every bee home to finish all 3 rounds."]},
     fruitsSpiritName:"Fruits of the Spirit", fs_intro:"Swipe a fruit toward a neighbor to swap them and match 3 or more. Collect every fruit to light up all the words.",
@@ -1353,7 +1354,7 @@ var T = {
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
     hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
-    hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
+    hg_noChances:"¡SIN OPORTUNIDADES!", hg_outTitle:"¡Sin Oportunidades!", hg_outBody:"Se fueron volando demasiadas abejas. ¡Inténtalo de nuevo!", hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
     hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
       "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas! Si dos abejas chocan, pierdes la ronda.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
     fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
@@ -7779,9 +7780,9 @@ var HG_COLORS = [
 // Every round has the same garden (2026-10-26, per Dan): n = 4 patches along each side, so 16 flowers in the 8 colours, each colour exactly twice and the two as far apart as they can be; only the bees change. bees = how many bees must reach their flowers, live = most bees flying at once, gap = seconds between bees coming in,
 // speed = how fast a bee flies on its own (picture pixels a second), head / stem / patchH / front / pathX / pathY / stemW = sizes of the flowers (a flower head, its short stem) and the patches in picture pixels
 var HG_ROUNDS = [
-  {n: 4, bees: 4,  live: 4, gap: 2.6, speed: 12, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
-  {n: 4, bees: 8,  live: 4, gap: 2.4, speed: 13, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
-  {n: 4, bees: 12, live: 3, gap: 2.8, speed: 12, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
+  {n: 4, bees: 4,  live: 4, gap: 2.6, speed: 24, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
+  {n: 4, bees: 8,  live: 4, gap: 2.4, speed: 26, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
+  {n: 4, bees: 12, live: 3, gap: 2.8, speed: 24, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
 ];
 var HG_FOLLOW = 1.5;           // a bee flies along its line this many times as fast as it flies on its own (a little faster, 2026-10-26, per Dan; it was about 6 times as fast)
 var HG_TAP = 16;               // how close (picture pixels) a touch must be to a bee to pick it
@@ -7790,6 +7791,8 @@ var HG_MARGIN = 11;            // the room each side of the garden for the hedge
 var HG_RING = 8;               // the hedge and the fence round the garden (picture pixels)
 var HG_MAXFRAC = 1.35;         // the dotted line is this much of the picture's width at most (it was .45; three times as long, 2026-10-26, per Dan)
 var HG_CRASH_MS = 1800;
+var HG_CHANCES = 3;            // chances for the whole game (2026-10-26, per Dan): a bee that flies off the screen costs one; one is given back after rounds 1 and 2, as in the other games
+function hgChances(s){ return typeof s.chances === "number" ? s.chances : HG_CHANCES; }
 var HG_HOVER = 3;              // seconds a bee hovers by its flower once it has got there
 var hg = null, hgBound = null, hgBoundRound = -1, hgRaf = 0, hgWaiting = true, hgTouched = false, hgSprites = {};
 function hgRand(a, b){ return a + Math.random() * (b - a); }
@@ -7797,7 +7800,7 @@ function hgShuffle(a){ a = a.slice(); for(var i = a.length - 1; i > 0; i--){ var
 function hgMax(){ return Math.round(hg.W * HG_MAXFRAC); }
 
 function initHopeGarden(){
-  state.session.hopeGarden = {v: 1, round: 0, status: "playing", interlude: null};
+  state.session.hopeGarden = {v: 1, round: 0, status: "playing", interlude: null, chances: HG_CHANCES, why: ""};
   hgBegin(state.session.hopeGarden);
   saveState();
 }
@@ -7975,12 +7978,20 @@ function hgInPlay(b){ return (b.state === "free" || b.state === "hover" || b.sta
 function hgNear(x, y, d, except){ return hg.bees.some(function(b){ return b !== except && (b.state === "free" || b.state === "hover" || b.state === "follow" || b.state === "home") && Math.abs(b.x - x) < d && Math.abs(b.y - y) < d; }); }
 // a bee comes in from a random edge, flying towards a random spot in the garden
 function hgSpawn(b){
-  var cfg = HG_ROUNDS[state.session.hopeGarden.round], W = hg.W, H = hg.H, tries = 0, x, y, e;
-  do {
+  var cfg = HG_ROUNDS[state.session.hopeGarden.round], W = hg.W, H = hg.H, k, x, y, e, cands = [];
+  var mine = hg.flowers.filter(function(f){ return f.ci === b.ci; });
+  for(k = 0; k < 60; k++){                                                      // a spot just off the edge of the picture, as far as possible from the bee's own flowers
     e = Math.random() * (2 * W + 2 * H);
-    if(e < W){ x = hgRand(10, W - 10); y = -7; } else if(e < W + H){ x = W + 7; y = hgRand(10, H - 10); } else if(e < 2 * W + H){ x = hgRand(10, W - 10); y = H + 7; } else { x = -7; y = hgRand(10, H - 10); }
-    tries++;
-  } while(tries < 14 && hgNear(x, y, 28, b));
+    if(e < W){ x = e; y = -7; } else if(e < W + H){ x = W + 7; y = e - W; } else if(e < 2 * W + H){ x = e - W - H; y = H + 7; } else { x = -7; y = e - 2 * W - H; }
+    x = Math.max(-7, Math.min(W + 7, x)); y = Math.max(-7, Math.min(H + 7, y));
+    if(hgNear(x, y, 28, b)) continue;
+    var sc = 1e9; mine.forEach(function(f){ sc = Math.min(sc, Math.sqrt((f.x - x) * (f.x - x) + (f.y - y) * (f.y - y))); });
+    cands.push({x: x, y: y, sc: sc});
+  }
+  if(!cands.length) cands.push({x: -7, y: hgRand(10, H - 10), sc: 0});
+  var top = 0; cands.forEach(function(c){ if(c.sc > top) top = c.sc; });
+  var best = cands.filter(function(c){ return c.sc >= top * .96; }), pick = best[Math.floor(Math.random() * best.length)];
+  x = pick.x; y = pick.y;
   var g = hg.garden, tx = hgRand(g.x + 8, g.x + g.w - 8), ty = hgRand(g.y + 8, g.y + g.h - 8), dx = tx - x, dy = ty - y, d = Math.sqrt(dx * dx + dy * dy) || 1, sp = cfg.speed * hgRand(.9, 1.15);
   b.sp = sp; b.x = x; b.y = y; b.vx = dx / d * sp; b.vy = dy / d * sp; b.state = "free"; b.path = null; b.face = b.vx >= 0 ? 1 : -1;
 }
@@ -8007,7 +8018,7 @@ function hgStep(s, dt){
   var cfg = HG_ROUNDS[s.round], W = hg.W, H = hg.H;
   hg.t += dt;
   if(hg.mode === "crash"){ hg.crash.t += dt; hg.flash = Math.max(0, hg.flash - dt * 1.5); hgParticles(dt); return; }
-  if(hg.mode === "done"){ hgParticles(dt); return; }
+  if(hg.mode === "done" || hg.mode === "over"){ hgParticles(dt); return; }
   // bees come in, one every cfg.gap seconds while there are not too many in the air
   hg.nextSpawn -= dt;
   if(hg.nextSpawn <= 0){
@@ -8018,7 +8029,7 @@ function hgStep(s, dt){
     b.ph += dt * 22;
     if(b.state === "free"){
       b.x += b.vx * dt; b.y += b.vy * dt;
-      if(b.x < -12 || b.x > W + 12 || b.y < -12 || b.y > H + 12){ b.state = "gone"; b.wait = hgRand(.9, 1.8); }       // it has flown off the screen: it comes back from another edge
+      if(b.x < -12 || b.x > W + 12 || b.y < -12 || b.y > H + 12){ b.state = "gone"; b.wait = hgRand(.9, 1.8); hgLoseChance(s); }       // it has flown off the screen: a chance is lost, and it comes back from the far edge
     } else if(b.state === "gone"){
       b.wait -= dt; if(b.wait <= 0) hgSpawn(b);
     } else if(b.state === "home"){
@@ -8055,6 +8066,22 @@ function hgStep(s, dt){
     }, 900);
   }
 }
+function hgPaintHearts(s){ var el = document.getElementById("hgHearts"); if(el) el.innerHTML = chancesHeartsHtml(Math.max(0, hgChances(s)), HG_CHANCES); }
+function hgLoseChance(s){
+  if(hg.mode !== "play") return;
+  s.chances = hgChances(s) - 1;
+  var last = s.chances <= 0;
+  pixSfxPlay(last ? "fmLast" : "fmMiss", true);                         // the same sounds as the other games
+  hgPaintHearts(s); saveState();
+  if(!last) return;
+  hg.mode = "over"; hg.drag = null;
+  var st = document.getElementById("hgStage");
+  if(st){ var el = document.createElement("div"); el.className = "hgOhNo"; el.textContent = t("hg_noChances"); st.appendChild(el); }
+  setTimeout(function(){
+    if(state.screen !== "hopeGarden" || state.session.hopeGarden !== s || s.status !== "playing") return;
+    s.status = "failed"; s.why = "chances"; saveState(); render();
+  }, 1400);
+}
 function hgParticles(dt){
   hg.particles.forEach(function(p){ p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 40 * dt; });
   hg.particles = hg.particles.filter(function(p){ return p.t < p.life; });
@@ -8069,7 +8096,7 @@ function hgCrash(s, a, b){
   if(st){ var el = document.createElement("div"); el.className = "hgOhNo"; el.textContent = t("hg_bump"); st.appendChild(el); }
   setTimeout(function(){
     if(state.screen !== "hopeGarden" || state.session.hopeGarden !== s || s.status !== "playing") return;
-    s.status = "failed"; saveState(); render();
+    s.status = "failed"; s.why = "crash"; saveState(); render();
   }, HG_CRASH_MS);
 }
 
@@ -8273,11 +8300,15 @@ document.addEventListener("pointerdown", function(e){
 function hgOpen(){ state.session.hopeGarden = null; hg = null; go("hopeGardenIntro"); }
 function hgStart(){ initHopeGarden(); go("hopeGarden"); }
 function hgTryAgain(){ initHopeGarden(); render(); }                                                   // PLAY AGAIN after winning: from round 1
-function hgRetry(){ var s = state.session.hopeGarden; if(!s) return; s.status = "playing"; s.interlude = null; hgBegin(s); saveState(); render(); }      // TRY AGAIN after a crash: the same round
+function hgRetry(){ var s = state.session.hopeGarden; if(!s) return; s.status = "playing"; s.why = ""; s.interlude = null; hgBegin(s); saveState(); render(); }      // TRY AGAIN after a crash: the same round
 
 function hgQuit(){ state.session.hopeGarden = null; hg = null; go("mainMenu"); }
 function hgInterlude(){
-  pixRoundRun("hopeGarden", function(){ return state.session.hopeGarden; }, null, function(s2){
+  pixRoundRun("hopeGarden", function(){ return state.session.hopeGarden; }, function(s2){
+    if(hgChances(s2) >= HG_CHANCES) return false;
+    s2.chances = hgChances(s2) + 1;
+    return true;
+  }, function(s2){
     if(s2.interlude.final){ s2.interlude = null; s2.status = "won"; saveState(); render(); return; }
     s2.round++; s2.interlude = null; hgBegin(s2);
     saveState(); render();
@@ -8293,21 +8324,22 @@ function screenHopeGarden(){
   var s = state.session.hopeGarden;
   if(!s || s.v !== 1){ initHopeGarden(); s = state.session.hopeGarden; }
   if(s.status === "failed"){
-    return pixResultHtml("hopeGardenName", {cls:"pixLower", title:t("hg_failTitle"), body:t("hg_failBody"),
-      buttons:pixBtnHtml(t("tryAgain"), "hgRetry()") + pixBtnHtml(t("mainMenu"), "hgQuit()", true)});
+    var out = s.why === "chances";
+    return pixResultHtml("hopeGardenName", {cls:"pixLower", title:t(out ? "hg_outTitle" : "hg_failTitle"), body:t(out ? "hg_outBody" : "hg_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), out ? "hgTryAgain()" : "hgRetry()") + pixBtnHtml(t("mainMenu"), "hgQuit()", true)});
   }
   if(s.status === "won"){
     return pixResultHtml("hopeGardenName", {cls:"pixLower", title:t("hg_winTitle"), body:t("hg_winBody"),
       buttons:pixBtnHtml(t("playAgain"), "hgTryAgain()") + pixBtnHtml(t("mainMenu"), "hgQuit()", true)});
   }
-  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("hopeGardenName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
+  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("hopeGardenName") + '</h2><div class="pixChances">' + chancesHeartsHtml(Math.max(0, hgChances(s)), HG_CHANCES) + '</div>' + pixRoundDoneHtml(s.interlude), "pixLower");
   if(!hg || hgBound !== s || hgBoundRound !== s.round) hgBegin(s);          // a round that was saved in the middle starts again
   if(hgWaiting) hgTouched = false;
   return pixShell((hgWaiting ? '<div class="jlTapAll hgTapAll" onpointerdown="hgGo(event)" ontouchstart="hgGo(event)" onclick="hgGo(event)"></div>' : '') +
     '<div class="hgTop"><canvas class="hgScenery" id="hgScenery" width="130" height="50"></canvas>' +
       '<div class="hgCameo"><img src="tiles/anamaria.png" alt="" onerror="this.onerror=null;this.src=\'tiles/anamaria_placeholder.png\'"></div>' +
       '<div class="hgBanner"><div class="hgTitle"' + (t("hopeGardenName").length > 14 ? ' style="font-size:1rem;letter-spacing:.02em"' : '') + '>' + t("hopeGardenName") + '</div><div class="hgSub">' + t("hg_sub") + '</div></div>' +
-      '<div class="hgRibbon">' + t("hg_level")(s.round + 1, HG_ROUNDS.length) + '</div>' +
+      '<div class="hgRibbon">' + t("hg_level")(s.round + 1, HG_ROUNDS.length) + '</div><div class="hgHearts" id="hgHearts">' + chancesHeartsHtml(Math.max(0, hgChances(s)), HG_CHANCES) + '</div>' +
       '<div class="hgBadge"><span>' + t("hg_beesLabel") + '</span><b id="hgCount">' + hg.delivered + '/' + hg.total + '</b></div></div>' +
     '<div class="hgArea"><div class="hgStage" id="hgStage"><canvas class="hgCanvas" id="hgCanvas" width="100" height="100" onpointerdown="hgDown(event)" onpointermove="hgMove(event)" oncontextmenu="return false"></canvas>' +
       (hgWaiting ? '<div class="dpReady" id="hgReady">' + t("dp_ready") + '</div>' : '') + '</div></div>' +
@@ -8734,7 +8766,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AV";
+var APP_BUILD = "2026-10-26 AW";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
