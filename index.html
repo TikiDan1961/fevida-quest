@@ -206,7 +206,7 @@
   /* Hope Garden layout (2026-10-26, per Dan, from the Bee Line concept picture): a top bar (title banner, level ribbon, 3 stars, count badge over mountains and a church), the fenced garden,
      and a bottom banner (Anamaria's picture and the instruction) over the green main button and a TRY AGAIN button */
   .hgScreen .hgTop{position:relative;width:100%;height:150px;flex:none;margin-top:2px;}
-  .hgCameo{position:absolute;left:50%;top:-30px;transform:translateX(-50%);z-index:2;width:46px;height:46px;box-sizing:border-box;border-radius:50%;border:3px solid #1B3A22;overflow:hidden;background:#BFE3FF;box-shadow:0 3px 0 rgba(20,40,20,.4);}
+  .hgCameo{position:absolute;left:50%;top:-50px;transform:translateX(-50%);z-index:2;width:66px;height:66px;box-sizing:border-box;border-radius:50%;border:3px solid #1B3A22;overflow:hidden;background:#BFE3FF;box-shadow:0 3px 0 rgba(20,40,20,.4);}
   .hgCameo img{display:block;width:100%;height:100%;object-fit:cover;}
   .hgScenery{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
   .hgBanner{position:absolute;left:calc(50% - 12px);top:10px;transform:translateX(-50%);min-width:178px;text-align:center;padding:4px 12px 5px;background:linear-gradient(#41A24E,#2A7A36);border:4px solid #1B3A22;border-radius:14px;box-shadow:inset 0 0 0 2px #7BD26F,0 4px 0 rgba(20,40,20,.45);}
@@ -1199,7 +1199,7 @@ var T = {
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
-    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hg_level:function(n){return "Round "+n;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
+    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hg_level:function(n,total){return "Round "+n+"/"+total;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
     hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
     hg_guide:{d:"Colored bees are buzzing into the garden. Guide each one to a flower that is the same color as the bee.", h:["Tap a bee, then drag your finger toward a flower of the same color. A dotted line shows the way, but it only reaches so far.",
       "Lift your finger and the bee flies along the line. If it lands on its flower, it is home!", "A bee that misses flies off in a random direction. Tap it again to guide it back.", "Keep the bees apart! If two bees bump into each other, the round is lost.", "Bring every bee home to finish all 3 rounds."]},
@@ -1352,7 +1352,7 @@ var T = {
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
-    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hg_level:function(n){return "Ronda "+n;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
+    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
     hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
     hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
       "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas! Si dos abejas chocan, pierdes la ronda.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
@@ -8271,7 +8271,7 @@ function screenHopeGarden(){
     '<div class="hgTop"><canvas class="hgScenery" id="hgScenery" width="130" height="50"></canvas>' +
       '<div class="hgCameo"><img src="tiles/anamaria.png" alt="" onerror="this.onerror=null;this.src=\'tiles/anamaria_placeholder.png\'"></div>' +
       '<div class="hgBanner"><div class="hgTitle"' + (t("hopeGardenName").length > 14 ? ' style="font-size:1rem;letter-spacing:.02em"' : '') + '>' + t("hopeGardenName") + '</div><div class="hgSub">' + t("hg_sub") + '</div></div>' +
-      '<div class="hgRibbon">' + t("hg_level")(s.round + 1) + '</div>' +
+      '<div class="hgRibbon">' + t("hg_level")(s.round + 1, HG_ROUNDS.length) + '</div>' +
       '<div class="hgBadge"><span>' + t("hg_beesLabel") + '</span><b id="hgCount">' + hg.delivered + '/' + hg.total + '</b></div></div>' +
     '<div class="hgArea"><div class="hgStage" id="hgStage"><canvas class="hgCanvas" id="hgCanvas" width="100" height="100" onpointerdown="hgDown(event)" onpointermove="hgMove(event)" oncontextmenu="return false"></canvas>' +
       (hgWaiting ? '<div class="dpReady" id="hgReady">' + t("dp_ready") + '</div>' : '') + '</div></div>' +
@@ -8698,7 +8698,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AQ";
+var APP_BUILD = "2026-10-26 AR";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
