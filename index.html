@@ -7777,13 +7777,13 @@ var HG_COLORS = [
   {id:"purple", c:"#B04FD8", l:"#E3A6FF", d:"#6A2090"},
   {id:"pink",   c:"#FF73BA", l:"#FFC2E2", d:"#B8286F"}
 ];
-// bf = butterflies and df = dragonflies in the way (round 2 has 2 butterflies, round 3 has 2 butterflies and 1 dragonfly), bfSpeed / dfSpeed = how fast they fly.
+// bf = butterflies and df = dragonflies in the way (round 2 has a butterfly, round 3 a butterfly and a dragonfly, but only ONE of them is on the board at any time), bfSpeed / dfSpeed = how fast they fly.
 // Every round has the same garden (2026-10-26, per Dan): n = 4 patches along each side, so 16 flowers in the 8 colours, each colour exactly twice and the two as far apart as they can be; only the bees change. bees = how many bees must reach their flowers, live = most bees flying at once, gap = seconds between bees coming in,
 // speed = how fast a bee flies on its own (picture pixels a second), head / stem / patchH / front / pathX / pathY / stemW = sizes of the flowers (a flower head, its short stem) and the patches in picture pixels
 var HG_ROUNDS = [
-  {n: 4, bf: 0, df: 0, bfSpeed: 16, dfSpeed: 44, bees: 4,  live: 4, gap: 2.6, speed: 24, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
-  {n: 4, bf: 2, df: 0, bfSpeed: 16, dfSpeed: 44, bees: 8,  live: 4, gap: 2.4, speed: 26, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
-  {n: 4, bf: 2, df: 1, bfSpeed: 16, dfSpeed: 44, bees: 12, live: 3, gap: 2.8, speed: 24, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
+  {n: 4, bf: 0, df: 0, bfSpeed: 16, dfSpeed: 44, bees: 4,  live: 4, gap: 2.6, speed: 17, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
+  {n: 4, bf: 1, df: 0, bfSpeed: 16, dfSpeed: 44, bees: 8,  live: 4, gap: 2.4, speed: 18, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
+  {n: 4, bf: 1, df: 1, bfSpeed: 16, dfSpeed: 44, bees: 12, live: 3, gap: 2.8, speed: 17, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
 ];
 var HG_WARN_BB = 20, HG_WARN_BF = 22, HG_WARN_DF = 28;       // how close (picture pixels) bees must be to each other, to a butterfly, to a dragonfly, before a pulsing dotted circle warns of it (2026-10-27, per Dan)
 var HG_FOLLOW = 1.5;           // a bee flies along its line this many times as fast as it flies on its own (a little faster, 2026-10-26, per Dan; it was about 6 times as fast)
@@ -7934,7 +7934,7 @@ function hgHeadSprite(ci, D, sc){
   sc = sc || 1;
   var key = "h" + ci + "_" + D + "_" + sc; if(hgSprites[key]) return hgSprites[key];
   var col = HG_COLORS[ci], cv = document.createElement("canvas"); cv.width = cv.height = D;
-  var x = cv.getContext("2d"), mid = (D - 1) / 2, R = (D - 2) / 2 * sc, np = D >= 24 ? 8 : 6, a = R * .5, pd = R - a + .15, b = pd * Math.tan(Math.PI / np) * 1.12 + .35, cr = Math.max(1.7, R * .27);
+  var x = cv.getContext("2d"), mid = (D - 1) / 2, R = (D - 2) / 2 * sc, np = D >= 24 ? 8 : 6, a = R * .5, pd = R - a + .15, b = pd * Math.tan(Math.PI / np) * 1.12 + .35, cr = Math.max(sc < .6 ? 1.1 : 1.7, R * .27);
   var id = [], vv = [], i, j, k;                       // id = which petal a pixel belongs to (-1 none, -2 the centre), vv = how far out in its petal
   for(j = 0; j < D; j++){ id.push([]); vv.push([]); for(i = 0; i < D; i++){ id[j].push(-1); vv[j].push(9); } }
   for(j = 0; j < D; j++) for(i = 0; i < D; i++){
@@ -8153,7 +8153,7 @@ function hgObsStep(s, dt){
   var W = hg.W, H = hg.H;
   hg.obs.forEach(function(o){
     o.ph += dt * (o.kind === "bf" ? 8 : 50);
-    if(o.state === "gone"){ o.wait -= dt; if(o.wait <= 0) hgObsSpawn(o); return; }
+    if(o.state === "gone"){ o.wait -= dt; if(o.wait <= 0 && !hg.obs.some(function(q){ return q.state === "fly"; })) hgObsSpawn(o); return; }       // only one at a time (2026-10-27, per Dan)
     if(o.kind === "bf"){
       o.bx += o.ux * o.sp * dt; o.by += o.uy * o.sp * dt; o.fl += dt * 2.4;
       var off = Math.sin(o.fl) * 5; o.x = o.bx - o.uy * off; o.y = o.by + o.ux * off;
@@ -8184,7 +8184,7 @@ function hgHit(s, o, b){
   hgLoseChance(s);
 }
 
-// ---- pictures: a closed flower, the butterfly, the dragonfly ----
+// ---- pictures: the butterfly and the dragonfly ----
 function hgBlob(w, h, shapes, line, after){
   var id = [], i, j, cv = document.createElement("canvas"); cv.width = w; cv.height = h;
   var x = cv.getContext("2d");
@@ -8202,26 +8202,6 @@ function hgBlob(w, h, shapes, line, after){
   }
   if(after) after(x);
   return cv;
-}
-function hgBudSprite(ci, D){
-  var key = "d" + ci + "_" + D; if(hgSprites[key]) return hgSprites[key];
-  var col = HG_COLORS[ci], m = (D - 1) / 2, cy = m - D * .06, rx = Math.max(2.4, D * .26), ry = Math.max(3.4, D * .36);
-  var cv = hgBlob(D, D, [
-    {cx: m + .5, cy: cy + 1.2, rx: rx * 1.25, ry: ry * .55, c: "#2E9B3A"},                         // the green cup the bud sits in
-    {cx: m + .5, cy: cy, rx: rx, ry: ry, c: col.c}
-  ], "#1B1F3B", function(x){
-    var i, j;
-    for(j = 0; j < D; j++) for(i = 0; i < D; i++){
-      var dx = (i + .5 - (m + .5)) / rx, dy = (j + .5 - cy) / ry;
-      if(dx * dx + dy * dy <= 1){
-        x.fillStyle = i < m - .5 ? col.l : (i > m + .5 ? col.d : col.c);                         // lit on the left, shaded on the right, a seam down the middle
-        if(Math.abs(i - m) < .6 && j > cy - ry * .2) x.fillStyle = col.d;
-        x.fillRect(i, j, 1, 1);
-      }
-    }
-    x.fillStyle = "#58D05C"; x.fillRect(Math.round(m - rx * .9), Math.round(cy + ry * .55), 1, 1);
-  });
-  hgSprites[key] = cv; return cv;
 }
 var HG_BF = [
   {w: "#F28C28", d: "#7A3A00", s: "#FFF3C0"},
@@ -8274,7 +8254,7 @@ function hgDraw(){
     var ly = Math.round((f.stemTop + f.stemBot) / 2) - 1, lw = Math.max(3, Math.round(f.D / 4)), dir = f.row % 2 ? -1 : 1;
     function leaf(d, yy){ var lx = d > 0 ? f.x + Math.ceil(f.stemW / 2) : f.x - sw - lw; x.fillStyle = "#1B1F3B"; x.fillRect(lx - 1, yy - 1, lw + 2, 4); x.fillStyle = "#46C24E"; x.fillRect(lx, yy, lw, 2); x.fillStyle = "#2E9B3A"; x.fillRect(lx, yy + 1, lw, 1); }
     leaf(dir, ly); leaf(-dir, ly);                      // a second branch on the other side of the stem, at the same height (2026-10-26, per Dan)
-    x.drawImage(f.k > .85 ? hgHeadSprite(f.ci, f.D) : (f.k > .35 ? hgHeadSprite(f.ci, f.D, .66) : hgBudSprite(f.ci, f.D)), Math.round(f.x - f.D / 2), Math.round(f.y - f.D / 2) + bob);
+    x.drawImage(hgHeadSprite(f.ci, f.D, f.k > .85 ? 1 : (f.k > .6 ? .8 : (f.k > .3 ? .65 : .5))), Math.round(f.x - f.D / 2), Math.round(f.y - f.D / 2) + bob);       // closing: the petals fold in to the middle
   });
   // the lines: the one being drawn, and those of the bees flying along theirs (a line stays until its bee has got to the end of it, 2026-10-26, per Dan)
   function line(pts, col, withEnd){
@@ -8965,7 +8945,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 C";
+var APP_BUILD = "2026-10-27 D";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
