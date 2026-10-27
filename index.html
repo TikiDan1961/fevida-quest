@@ -7775,12 +7775,12 @@ var HG_COLORS = [
   {id:"indigo", c:"#4B3FB0", l:"#9A8FF0", d:"#2A2075"},
   {id:"purple", c:"#B04FD8", l:"#E3A6FF", d:"#6A2090"}
 ];
-// n = patches along each side, bees = how many bees must reach their flowers, kinds = how many colours, live = most bees flying at once, gap = seconds between bees coming in,
+// Every round has the same garden (2026-10-26, per Dan): n = 4 patches along each side, so 16 flowers in the 7 colours, each colour at least twice; only the bees change. bees = how many bees must reach their flowers, live = most bees flying at once, gap = seconds between bees coming in,
 // speed = how fast a bee flies on its own (picture pixels a second), head / stem / patchH / front / pathX / pathY / stemW = sizes of the flowers (a flower head, its short stem) and the patches in picture pixels
 var HG_ROUNDS = [
-  {n: 2, bees: 4,  kinds: 4, live: 4, gap: 2.6, speed: 12, head: 25, stem: 6, patchH: 18, front: 4, pathX: 9, pathY: 10, stemW: 3},
-  {n: 3, bees: 8,  kinds: 7, live: 4, gap: 2.4, speed: 13, head: 19, stem: 5, patchH: 12, front: 3, pathX: 7, pathY: 8,  stemW: 2},
-  {n: 4, bees: 12, kinds: 7, live: 4, gap: 2.2, speed: 14, head: 15, stem: 4, patchH: 8,  front: 3, pathX: 4, pathY: 6,  stemW: 2}
+  {n: 4, bees: 4,  live: 4, gap: 2.6, speed: 12, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
+  {n: 4, bees: 8,  live: 4, gap: 2.4, speed: 13, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2},
+  {n: 4, bees: 12, live: 4, gap: 2.2, speed: 14, head: 15, stem: 4, patchH: 8, front: 3, pathX: 4, pathY: 6, stemW: 2}
 ];
 var HG_FOLLOW = 78;            // how fast a bee flies along its line
 var HG_TAP = 16;               // how close (picture pixels) a touch must be to a bee to pick it
@@ -7801,13 +7801,12 @@ function initHopeGarden(){
 }
 // the colours of this round's flowers and bees: every bee has at least one flower of its colour
 function hgPickColors(cfg){
-  var total = cfg.n * cfg.n, ids = [0, 1, 2, 3, 4, 5, 6], f = [], b = [], i;
-  if(cfg.kinds < 7){ ids = hgShuffle(ids).slice(0, cfg.kinds); return {f: hgShuffle(ids), b: hgShuffle(ids)}; }
-  var per = Math.floor(total / 7);
+  var total = cfg.n * cfg.n, ids = [0, 1, 2, 3, 4, 5, 6], f = [], b, i;
+  var per = Math.floor(total / 7);                          // 16 flowers: every colour twice, and two more at random
   for(i = 0; i < per; i++) f = f.concat(ids);
   while(f.length < total) f.push(Math.floor(Math.random() * 7));
-  b = ids.slice();
-  while(b.length < cfg.bees) b.push(Math.floor(Math.random() * 7));
+  if(cfg.bees <= 7) b = hgShuffle(ids).slice(0, cfg.bees);   // 4 bees: four different colours; 8 and 12: every colour, and the rest at random
+  else { b = ids.slice(); while(b.length < cfg.bees) b.push(Math.floor(Math.random() * 7)); }
   return {f: hgShuffle(f), b: hgShuffle(b)};
 }
 // a new round: the picture is laid out (hgLayout) once the canvas has been measured (hgFit)
@@ -8648,7 +8647,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-26 AH";
+var APP_BUILD = "2026-10-26 AI";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
