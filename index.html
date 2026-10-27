@@ -248,7 +248,7 @@
   @media (orientation:portrait){ body.hglMode .rotateMsg{display:flex;} }
   body.hglMode .rotatePhone{animation-name:rotateHintL;}
   @keyframes rotateHintL{0%,25%{transform:rotate(0deg);}60%,100%{transform:rotate(90deg);}}
-  body.hglMode .exitBar{position:absolute;left:calc(env(safe-area-inset-left,0px) + 12px);top:calc(env(safe-area-inset-top,0px) + 20px);margin:0;}
+  body.hglMode .exitBar{position:absolute;left:calc(env(safe-area-inset-left,0px) + 30px);top:calc(env(safe-area-inset-top,0px) + 20px);margin:0;}
   .hglScreen{position:relative;flex:1;display:block;overflow:hidden;background:linear-gradient(#4FA9F0 0,#BFE3FF 100%);}
   .hglCanvas{position:absolute;left:50%;top:0;transform:translateX(-50%);display:block;touch-action:none;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
   .hglBadge{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 10px;z-index:3;pointer-events:none;}
@@ -8595,7 +8595,15 @@ function hglFit(){
       round: 0, mode: "play", chances: HG_CHANCES, flash: 0, need: {}, total: 0, landed: 0, landedBy: {0: 0, 2: 0, 4: 0, 6: 0}, totalBy: {}, lastGone: {0: -99, 2: -99, 4: -99, 6: -99}};
     HGL_IN.forEach(function(ci){ hgl.need[ci] = HGL_ROUNDS[0].need[ci]; hgl.totalBy[ci] = hgl.need[ci]; hgl.total += hgl.need[ci]; });
   }
-  hglPaint(); hglCountPaint();
+  hglPlaceSigns(); hglPaint(); hglCountPaint();
+}
+// The butterfly sign sits beside the name, as far from it as the bee sign is on the other side (2026-10-27, per Dan). hgl.signR is where it ends (in game pixels), so no signal comes up under it.
+function hglPlaceSigns(){
+  var scr = document.getElementById("hglScreen"), a = scr && scr.querySelector(".hglSignL"), b = scr && scr.querySelector(".hglSignR"), n = scr && scr.querySelector(".hglBanner");
+  if(!a || !b || !n || !hgl) return;
+  var sr = scr.getBoundingClientRect(), ar = a.getBoundingClientRect(), nr = n.getBoundingClientRect(), gap = Math.max(4, nr.left - ar.right);
+  b.style.right = "auto"; b.style.left = Math.round(nr.right - sr.left + gap) + "px";
+  hgl.signR = (b.getBoundingClientRect().right - sr.left) / HG_SCALE;
 }
 window.addEventListener("resize", function(){ if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); } });
 window.addEventListener("orientationchange", function(){ setTimeout(function(){ if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); } }, 250); });
@@ -8612,7 +8620,7 @@ var hgl = null, hglRaf = 0;
 var HGL_BEE_COLORS = [0, 2];          // the colours of the bees that come: red, yellow
 var HGL_SPEED = 22, HGL_GAP = 1.6;      // (HGL_GAP: the least time between two signals, of any colours)
 function hglFunW(f, ra){ return (2.4 + 10.4 * (ra / f.fun.len)) * (f.fun.K / .48) * HGL_FUN_W; }      // half the width of a funnel, ra from its flower
-function hglMax(){ return Math.round(hgl.W * .9); }
+function hglMax(){ return Math.round(hgl.W * 1.35); }                  // (the longest line a finger may draw: .9 of the screen's width until 2026-10-27, then 50% longer, per Dan)
 function hglBurst(x, y, col){
   var k, cols = [col.c, col.l, "#FFFFFF", "#FFE45E"];
   for(k = 0; k < 16; k++){ var a = Math.random() * 6.2832, sp = hgRand(14, 44); hgl.particles.push({x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 8, t: 0, life: hgRand(.45, .9), c: cols[k % cols.length]}); }
@@ -8633,7 +8641,7 @@ function hglPlan(ci){
     if(side === 0){ ex = 10 + u * (W - 20); ey = 0; nx = 0; ny = 1; } else if(side === 1){ ex = W; ey = 10 + u * (H - 20); nx = -1; ny = 0; }
     else if(side === 2){ ex = 10 + u * (W - 20); ey = H; nx = 0; ny = -1; } else { ex = 0; ey = 10 + u * (H - 20); nx = 1; ny = 0; }
     if(side === 0 && Math.abs(ex - W / 2) < 44) continue;                             // (the name and the hearts hide the top middle)
-    if((side === 0 && (ex < 62 || ex > W - 40)) || ((side === 3 || side === 1) && ey < 36)) continue;                  // (so do the red X and the two signs in the top corners)
+    if((side === 0 && (ex < 62 || (ex > W / 2 && ex < (hgl.signR || W / 2) + 4))) || ((side === 3 || side === 1) && ey < 36)) continue;                  // (so do the red X, the bee sign and the butterfly sign)
     var tx = hgRand(g.x + 10, g.x + g.w - 10), ty = hgRand(g.y + 10, g.y + g.h - 10), dx = tx - ex, dy = ty - ey, d = Math.sqrt(dx * dx + dy * dy) || 1;
     ux = dx / d; uy = dy / d;
     if(f.fun && Math.abs(ux * f.fun.ax + uy * f.fun.ay) > .866) continue;           // a bee never flies along the line of its own funnel (within 30 degrees of it, either way)
@@ -8722,6 +8730,17 @@ function hglStep(dt){
   hgl.plans = hgl.plans.filter(function(p){ return !p.go; });
   hgl.bees.forEach(function(b){
     b.ph += dt * (b.kind === "bf" ? 9 : 22);
+    if(b.kind === "bf"){                                  // a butterfly turns so that its body lies along the way it is flying (2026-10-27, per Dan); one hovering or at its flower keeps the turn it had
+      var rx = null, ry = null;
+      if(b.state === "free"){ rx = b.vx; ry = b.vy; }
+      else if(b.state === "follow" && b.path){ var rp = b.path[Math.min(b.seg, b.path.length - 1)]; rx = rp.x - b.x; ry = rp.y - b.y; }
+      if(rx !== null && rx * rx + ry * ry > .01){
+        var ta = Math.atan2(ry, rx) + Math.PI / 2;
+        if(b.rot === undefined) b.rot = ta;
+        var da = ta - b.rot; da = Math.atan2(Math.sin(da), Math.cos(da));
+        b.rot += da * Math.min(1, dt * 9);
+      }
+    }
     if(b.state === "free"){
       b.x += b.vx * dt; b.y += b.vy * dt;
       // it bounces off the edges of the screen, at the same angle (2026-10-27, per Dan), and keeps flying. (One that is only just coming in, still outside, is flying inwards and is left alone.)
@@ -8785,26 +8804,35 @@ function hglPaint(){
   var x = cv.getContext("2d");
   x.clearRect(0, 0, hgl.W, hgl.H);                                  // (the sky of the picture has no pixels of its own, so the last picture must be wiped or what flew over it stays)
   x.drawImage(hgl.bg, 0, 0);
-  function line(pts, col, withEnd){
-    var carry = 0, k;
+  function line(pts, col, withEnd, skip){                           // skip: how far along the line the dots begin (the part behind the bee is not drawn)
+    var acc = 0, next = 0, k;
     for(k = 1; k < pts.length; k++){
-      var ax = pts[k - 1].x, ay = pts[k - 1].y, bx = pts[k].x, by = pts[k].y, d = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)), pos = carry;
-      while(pos <= d){
-        var px = Math.round(ax + (bx - ax) * pos / (d || 1)), py = Math.round(ay + (by - ay) * pos / (d || 1));
-        x.fillStyle = "#1B1F3B"; x.fillRect(px - 2, py - 2, 4, 4); x.fillStyle = col.c; x.fillRect(px - 1, py - 1, 2, 2); x.fillStyle = col.l; x.fillRect(px - 1, py - 1, 1, 1);
-        pos += 6;
+      var ax = pts[k - 1].x, ay = pts[k - 1].y, bx = pts[k].x, by = pts[k].y, d = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
+      while(next <= acc + d){
+        if(next >= (skip || 0)){
+          var u = (next - acc) / (d || 1), px = Math.round(ax + (bx - ax) * u), py = Math.round(ay + (by - ay) * u);
+          x.fillStyle = "#1B1F3B"; x.fillRect(px - 2, py - 2, 4, 4); x.fillStyle = col.c; x.fillRect(px - 1, py - 1, 2, 2); x.fillStyle = col.l; x.fillRect(px - 1, py - 1, 1, 1);
+        }
+        next += 6;
       }
-      carry = pos - d;
+      acc += d;
     }
     if(withEnd){ var last = pts[pts.length - 1]; x.fillStyle = "#FFFFFF"; x.fillRect(Math.round(last.x) - 1, Math.round(last.y) - 1, 3, 3); x.fillStyle = col.c; x.fillRect(Math.round(last.x), Math.round(last.y), 1, 1); }
   }
   hglGlows(x);
-  hgl.bees.forEach(function(b){ if(b.state === "follow" && b.path) line(b.path, HG_COLORS[b.ci], false); });
+  hgl.bees.forEach(function(b){
+    if(b.state !== "follow" || !b.path) return;
+    var k, run = 0, pl = b.path, sg = Math.min(b.seg, pl.length - 1);                   // how far along its line the bee is
+    for(k = 1; k < sg; k++) run += Math.sqrt((pl[k].x - pl[k - 1].x) * (pl[k].x - pl[k - 1].x) + (pl[k].y - pl[k - 1].y) * (pl[k].y - pl[k - 1].y));
+    run += Math.sqrt((b.x - pl[sg - 1].x) * (b.x - pl[sg - 1].x) + (b.y - pl[sg - 1].y) * (b.y - pl[sg - 1].y));
+    line(pl, HG_COLORS[b.ci], false, run);
+  });
   if(hgl.drag) line(hgl.drag.pts, HG_COLORS[hgl.drag.bee.ci], true);
   hgl.bees.slice().sort(function(a, b){ return a.y - b.y; }).forEach(function(b){
     var fr = Math.floor(b.ph) % 2, sp = b.kind === "bf" ? hglButterflySprite(b.ci, fr) : hgBeeSprite(b.ci, fr, b.face), hov = b.state === "hover" ? Math.round(Math.sin(hgl.t * 12)) : 0;
     x.fillStyle = "rgba(40,24,8,.28)"; x.fillRect(Math.round(b.x) - 4, Math.round(b.y) + 7, 8, 1);
-    x.drawImage(sp, Math.round(b.x - sp.width / 2), Math.round(b.y - sp.height / 2) + hov);
+    if(b.kind === "bf" && b.rot){ x.save(); x.imageSmoothingEnabled = false; x.translate(Math.round(b.x), Math.round(b.y) + hov); x.rotate(b.rot); x.drawImage(sp, -Math.round(sp.width / 2), -Math.round(sp.height / 2)); x.restore(); }
+    else x.drawImage(sp, Math.round(b.x - sp.width / 2), Math.round(b.y - sp.height / 2) + hov);
     if(b.state === "hover"){            // four white corners show which bee is being guided
       var bx2 = Math.round(b.x), by2 = Math.round(b.y); x.fillStyle = "#FFFFFF";
       x.fillRect(bx2 - 9, by2 - 8, 3, 1); x.fillRect(bx2 - 9, by2 - 8, 1, 3); x.fillRect(bx2 + 7, by2 - 8, 3, 1); x.fillRect(bx2 + 9, by2 - 8, 1, 3);
@@ -9000,7 +9028,7 @@ function hglFlower(x, g, ci, mirror){
   x.fillStyle = "#1B1F3B"; pts.forEach(function(p){ x.fillRect(p[0] - 2, p[1] - 2, 4, 4); });
   x.fillStyle = "#2E9B3A"; pts.forEach(function(p){ x.fillRect(p[0] - 1, p[1] - 1, 2, 2); });
   x.fillStyle = "#58D05C"; pts.forEach(function(p){ x.fillRect(p[0] - 1, p[1] - 1, 1, 2); });
-  function leaf(lx, ly, dir){ var lw = 5, l0 = dir > 0 ? lx + 2 : lx - 2 - lw; x.fillStyle = "#1B1F3B"; x.fillRect(l0 - 1, ly - 1, lw + 2, 4); x.fillStyle = "#46C24E"; x.fillRect(l0, ly, lw, 2); x.fillStyle = "#2E9B3A"; x.fillRect(l0, ly + 1, lw, 1); }
+  function leaf(lx, ly, dir){ var lw = 3, l0 = dir > 0 ? lx + 2 : lx - 2 - lw; x.fillStyle = "#1B1F3B"; x.fillRect(l0 - 1, ly - 1, lw + 2, 4); x.fillStyle = "#46C24E"; x.fillRect(l0, ly, lw, 2); x.fillStyle = "#2E9B3A"; x.fillRect(l0, ly + 1, lw, 1); }
   var m1 = pts[Math.round(pts.length * .72)];
   leaf(m1[0], m1[1], 1); leaf(m1[0], m1[1], -1);
   x.drawImage(sp, Math.round(hx - D / 2), top);
@@ -9537,7 +9565,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 AN";
+var APP_BUILD = "2026-10-27 AR";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
