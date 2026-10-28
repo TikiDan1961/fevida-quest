@@ -8666,8 +8666,8 @@ window.addEventListener("resize", function(){ if(state.screen === "mainMenu") hg
 // The picture is drawn at 1 pixel = 3 x 3 screen pixels like the rest of the game, and measured from the screen (hglFit).
 function screenHopeGardenL(){
   return '<div class="screen hglScreen" id="hglScreen"><canvas class="hglCanvas" id="hglCanvas" width="100" height="100" onpointerdown="hglDown(event)" onpointermove="hglMove(event)" oncontextmenu="return false"></canvas><canvas class="hglOver" id="hglOver" width="100" height="100"></canvas>' +
-    '<div class="hgBadge hglBadge hglSignL"><img src="' + hgBeeSprite(2, 0, 1).toDataURL() + '" style="width:36px" alt=""><b id="hglCountB">0/8</b></div>' +
-    '<div class="hgBadge hglBadge hglSignR"><img src="' + hglButterflySprite(4, 0).toDataURL() + '" style="width:34px" alt=""><b id="hglCountF">0/4</b></div>' +
+    '<div class="hgBadge hglBadge hglSignL"><img src="' + hgBeeSprite(HGL_ROUNDS[hgl ? hgl.round : 0].signs.bee, 0, 1).toDataURL() + '" style="width:36px" alt=""><b id="hglCountB">0/8</b></div>' +
+    '<div class="hgBadge hglBadge hglSignR"><img src="' + hglButterflySprite(HGL_ROUNDS[hgl ? hgl.round : 0].signs.bf, 0).toDataURL() + '" style="width:34px" alt=""><b id="hglCountF">0/4</b></div>' +
     '<div class="hgBanner hglBanner"><div class="hgTitle">' + t("hopeGardenName") + '</div></div><div class="hgHearts hglHearts" id="hglHearts"></div>' + hglOverlayHtml() + '</div>';
 }
 function hglUpright(){ return !!(window.matchMedia && window.matchMedia("(orientation:portrait)").matches); }
@@ -8722,16 +8722,37 @@ function hglBurst(x, y, col){
 var HGL_IN = [0, 2, 4, 6];            // the colours that come: red and yellow bees, blue and purple butterflies (2026-10-27, per Dan)
 // Round 1 (2026-10-27, per Dan): the player must land 8 bees (4 red, 4 yellow) and 4 butterflies (2 blue, 2 purple). Two of one colour are never on the board together (a signal counts as being on it), and
 // after one has gone (landed, or flown off) the next of its colour waits a while: HGL_DELAYS[round] seconds, shorter with each round. One that flies off without landing has to come again.
-var HGL_ROUNDS = [{need: {0: 4, 2: 4, 4: 2, 6: 2}}, {need: {0: 5, 2: 5, 4: 3, 6: 3}}, {need: {0: 6, 2: 6, 4: 4, 6: 4}}];      // (rounds 2 and 3 are placeholders, 2026-10-27: Dan has not set them yet)
+// Each round: need = how many of each colour must land, bees / bfs = which colours are bees and which butterflies, speed = how fast everything flies compared with round 1, sides = which edges each colour comes in from
+// (0 top, 1 right, 2 bottom, 3 left; def = the colours not listed), signs = the colours of the bee and the butterfly on the two signs, layout = where the flowers are (see hglDrawLayout; none = round 1's own).
+// Round 2 (2026-10-27, per Dan): blue and purple funnel flowers (bees), red and yellow open flowers (butterflies); 16 bees and 8 butterflies; a little faster; from the top, bottom and right edges.
+// Round 3 (2026-10-27, per Dan): red and yellow funnel flowers (bees), blue and purple open flowers (butterflies); 24 bees and 12 butterflies; faster again; from all four edges.
+var HGL_LAYOUT2 = [
+  {ci: 4, px: 1559, py: 157, ax: -1, ay: 0},              // blue: its funnel opens straight to the left
+  {ci: 6, px: 1608, py: 371, ax: -.857, ay: .516},        // purple: its funnel opens down and to the left
+  {ci: 0, px: 1073, py: 391},                             // red: open, no funnel
+  {ci: 2, px: 1528, py: 704}                              // yellow: open, no funnel
+];
+var HGL_LAYOUT3 = [
+  {ci: 0, px: 985, py: 270, ax: -.856, ay: .516},         // red: its funnel opens down and to the left
+  {ci: 2, px: 1356, py: 719, ax: -.9993, ay: -.037},      // yellow: its funnel opens to the left (a hair upwards)
+  {ci: 4, px: 1211, py: 451},                             // blue: open, no funnel
+  {ci: 6, px: 1437, py: 148}                              // purple: open, no funnel
+];
+var HGL_ROUNDS = [
+  {need: {0: 4, 2: 4, 4: 2, 6: 2}, bees: [0, 2], bfs: [4, 6], speed: 1, sides: {6: [3], 4: [1]}, signs: {bee: 2, bf: 4}, layout: null},
+  {need: {4: 8, 6: 8, 0: 4, 2: 4}, bees: [4, 6], bfs: [0, 2], speed: 1.2, sides: {def: [0, 1, 2]}, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2},
+  {need: {0: 12, 2: 12, 4: 6, 6: 6}, bees: [0, 2], bfs: [4, 6], speed: 1.4, sides: {def: [0, 1, 2, 3]}, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3}
+];
+function hglColours(r){ return Object.keys(HGL_ROUNDS[r].need).map(Number); }
 var HGL_DELAYS = [2.5, 2, 1.5];
 var HGL_BF_SPEED = HGL_SPEED / 2, HGL_WARN_S = 1.4;     // butterflies fly half the speed of bees (2026-10-27, per Dan); a signal shows this long before the bee or butterfly comes in
-function hglIsBee(ci){ return ci === 0 || ci === 2; }
+function hglIsBee(ci){ return HGL_ROUNDS[hgl.round].bees.indexOf(ci) !== -1; }
 // Where and which way a bee or butterfly will come in is chosen first, and a small circle of its colour with an arrow in it shows that spot, the arrow pointing the way it will fly.
 function hglPlan(ci){
   var f = hgl.flowers.filter(function(q){ return q.ci === ci; })[0];
   var W = hgl.W, H = hgl.H, g = hgl.g, k, ex, ey, nx, ny, ux, uy, ok = false;
   for(k = 0; k < 80 && !ok; k++){
-    var side = ci === 6 ? 3 : (ci === 4 ? 1 : Math.floor(Math.random() * 4)), u = Math.random();           // purple butterflies come from the left, blue ones from the right (2026-10-27, per Dan)
+    var sd = HGL_ROUNDS[hgl.round].sides, sl = sd[ci] || sd.def || [0, 1, 2, 3], side = sl[Math.floor(Math.random() * sl.length)], u = Math.random();           // round 1: purple butterflies come from the left, blue ones from the right (2026-10-27, per Dan); round 2: the top, the bottom and the right
     if(side === 0){ ex = 10 + u * (W - 20); ey = 0; nx = 0; ny = 1; } else if(side === 1){ ex = W; ey = 10 + u * (H - 20); nx = -1; ny = 0; }
     else if(side === 2){ ex = 10 + u * (W - 20); ey = H; nx = 0; ny = -1; } else { ex = 0; ey = 10 + u * (H - 20); nx = 1; ny = 0; }
     if(side === 0 && Math.abs(ex - W / 2) < 44) continue;                             // (the name and the hearts hide the top middle)
@@ -8750,7 +8771,7 @@ function hglPlan(ci){
 // which colour comes next: one that still has to land, that is not on the board, and whose wait since the last of its colour has passed
 function hglPick(){
   var d = HGL_DELAYS[Math.min(hgl.round, HGL_DELAYS.length - 1)];
-  var c = HGL_IN.filter(function(ci){
+  var c = hglColours(hgl.round).filter(function(ci){
     return hgl.need[ci] > 0 && !hgl.bees.some(function(b){ return b.ci === ci; }) && !hgl.plans.some(function(p){ return p.ci === ci; }) && hgl.t - hgl.lastGone[ci] >= d;
   });
   return c.length ? c[Math.floor(Math.random() * c.length)] : null;
@@ -8759,18 +8780,20 @@ function hglPick(){
 function hglSetRound(r){
   hgl.round = r; hgl.mode = "play"; hgl.interlude = null; hgl.need = {}; hgl.totalBy = {}; hgl.total = 0; hgl.landed = 0; hgl.landedBy = {0: 0, 2: 0, 4: 0, 6: 0};
   hgl.lastGone = {0: -99, 2: -99, 4: -99, 6: -99}; hgl.nextSpawn = 1.2; hgl.bees = []; hgl.plans = []; hgl.particles = []; hgl.sel = null; hgl.drag = null;
-  HGL_IN.forEach(function(ci){ hgl.need[ci] = HGL_ROUNDS[r].need[ci]; hgl.totalBy[ci] = hgl.need[ci]; hgl.total += hgl.need[ci]; });
+  hglColours(r).forEach(function(ci){ hgl.need[ci] = HGL_ROUNDS[r].need[ci]; hgl.totalBy[ci] = hgl.need[ci]; hgl.total += hgl.need[ci]; });
+  var info = hglDraw(hgl.bg, hgl.W, hgl.H, r); hgl.g = info.g; hgl.flowers = info.flowers;                  // the garden of this round
   hglDangerSfx(false); hglCountPaint();
 }
 function hglCountPaint(){
   if(!hgl) return;
   var a = document.getElementById("hglCountB"), b = document.getElementById("hglCountF");
-  if(a) a.textContent = (hgl.landedBy[0] + hgl.landedBy[2]) + "/" + (hgl.totalBy[0] + hgl.totalBy[2]);
-  if(b) b.textContent = (hgl.landedBy[4] + hgl.landedBy[6]) + "/" + (hgl.totalBy[4] + hgl.totalBy[6]);
+  var R = HGL_ROUNDS[hgl.round], sum = function(list, m){ return list.reduce(function(n, ci){ return n + (m[ci] || 0); }, 0); };
+  if(a) a.textContent = sum(R.bees, hgl.landedBy) + "/" + sum(R.bees, hgl.totalBy);
+  if(b) b.textContent = sum(R.bfs, hgl.landedBy) + "/" + sum(R.bfs, hgl.totalBy);
   var h = document.getElementById("hglHearts"); if(h) h.innerHTML = chancesHeartsHtml(Math.max(0, hgl.chances), HG_CHANCES);
 }
 function hglEnter(p){
-  var bee = hglIsBee(p.ci), sp = (bee ? HGL_SPEED : HGL_BF_SPEED) * hgRand(.9, 1.15);
+  var bee = hglIsBee(p.ci), sp = (bee ? HGL_SPEED : HGL_BF_SPEED) * (HGL_ROUNDS[hgl.round].speed || 1) * hgRand(.9, 1.15);
   hgl.bees.push({id: ++hgl.id, ci: p.ci, kind: bee ? "bee" : "bf", x: p.ex - p.ux * 7, y: p.ey - p.uy * 7, vx: p.ux * sp, vy: p.uy * sp, sp: sp, face: p.ux >= 0 ? 1 : -1, ph: Math.random() * 6, state: "free", path: null, seg: 1, inF: false, prevRa: 0});
 }
 function hglHome(b, f){
@@ -9140,11 +9163,12 @@ function hglUp(ev){
 }
 window.addEventListener("pointerup", hglUp, true);
 window.addEventListener("pointercancel", hglUp, true);
-function hglFlowerSprite(ci, D){
-  var key = "L" + ci + "_" + D; if(hgSprites[key]) return hgSprites[key];
+function hglFlowerSprite(ci, D, ax, ay){          // ax, ay: the way the flower faces (the way its funnel opens); north-east if not given
+  var dX = ax === undefined ? .7071 : ax, dY = ay === undefined ? -.7071 : ay;
+  var key = "L" + ci + "_" + D + "_" + Math.round(dX * 100) + "_" + Math.round(dY * 100); if(hgSprites[key]) return hgSprites[key];
   var col = HG_COLORS[ci], cv = document.createElement("canvas"); cv.width = cv.height = D;
   var x = cv.getContext("2d"), mid = (D - 1) / 2, R = (D - 2) / 2, np = 8, a = R * .5, pd = R - a + .15, b = pd * Math.tan(Math.PI / np) * 1.12 + .35, cr = Math.max(2.6, R * .26);
-  var dX = .7071, dY = -.7071, sq = .7071, id = [], vv = [], i, j, k;
+  var sq = .7071, id = [], vv = [], i, j, k;
   for(j = 0; j < D; j++){ id.push([]); vv.push([]); for(i = 0; i < D; i++){ id[j].push(-1); vv[j].push(9); } }
   for(j = 0; j < D; j++) for(i = 0; i < D; i++){
     var px = i - mid, py = j - mid, along = px * dX + py * dY, fx = px + (1 / sq - 1) * along * dX, fy = py + (1 / sq - 1) * along * dY, best = 9, bk = -1;
@@ -9179,7 +9203,7 @@ function hglFlowerSprite(ci, D){
 var HGL_FUN_W = .8;               // the funnels are 20 % narrower than they were (2026-10-27, per Dan)
 var HGL_FLOWER_K = .576;        // the whole flower picture is 57.6 % of its first size (2026-10-27, per Dan: 40 % smaller, 20 % smaller again, then 20 % bigger)
 // ci: the colour (0 red, 2 yellow); mirror: true draws the whole flower, stem and funnel as a mirror image across the middle of the garden (the yellow one at the right, 2026-10-27, per Dan)
-var HGL_GLOW = {0: ["rgba(255,110,80,.56)", "rgba(255,50,50,.42)", "rgba(235,30,45,.3)", "rgba(215,25,45,.18)"], 2: ["rgba(255,245,110,.56)", "rgba(255,218,55,.42)", "rgba(250,192,30,.3)", "rgba(235,170,20,.18)"]};
+var HGL_GLOW = {4: ["rgba(80,170,255,.7)", "rgba(30,125,250,.54)", "rgba(15,100,235,.4)", "rgba(10,85,215,.24)"], 6: ["rgba(215,120,255,.7)", "rgba(175,65,242,.54)", "rgba(148,35,222,.4)", "rgba(125,25,198,.24)"], 0: ["rgba(255,110,80,.56)", "rgba(255,50,50,.42)", "rgba(235,30,45,.3)", "rgba(215,25,45,.18)"], 2: ["rgba(255,245,110,.56)", "rgba(255,218,55,.42)", "rgba(250,192,30,.3)", "rgba(235,170,20,.18)"]};
 function hglFlower(x, g, ci, mirror){
   x.save();
   if(mirror){ x.translate(2 * g.x + g.w, 0); x.scale(-1, 1); }
@@ -9221,12 +9245,83 @@ function hglFlower(x, g, ci, mirror){
   x.restore();
   return {hx: hx, hy: hy, rLen: rLen, K: K};                                       // where its head is (before any mirroring), and how long its funnel is
 }
-function hglDraw(cv, W, H){
+// ---- Round 2 and later: a garden laid out from Dan's picture (2026-10-27) ----
+// The picture (1785 x 880) is fitted to the height of the dirt and put against its upper right corner; a flower's place in it is its place in the dirt. Funnel flowers keep round 1's funnel length, face the way
+// their funnel opens, and have their stem run straight to the nearest edge of the dirt. Flowers whose heads would overlap are moved apart a little.
+var HGL_PIC = {w: 1788, h: 886};            // (the size of Dan's round 2 picture; his round 3 picture is a little shorter, 1788 x 839, but both are taken as the same part of the dirt at the same scale)
+function hglPicXY(g, px, py){ var sc = g.h / HGL_PIC.h; return {x: g.x + g.w - (HGL_PIC.w - px) * sc, y: g.y + py * sc}; }
+// how long round 1's funnel is (every funnel is this long): 1.5 times its flower and stem
+function hglR1Len(g){
+  var D = Math.round(Math.min(46, Math.max(30, Math.round(g.h * .6))) * HGL_FLOWER_K), bottom = g.y + g.h - 1, sp = hglFlowerSprite(0, D), low = 0, im = sp.getContext("2d").getImageData(0, 0, D, D).data, i, j;
+  for(j = D - 1; j >= 0 && !low; j--) for(i = 0; i < D; i++) if(im[(j * D + i) * 4 + 3]){ low = j; break; }
+  var hy = bottom - 1 - low - 4 + Math.round(D / 2), ey = bottom - 4;
+  return 1.5 * ((ey - hy) * Math.SQRT2 + D / 2);
+}
+// the glow of a funnel: narrow at the flower, opening out to its mouth (hx, hy: the middle of the flower; ax, ay: the way the funnel opens)
+function hglFunnelDraw(x, g, hx, hy, ax, ay, rLen, K, glow){
+  var rn = Math.ceil(rLen + 18), i, j, ra, rp, rw, ru, rb;
+  for(j = -rn; j <= rn; j++) for(i = -rn; i <= rn; i++){
+    ra = i * ax + j * ay; rp = -i * ay + j * ax;
+    if(ra < 0 || ra > rLen) continue;
+    rw = (2.4 + 10.4 * (ra / rLen)) * (K / .48) * HGL_FUN_W;
+    ru = Math.abs(rp) / rw; if(ru >= 1) continue;
+    if(hx + i < g.x || hx + i >= g.x + g.w || hy + j < g.y || hy + j >= g.y + g.h) continue;
+    rb = (1 - ru) * (1 - .35 * (ra / rLen));
+    x.fillStyle = rb > .66 ? glow[0] : rb > .42 ? glow[1] : rb > .22 ? glow[2] : glow[3];
+    x.fillRect(hx + i, hy + j, 1, 1);
+  }
+}
+// the earth mound, the stem (straight to the nearest edge of the dirt, as round 1's runs to the bottom), its two leaves and the funnel of a flower; its head is drawn afterwards
+function hglFlowerAt(x, g, ci, hx, hy, ax, ay, rLen, K){
+  var dT = hy - g.y, dB = g.y + g.h - 1 - hy, dL = hx - g.x, dR = g.x + g.w - 1 - hx, m = Math.min(dT, dB, dL, dR), ex, ey, vert, mx, my, i, j, t, pts = [];
+  if(m === dB){ ex = hx; ey = g.y + g.h - 5; vert = true; mx = ex + 1; my = ey + 2; }
+  else if(m === dT){ ex = hx; ey = g.y + 4; vert = true; mx = ex + 1; my = ey - 2; }
+  else if(m === dL){ ex = g.x + 4; ey = hy; vert = false; mx = ex - 2; my = ey + 1; }
+  else { ex = g.x + g.w - 5; ey = hy; vert = false; mx = ex + 2; my = ey + 1; }
+  var A = vert ? 8 : 4, B = vert ? 4 : 8;
+  for(j = -B; j <= B; j++) for(i = -A; i <= A; i++){ var d2 = (i * i) / (A * A) + (j * j) / (B * B); if(d2 <= 1){ x.fillStyle = d2 > .62 ? "#A8763F" : "#B58450"; x.fillRect(mx + i, my + j, 1, 1); } }
+  hglFunnelDraw(x, g, hx, hy, ax, ay, rLen, K, HGL_GLOW[ci]);
+  for(t = 0; t <= 1.0001; t += .04) pts.push([Math.round(hx + (ex - hx) * t), Math.round(hy + (ey - hy) * t)]);
+  x.fillStyle = "#1B1F3B"; pts.forEach(function(p){ x.fillRect(p[0] - 2, p[1] - 2, 4, 4); });
+  x.fillStyle = "#2E9B3A"; pts.forEach(function(p){ x.fillRect(p[0] - 1, p[1] - 1, 2, 2); });
+  x.fillStyle = "#58D05C"; pts.forEach(function(p){ x.fillRect(p[0] - 1, p[1] - 1, 1, 2); });
+  function leaf(lx, ly, dir){
+    var lw = 3;
+    if(vert){ var l0 = dir > 0 ? lx + 2 : lx - 2 - lw; x.fillStyle = "#1B1F3B"; x.fillRect(l0 - 1, ly - 1, lw + 2, 4); x.fillStyle = "#46C24E"; x.fillRect(l0, ly, lw, 2); x.fillStyle = "#2E9B3A"; x.fillRect(l0, ly + 1, lw, 1); }
+    else { var t0 = dir > 0 ? ly + 2 : ly - 2 - lw; x.fillStyle = "#1B1F3B"; x.fillRect(lx - 1, t0 - 1, 4, lw + 2); x.fillStyle = "#46C24E"; x.fillRect(lx, t0, 2, lw); x.fillStyle = "#2E9B3A"; x.fillRect(lx + 1, t0, 1, lw); }
+  }
+  var m1 = pts[Math.round(pts.length * .72)];
+  leaf(m1[0], m1[1], 1); leaf(m1[0], m1[1], -1);
+}
+function hglDrawLayout(x, W, H, topH, g, lay){
+  var K = HGL_FLOWER_K, D = Math.round(Math.min(46, Math.max(30, Math.round(g.h * .6))) * K), TD = 24, rLen = hglR1Len(g), pass, i, j;
+  var items = lay.map(function(f){ var p = hglPicXY(g, f.px, f.py); return {f: f, x: p.x, y: p.y, rad: f.ax === undefined ? TD / 2 : D / 2}; });
+  for(pass = 0; pass < 10; pass++){                                              // no two heads on top of each other (a couple of pixels may touch)
+    for(i = 0; i < items.length; i++) for(j = i + 1; j < items.length; j++){
+      var A = items[i], B = items[j], dx = B.x - A.x, dy = B.y - A.y, d = Math.sqrt(dx * dx + dy * dy), need = A.rad + B.rad - 2;
+      if(d < need){ if(d < .01){ dx = 0; dy = 1; d = 1; } var push = (need - d) / 2; A.x -= dx / d * push; A.y -= dy / d * push; B.x += dx / d * push; B.y += dy / d * push; }
+    }
+    items.forEach(function(q){ q.x = Math.max(g.x + q.rad + 1, Math.min(g.x + g.w - 1 - q.rad - 1, q.x)); q.y = Math.max(g.y + q.rad + 1, Math.min(g.y + g.h - 1 - q.rad - 1, q.y)); });
+  }
+  items.forEach(function(q){ q.x = Math.round(q.x); q.y = Math.round(q.y); });
+  items.forEach(function(q){ if(q.f.ax !== undefined) hglFlowerAt(x, g, q.f.ci, q.x, q.y, q.f.ax, q.f.ay, rLen, K); });
+  items.forEach(function(q){
+    if(q.f.ax !== undefined) x.drawImage(hglFlowerSprite(q.f.ci, D, q.f.ax, q.f.ay), Math.round(q.x - D / 2), Math.round(q.y - D / 2));
+    else x.drawImage(hgHeadSprite(q.f.ci, TD), Math.round(q.x - TD / 2), Math.round(q.y - TD / 2));
+  });
+  hglScenery(x, W, topH);
+  return {g: g, flowers: items.map(function(q){
+    return q.f.ax !== undefined ? {ci: q.f.ci, x: q.x + .5, y: q.y + .5, fun: {ax: q.f.ax, ay: q.f.ay, len: rLen, K: K}} : {ci: q.f.ci, x: q.x, y: q.y, r: TD / 2 - 1, fun: null};
+  })};
+}
+function hglDraw(cv, W, H, round){
   var x = cv.getContext("2d");
   x.clearRect(0, 0, W, H);
   var topH = Math.max(26, Math.min(30, Math.round(H * .22))), gy = topH + HG_RING + 1;
   var g = {x: HG_MARGIN, y: gy, w: W - 2 * HG_MARGIN, h: Math.max(20, H - gy - HG_RING - 1)};
   hglGround(x, W, H, topH, g);
+  var lay = HGL_ROUNDS[round || 0].layout;
+  if(lay) return hglDrawLayout(x, W, H, topH, g, lay);                         // the rounds with a layout of their own
   var rf = hglFlower(x, g, 0, false);
   hglFlower(x, g, 2, true);
   // two flowers seen from above, fully open (2026-10-27, per Dan): a blue one to the left of the red funnel and a violet one to the right of the yellow funnel (swapped, per Dan)
@@ -9751,7 +9846,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 BF";
+var APP_BUILD = "2026-10-27 BH";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
