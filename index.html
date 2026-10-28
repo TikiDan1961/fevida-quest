@@ -252,7 +252,7 @@
   body.hglMode .exitBar{position:absolute;left:calc(env(safe-area-inset-left,0px) + 30px);top:calc(env(safe-area-inset-top,0px) + 20px);margin:0;}
   .hglScreen{position:relative;flex:1;display:block;overflow:hidden;background:linear-gradient(#4FA9F0 0,#BFE3FF 100%);}
   .hglCanvas{position:absolute;left:50%;top:0;transform:translateX(-50%);display:block;touch-action:none;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;}
-  .hglBadge{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 10px;z-index:3;pointer-events:none;}
+  .hglBadge{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;padding:4px 10px;z-index:3;pointer-events:none;}
   .hglBadge img{display:block;image-rendering:pixelated;height:auto;flex:none;}
   .hglSignL{right:auto;left:76px;top:10px;}
   .hglSignR{left:auto;right:12px;top:10px;}
@@ -1221,7 +1221,7 @@ var T = {
     cj_body:"Go to the Fe y Vida booth (#301) to have a joyful instant photo taken with a friend! Once you've done it, tap the button below.",
     awardTitle:"Mission Complete!",
     awardBody:function(pts,badge){return "You won "+pts+" Quest Points and unlocked the "+badge+" Badge!";},
-    awardBodyNoPts:function(badge){return "You unlocked the "+badge+" Badge!";},
+    awardBodyNoPts:function(badge){return "You unlocked the "+badge+" Badge!";}, awardBodyPtsOnly:function(pts){return "You won "+pts+" Quest Points!";},
     passportTitle:"Fe y Vida Passport",
     missionBadge:function(n){return "MISSION "+n+" BADGE";},
     badgeLocked:"???",
@@ -1375,7 +1375,7 @@ var T = {
     cj_body:"¡Ve al stand de Fe y Vida (#301) para hacerte una foto instantánea alegre con un amigo! Cuando termines, toca el botón de abajo.",
     awardTitle:"¡Misión Completada!",
     awardBody:function(pts,badge){return "¡Ganaste "+pts+" Puntos de Aventura y desbloqueaste la insignia "+badge+"!";},
-    awardBodyNoPts:function(badge){return "¡Desbloqueaste la insignia "+badge+"!";},
+    awardBodyNoPts:function(badge){return "¡Desbloqueaste la insignia "+badge+"!";}, awardBodyPtsOnly:function(pts){return "¡Ganaste "+pts+" Puntos de Aventura!";},
     passportTitle:"Pasaporte Fe y Vida",
     missionBadge:function(n){return "INSIGNIA MISIÓN "+n;},
     badgeLocked:"???",
@@ -1523,10 +1523,7 @@ var MISSIONS = [
   // Mustard Seed (2026-10-23, per Dan): took the place of the third "TBD" tile. Own Growth badge since 2026-10-26.
   {id:"mustardSeed", icon:"🌱", badgeImg:"tiles/badge_growth.png", nameKey:"mustardSeedName", themeKey:"themeGrowth"},
   // Pray the Beads (2026-10-23, per Dan): took the place of the last "TBD" tile. Own Prayer badge since 2026-10-26.
-  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_beads.png", nameKey:"prayBeadsName", themeKey:"themePrayer"},
-  // Hope Garden (2026-10-28, per Dan: finishing it must give points, move the pilgrim and give a badge). It uses the Hope badge, which Choose Joy has too, until a badge of its own is made; swap badgeImg then.
-  // Its icon is in the sky on the Main Menu, not in the Missions window (see isMenuIconMission).
-  {id:"hopeGarden", icon:"🌼", badgeImg:"tiles/badge_hope.png", nameKey:"hopeGardenName", themeKey:"themeHope"}
+  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_beads.png", nameKey:"prayBeadsName", themeKey:"themePrayer"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1538,7 +1535,8 @@ var MISSIONS = [
 // Passport's page-count/wrap math and the "/11" CSS above (percentages
 // can't reference a JS constant, so they're hand-kept in sync with this)
 // stay easy to grep together if the mission count ever changes again.
-var PASSPORT_PAGES = MISSIONS.length;       // one badge page for each mission; the Joyous Photo page that came last is gone (2026-10-22, per Dan)
+var PASSPORT_MISSIONS = MISSIONS;      // every mission has a badge page (Hope Garden is not a mission: it gives no badge, points or step for the pilgrim, 2026-10-28, per Dan)
+var PASSPORT_PAGES = PASSPORT_MISSIONS.length;       // one badge page for each mission with a badge; the Joyous Photo page that came last is gone (2026-10-22, per Dan)
 // The rendered track carries 2 extra "phantom" slides beyond the real
 // PASSPORT_PAGES -- a clone of the last page before slot 0 and a clone of
 // the first page after the last real slot -- purely so a wrap (11th page ->
@@ -2838,7 +2836,7 @@ function screenMainMenu(){
     '<div class="homeGrid">' + icons + '</div>' +
     pilgrimSceneHtml() +
     '<div class="pixDoveLayer"><div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div></div>' +
-    '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"openMission('hopeGarden')", bg:ICON_BG.hopeGarden, cls:state.missions.hopeGarden.done ? "done" : "", inner:iconSpr("hopeGarden"), label:t("hopeGardenName"), badge:state.missions.hopeGarden.done ? '<span class="doneBadge">&#10003;</span>' : ""}) + '</div>' +
+    '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeGardenName")}) + '</div>' +
     '<div class="hgMenuIcon" id="cjMenuIcon">' + appIconHtml({onclick:"openMission('" + MENU_ICON_MISSION + "')", bg:ICON_BG[MENU_ICON_MISSION], cls:state.missions[MENU_ICON_MISSION].done ? "done" : "", inner:iconSpr(MENU_ICON_MISSION),
       label:t(missionById(MENU_ICON_MISSION).nameKey), badge:state.missions[MENU_ICON_MISSION].done ? '<span class="doneBadge">&#10003;</span>' : ""}) + '</div>' +
     folderHtml() +
@@ -2869,7 +2867,8 @@ function openPassport(){ go("passport"); }
 function missionIsGame(id){ return PILGRIM_NON_GAMES.indexOf(id) === -1; }
 function grantMission(id, missionState){
   state.missions[id].done = true;
-  state.missions[id].badge = true;
+  var gm = missionById(id);
+  state.missions[id].badge = !(gm && gm.noBadge);
   if(missionIsGame(id)){ state.points += 100; state.pilgrimSteps = (state.pilgrimSteps || 0) + 1; }
   Object.assign(state.missions[id], missionState || {});
   state.awardMissionId = id;
@@ -2900,7 +2899,7 @@ function awardAutoReturn(){
 function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
-  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.id,
+  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:m.noBadge ? t("awardBodyPtsOnly")(100) : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
     buttons:""});
 }
 
@@ -8703,16 +8702,26 @@ function hglFit(){
   }
   hglPlaceSigns(); hglPaint(); hglCountPaint();
 }
-// The two signs are centred in the room beside the name (2026-10-28, per Dan): the bee sign halfway between the left edge of the screen and the left edge of the name, the butterfly sign halfway between the right edge of the
-// name and the right edge of the screen. They are centred on that point (translateX -50%), so they stay centred when the numbers grow to two digits; hglCountPaint places them again after every change of the counts.
+// The two signs are the same size, and always as wide as the widest count can make them ("24/24"), so neither looks lopsided and nothing moves as the numbers grow (2026-10-28, per Dan). The bee sign is centred between the left edge of the screen
+// and the name, the butterfly sign between the name and the right edge, but neither covers the red X, the name or the church: where the room is short the signs sit as near the centre as they can, and a very narrow phone shrinks them (never below 60 %).
+var HGL_SIGN_WIDEST = "24/24";
 function hglPlaceSigns(){
   var scr = document.getElementById("hglScreen"), a = scr && scr.querySelector(".hglSignL"), b = scr && scr.querySelector(".hglSignR"), n = scr && scr.querySelector(".hglBanner");
-  if(!a || !b || !n) return;
-  var sr = scr.getBoundingClientRect(), nr = n.getBoundingClientRect(), left = nr.left - sr.left, right = nr.right - sr.left, xb = document.querySelector(".exitBtn"), aw = a.getBoundingClientRect().width;
-  var ac = left / 2;
-  if(xb) ac = Math.max(ac, xb.getBoundingClientRect().right - sr.left + 6 + aw / 2);                  // (on a narrow phone the red X is in the way: the sign is then as far left as it can go beside it)
-  a.style.right = "auto"; a.style.left = Math.round(ac) + "px"; a.style.transform = "translateX(-50%)";
-  b.style.right = "auto"; b.style.left = Math.round((right + sr.width) / 2) + "px"; b.style.transform = "translateX(-50%)";
+  var ca = document.getElementById("hglCountB"), cb = document.getElementById("hglCountF");
+  if(!a || !b || !n || !ca || !cb) return;
+  var ta = ca.textContent, tb = cb.textContent;
+  ca.textContent = cb.textContent = HGL_SIGN_WIDEST;                          // measure them at the widest
+  a.style.width = b.style.width = "auto"; a.style.transform = b.style.transform = "none";
+  var nat = Math.ceil(Math.max(a.getBoundingClientRect().width, b.getBoundingClientRect().width));
+  ca.textContent = ta; cb.textContent = tb;
+  var sr = scr.getBoundingClientRect(), nr = n.getBoundingClientRect(), xb = document.querySelector(".exitBtn");
+  var nameL = nr.left - sr.left, nameR = nr.right - sr.left, xr = xb ? xb.getBoundingClientRect().right - sr.left + 6 : 6, churchL = hgl ? (hgl.W - 24) * HG_SCALE : sr.width - 4;
+  var k = Math.max(.6, Math.min(1, (nameL - 8 - xr) / nat, (churchL - 4 - (nameR + 8)) / nat)), half = nat * k / 2;
+  var ac = Math.max(xr + half, Math.min(nameL / 2, nameL - 8 - half));
+  var bc = Math.max(nameR + 8 + half, Math.min((nameR + sr.width) / 2, churchL - 4 - half));
+  a.style.width = b.style.width = nat + "px";
+  a.style.right = "auto"; a.style.left = Math.round(ac) + "px"; a.style.transform = "translateX(-50%) scale(" + k.toFixed(3) + ")";
+  b.style.right = "auto"; b.style.left = Math.round(bc) + "px"; b.style.transform = "translateX(-50%) scale(" + k.toFixed(3) + ")";
 }
 window.addEventListener("resize", function(){ if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); } });
 window.addEventListener("orientationchange", function(){ setTimeout(function(){ if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); } }, 250); });
@@ -8886,11 +8895,7 @@ function hglPlayAgain(){ hglDangerSfx(false); hgl = null; render(); }           
 // the end of a ROUND X COMPLETED! screen: the lost chance is given back (after rounds 1 and 2), then the next round starts; after the last round the end message comes up
 function hglInterlude(){
   pixRoundRun("hopeGardenL", function(){ return hgl; }, function(s){ if(hgl.chances >= HG_CHANCES) return false; hgl.chances++; return true; }, function(s){
-    if(s.interlude.final){                                           // all three rounds done: the Mission Completed screen with the badge, the 100 points and a step for the pilgrim, as for the other games (2026-10-28, per Dan)
-      hglDangerSfx(false); hgl = null; state.session.hopeGarden = null;
-      grantMission("hopeGarden");
-      return;
-    }
+    if(s.interlude.final){ hgl.interlude = null; hgl.mode = "complete"; render(); return; }          // all three rounds done: the end message and PLAY AGAIN (no badge, points or step for the pilgrim: Hope Garden is a separate activity, 2026-10-28, per Dan)
     hglSetRound(hgl.round + 1);
     render();
   });
@@ -9340,9 +9345,10 @@ function hglFlowerAt(x, g, ci, hx, hy, ax, ay, rLen, K, back){
 }
 function hglDrawLayout(x, W, H, topH, g, lay){
   var K = HGL_FLOWER_K, D = Math.round(Math.min(46, Math.max(30, Math.round(g.h * .6))) * K), TD = 24, rLen = hglR1Len(g), pass, i, j;
+  var sc = Math.min(1, D / 25);                                                   // the open flowers shrink with the funnel flowers on a short phone (2026-10-28, per Dan): 25 across is the size on an 844 x 390 phone; the picture stays 24 across and the flower is drawn smaller in it
   var items = lay.map(function(f){
     var fun = f.ang !== undefined, a = fun ? f.ang * Math.PI / 180 : 0;
-    return {f: f, fun: fun, ax: Math.cos(a), ay: Math.sin(a), x: g.x + f.fx / 100 * g.w, y: g.y + f.fy / 100 * g.h, rad: fun ? D / 2 : TD / 2};
+    return {f: f, fun: fun, ax: Math.cos(a), ay: Math.sin(a), x: g.x + f.fx / 100 * g.w, y: g.y + f.fy / 100 * g.h, rad: fun ? D / 2 : TD / 2 * sc};
   });
   for(pass = 0; pass < 10; pass++){                                              // no two heads on top of each other (a couple of pixels may touch)
     for(i = 0; i < items.length; i++) for(j = i + 1; j < items.length; j++){
@@ -9355,11 +9361,11 @@ function hglDrawLayout(x, W, H, topH, g, lay){
   items.forEach(function(q){ if(q.fun) hglFlowerAt(x, g, q.f.ci, q.x, q.y, q.ax, q.ay, rLen, K, q.f.stem === "opp"); });
   items.forEach(function(q){
     if(q.fun) x.drawImage(hglFlowerSprite(q.f.ci, D, q.ax, q.ay), Math.round(q.x - D / 2), Math.round(q.y - D / 2));
-    else x.drawImage(hgHeadSprite(q.f.ci, TD), Math.round(q.x - TD / 2), Math.round(q.y - TD / 2));
+    else x.drawImage(hgHeadSprite(q.f.ci, TD, sc), Math.round(q.x - TD / 2), Math.round(q.y - TD / 2));
   });
   hglScenery(x, W, topH);
   return {g: g, flowers: items.map(function(q){
-    return q.fun ? {ci: q.f.ci, x: q.x + .5, y: q.y + .5, fun: {ax: q.ax, ay: q.ay, len: rLen, K: K}} : {ci: q.f.ci, x: q.x, y: q.y, r: TD / 2 - 1, fun: null};
+    return q.fun ? {ci: q.f.ci, x: q.x + .5, y: q.y + .5, fun: {ax: q.ax, ay: q.ay, len: rLen, K: K}} : {ci: q.f.ci, x: q.x, y: q.y, r: TD / 2 * sc - 1, fun: null};
   })};
 }
 function hglDraw(cv, W, H, round){
@@ -9838,8 +9844,8 @@ var PASSPORT_SHOW_ALL = false;
 function badge8Src(m){ return m.badgeImg.replace("tiles/badge_", "tiles/badges96/b96_"); }
 
 function passportPageInner(page){
-  if(page < MISSIONS.length){
-    var m = MISSIONS[page];
+  if(page < PASSPORT_MISSIONS.length){
+    var m = PASSPORT_MISSIONS[page];
     var earned = PASSPORT_SHOW_ALL || state.missions[m.id].badge;
     return '<div class="pxNoteZone"><div class="pxNote">' + t("missionBadge")(page+1) + '</div></div>' +
       '<div class="pxBadgeBlock">' +
@@ -9894,7 +9900,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 BS";
+var APP_BUILD = "2026-10-28 BW";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -10228,7 +10234,7 @@ render();
 // safety net for the rare case someone reaches it before this finishes.
 preloadMatchTiles();
 // The badge pictures are fetched at boot too (2026-10-22, per Dan): the badge on a results screen showed a beat late, with a blank space where it goes.
-var badgePreload = MISSIONS.map(function(m){ var img = new Image(); img.src = badge8Src(m); return img; });
+var badgePreload = PASSPORT_MISSIONS.map(function(m){ var img = new Image(); img.src = badge8Src(m); return img; });
 setTimeout(pixPreloadAll, 700);
 </script>
 </body>
