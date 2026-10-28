@@ -261,6 +261,7 @@
   .hglHearts .pixHearts img{width:22px;height:20px;}      /* the same size as in the other games (2026-10-27, per Dan; a phone on its side is a short screen, which made them 18 x 16) */
   .hglOver{position:absolute;left:50%;top:0;transform:translateX(-50%);display:block;pointer-events:none;z-index:1;}
   .hglAgain{position:absolute;left:0;right:0;top:58%;display:flex;justify-content:center;z-index:6;}
+  #app.assetsWait .screen > *, #app.assetsWait > .exitBar{visibility:hidden;}      /* a new screen waits for its pictures (pixHoldUntilLoaded) */
   /* the Hope Garden screen about Unfinished (2026-10-27, per Dan) */
   .pixMission.pixLower.hgiScreen{padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);overflow-y:auto;overflow-x:hidden;}
   .pixMission.pixLower.hgiScreen > .hgiMeadow{position:absolute;left:0;right:0;bottom:0;height:78%;z-index:0;pointer-events:none;background-color:#52B043;
@@ -1278,7 +1279,7 @@ var T = {
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
-    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hgi_with:"with Anamaria", hgi_quote:"\u201c\u2026the one who began a good work in you will continue to complete it\u2026\u201d", hgi_ref:"PHILIPPIANS 1:6 \u2022 NABRE", hgi_tag:"Help the bees pollinate Hope Garden.", hgi_scan:"SCAN TO WATCH", hgi_qrSoon:"QR code coming soon", hgi_play:"PLAY BEE LINE", hgi_watch:"WATCH ON YOUTUBE", hgi_back:"BACK TO QUEST", hgi_foot:"Your story is still growing.", hg_level:function(n,total){return "Round "+n+"/"+total;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
+    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hgi_with:"with Anamaria", hgi_quote:"\u201c\u2026the one who began a good work in you will continue to complete it\u2026\u201d", hgi_ref:"PHILIPPIANS 1:6 \u2022 NABRE", hgi_tag:"Help the bees pollinate Hope Garden.", hgi_scan:"SCAN TO WATCH", hgi_qrSoon:"QR code coming soon", hgi_play:"PLAY HOPE GARDEN", hgi_watch:"WATCH ON YOUTUBE", hgi_back:"BACK TO QUEST", hgi_foot:"Your story is still growing.", hg_level:function(n,total){return "Round "+n+"/"+total;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
     hg_noChances:"NO CHANCES LEFT!", hg_outTitle:"Out of Chances!", hg_outBody:"Too many bees flew away or bumped into each other. Try again!", hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
     hg_guide:{d:"Colored bees are buzzing into the garden. Guide each one to a flower that is the same color as the bee.", h:["Tap a bee, then drag your finger toward a flower of the same color. A dotted line shows the way, but it only reaches so far.",
       "Lift your finger and the bee flies along the line. If it lands on its flower, it is home!", "A bee that misses flies off in a random direction. Tap it again to guide it back.", "Keep the bees apart and on the screen! If two bees bump into each other, or a bee flies away, you lose a chance. You have 3.", "Flowers open and close, and a bee only counts at a flower that is wide open. Later rounds send butterflies and dragonflies across the garden: bumping into one costs a chance too.", "Bring every bee home to finish all 3 rounds."]},
@@ -1431,7 +1432,7 @@ var T = {
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
-    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hgi_with:"con Anamaria", hgi_quote:"\u201c\u2026el que comenz\u00f3 en ustedes la buena obra la ir\u00e1 consumando\u2026\u201d", hgi_ref:"FILIPENSES 1:6", hgi_tag:"Ayuda a las abejas a polinizar el Jard\u00edn de la Esperanza.", hgi_scan:"ESCANEA PARA VER", hgi_qrSoon:"C\u00f3digo QR pr\u00f3ximamente", hgi_play:"JUGAR L\u00cdNEA DE LA ABEJA", hgi_watch:"VER EN YOUTUBE", hgi_back:"VOLVER A LA AVENTURA", hgi_foot:"Tu historia sigue creciendo.", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
+    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hgi_with:"con Anamaria", hgi_quote:"\u201c\u2026el que comenz\u00f3 en ustedes la buena obra la ir\u00e1 consumando\u2026\u201d", hgi_ref:"FILIPENSES 1:6", hgi_tag:"Ayuda a las abejas a polinizar el Jard\u00edn de la Esperanza.", hgi_scan:"ESCANEA PARA VER", hgi_qrSoon:"C\u00f3digo QR pr\u00f3ximamente", hgi_play:"JUGAR JARD\u00cdN DE LA ESPERANZA", hgi_watch:"VER EN YOUTUBE", hgi_back:"VOLVER A LA AVENTURA", hgi_foot:"Tu historia sigue creciendo.", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
     hg_noChances:"¡SIN OPORTUNIDADES!", hg_outTitle:"¡Sin Oportunidades!", hg_outBody:"Demasiadas abejas se fueron volando o chocaron. ¡Inténtalo de nuevo!", hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
     hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
       "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas y dentro de la pantalla! Si dos abejas chocan, o una se va volando, pierdes una oportunidad. Tienes 3.", "Las flores se abren y se cierran, y una abeja solo cuenta en una flor bien abierta. Las rondas siguientes traen mariposas y libélulas por el jardín: chocar con una también cuesta una oportunidad.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
@@ -9645,7 +9646,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 BB";
+var APP_BUILD = "2026-10-27 BC";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -9781,8 +9782,37 @@ function rotateMsgUpdate(){
   tx.textContent = es ? "POR FAVOR, GIRA TU TELÉFONO" : "PLEASE ROTATE YOUR PHONE";
   sub.textContent = unset ? "POR FAVOR, GIRA TU TELÉFONO" : "";             // before a language is chosen both are shown
 }
+// A new screen is shown only when every picture on it has arrived (2026-10-27, per Dan: on the Anamaria screen some pictures came in late). The pictures of the whole game are also fetched in the background
+// soon after the app starts (pixPreloadAll), so this wait is hardly ever seen. The wait is never longer than 1.5 seconds, and the sky behind the screen stays up (no dark flash).
+var holdToken = 0;
+function pixHoldUntilLoaded(app){
+  var mine = ++holdToken, pending = [].filter.call(app.querySelectorAll("img"), function(im){ return !im.complete; });
+  if(!pending.length) return;
+  app.classList.add("assetsWait");
+  var left = pending.length;
+  function reveal(){ if(mine === holdToken) app.classList.remove("assetsWait"); }
+  function one(){ if(--left <= 0) reveal(); }
+  pending.forEach(function(im){ im.addEventListener("load", one); im.addEventListener("error", one); });
+  setTimeout(reveal, 1500);
+}
+// Every picture of the game (tiles/, all the .png and .jpg: 296 of them, about 5.6 MB), fetched a few at a time in the background after the first screen is up. New pictures put in tiles/ must be added to this list.
+var PRELOAD_LIST = "anamaria.png|anamaria_placeholder.png|badge_beads.png|badge_discipleship.png|badge_faith.png|badge_forgiveness.png|badge_friendship.png|badge_grace.png|badge_growth.png|badge_holiness.png|badge_hope.png|badge_light.png|badge_love.png|badge_mercy.png|badge_perseverance.png|badge_salvation.png|badge_scripture.png|badge_spirit.png|badge_truth.png|badge_wisdom.png|badges8/b8_faith.png|badges8/b8_forgiveness.png|badges8/b8_friendship.png|badges8/b8_grace.png|badges8/b8_holiness.png|badges8/b8_hope.png|badges8/b8_light.png|badges8/b8_love.png|badges8/b8_mercy.png|badges8/b8_salvation.png|badges96/b96_beads.png|badges96/b96_discipleship.png|badges96/b96_faith.png|badges96/b96_forgiveness.png|badges96/b96_friendship.png|badges96/b96_grace.png|badges96/b96_growth.png|badges96/b96_holiness.png|badges96/b96_hope.png|badges96/b96_light.png|badges96/b96_love.png|badges96/b96_mercy.png|badges96/b96_perseverance.png|badges96/b96_salvation.png|badges96/b96_scripture.png|badges96/b96_spirit.png|badges96/b96_truth.png|badges96/b96_wisdom.png|blessings.png|candle.png|card_back.png|cat.png|church_interior.png|church_interior2.png|clouds_1.png|clouds_2.png|clouds_3.png|clouds_menu.png|dog.png|dove.png|dove2.png|dove3.png|emoji/e_angel.png|emoji/e_apple.png|emoji/e_baby.png|emoji/e_boy.png|emoji/e_bread.png|emoji/e_cross.png|emoji/e_crown.png|emoji/e_cup.png|emoji/e_dove.png|emoji/e_earth.png|emoji/e_elephant.png|emoji/e_feet.png|emoji/e_fire.png|emoji/e_fish.png|emoji/e_heart.png|emoji/e_herb.png|emoji/e_house.png|emoji/e_jar.png|emoji/e_ladder.png|emoji/e_lion.png|emoji/e_moneybag.png|emoji/e_moon.png|emoji/e_mountain.png|emoji/e_ogre.png|emoji/e_oldman.png|emoji/e_people.png|emoji/e_pig.png|emoji/e_pray.png|emoji/e_rain.png|emoji/e_rainbow.png|emoji/e_sailboat.png|emoji/e_seedling.png|emoji/e_sheep.png|emoji/e_ship.png|emoji/e_snake.png|emoji/e_star.png|emoji/e_sun.png|emoji/e_sunrise.png|emoji/e_tablets.png|emoji/e_target.png|emoji/e_tower.png|emoji/e_tree.png|emoji/e_walk.png|emoji/e_wave.png|emoji/e_whale.png|faith_tile2_00.jpg|faith_tile2_01.jpg|faith_tile2_02.jpg|faith_tile2_03.jpg|faith_tile2_04.jpg|faith_tile2_05.jpg|faith_tile2_06.jpg|faith_tile2_07.jpg|faith_tile2_08.jpg|faith_tile2_09.jpg|faith_tile2_10.jpg|faith_tile2_11.jpg|faith_tile2_12.jpg|faith_tile2_13.jpg|faith_tile2_14.jpg|faith_tile2_15.jpg|faith_tile8_00.png|faith_tile8_01.png|faith_tile8_02.png|faith_tile8_03.png|faith_tile8_04.png|faith_tile8_05.png|faith_tile8_06.png|faith_tile8_07.png|faith_tile8_08.png|faith_tile8_09.png|faith_tile8_10.png|faith_tile8_11.png|faith_tile8_12.png|faith_tile8_13.png|faith_tile8_14.png|faith_tile8_15.png|fence_front.png|fence_front2.png|fence_front3.png|flame.png|fruits/fs_1.png|fruits/fs_2.png|fruits/fs_3.png|fruits/fs_4.png|fruits/fs_5.png|fruits/fs_6.png|fruits/fs_7.png|fruits/fs_8.png|fruits/fs_9.png|fruits/fs_9b.png|fruits/fs_9c.png|fruits/fs_9d.png|golden_ticket.png|hands.png|hands2.png|hands3.png|hb_scene.png|heart_empty.png|heart_full.png|hg_intro_scene.png|hg_qr.png|icons/ic_back.png|icons/ic_beTheLight.png|icons/ic_catchLight.png|icons/ic_chooseJoy.png|icons/ic_emojiStories.png|icons/ic_faithFlash.png|icons/ic_faithMatch.png|icons/ic_followLight.png|icons/ic_goldenTicket.png|icons/ic_hiddenBlessings.png|icons/ic_jesusTimeline.png|icons/ic_kindnessSort.png|icons/ic_lightCandle.png|icons/ic_lock.png|icons/ic_music.png|icons/ic_options.png|icons/ic_passport.png|icons/ic_pathOfLight.png|icons/ic_sacredSudoku.png|icons/ic_sound.png|icons/ic_stainedGlass.png|icons/ic_tbd.png|icons/ic_wordUnscramble.png|icons/lc_courage.png|icons/lc_family.png|icons/lc_friends.png|icons/lc_healing.png|icons/lc_peace.png|icons/lc_thanks.png|icons48/ic_back.png|icons48/ic_beTheLight.png|icons48/ic_catchLight.png|icons48/ic_chooseJoy.png|icons48/ic_dovePeace.png|icons48/ic_emojiStories.png|icons48/ic_faithFlash.png|icons48/ic_faithMatch.png|icons48/ic_followLight.png|icons48/ic_fruitsSpirit.png|icons48/ic_goldenTicket.png|icons48/ic_hiddenBlessings.png|icons48/ic_hopeGarden.png|icons48/ic_jacobLadder.png|icons48/ic_jesusTimeline.png|icons48/ic_kindnessSort.png|icons48/ic_lightCandle.png|icons48/ic_lock.png|icons48/ic_music.png|icons48/ic_mustardSeed.png|icons48/ic_options.png|icons48/ic_passport.png|icons48/ic_pathOfLight.png|icons48/ic_pilgrimRoad.png|icons48/ic_prayBeads.png|icons48/ic_sacredSudoku.png|icons48/ic_sound.png|icons48/ic_stainedGlass.png|icons48/ic_tbd.png|icons48/ic_wordGroups.png|icons48/ic_wordTrail.png|icons48/ic_wordUnscramble.png|icons48p/ic_back.png|icons48p/ic_beTheLight.png|icons48p/ic_catchLight.png|icons48p/ic_chooseJoy.png|icons48p/ic_dovePeace.png|icons48p/ic_emojiStories.png|icons48p/ic_faithFlash.png|icons48p/ic_faithMatch.png|icons48p/ic_followLight.png|icons48p/ic_fruitsSpirit.png|icons48p/ic_goldenTicket.png|icons48p/ic_hiddenBlessings.png|icons48p/ic_hopeGarden.png|icons48p/ic_jacobLadder.png|icons48p/ic_jesusTimeline.png|icons48p/ic_kindnessSort.png|icons48p/ic_lightCandle.png|icons48p/ic_lock.png|icons48p/ic_music.png|icons48p/ic_mustardSeed.png|icons48p/ic_options.png|icons48p/ic_passport.png|icons48p/ic_pathOfLight.png|icons48p/ic_pilgrimRoad.png|icons48p/ic_prayBeads.png|icons48p/ic_sacredSudoku.png|icons48p/ic_sound.png|icons48p/ic_stainedGlass.png|icons48p/ic_tbd.png|icons48p/ic_wordGroups.png|icons48p/ic_wordTrail.png|icons48p/ic_wordUnscramble.png|lawn.png|logo_8bit.png|logo_small.png|ms/ms_1.png|ms/ms_2.png|ms/ms_3.png|ms/ms_4.png|ms/ms_5.png|ms/ms_6.png|passport_bg.png|pilgrim.png|pilgrim_back.png|pr/church.png|puzzle/pz_01.jpg|puzzle/pz_02.jpg|puzzle/pz_03.jpg|puzzle/pz_04.jpg|puzzle/pz_05.jpg|puzzle/pz_06.jpg|puzzle/pz_07.jpg|puzzle/pz_08.jpg|puzzle/pz_09.jpg|puzzle/pz_10.jpg|puzzle/pz_11.jpg|puzzle/pz_12.jpg|qr_feyvida.png|scene_church.png|scene_home.png|scene_world.png|scene_world2.png|scene_world3.png|sheep.png|sheep_far.png|sheep_far2.png|sheep_near.png|sheep_near2.png|sky_menu.png|spark.png|stars_tile.png".split("|");
+var preloadKeep = [];
+function pixPreloadAll(){
+  var i = 0, running = 0;
+  function next(){
+    while(running < 4 && i < PRELOAD_LIST.length){
+      var im = new Image(); running++;
+      im.onload = im.onerror = function(){ running--; next(); };
+      im.src = "tiles/" + PRELOAD_LIST[i++];
+      preloadKeep.push(im);
+    }
+  }
+  next();
+}
 function render(){
   var app = document.getElementById("app");
+  app.classList.remove("assetsWait");
   var html;
   switch(state.screen){
     case "language": html = screenLanguage(); break;
@@ -9827,6 +9857,7 @@ function render(){
   rotateMsgUpdate();
   var wasSky = !!app.querySelector(".screen.pixSky");     // the screen being replaced was a sky screen
   app.innerHTML = exitBarHtml() + html;
+  if(isNewScreen) pixHoldUntilLoaded(app);
   if(isNewScreen){
     var el = app.querySelector(".screen");
     // No fade between two sky screens (2026-10-22, per Dan): the fade starts from see-through, which showed the dark purple page behind it as a
@@ -9948,6 +9979,7 @@ render();
 preloadMatchTiles();
 // The badge pictures are fetched at boot too (2026-10-22, per Dan): the badge on a results screen showed a beat late, with a blank space where it goes.
 var badgePreload = MISSIONS.map(function(m){ var img = new Image(); img.src = badge8Src(m); return img; });
+setTimeout(pixPreloadAll, 700);
 </script>
 </body>
 </html>
