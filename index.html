@@ -8593,6 +8593,8 @@ function hgInterlude(){
 // The screen that comes up when the Hope Garden icon is tapped (2026-10-27, per Dan, from the concept picture he supplied): about Unfinished and Anamaria, with the verse, a scene (tiles/hg_intro_scene.png, cut from that picture), a
 // QR code and three buttons. HGI_YOUTUBE_URL is the link behind WATCH ON YOUTUBE: until Dan gives it the button only says it is coming. The QR code is tiles/hg_qr.png: until that file is there a small note stands in for it.
 var HGI_YOUTUBE_URL = "https://youtube.com/@institutofeyvida3521?si=oZgtVfSkZG198n4d";      // (given by Dan 2026-10-27; tiles/hg_qr.png is the QR code of this same link)
+// On a phone the link opens in the same tab (2026-10-28, per Dan: a new tab did not open on his phone; YouTube's own app or page takes over, and Back returns to the game, which remembers where it was); on a computer, in a new tab.
+function hgiLinkTarget(){ return (window.matchMedia && window.matchMedia("(pointer:coarse)").matches) ? "_self" : "_blank"; }
 function hgiWatch(){ if(HGI_YOUTUBE_URL) window.open(HGI_YOUTUBE_URL, "_blank", "noopener"); else toast(t("comingSoonToast")); }
 // The scenery along the top of the game (mountains, hills, trees, the church) is drawn along the horizon behind the cameo (2026-10-27, per Dan): the strip ends half way down the cameo, and the meadow starts there.
 function hgiHorizon(){
@@ -8614,7 +8616,7 @@ function screenHopeGardenIntro(){
     '<div class="hgiPill hgiTag">' + leaf + '<span>' + t("hgi_tag") + '</span>' + leaf + '</div>' +
     '<div class="hgiRow">' +
       '<div class="hgiCard hgiQr"><div class="hgiScan">' + t("hgi_scan") + '</div><div class="hgiQrBox"><span>' + t("hgi_qrSoon") + '</span><img src="tiles/hg_qr.png" alt="" onerror="this.style.display=\'none\'"></div></div>' +
-      '<div class="hgiBtns">' + btn(t("hgi_play"), "hgStart()") + (HGI_YOUTUBE_URL ? '<a class="hgiBtn" href="' + HGI_YOUTUBE_URL + '" target="_blank" rel="noopener" onpointerdown="pixPressSfx()"><span>' + t("hgi_watch") + '</span><i class="hgiArrow"></i></a>' : btn(t("hgi_watch"), "hgiWatch()")) + btn(t("hgi_back"), "hgQuit()") + '</div>' +
+      '<div class="hgiBtns">' + btn(t("hgi_play"), "hgStart()") + (HGI_YOUTUBE_URL ? '<a class="hgiBtn" href="' + HGI_YOUTUBE_URL + '" target="' + hgiLinkTarget() + '" rel="noopener" onpointerdown="pixPressSfx()"><span>' + t("hgi_watch") + '</span><i class="hgiArrow"></i></a>' : btn(t("hgi_watch"), "hgiWatch()")) + btn(t("hgi_back"), "hgQuit()") + '</div>' +
     '</div>' +
     '<div class="hgiFoot">' + heart + '<span>' + t("hgi_foot") + '</span>' + heart + '</div>' +
   '</div>', "hgiScreen");
@@ -9851,7 +9853,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 BJ";
+var APP_BUILD = "2026-10-28 BK";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
