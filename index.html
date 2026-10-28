@@ -261,6 +261,50 @@
   .hglHearts .pixHearts img{width:22px;height:20px;}      /* the same size as in the other games (2026-10-27, per Dan; a phone on its side is a short screen, which made them 18 x 16) */
   .hglOver{position:absolute;left:50%;top:0;transform:translateX(-50%);display:block;pointer-events:none;z-index:1;}
   .hglAgain{position:absolute;left:0;right:0;top:58%;display:flex;justify-content:center;z-index:6;}
+  /* the Hope Garden screen about Unfinished (2026-10-27, per Dan) */
+  .pixMission.pixLower.hgiScreen{padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);overflow-y:auto;overflow-x:hidden;}
+  .pixMission.pixLower.hgiScreen > .hgiMeadow{position:absolute;left:0;right:0;bottom:0;height:78%;z-index:0;pointer-events:none;background-color:#52B043;
+    background-image:radial-gradient(circle,#FFE45E 0 2px,transparent 2.6px),radial-gradient(circle,#FFFFFF 0 2px,transparent 2.6px),radial-gradient(circle,#FF8FB8 0 2px,transparent 2.6px),linear-gradient(#79CE57,#52B043 22%,#3E9F3A);
+    background-size:47px 53px,61px 41px,37px 59px,100% 100%;background-position:6px 10px,30px 22px,15px 40px,0 0;}
+  .pixMission.pixLower.hgiScreen > .hgiHorizon{position:absolute;left:0;top:0;width:100%;height:78px;z-index:0;pointer-events:none;image-rendering:pixelated;}
+  .hgiWrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:7px;min-height:100%;box-sizing:border-box;width:100%;max-width:420px;margin:0 auto;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;}
+  .hgiTitle{display:flex;flex-direction:column;align-items:center;line-height:.95;text-transform:uppercase;color:#FFC93A;
+    text-shadow:3px 0 #1b2a6b,-3px 0 #1b2a6b,0 3px #1b2a6b,0 -3px #1b2a6b,3px 3px #1b2a6b,-3px -3px #1b2a6b,3px -3px #1b2a6b,-3px 3px #1b2a6b,0 5px 0 #1b2a6b;}
+  .hgiT1{font-weight:700;font-size:1.65rem;letter-spacing:.03em;}
+  .hgiT2{font-weight:700;font-size:2.7rem;letter-spacing:.02em;margin-top:2px;}
+  .hgiPill,.hgiCard{box-sizing:border-box;background:#FFF8DC;color:#1E2F7A;border:3px solid #1B1F3B;border-radius:10px;box-shadow:inset 0 0 0 3px #FFC93A,0 4px 0 rgba(20,30,90,.4);text-align:center;}
+  .hgiPill{display:flex;align-items:center;justify-content:center;gap:7px;padding:4px 16px 5px;font-weight:700;letter-spacing:.03em;}
+  .hgiCameo{position:relative;z-index:2;flex:none;width:clamp(120px,21vh,180px);margin-bottom:-18px;aspect-ratio:1;box-sizing:border-box;border-radius:50%;border:4px solid #FFC93A;overflow:hidden;background:#BFE3FF;box-shadow:0 0 0 3px #1B1F3B,0 6px 0 3px rgba(20,30,90,.4);}
+  .hgiCameo img{display:block;width:100%;height:100%;object-fit:cover;}
+  .hgiTag{width:100%;font-size:1.05rem;line-height:1.1;padding:6px 14px 7px;}
+  .hgiHeart{width:15px;height:14px;image-rendering:pixelated;flex:none;}
+  .hgiLeaf{display:inline-block;flex:none;width:13px;height:13px;background:#46C24E;border:2px solid #1B6E2B;border-radius:0 80% 0 80%;box-sizing:border-box;box-shadow:inset -2px -2px 0 #2E9B3A;}
+  .hgiQuote{position:relative;width:100%;padding:12px 14px 9px;}
+  .hgiQuote .hgiLeaf{position:absolute;width:20px;height:20px;}
+  .hgiQuote .c1{left:-5px;top:-5px;transform:rotate(-12deg);}
+  .hgiQuote .c2{right:-5px;top:-5px;transform:scaleX(-1) rotate(-12deg);}
+  .hgiQuote .c3{left:-5px;bottom:-5px;transform:scaleY(-1) rotate(-12deg);}
+  .hgiQuote .c4{right:-5px;bottom:-5px;transform:scale(-1,-1) rotate(-12deg);}
+  .hgiQ{margin:0;font-weight:700;font-size:1.28rem;line-height:1.12;}
+  .hgiRef{margin:5px 0 0;font-weight:700;font-size:.8rem;letter-spacing:.05em;color:#1B1F3B;}
+  .hgiScene{display:block;width:100%;height:auto;border:3px solid #1B1F3B;border-radius:10px;box-sizing:border-box;box-shadow:0 4px 0 rgba(20,30,90,.4);}
+  .hgiRow{display:grid;grid-template-columns:auto 1fr;gap:9px;width:100%;margin-top:2px;}
+  .hgiQr{padding:7px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .hgiScan{font-weight:700;font-size:.88rem;letter-spacing:.04em;color:#1B1F3B;}
+  .hgiQrBox{position:relative;flex:none;width:clamp(100px,29vw,130px);aspect-ratio:1;background:#fff;border:2px solid #1B1F3B;display:flex;align-items:center;justify-content:center;}
+  .hgiQrBox span{font-size:.8rem;line-height:1.1;color:#6A7288;padding:4px;}
+  .hgiQrBox img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;background:#fff;}
+  .hgiBtns{display:flex;flex-direction:column;gap:7px;}
+  .hgiBtn{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:42px;padding:3px 12px 5px 12px;font-family:inherit;font-weight:700;font-size:1.05rem;line-height:1.02;letter-spacing:.03em;text-align:left;text-transform:uppercase;color:#fff;
+    text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1B1F3B;border-radius:10px;box-shadow:inset 0 0 0 2px #8CC4F6,inset 0 -4px 0 rgba(0,0,0,.18),0 4px 0 rgba(20,30,90,.4);cursor:pointer;}
+  .hgiBtn:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #8CC4F6,0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .hgiArrow{flex:none;width:0;height:0;border-left:10px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.35));}
+  @media (max-height:700px){
+    .pixMission.pixLower.hgiScreen{padding-top:calc(env(safe-area-inset-top,0px) + 6px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6px);}
+    .hgiWrap{gap:5px;} .hgiT1{font-size:1.4rem;} .hgiT2{font-size:2.2rem;} .hgiQ{font-size:1.12rem;} .hgiQuote{padding:9px 12px 7px;}
+    .hgiBtn{min-height:37px;font-size:.98rem;} .hgiCameo{width:112px;}.hgiTag{padding:4px 12px 5px;font-size:.98rem;} .hgiPill{padding-top:2px;padding-bottom:3px;}
+  }
+  .hgiFoot{display:flex;align-items:center;gap:8px;margin-top:2px;font-weight:700;font-size:.95rem;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.45);}
   .pixHome.pixSky > .hgMenuIcon{position:absolute;z-index:6;visibility:hidden;left:0;top:300px;margin:0;}
   .pixMenu.pilgrimBusy .hgMenuIcon{filter:grayscale(1);opacity:.55;pointer-events:none;}
 
@@ -1233,7 +1277,7 @@ var T = {
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
     jacobLadderName:"Jacob's Ladder", jl_intro:"Hold LEFT or RIGHT to steer Jacob. Bounce up the rungs to the gate of heaven. The bar on the right shows how high you are.", jl_ohno:"OH NO!!!!", jl_left:"LEFT", jl_right:"RIGHT",
     jl_height:function(n,total){return "Height: "+n+" / "+total;}, jl_failTitle:"Jacob Fell!", jl_failBody:"Jacob fell too many times. Try again!",
-    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hg_level:function(n,total){return "Round "+n+"/"+total;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
+    hopeGardenName:"Hope Garden", hg_sub:"Unfinished with Anamaria", hgi_with:"with Anamaria", hgi_quote:"\u201c\u2026the one who began a good work in you will continue to complete it\u2026\u201d", hgi_ref:"PHILIPPIANS 1:6 \u2022 NABRE", hgi_tag:"Help the bees pollinate Hope Garden.", hgi_scan:"SCAN TO WATCH", hgi_qrSoon:"QR code coming soon", hgi_play:"PLAY BEE LINE", hgi_watch:"WATCH ON YOUTUBE", hgi_back:"BACK TO QUEST", hgi_foot:"Your story is still growing.", hg_level:function(n,total){return "Round "+n+"/"+total;}, hg_beesLabel:"Bees", hg_startBtn:"Start", hg_playing:"Guide the bees!", hg_intro:"Tap a bee, then drag your finger to a flower of the same color.", hg_play:"PLAY", hg_home:function(n,total){return "Bees home: "+n+" / "+total;}, hg_bump:"BEES CRASHED!",
     hg_noChances:"NO CHANCES LEFT!", hg_outTitle:"Out of Chances!", hg_outBody:"Too many bees flew away or bumped into each other. Try again!", hg_failTitle:"Bees Crashed!", hg_failBody:"Two bees bumped into each other. Try again!", hg_winTitle:"The Garden Is in Bloom!", hg_winBody:"Every bee found its flower. Great job!",
     hg_guide:{d:"Colored bees are buzzing into the garden. Guide each one to a flower that is the same color as the bee.", h:["Tap a bee, then drag your finger toward a flower of the same color. A dotted line shows the way, but it only reaches so far.",
       "Lift your finger and the bee flies along the line. If it lands on its flower, it is home!", "A bee that misses flies off in a random direction. Tap it again to guide it back.", "Keep the bees apart and on the screen! If two bees bump into each other, or a bee flies away, you lose a chance. You have 3.", "Flowers open and close, and a bee only counts at a flower that is wide open. Later rounds send butterflies and dragonflies across the garden: bumping into one costs a chance too.", "Bring every bee home to finish all 3 rounds."]},
@@ -1386,7 +1430,7 @@ var T = {
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
     jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
     jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
-    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
+    hopeGardenName:"Jardín de la Esperanza", hg_sub:"Unfinished con Anamaria", hgi_with:"con Anamaria", hgi_quote:"\u201c\u2026el que comenz\u00f3 en ustedes la buena obra la ir\u00e1 consumando\u2026\u201d", hgi_ref:"FILIPENSES 1:6", hgi_tag:"Ayuda a las abejas a polinizar el Jard\u00edn de la Esperanza.", hgi_scan:"ESCANEA PARA VER", hgi_qrSoon:"C\u00f3digo QR pr\u00f3ximamente", hgi_play:"JUGAR L\u00cdNEA DE LA ABEJA", hgi_watch:"VER EN YOUTUBE", hgi_back:"VOLVER A LA AVENTURA", hgi_foot:"Tu historia sigue creciendo.", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
     hg_noChances:"¡SIN OPORTUNIDADES!", hg_outTitle:"¡Sin Oportunidades!", hg_outBody:"Demasiadas abejas se fueron volando o chocaron. ¡Inténtalo de nuevo!", hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
     hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
       "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas y dentro de la pantalla! Si dos abejas chocan, o una se va volando, pierdes una oportunidad. Tienes 3.", "Las flores se abren y se cierran, y una abeja solo cuenta en una flor bien abierta. Las rondas siguientes traen mariposas y libélulas por el jardín: chocar con una también cuesta una oportunidad.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
@@ -8530,11 +8574,34 @@ function hgInterlude(){
     saveState(); render();
   });
 }
+// The screen that comes up when the Hope Garden icon is tapped (2026-10-27, per Dan, from the concept picture he supplied): about Unfinished and Anamaria, with the verse, a scene (tiles/hg_intro_scene.png, cut from that picture), a
+// QR code and three buttons. HGI_YOUTUBE_URL is the link behind WATCH ON YOUTUBE: until Dan gives it the button only says it is coming. The QR code is tiles/hg_qr.png: until that file is there a small note stands in for it.
+var HGI_YOUTUBE_URL = "https://youtube.com/@institutofeyvida3521?si=oZgtVfSkZG198n4d";      // (given by Dan 2026-10-27; tiles/hg_qr.png is the QR code of this same link)
+function hgiWatch(){ if(HGI_YOUTUBE_URL) window.open(HGI_YOUTUBE_URL, "_blank", "noopener"); else toast(t("comingSoonToast")); }
+// The scenery along the top of the game (mountains, hills, trees, the church) is drawn along the horizon behind the cameo (2026-10-27, per Dan): the strip ends half way down the cameo, and the meadow starts there.
+function hgiHorizon(){
+  var cv = document.getElementById("hgiHorizon"), cm = document.querySelector(".hgiCameo"), scr = document.querySelector(".hgiScreen"), mead = document.querySelector(".hgiMeadow"); if(!cv || !cm || !scr) return;
+  var sr = scr.getBoundingClientRect(), cr = cm.getBoundingClientRect(), W = Math.max(60, Math.ceil(sr.width / HG_SCALE)), y0 = Math.round(cr.top + cr.height * .62 - sr.top);
+  if(cv.width !== W){ cv.width = W; cv.height = 26; var x = cv.getContext("2d"); x.clearRect(0, 0, W, 26); hglScenery(x, W, 26); }
+  cv.style.top = (y0 - 26 * HG_SCALE) + "px"; cv.style.height = (26 * HG_SCALE) + "px";
+  if(mead){ mead.style.top = y0 + "px"; mead.style.height = "auto"; }
+}
+window.addEventListener("resize", function(){ if(state.screen === "hopeGardenIntro") hgiHorizon(); });
 function screenHopeGardenIntro(){
-  var g = t("hg_guide"), steps = g.h.map(function(line){ return '<li>' + line + '</li>'; }).join("");
-  return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t("hopeGardenName") + '</h2>' +
-    '<div class="pixPaper pixGuide"><p class="pixGuideDesc">' + g.d + '</p><ul>' + steps + '</ul></div></div>' +
-    pixBtnHtml(t("hg_play"), "hgStart()"), "pixLower");
+  var heart = '<img class="hgiHeart" src="tiles/heart_full.png" alt="">', leaf = '<i class="hgiLeaf"></i>';
+  function btn(label, js){ return '<button class="hgiBtn" type="button" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '"><span>' + label + '</span><i class="hgiArrow"></i></button>'; }
+  return pixShell('<div class="hgiMeadow"></div><canvas class="hgiHorizon" id="hgiHorizon" width="100" height="26"></canvas><div class="hgiWrap">' +
+    '<div class="hgiTitle"><span class="hgiT1">Fe y Vida Quest</span><span class="hgiT2">UNFINISHED</span></div>' +
+    '<div class="hgiCameo"><img src="tiles/anamaria.png" alt="Anamaria" onerror="this.onerror=null;this.src=\'tiles/anamaria_placeholder.png\'"></div>' +      // the large cameo of Anamaria that used to be on the game screen (2026-10-27, per Dan; it replaced the two cards under the title)
+    '<div class="hgiCard hgiQuote"><i class="hgiLeaf c1"></i><i class="hgiLeaf c2"></i><i class="hgiLeaf c3"></i><i class="hgiLeaf c4"></i><p class="hgiQ">' + t("hgi_quote") + '</p><p class="hgiRef">' + t("hgi_ref") + '</p></div>' +
+    '<img class="hgiScene" src="tiles/hg_intro_scene.png" alt="">' +
+    '<div class="hgiPill hgiTag">' + leaf + '<span>' + t("hgi_tag") + '</span>' + leaf + '</div>' +
+    '<div class="hgiRow">' +
+      '<div class="hgiCard hgiQr"><div class="hgiScan">' + t("hgi_scan") + '</div><div class="hgiQrBox"><span>' + t("hgi_qrSoon") + '</span><img src="tiles/hg_qr.png" alt="" onerror="this.style.display=\'none\'"></div></div>' +
+      '<div class="hgiBtns">' + btn(t("hgi_play"), "hgStart()") + btn(t("hgi_watch"), "hgiWatch()") + btn(t("hgi_back"), "hgQuit()") + '</div>' +
+    '</div>' +
+    '<div class="hgiFoot">' + heart + '<span>' + t("hgi_foot") + '</span>' + heart + '</div>' +
+  '</div>', "hgiScreen");
 }
 function screenHopeGarden(){
   var s = state.session.hopeGarden;
@@ -9577,7 +9644,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 AT";
+var APP_BUILD = "2026-10-27 BA";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -9663,7 +9730,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["missionIntro","faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder","hopeGardenIntro","hopeGarden","hopeGardenL"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder","hopeGarden","hopeGardenL"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved","won"];
 
 function exitBarHtml(){
@@ -9851,6 +9918,7 @@ function render(){
   if(state.screen === "hopeGarden"){ hgFit(); hgDraw(); hgLoopStart(); }
   if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); }
   if(state.screen === "mainMenu") hgPlaceMenuIcon();
+  if(state.screen === "hopeGardenIntro") hgiHorizon();
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "lightCandle") lcPaint();
