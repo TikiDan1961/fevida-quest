@@ -258,6 +258,7 @@
   .hglDone{color:#52C246;z-index:5;}
   .hglBanner{left:50%;top:6px;min-width:0;z-index:3;pointer-events:none;}
   .hglHearts{top:62px;z-index:3;pointer-events:none;}
+  .hglHearts .pixHearts img{width:22px;height:20px;}      /* the same size as in the other games (2026-10-27, per Dan; a phone on its side is a short screen, which made them 18 x 16) */
   .hglOver{position:absolute;left:50%;top:0;transform:translateX(-50%);display:block;pointer-events:none;z-index:1;}
   .hglAgain{position:absolute;left:0;right:0;top:58%;display:flex;justify-content:center;z-index:6;}
   .pixHome.pixSky > .hgMenuIcon{position:absolute;z-index:6;visibility:hidden;left:0;top:300px;margin:0;}
@@ -8605,12 +8606,15 @@ function hglFit(){
   }
   hglPlaceSigns(); hglPaint(); hglCountPaint();
 }
-// The butterfly sign sits beside the name, as far from it as the bee sign is on the other side (2026-10-27, per Dan). hgl.signR is where it ends (in game pixels), so no signal comes up under it.
+// The two signs sit close to the name, one each side with the same small gap (2026-10-27, per Dan; they were further out). hgl.signL and hgl.signR are where they end (in game pixels), so no signal comes up under them.
+var HGL_SIGN_GAP = 12;
 function hglPlaceSigns(){
   var scr = document.getElementById("hglScreen"), a = scr && scr.querySelector(".hglSignL"), b = scr && scr.querySelector(".hglSignR"), n = scr && scr.querySelector(".hglBanner");
   if(!a || !b || !n || !hgl) return;
-  var sr = scr.getBoundingClientRect(), ar = a.getBoundingClientRect(), nr = n.getBoundingClientRect(), gap = Math.max(4, nr.left - ar.right);
-  b.style.right = "auto"; b.style.left = Math.round(nr.right - sr.left + gap) + "px";
+  var sr = scr.getBoundingClientRect(), nr = n.getBoundingClientRect(), aw = a.getBoundingClientRect().width;
+  a.style.right = "auto"; a.style.left = Math.round(nr.left - sr.left - HGL_SIGN_GAP - aw) + "px";
+  b.style.right = "auto"; b.style.left = Math.round(nr.right - sr.left + HGL_SIGN_GAP) + "px";
+  hgl.signL = (a.getBoundingClientRect().left - sr.left) / HG_SCALE;
   hgl.signR = (b.getBoundingClientRect().right - sr.left) / HG_SCALE;
 }
 window.addEventListener("resize", function(){ if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); } });
@@ -8649,7 +8653,7 @@ function hglPlan(ci){
     if(side === 0){ ex = 10 + u * (W - 20); ey = 0; nx = 0; ny = 1; } else if(side === 1){ ex = W; ey = 10 + u * (H - 20); nx = -1; ny = 0; }
     else if(side === 2){ ex = 10 + u * (W - 20); ey = H; nx = 0; ny = -1; } else { ex = 0; ey = 10 + u * (H - 20); nx = 1; ny = 0; }
     if(side === 0 && Math.abs(ex - W / 2) < 44) continue;                             // (the name and the hearts hide the top middle)
-    if((side === 0 && (ex < 62 || (ex > W / 2 && ex < (hgl.signR || W / 2) + 4))) || ((side === 3 || side === 1) && ey < 36)) continue;                  // (so do the red X, the bee sign and the butterfly sign)
+    if((side === 0 && (ex < 28 || ex > W - 28 || (ex < W / 2 && ex > (hgl.signL || W / 2) - 4) || (ex > W / 2 && ex < (hgl.signR || W / 2) + 4))) || ((side === 3 || side === 1) && ey < 36)) continue;                  // (so do the red X, the two signs and the church)
     var tx = hgRand(g.x + 10, g.x + g.w - 10), ty = hgRand(g.y + 10, g.y + g.h - 10), dx = tx - ex, dy = ty - ey, d = Math.sqrt(dx * dx + dy * dy) || 1;
     ux = dx / d; uy = dy / d;
     if(f.fun && Math.abs(ux * f.fun.ax + uy * f.fun.ay) > .866) continue;           // a bee never flies along the line of its own funnel (within 30 degrees of it, either way)
@@ -9092,7 +9096,7 @@ function hglScenery(x, W, topH){
   var off = document.createElement("canvas"); off.width = W * 2; off.height = 50;
   hglSceneryFull(off.getContext("2d"), W * 2, 0);
   x.imageSmoothingEnabled = true; x.drawImage(off, 0, 0, W * 2, 50, 0, topH - 25, W, 25);          // half the size (2026-10-27, per Dan: smaller, so the garden can be taller)
-  hglChurch(x, Math.round(W * .7), topH - 2);                                                      // the church itself is full size
+  hglChurch(x, W - 16, topH - 2);                                                                  // the church itself is full size, at the far right of the top area (2026-10-27, per Dan; it was at .7 of the width)
 }
 function hglChurch(x, cx0, B){
   function R(c, a, b, w, h){ x.fillStyle = c; x.fillRect(a, b, w, h); }
@@ -9573,7 +9577,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 AS";
+var APP_BUILD = "2026-10-27 AT";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
