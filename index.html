@@ -243,6 +243,7 @@
   @media (orientation:landscape) and (max-height:500px) and (pointer:coarse){ body:not(.landscapeOK) .rotateMsg{display:flex;} }
   /* Hope Garden on its side (stage 1, 2026-10-27, per Dan): the screen is as wide as the phone, with no side margins */
   body.hglMode #app{max-width:none;padding:0 env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px);overflow:hidden;}
+  body.hglMode, body.hglMode #app, body.hglMode .hglScreen{overscroll-behavior:none;touch-action:none;}      /* no pull-down / bounce of the page while playing (the phone's own swipe-down from the top edge cannot be switched off by a web page) */
   body.hglMode #app{position:relative;}
   /* the landscape Hope Garden held upright: the same message, and the little phone turns the other way (2026-10-27, per Dan) */
   @media (orientation:portrait){ body.hglMode .rotateMsg{display:flex;} }
@@ -8750,6 +8751,9 @@ function hglColours(r){ return Object.keys(HGL_ROUNDS[r].need).map(Number); }
 var HGL_DELAYS = [2.5, 2, 1.5];
 var HGL_BF_SPEED = HGL_SPEED / 2, HGL_WARN_S = 1.4;     // butterflies fly half the speed of bees (2026-10-27, per Dan); a signal shows this long before the bee or butterfly comes in
 function hglIsBee(ci){ return HGL_ROUNDS[hgl.round].bees.indexOf(ci) !== -1; }
+// The play area is the wooden fence round the garden (2026-10-28, per Dan): the bees and butterflies come in at the fence, bounce off it, and never go over the scenery or near the edges of the screen (where the
+// phone's own swipes, such as the Notification Center, begin). hglFence gives the outer edges of the fence.
+function hglFence(){ var g = hgl.g; return {x0: g.x - HG_RING, y0: g.y - HG_RING, x1: g.x + g.w + HG_RING, y1: g.y + g.h + HG_RING}; }
 var HGL_BF_WAIT = 2, HGL_BF_AWAY = 70;      // butterflies wait twice as long as bees before the next of their colour comes; and come in at least this far (picture pixels) from their own flower
 // Where and which way a bee or butterfly will come in is chosen first, and a small circle of its colour with an arrow in it shows that spot, the arrow pointing the way it will fly.
 function hglPlan(ci){
@@ -8759,10 +8763,9 @@ function hglPlan(ci){
   for(si = sl.length - 1; si > 0; si--){ var sj = Math.floor(Math.random() * (si + 1)), st = sl[si]; sl[si] = sl[sj]; sl[sj] = st; }      // the allowed edges in a random order: each is as likely as any other to be used (2026-10-28, per Dan; before, the first edge to give a spot won, which favoured the bottom)
   for(si = 0; si < sl.length && !ok; si++) for(k = 0; k < 24 && !ok; k++){
     side = sl[si]; var u = Math.random();
-    if(side === 0){ ex = 10 + u * (W - 20); ey = 0; nx = 0; ny = 1; } else if(side === 1){ ex = W; ey = 10 + u * (H - 20); nx = -1; ny = 0; }
-    else if(side === 2){ ex = 10 + u * (W - 20); ey = H; nx = 0; ny = -1; } else { ex = 0; ey = 10 + u * (H - 20); nx = 1; ny = 0; }
-    if(side === 0 && Math.abs(ex - W / 2) < 44) continue;                             // (the name and the hearts hide the top middle)
-    if((side === 0 && (ex < 28 || ex > W - 28 || (ex < W / 2 && ex > (hgl.signL || W / 2) - 4) || (ex > W / 2 && ex < (hgl.signR || W / 2) + 4))) || ((side === 3 || side === 1) && ey < 36)) continue;                  // (so do the red X, the two signs and the church)
+    var fe = hglFence();                                                              // it comes in at the wooden fence
+    if(side === 0){ ex = fe.x0 + 12 + u * (fe.x1 - fe.x0 - 24); ey = fe.y0; nx = 0; ny = 1; } else if(side === 1){ ex = fe.x1; ey = fe.y0 + 12 + u * (fe.y1 - fe.y0 - 24); nx = -1; ny = 0; }
+    else if(side === 2){ ex = fe.x0 + 12 + u * (fe.x1 - fe.x0 - 24); ey = fe.y1; nx = 0; ny = -1; } else { ex = fe.x0; ey = fe.y0 + 12 + u * (fe.y1 - fe.y0 - 24); nx = 1; ny = 0; }
     if(!bee && f && (ex - f.x) * (ex - f.x) + (ey - f.y) * (ey - f.y) < HGL_BF_AWAY * HGL_BF_AWAY) continue;           // a butterfly never comes in right beside its own flower (2026-10-28, per Dan: too many did)
     var tx = hgRand(g.x + 10, g.x + g.w - 10), ty = hgRand(g.y + 10, g.y + g.h - 10), dx = tx - ex, dy = ty - ey, d = Math.sqrt(dx * dx + dy * dy) || 1;
     ux = dx / d; uy = dy / d;
@@ -8945,10 +8948,10 @@ function hglStep(dt){
     }
     if(b.state === "free"){
       b.x += b.vx * dt; b.y += b.vy * dt;
-      // it bounces off the edges of the screen, at the same angle (2026-10-27, per Dan), and keeps flying. (One that is only just coming in, still outside, is flying inwards and is left alone.)
-      var bm = b.kind === "bf" ? 8 : 6;
-      if(b.x < bm && b.vx < 0){ b.vx = -b.vx; b.x = bm; } else if(b.x > W - bm && b.vx > 0){ b.vx = -b.vx; b.x = W - bm; }
-      if(b.y < bm && b.vy < 0){ b.vy = -b.vy; b.y = bm; } else if(b.y > H - bm && b.vy > 0){ b.vy = -b.vy; b.y = H - bm; }
+      // it bounces off the wooden fence, at the same angle (2026-10-27, per Dan; the fence and not the edges of the screen since 2026-10-28), and keeps flying. (One that is only just coming in, still outside, is flying inwards and is left alone.)
+      var bm = b.kind === "bf" ? 8 : 6, fe = hglFence();
+      if(b.x < fe.x0 + bm && b.vx < 0){ b.vx = -b.vx; b.x = fe.x0 + bm; } else if(b.x > fe.x1 - bm && b.vx > 0){ b.vx = -b.vx; b.x = fe.x1 - bm; }
+      if(b.y < fe.y0 + bm && b.vy < 0){ b.vy = -b.vy; b.y = fe.y0 + bm; } else if(b.y > fe.y1 - bm && b.vy > 0){ b.vy = -b.vy; b.y = fe.y1 - bm; }
       if(Math.abs(b.vx) > .3) b.face = b.vx >= 0 ? 1 : -1;
       hglCheck(b);
     } else if(b.state === "follow"){
@@ -9130,9 +9133,10 @@ function hglLoop(now){
 }
 function hglLoopStart(){ if(hgl) hgl.last = performance.now(); if(hglRaf) return; hglRaf = requestAnimationFrame(hglLoop); }
 // ---- the finger (as in v1) ----
-function hglPt(ev){
-  var cv = document.getElementById("hglCanvas"), r = cv.getBoundingClientRect();
-  return {x: Math.max(0, Math.min(hgl.W, (ev.clientX - r.left) * hgl.W / r.width)), y: Math.max(0, Math.min(hgl.H, (ev.clientY - r.top) * hgl.H / r.height))};
+function hglPt(ev, inFence){
+  var cv = document.getElementById("hglCanvas"), r = cv.getBoundingClientRect(), x0 = 0, y0 = 0, x1 = hgl.W, y1 = hgl.H;
+  if(inFence){ var fe = hglFence(); x0 = fe.x0 + 2; y0 = fe.y0 + 2; x1 = fe.x1 - 2; y1 = fe.y1 - 2; }                    // (a line stays inside the fence)
+  return {x: Math.max(x0, Math.min(x1, (ev.clientX - r.left) * hgl.W / r.width)), y: Math.max(y0, Math.min(y1, (ev.clientY - r.top) * hgl.H / r.height))};
 }
 function hglDown(ev){
   if(!hgl || hgl.drag || hgl.mode !== "play") return;
@@ -9155,7 +9159,7 @@ function hglDown(ev){
 }
 function hglMove(ev){
   var d0 = hgl && hgl.drag; if(!d0 || ev.pointerId !== d0.id) return;
-  var p = hglPt(ev), last = d0.pts[d0.pts.length - 1], dx = p.x - last.x, dy = p.y - last.y, d = Math.sqrt(dx * dx + dy * dy), max = hglMax();
+  var p = hglPt(ev, true), last = d0.pts[d0.pts.length - 1], dx = p.x - last.x, dy = p.y - last.y, d = Math.sqrt(dx * dx + dy * dy), max = hglMax();
   if(d < 2.5 || d0.len >= max) return;
   if(d0.len + d > max){ var k = (max - d0.len) / d; p = {x: last.x + dx * k, y: last.y + dy * k}; d = max - d0.len; }
   d0.pts.push(p); d0.len += d;
@@ -9853,7 +9857,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 BK";
+var APP_BUILD = "2026-10-28 BM";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
