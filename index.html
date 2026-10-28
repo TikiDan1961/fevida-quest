@@ -8753,6 +8753,7 @@ var HGL_BF_SPEED = HGL_SPEED / 2, HGL_WARN_S = 1.4;     // butterflies fly half 
 function hglIsBee(ci){ return HGL_ROUNDS[hgl.round].bees.indexOf(ci) !== -1; }
 // The play area is the wooden fence round the garden (2026-10-28, per Dan): the bees and butterflies come in at the fence, bounce off it, and never go over the scenery or near the edges of the screen (where the
 // phone's own swipes, such as the Notification Center, begin). hglFence gives the outer edges of the fence.
+var HGL_BOTTOM_PAD = 12;      // game pixels (3 screen pixels each) of meadow between the bottom of the fence and the bottom of the screen: 36 px, with the 18 px a flyer keeps from the fence, a touch on one starts about 54 px up
 function hglFence(){ var g = hgl.g; return {x0: g.x - HG_RING, y0: g.y - HG_RING, x1: g.x + g.w + HG_RING, y1: g.y + g.h + HG_RING}; }
 var HGL_BF_WAIT = 2, HGL_BF_AWAY = 70;      // butterflies wait twice as long as bees before the next of their colour comes; and come in at least this far (picture pixels) from their own flower
 // Where and which way a bee or butterfly will come in is chosen first, and a small circle of its colour with an arrow in it shows that spot, the arrow pointing the way it will fly.
@@ -8769,6 +8770,7 @@ function hglPlan(ci){
     if(!bee && f && (ex - f.x) * (ex - f.x) + (ey - f.y) * (ey - f.y) < HGL_BF_AWAY * HGL_BF_AWAY) continue;           // a butterfly never comes in right beside its own flower (2026-10-28, per Dan: too many did)
     var tx = hgRand(g.x + 10, g.x + g.w - 10), ty = hgRand(g.y + 10, g.y + g.h - 10), dx = tx - ex, dy = ty - ey, d = Math.sqrt(dx * dx + dy * dy) || 1;
     ux = dx / d; uy = dy / d;
+    if(ux * nx + uy * ny < .5) continue;                                           // it comes in well away from the fence, not along it (a flyer sliding along the bottom edge is hard to touch without the phone's swipe taking it), 2026-10-28
     if(f.fun && Math.abs(ux * f.fun.ax + uy * f.fun.ay) > .866) continue;           // a bee never flies along the line of its own funnel (within 30 degrees of it, either way)
     if(hgl.bees.some(function(b){ return Math.abs(b.x - ex) < 28 && Math.abs(b.y - ey) < 28; })) continue;
     if(hgl.plans.some(function(p){ return Math.abs(p.ex - ex) < 28 && Math.abs(p.ey - ey) < 28; })) continue;
@@ -9329,7 +9331,7 @@ function hglDraw(cv, W, H, round){
   var x = cv.getContext("2d");
   x.clearRect(0, 0, W, H);
   var topH = Math.max(26, Math.min(30, Math.round(H * .22))), gy = topH + HG_RING + 1;
-  var g = {x: HG_MARGIN, y: gy, w: W - 2 * HG_MARGIN, h: Math.max(20, H - gy - HG_RING - 1)};
+  var g = {x: HG_MARGIN, y: gy, w: W - 2 * HG_MARGIN, h: Math.max(20, H - gy - HG_RING - 1 - HGL_BOTTOM_PAD)};      // (a strip of meadow is left under the fence: the phone's own swipe up from the bottom edge took a flyer touched there, 2026-10-28, per Dan)
   hglGround(x, W, H, topH, g);
   var lay = HGL_ROUNDS[round || 0].layout;
   if(lay) return hglDrawLayout(x, W, H, topH, g, lay);                         // the rounds with a layout of their own
@@ -9857,7 +9859,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 BM";
+var APP_BUILD = "2026-10-28 BO";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
