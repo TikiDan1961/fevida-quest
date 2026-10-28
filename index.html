@@ -8963,12 +8963,17 @@ function hglStep(dt){
   hglDangerCheck();
   hgl.bees.forEach(function(b){ if(b.state === "done") hgl.lastGone[b.ci] = hgl.t; });
   hgl.bees = hgl.bees.filter(function(b){ return b.state !== "done"; });
-  if(hgl.mode === "play" && hgl.landed >= hgl.total && !hgl.bees.length){          // every one has landed: ROUND X COMPLETED! comes up on a screen of its own, as in the other games
-    hgl.mode = "round"; hgl.interlude = {n: hgl.round + 1, phase: "msg", award: false, final: hgl.round >= HGL_ROUNDS.length - 1};
-    hglDangerSfx(false);
-    render();
-    return;
-  }
+  // every one has landed: ROUND X COMPLETED! comes up on a screen of its own, as in the other games, but only once the last bee has finished buzzing and its sparkle has died away, and a beat after that
+  // (2026-10-27, per Dan: the round ended before the last bee's sparkle showed)
+  if(hgl.mode === "play" && hgl.landed >= hgl.total && !hgl.bees.length && !hgl.particles.length){
+    hgl.clearT = (hgl.clearT || 0) + dt;
+    if(hgl.clearT >= .6){
+      hgl.mode = "round"; hgl.interlude = {n: hgl.round + 1, phase: "msg", award: false, final: hgl.round >= HGL_ROUNDS.length - 1};
+      hgl.clearT = 0; hglDangerSfx(false);
+      render();
+      return;
+    }
+  } else hgl.clearT = 0;
   hgl.particles.forEach(function(p){ p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 40 * dt; });
   hgl.particles = hgl.particles.filter(function(p){ return p.t < p.life; });
 }
@@ -9746,7 +9751,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 BE";
+var APP_BUILD = "2026-10-27 BF";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
