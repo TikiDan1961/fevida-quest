@@ -8855,17 +8855,17 @@ function emBump(x, ox, gy){
   var inner = [[5, 11], [4, 12], [3, 13], [3, 13]];
   for(r = 0; r < inner.length; r++) emR(x, "#887E76", ox + inner[r][0], gy - 4 + r, ox + inner[r][1], gy - 4 + r);
 }
-function emCoinCv(f){          // a gold coin turning on its edge (2026-10-28, per Dan): 8 x 8, six pictures
+function emCoinCv(f){          // a gold coin turning on its edge (2026-10-28, per Dan): 8 x 8, six pictures; every row is an even number of pixels wide, centred, so a narrow picture is not lopsided
   if(emCoinCache[f]) return emCoinCache[f];
   var m = emMake(8, 8), x = m.x, w6 = [8, 6, 4, 2, 4, 6][f], half = [2, 3, 4, 4, 4, 4, 3, 2], r;
   for(r = 0; r < 8; r++){
-    var h = Math.max(.5, half[r] * w6 / 8), a = Math.round(4 - h), b = Math.round(4 + h) - 1; if(b < a) b = a;
-    x.fillStyle = "#8A5A00"; x.fillRect(a, r, b - a + 1, 1);
-    if(b - a >= 2 && r > 0 && r < 7){ x.fillStyle = "#FFD23A"; x.fillRect(a + 1, r, b - a - 1, 1); }
-    else if(b - a < 2){ x.fillStyle = "#D9A000"; x.fillRect(a, r, b - a + 1, 1); }
+    var n = Math.max(2, 2 * Math.round(half[r] * w6 / 8)), a = 4 - n / 2, b = a + n - 1;
+    x.fillStyle = "#8A5A00"; x.fillRect(a, r, n, 1);
+    if(n >= 4 && r > 0 && r < 7){ x.fillStyle = "#FFD23A"; x.fillRect(a + 1, r, n - 2, 1); }
+    else if(n < 4){ x.fillStyle = "#D9A000"; x.fillRect(a, r, n, 1); }
+    if(r === 2 && n >= 4){ x.fillStyle = "#FFF6B8"; x.fillRect(a + 1, r, 1, 1); }
   }
   if(w6 >= 6){ x.fillStyle = "#E0A800"; x.fillRect(3, 3, 2, 2); }
-  if(w6 >= 4){ x.fillStyle = "#FFF6B8"; x.fillRect(Math.round(4 - w6 / 2) + 1, 2, 1, 1); }
   emCoinCache[f] = m.c; return m.c;
 }
 function emCoinTxt(n){ n = Math.min(99, n); return (n < 10 ? "0" : "") + n; }
@@ -8906,7 +8906,7 @@ function emSetRound(r){          // a round starts: a new street, the pilgrim at
   var e = em, cfg = EM_ROUNDS[r];
   e.round = r; e.speed = cfg.speed; e.len = Math.round(cfg.speed * cfg.secs); e.dist = 0; e.mode = "ready"; e.interlude = null; e.clearT = 0; e.flash = 0;
   e.PX = Math.round(e.W / 4); e.GY = e.H - 17; e.rideLen = Math.round(e.W * EM_RIDE_SCREENS);
-  e.runX = 0; e.runT = 0; e.p = {h: 0, vy: 0, inv: 0, buf: 0}; e.ride = null; e.bump = null; e.junk = []; e.parts = [];
+  e.cam = 0; e.runX = 0; e.runT = 0; e.p = {h: 0, vy: 0, inv: 0, buf: 0}; e.ride = null; e.bump = null; e.junk = []; e.parts = [];
   e.obs = emTrack(r); e.L = emBuildLayers(cfg.theme);
 }
 function emRestart(){ if(!em) return; var r = em.round; emSetRound(r); em.chances = EM_CHANCES; em.coins = em.coinBase; render(); }          // (the coins picked up in the round go back too)          // TRY AGAIN: the same round again, with all the chances (as in the other games)
@@ -8921,7 +8921,7 @@ function emTrack(r){
     if(zone && x > cartAt + ride - 40){ x = cartAt + ride + 24 + 60; zone = false; }
     if(x >= end) break;
     if(!zone && bi < bAt.length && x >= bAt[bi] && x < end - 230){          // a basket (outside a ride's stretch): and, up in the air where a jump from it reaches, a row of coins; then room to come down
-      var bd = EM_OB.basket, cyB = Math.min(54, e.GY - 14), dtc = Math.max(9 / v, .1);
+      var bd = EM_OB.basket, cyB = Math.min(54, e.GY - 14), dtc = Math.max(12 / v, .12);
       list.push({type: "basket", wx: x, w: bd.w, h: bd.h, vx: 0, soft: true, dead: false}); bi++;
       for(k = 0; k < 4; k++) coins.push({wx: x + bd.w / 2 + v * (.53 + (k - 1.5) * dtc), cy: cyB, got: false});
       x = Math.round(x + bd.w + v * 1.1 + 30);
@@ -8939,17 +8939,25 @@ function emTrack(r){
   var carts = list.filter(function(o){ return o.type === "cart"; });
   function inRide(px){ return carts.some(function(c){ return px > c.wx + 26 && px < c.wx + 24 + ride - 30; }); }
   function add(wx, cy){ if(wx < len - 30) coins.push({wx: wx, cy: cy, got: false}); }
-  var arc = [0, 3, 4, 3, 0], cm = [.45, .3, .45][r];          // (cm: fewer coins on the longer streets, so a whole game stays under 100)
+  var arc = [0, 3, 4, 3, 0], cm = [.4, .25, .35][r];          // (cm: fewer coins on the longer streets, so a whole game stays under 100)
   for(i = 0; i < list.length; i++){
     var o = list[i], nx = list[i + 1];
-    if(o.type !== "cart" && o.type !== "basket" && o.type !== "dog" && Math.random() < cm * .22){ var cx = o.wx + o.w / 2; for(k = 0; k < 5; k++) add(cx + (k - 2) * 8, o.h + 9 + arc[k]); }
+    if(o.type !== "cart" && o.type !== "basket" && o.type !== "dog" && Math.random() < cm * .22){ var cx = o.wx + o.w / 2; for(k = 0; k < 5; k++) add(cx + (k - 2) * 10, o.h + 9 + arc[k]); }
     if(o.type === "basket" || o.type === "dog" || (nx && (nx.type === "basket" || nx.type === "dog"))) continue;
     var g0 = o.wx + o.w, g1 = nx ? nx.wx : end;
-    if(g1 - g0 < 76) continue;
+    if(g1 - g0 < 84) continue;
     var mid = (g0 + g1) / 2, rr = Math.random();
-    if(inRide(mid)){ if(rr < cm * .6) for(k = 0; k < 4; k++) add(mid + (k - 1.5) * 9, EM_CH + 9); }
-    else if(rr < cm * .3){ for(k = 0; k < 4; k++) add(mid + (k - 1.5) * 9, 7); }
-    else if(rr < cm * .48){ for(k = 0; k < 3; k++) add(mid + (k - 1) * 10, 34); }
+    if(inRide(mid)){ if(rr < cm * .6) for(k = 0; k < 4; k++) add(mid + (k - 1.5) * 13, EM_CH + 9); }
+    else if(rr < cm * .3){ for(k = 0; k < 4; k++) add(mid + (k - 1.5) * 13, 7); }
+    else if(rr < cm * .48){ for(k = 0; k < 3; k++) add(mid + (k - 1) * 13, 34); }
+  }
+  var nS = [7, 8, 8][r], s0 = Math.round(e.W * 1.15) + 40, span = end - 60 - s0;          // and a few single coins, spread along the whole route (2026-10-28, per Dan): low, at a short jump's height, or (in a ride) at the cart's height
+  for(i = 0; i < nS; i++){
+    var sx0 = s0 + span * (i + .2 + Math.random() * .6) / nS;
+    var busy = list.some(function(o){ return o.type === "basket" ? (sx0 > o.wx - 30 && sx0 < o.wx + o.w + v * 1.2 + 30) : (sx0 > o.wx - (o.type === "dog" ? 34 : 14) && sx0 < o.wx + o.w + 14); }) || coins.some(function(c){ return Math.abs(c.wx - sx0) < 20; });
+    if(busy) continue;
+    var rs = Math.random();
+    coins.push({wx: sx0, cy: inRide(sx0) ? EM_CH + 9 : rs < .55 ? 7 : rs < .8 ? 20 : 28, got: false});
   }
   coins.sort(function(a, b){ return a.wx - b.wx; });
   e.cl = coins;
@@ -9015,6 +9023,8 @@ function emThrow(byHit){
 function emStep(dt){
   var e = em, p = e.p, PX = e.PX, i;
   e.t += dt; e.flash = Math.max(0, e.flash - dt * 1.6);
+  var camT = e.mode === "play" ? Math.max(0, e.p.h + (e.ride ? EM_CH : 0) - Math.max(e.GY - 36, 34)) : 0;          // when he is higher than this the picture scrolls down to keep him in view (2026-10-28, per Dan)
+  e.cam += (camT - e.cam) * Math.min(1, dt * 9);
   e.parts.forEach(function(q){ q.t += dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 140 * dt; });
   e.parts = e.parts.filter(function(q){ return q.t < q.life; });
   e.junk.forEach(function(j){ j.t += dt; });
@@ -9104,9 +9114,12 @@ function emPaint(){
   var cv = document.getElementById("emCanvas"); if(!cv || !em || !em.L) return;
   var e = em, x = cv.getContext("2d"), L = e.L, W = e.W, GY = e.GY, PX = e.PX, d0 = Math.floor(e.dist), p = e.p, k;
   x.imageSmoothingEnabled = false;
-  x.drawImage(L.sky, 0, 0);
+  var cam = Math.round(e.cam || 0);
+  x.fillStyle = EM_THEMES[EM_ROUNDS[e.round].theme].sky[0]; x.fillRect(0, 0, W, e.H);
+  x.drawImage(L.sky, 0, Math.round(cam * .6));
   function lay(img, f, extra){ var o = Math.floor(d0 * f + (extra || 0)) % L.TW; x.drawImage(img, -o, 0); x.drawImage(img, L.TW - o, 0); }
-  lay(L.clouds, .05, e.t * 1.5); lay(L.mount, .1); lay(L.hills, .2); lay(L.far, .45); lay(L.near, 1);
+  x.save(); x.translate(0, Math.round(cam * .6)); lay(L.clouds, .05, e.t * 1.5); x.restore();
+  x.save(); x.translate(0, cam); lay(L.mount, .1); lay(L.hills, .2); lay(L.far, .45); lay(L.near, 1);
   e.junk.forEach(function(j){                                           // a cart left behind: it tips over forward, onto its front wheel, and lies there
     var sx = Math.round(j.wx) - d0, a = Math.min(1, j.t / .45); a = 1 - (1 - a) * (1 - a);
     x.save(); x.translate(sx + 20, GY); x.rotate(.9 * a); x.drawImage(emCart(), -20, -17); x.restore();
@@ -9140,6 +9153,7 @@ function emPaint(){
     emPilgrim(x, PX - 6 + rx, GY - hh - (riding ? EM_CH : 0), hh > 0 ? 2 : (e.mode === "play" ? Math.floor(e.t * 10) % 2 : e.mode === "exit" ? Math.floor(e.t * 18) % 2 : 0));
   }
   e.parts.forEach(function(q){ x.fillStyle = q.c; x.fillRect(Math.round(q.x), Math.round(q.y), 2, 2); });
+  x.restore();
   if(e.flash > 0){ x.fillStyle = "rgba(255,60,60," + Math.min(.45, e.flash).toFixed(2) + ")"; x.fillRect(0, 0, W, e.H); }
   var pf = document.getElementById("emProgFill"); if(pf) pf.style.width = Math.round(Math.min(1, e.dist / e.len) * 100) + "%";
 }
@@ -10473,7 +10487,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 CB";
+var APP_BUILD = "2026-10-28 CC";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
