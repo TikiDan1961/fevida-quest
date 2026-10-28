@@ -1204,7 +1204,7 @@ var T = {
       fruitsSpirit:{d:"Match fruit to collect all 8 fruits of the Spirit.", h:["Swipe a fruit toward a neighbor to swap them. Make a row or column of 3 or more of the same fruit, or they slide back.", "The words below the board count each fruit you collect, like 3/5. Fill all 8 to finish a level.", "Match 4 or more to make a flame. The flame is wild: put it next to 2 matching fruit and the whole row or column clears.", "Stuck? Tap HINT (3 in the whole game) to light up a match."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 3 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
-      prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap the TAP button when a bead is in the ring (tapping the sky does nothing). Some beads come close together, so tap quickly, once for each bead.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Each round is one whole rosary of 60 beads, 7 large and 53 small, in the order of a real one, and the beads move faster each round. Finish all 3 rounds to win."]},
+      prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap anywhere on the screen, or the TAP button, when a bead is in the ring (the TAP button lights up; the rest of the screen does not). Some beads come close together, so tap quickly, once for each bead.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Each round is one whole rosary of 60 beads, 7 large and 53 small, in the order of a real one, and the beads move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
     },
@@ -1275,7 +1275,7 @@ var T = {
     sudokuName:"Sacred Sudoku", themeWisdom:"Wisdom",
     mustardSeedName:"Mustard Seed", themeGrowth:"Growth", ms_intro:"Tap DROP TILE when the plant is over the column you want.", ms_goal:"Goal:", ms_dropBtn:"DROP TILE",
     ms_failTitle:"Garden Full", ms_failBody:"A column filled up to the top. Join matching plants to keep the columns low. Try again!",
-    prayBeadsName:"Pray the Beads", pb_intro:"Tap the TAP button when a bead is in the ring. Some beads come close together: tap quickly!", pb_tap:"TAP",
+    prayBeadsName:"Pray the Beads", pb_intro:"Tap anywhere when a bead is in the ring. Some beads come close together: tap quickly!", pb_tap:"TAP",
     pb_ourFather:"Our Father", pb_hailMary:"Hail Mary", pb_of:function(n,total){return n+" of "+total;}, pb_amen:"Amen",
     pb_perfect:"Perfect!", pb_good:"Good!", pb_early:"Too early!", pb_miss:"Missed!",
     pb_failTitle:"Keep Trying!", pb_failBody:"You ran out of chances. Keep a steady rhythm and try again!",
@@ -1358,7 +1358,7 @@ var T = {
       fruitsSpirit:{d:"Combina frutas para reunir los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que reúnes, como 3/5. Llena las 8 para terminar un nivel.", "Junta 4 o más para crear una llama. La llama es un comodín: ponla junto a 2 frutas iguales y toda la fila o columna desaparece.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
-      prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca el botón TOCAR cuando una cuenta esté dentro del aro (tocar el cielo no hace nada). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. Cada ronda es un rosario completo de 60 cuentas, 7 grandes y 53 pequeñas, en el orden de uno de verdad, y las cuentas van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
+      prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca en cualquier parte de la pantalla, o el botón TOCAR, cuando una cuenta esté dentro del aro (el botón TOCAR se ilumina; el resto de la pantalla no). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. Cada ronda es un rosario completo de 60 cuentas, 7 grandes y 53 pequeñas, en el orden de uno de verdad, y las cuentas van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
@@ -1428,7 +1428,7 @@ var T = {
     sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
     mustardSeedName:"Semilla de Mostaza", themeGrowth:"Crecimiento", ms_intro:"Toca SOLTAR cuando la planta esté sobre la columna que quieres.", ms_goal:"Meta:", ms_dropBtn:"SOLTAR PLANTA",
     ms_failTitle:"Jardín Lleno", ms_failBody:"Una columna se llenó hasta arriba. Une plantas iguales para mantener las columnas bajas. ¡Inténtalo de nuevo!",
-    prayBeadsName:"Reza el Rosario", pb_intro:"Toca el botón TOCAR cuando una cuenta esté dentro del aro. Algunas vienen juntas: ¡toca rápido!", pb_tap:"TOCAR",
+    prayBeadsName:"Reza el Rosario", pb_intro:"Toca en cualquier parte cuando una cuenta esté dentro del aro. Algunas vienen juntas: ¡toca rápido!", pb_tap:"TOCAR",
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
@@ -6120,6 +6120,15 @@ document.addEventListener("pointerdown", function(e){          // any new touch 
   if(e.target && e.target.closest && e.target.closest(".exitBar, .exitBtn")) return;
   pbStart();
 }, true);
+// A tap anywhere on the screen counts as a tap too (2026-10-27, per Dan), but only the TAP button lights up. The button itself is handled by tapOnTouch (it clicks it on the touch), so it is left out here, and so is
+// anything else that can be pressed (the red X, the buttons of the failed screen).
+document.addEventListener("pointerdown", function(e){
+  if(state.screen !== "prayBeads" || pbWaiting) return;
+  if(!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+  if(e.target && e.target.closest && e.target.closest(".pbBar, .exitBar, .exitBtn, button, [onclick]")) return;
+  pixDownT = e.timeStamp;
+  pbTap();
+}, true);
 function initPrayBeads(){
   var s = {v: 3, round: 0, chances: PB_CHANCES, res: [], fb: null, busy: false, status: "playing", interlude: null};
   state.session.prayBeads = s;
@@ -9737,7 +9746,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-27 BD";
+var APP_BUILD = "2026-10-27 BE";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
