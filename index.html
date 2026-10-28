@@ -264,6 +264,20 @@
   .hglAgain{position:absolute;left:0;right:0;top:58%;display:flex;justify-content:center;z-index:6;}
   .hglRound{position:absolute;left:0;right:0;top:0;bottom:0;z-index:9;display:flex;align-items:center;justify-content:center;background:linear-gradient(#4FA9F0 0,#BFE3FF 100%);overflow:hidden;}
   .hglRound .pixRoundDone{position:relative;z-index:2;min-width:280px;}
+  /* The Road to Emmaus (2026-10-28, per Dan): played on its side like the landscape Hope Garden (it shares hglMode, hglScreen, hglCanvas, hglRound, hglAgain and hgOhNo) */
+  .emScreen{background:#4FA9F0;}
+  .emHud{position:absolute;left:calc(env(safe-area-inset-left,0px) + 84px);right:calc(env(safe-area-inset-right,0px) + 18px);top:calc(env(safe-area-inset-top,0px) + 14px);display:flex;align-items:center;gap:12px;z-index:3;pointer-events:none;}
+  .emHud .hgHearts{position:static;transform:none;top:auto;left:auto;flex:none;}
+  .emHud .pixHearts img{width:22px;height:20px;}
+  .emHud .hgRibbon{position:static;transform:none;top:auto;left:auto;flex:none;padding:1px 14px 0;}
+  .emProg{position:relative;flex:1;max-width:300px;height:16px;box-sizing:border-box;border:3px solid #1B1F3B;border-radius:9px;background:#fff;box-shadow:0 2px 0 rgba(20,30,60,.4);}
+  .emProgFill{position:absolute;left:0;top:0;bottom:0;width:0;background:#52C246;border-radius:5px;}
+  .emFlag{position:absolute;right:-5px;top:-17px;width:3px;height:30px;background:#1B1F3B;}
+  .emFlag::after{content:"";position:absolute;left:3px;top:0;width:12px;height:9px;background:#D6343A;border:2px solid #1B1F3B;box-sizing:border-box;}
+  .emReady{position:absolute;left:0;right:0;top:30%;text-align:center;pointer-events:none;z-index:4;}
+  .emReady .emRName{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;line-height:1.05;letter-spacing:.04em;color:#FFE45E;text-transform:uppercase;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B,0 3px 0 #1B1F3B;}
+  .emReady .dpReady{position:static;margin-top:6px;}
+  .emReady .emHint{margin:2px auto 0;max-width:80%;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.05rem;color:#fff;text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   #app.assetsWait .screen > *, #app.assetsWait > .exitBar{visibility:hidden;}      /* a new screen waits for its pictures (pixHoldUntilLoaded) */
   /* the Hope Garden screen about Unfinished (2026-10-27, per Dan) */
   .pixMission.pixLower.hgiScreen{padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);overflow-y:auto;overflow-x:hidden;}
@@ -1206,6 +1220,7 @@ var T = {
       fruitsSpirit:{d:"Match fruit to collect all 8 fruits of the Spirit.", h:["Swipe a fruit toward a neighbor to swap them. Make a row or column of 3 or more of the same fruit, or they slide back.", "The words below the board count each fruit you collect, like 3/5. Fill all 8 to finish a level.", "Match 4 or more to make a flame. The flame is wild: put it next to 2 matching fruit and the whole row or column clears.", "Stuck? Tap HINT (3 in the whole game) to light up a match."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 3 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
+      emmaus:{d:"Run along the road to Emmaus. Tap to jump over what is in your way.", h:["You run by yourself. Tap anywhere on the screen to jump.", "Jump over crates, jars, sheep and dogs. Hit one and you lose a chance. You have 3 chances.", "Land on top of a cart to ride it! Tap, and the cart and you jump together. After a while a bump throws you off, and you run on.", "Reach the end of the road to finish a round. The road gets longer and faster each round. Finish all 3 rounds to win."]},
       prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap anywhere on the screen, or the TAP button, when a bead is in the ring (the TAP button lights up; the rest of the screen does not). Some beads come close together, so tap quickly, once for each bead.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Each round is one whole rosary of 60 beads, 7 large and 53 small, in the order of a real one, and the beads move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
@@ -1221,7 +1236,7 @@ var T = {
     cj_body:"Go to the Fe y Vida booth (#301) to have a joyful instant photo taken with a friend! Once you've done it, tap the button below.",
     awardTitle:"Mission Complete!",
     awardBody:function(pts,badge){return "You won "+pts+" Quest Points and unlocked the "+badge+" Badge!";},
-    awardBodyNoPts:function(badge){return "You unlocked the "+badge+" Badge!";}, awardBodyPtsOnly:function(pts){return "You won "+pts+" Quest Points!";},
+    awardBodyNoPts:function(badge){return "You unlocked the "+badge+" Badge!";}, awardBodyPtsOnly:function(pts){return "You won "+pts+" Quest Points!";}, awardBodyJoy:"Thank you for choosing joy!",
     passportTitle:"Fe y Vida Passport",
     missionBadge:function(n){return "MISSION "+n+" BADGE";},
     badgeLocked:"???",
@@ -1291,6 +1306,7 @@ var T = {
     fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_shuffling:"SHUFFLING", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
+    emmausName:"The Road to Emmaus", em_names:["Morning in the village", "Midday at the market", "Evening on the road"], em_hint:"Tap to jump. Land on a cart to ride it!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
@@ -1360,6 +1376,7 @@ var T = {
       fruitsSpirit:{d:"Combina frutas para reunir los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que reúnes, como 3/5. Llena las 8 para terminar un nivel.", "Junta 4 o más para crear una llama. La llama es un comodín: ponla junto a 2 frutas iguales y toda la fila o columna desaparece.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
+      emmaus:{d:"Corre por el camino a Ema\u00fas. Toca para saltar lo que se cruce en tu camino.", h:["Corres solo. Toca en cualquier parte de la pantalla para saltar.", "Salta sobre cajas, vasijas, ovejas y perros. Si chocas con uno, pierdes una oportunidad. Tienes 3 oportunidades.", "\u00a1Cae sobre un carro para viajar en \u00e9l! Toca, y el carro y t\u00fa saltan juntos. Despu\u00e9s de un rato un bache te lanza y sigues corriendo.", "Llega al final del camino para terminar una ronda. El camino es m\u00e1s largo y r\u00e1pido en cada ronda. Termina las 3 rondas para ganar."]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca en cualquier parte de la pantalla, o el botón TOCAR, cuando una cuenta esté dentro del aro (el botón TOCAR se ilumina; el resto de la pantalla no). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. Cada ronda es un rosario completo de 60 cuentas, 7 grandes y 53 pequeñas, en el orden de uno de verdad, y las cuentas van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
@@ -1375,7 +1392,7 @@ var T = {
     cj_body:"¡Ve al stand de Fe y Vida (#301) para hacerte una foto instantánea alegre con un amigo! Cuando termines, toca el botón de abajo.",
     awardTitle:"¡Misión Completada!",
     awardBody:function(pts,badge){return "¡Ganaste "+pts+" Puntos de Aventura y desbloqueaste la insignia "+badge+"!";},
-    awardBodyNoPts:function(badge){return "¡Desbloqueaste la insignia "+badge+"!";}, awardBodyPtsOnly:function(pts){return "¡Ganaste "+pts+" Puntos de Aventura!";},
+    awardBodyNoPts:function(badge){return "¡Desbloqueaste la insignia "+badge+"!";}, awardBodyPtsOnly:function(pts){return "¡Ganaste "+pts+" Puntos de Aventura!";}, awardBodyJoy:"¡Gracias por elegir la alegría!",
     passportTitle:"Pasaporte Fe y Vida",
     missionBadge:function(n){return "INSIGNIA MISIÓN "+n;},
     badgeLocked:"???",
@@ -1444,6 +1461,7 @@ var T = {
     fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
+    emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
@@ -1486,7 +1504,8 @@ var MISSIONS = [
   // until a dedicated "Unity" badge exists; swap badgeImg when it does.
   {id:"stainedGlass", icon:"🧩", badgeImg:"tiles/badge_friendship.png", nameKey:"stainedGlassName", themeKey:"themeUnity"},
   // (Choose Joy, Hidden Blessings and Light a Candle were taken out of this list on 2026-10-24 and put back the same day, per Dan.)
-  {id:"chooseJoy", icon:"📸", badgeImg:"tiles/badge_hope.png", nameKey:"chooseJoyName", themeKey:"themeHope"},
+  // The Road to Emmaus (2026-10-28, per Dan): a runner played on its side; it took the Hope badge from Choose Joy.
+  {id:"emmaus", icon:"🚶", badgeImg:"tiles/badge_hope.png", nameKey:"emmausName", themeKey:"themeHope"},
   // 5 new missions added 2026-09-29, per Dan. Real badge art wired in
   // 2026-09-29 (same day) — Dan supplied 5 more stained-glass badges
   // (Badges\Holiness Badge.png, Grace Badge.png, Salvation Badge.png,
@@ -1523,7 +1542,9 @@ var MISSIONS = [
   // Mustard Seed (2026-10-23, per Dan): took the place of the third "TBD" tile. Own Growth badge since 2026-10-26.
   {id:"mustardSeed", icon:"🌱", badgeImg:"tiles/badge_growth.png", nameKey:"mustardSeedName", themeKey:"themeGrowth"},
   // Pray the Beads (2026-10-23, per Dan): took the place of the last "TBD" tile. Own Prayer badge since 2026-10-26.
-  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_beads.png", nameKey:"prayBeadsName", themeKey:"themePrayer"}
+  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_beads.png", nameKey:"prayBeadsName", themeKey:"themePrayer"},
+  // Choose Joy is in the sky on the Main Menu and has no badge since 2026-10-28 (its Hope badge went to The Road to Emmaus); it gives no points either (a non-game).
+  {id:"chooseJoy", icon:"📸", noBadge:true, nameKey:"chooseJoyName", themeKey:"themeHope"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1535,7 +1556,7 @@ var MISSIONS = [
 // Passport's page-count/wrap math and the "/11" CSS above (percentages
 // can't reference a JS constant, so they're hand-kept in sync with this)
 // stay easy to grep together if the mission count ever changes again.
-var PASSPORT_MISSIONS = MISSIONS;      // every mission has a badge page (Hope Garden is not a mission: it gives no badge, points or step for the pilgrim, 2026-10-28, per Dan)
+var PASSPORT_MISSIONS = MISSIONS.filter(function(m){ return !m.noBadge; });      // the missions that have a badge page (Choose Joy has none since 2026-10-28; Hope Garden is not a mission)
 var PASSPORT_PAGES = PASSPORT_MISSIONS.length;       // one badge page for each mission with a badge; the Joyous Photo page that came last is gone (2026-10-22, per Dan)
 // The rendered track carries 2 extra "phantom" slides beyond the real
 // PASSPORT_PAGES -- a clone of the last page before slot 0 and a clone of
@@ -1762,11 +1783,12 @@ function defaultState(){
       mustardSeed: {done:false, badge:false},
       prayBeads: {done:false, badge:false},
       pilgrimRoad: {done:false, badge:false},
-      hopeGarden: {done:false, badge:false}
+      hopeGarden: {done:false, badge:false},
+      emmaus: {done:false, badge:false}
     },
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
-      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null, dovePeace:null, fruitsSpirit:null, jacobLadder:null, hopeGarden:null },
+      kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null, dovePeace:null, fruitsSpirit:null, jacobLadder:null, hopeGarden:null, emmaus:null },
     awardMissionId: null,
     folderOpen: false,
     pilgrimP: null,
@@ -2295,7 +2317,7 @@ function goldenTicketUnlocked(){
 // The games open on an instruction screen first (2026-10-22, per Dan): what the game is and how to play it, with a START MISSION button that
 // starts it. Be the Light and Choose Joy are not games and open straight away.
 var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","fruitsSpirit",
-  "jacobLadder","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace"];
+  "jacobLadder","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","emmaus"];
 function openMission(id){
   if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
@@ -2322,6 +2344,7 @@ function startMission(id){
   else if(id === "mustardSeed"){ initMustardSeed(); go("mustardSeed"); }
   else if(id === "prayBeads"){ initPrayBeads(); go("prayBeads"); }
   else if(id === "pilgrimRoad"){ initPilgrimRoad(); go("pilgrimRoad"); }
+  else if(id === "emmaus"){ initEmmaus(); go("emmaus"); }
   else if(id === "hopeGarden"){ hgOpen(); }                       // the Unfinished screen first; PLAY HOPE GARDEN there starts the game
 }
 
@@ -2344,7 +2367,7 @@ var COMING_SOON_MISSIONS = [
 var ICON_BG = {
   faithFlash:"#7A4FC8", faithMatch:"#E85A9B", beTheLight:"#F28C28", dovePeace:"#4FA6F0", fruitsSpirit:"#8E4FB8", stainedGlass:"#3FA84B", chooseJoy:"#3A8FE8",
   followLight:"#D6343A", wordUnscramble:"#FFC93A", catchLight:"#2457A6", kindnessSort:"#BFE3FF", hiddenBlessings:"#8F9BB5",
-  emojiStories:"#F5D9A8", lightCandle:"#26305F", jacobLadder:"#6FB7F5", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", hopeGarden:"#7ACB5A", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", pilgrimRoad:"#58B04A", tbd:"#AEB6C8",
+  emojiStories:"#F5D9A8", lightCandle:"#26305F", jacobLadder:"#6FB7F5", jesusTimeline:"#7A4FC8", sacredSudoku:"#3FA84B", hopeGarden:"#7ACB5A", wordTrail:"#2FA6A0", wordGroups:"#E85A9B", mustardSeed:"#8FD16A", prayBeads:"#4B3A9A", pilgrimRoad:"#58B04A", emmaus:"#D98B3A", tbd:"#AEB6C8",
   passport:"#FFC93A", goldenTicket:"#7A4FC8", lock:"#6A7288", options:"#26B0A8"
 };
 
@@ -2890,8 +2913,8 @@ function awardAutoReturn(){
   function leave(){
     awardTimer = 0;
     if(state.screen !== "award" || state.awardMissionId !== awardTimerFor) return;
-    // Hope Garden is played on its side and the Main Menu is upright: the badge stays up until the phone is turned (for 12 s at most), so the pilgrim's walk is not hidden by the "rotate your phone" message
-    if(state.awardMissionId === "hopeGarden" && !hglUpright() && waited < 12000){ waited += 300; awardTimer = setTimeout(leave, 300); return; }
+    // The Road to Emmaus is played on its side and the Main Menu is upright: the badge stays up until the phone is turned (for 12 s at most), so the pilgrim's walk is not hidden by the "rotate your phone" message
+    if(state.awardMissionId === "emmaus" && !hglUpright() && waited < 12000){ waited += 300; awardTimer = setTimeout(leave, 300); return; }
     afterAward();
   }
   awardTimer = setTimeout(leave, AWARD_SHOW_MS);
@@ -2899,7 +2922,7 @@ function awardAutoReturn(){
 function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
-  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:m.noBadge ? t("awardBodyPtsOnly")(100) : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
+  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:m.noBadge ? t("awardBodyJoy") : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
     buttons:""});
 }
 
@@ -8673,6 +8696,374 @@ function hgPlaceMenuIcon(){
 }
 window.addEventListener("resize", function(){ if(state.screen === "mainMenu") hgPlaceMenuIcon(); });
 
+/* ---------- The Road to Emmaus (2026-10-28, per Dan) ---------- */
+
+// A runner, played with the phone on its side like the landscape Hope Garden (it shares that game's full-width screen, rotate message and round / game-over screens). The pilgrim runs along a village street
+// that scrolls by from right to left, always a quarter of the way in from the left edge. Tap anywhere to jump (one jump, always the same size). Crates, jars, sheep and dogs come along the street, and
+// a hit costs one of the 3 chances (a red flash, a flicker, and the pilgrim keeps running). Land on top of a cart and the pilgrim rides it; the cart jumps with him; after a set distance a bump tips the
+// cart over, which throws him off (no chance lost), and he goes on on foot. The stretch of road after every cart has only low things on it, so a ride is a rest. Three rounds, longer and faster each time;
+// the lost chance is given back after rounds 1 and 2 (the same ROUND X COMPLETED! screens as the other games). Finishing round 3 completes the mission (100 Quest Points, a step for the pilgrim, the Hope badge).
+// The picture is 1 pixel = 4 x 4 screen pixels, measured from the screen (emFit), and drawn in four layers that scroll at four speeds: sky and clouds (slowest), mountains and hills, the far houses, then the near
+// houses, the street and everything on it (the speed of the ground). The feet stand on the line GY, 17 game pixels (68 screen pixels) above the bottom of the screen, clear of the phone's bottom-edge swipe.
+var EM_SCALE = 4, EM_CHANCES = 3, EM_V0 = 150, EM_G = 360;      // a jump leaves the ground at 150 px/s and falls back at 360 px/s squared: 31 pixels high, 0.83 s in the air
+var EM_RIDE_SCREENS = 2.5, EM_CH = 13;                          // the ride lasts this many screen widths; the floor of a cart is this high (the pilgrim's feet stand 13 pixels up on it)
+var EM_ROUNDS = [
+  {speed: 56, secs: 40, theme: 0, mix: {cart: 3, crate: 3, sheep: 3}, easy: ["crate", "sheep"], gap: 60},                           // morning in the village: carts, crates, sheep
+  {speed: 70, secs: 55, theme: 1, mix: {cart: 3, stack: 3, jars: 2, crate: 2, crate2w: 1}, easy: ["crate", "sheep"], gap: 50},      // midday at the market: crate stacks, jars, carts
+  {speed: 84, secs: 70, theme: 2, mix: {cart: 3, jars: 2, dog: 3, stack: 2, crate: 1}, easy: ["crate", "dog"], gap: 45}            // evening on the road: jars, dogs (they trot towards you), tall crates
+];
+var EM_OB = {      // what is on the street: width and height in game pixels (a dog trots left at vx pixels a second on top of the road's speed)
+  crate: {w: 12, h: 12}, crate2w: {w: 24, h: 12}, stack: {w: 12, h: 23}, jars: {w: 21, h: 17}, sheep: {w: 16, h: 12}, dog: {w: 18, h: 13, vx: 20}, cart: {w: 24, h: EM_CH}
+};
+var EM_THEMES = [
+  {sky: ["#4FA9F0", "#CDEBFF"], mount: "#A8C6E8", snow: "#FFFFFF", hill1: "#8ED28A", hill2: "#6FC079", bldFar: "#E7DCC0", bld: ["#E9D3A0", "#CDB682", "#B79E69"], door: "#5A3A22", win: "#3B2A1E", road: "#DDBB80", road2: "#CFA96C", curb: "#B58A50",
+    awn: ["#D6343A", "#F6EEDA"], lantern: false, cloud: "#FFFFFF", sun: ["#FFF3B0", .8, 58, 5]},
+  {sky: ["#3F9BEA", "#BFE3FF"], mount: "#B7CBE8", snow: "#FFFFFF", hill1: "#9AD98A", hill2: "#78C46B", bldFar: "#F1E6C6", bld: ["#F4E7C4", "#DCCB9C", "#C2AE7E"], door: "#5A3A22", win: "#3B2A1E", road: "#E2C28A", road2: "#D3AE72", curb: "#B58A50",
+    awn: ["#2FA64A", "#FFD23A"], lantern: false, cloud: "#FFFFFF", sun: ["#FFFBE0", .55, 68, 4]},
+  {sky: ["#3B2A6B", "#F29A5B"], mount: "#7C5E9C", snow: "#F4C4AA", hill1: "#5E4A86", hill2: "#4B3A70", bldFar: "#9A7B8A", bld: ["#B8906A", "#97704E", "#7A5A3E"], door: "#2A1A12", win: "#FFD23A", road: "#B8905E", road2: "#A07A4C", curb: "#7A5A3E",
+    awn: ["#B04FD8", "#F6C84A"], lantern: true, cloud: "#E8A8A0", sun: ["#FFB040", .72, 30, 9]}
+];
+var em = null, emRaf = 0, emImgs = {}, emCartCv = null;
+
+function emRgb(h){ h = h.replace("#", ""); return [parseInt(h.substr(0, 2), 16), parseInt(h.substr(2, 2), 16), parseInt(h.substr(4, 2), 16)]; }
+function emMix(a, b, k){ var A = typeof a === "string" ? emRgb(a) : a, B = typeof b === "string" ? emRgb(b) : b; return "rgb(" + Math.round(A[0] + (B[0] - A[0]) * k) + "," + Math.round(A[1] + (B[1] - A[1]) * k) + "," + Math.round(A[2] + (B[2] - A[2]) * k) + ")"; }
+function emRng(seed){ var s = seed >>> 0; return function(){ s = (s + 0x6D2B79F5) >>> 0; var t0 = s; t0 = Math.imul(t0 ^ (t0 >>> 15), t0 | 1); t0 ^= t0 + Math.imul(t0 ^ (t0 >>> 7), t0 | 61); return ((t0 ^ (t0 >>> 14)) >>> 0) / 4294967296; }; }
+function emMake(w, h){ var c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.imageSmoothingEnabled = false; return {c: c, x: x}; }
+function emR(x, col, x0, y0, x1, y1){ x.fillStyle = col; x.fillRect(x0, y0, x1 - x0 + 1, y1 - y0 + 1); }            // a filled rectangle, both corners included
+function emLine(x, col, x0, y0, x1, y1){ var n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)), i; x.fillStyle = col; for(i = 0; i <= n; i++) x.fillRect(Math.round(x0 + (x1 - x0) * (n ? i / n : 0)), Math.round(y0 + (y1 - y0) * (n ? i / n : 0)), 1, 1); }
+function emImg(n){ if(!emImgs[n]){ var im = new Image(); im.src = "tiles/" + n; emImgs[n] = im; } return emImgs[n]; }
+var EM_DARK = "#2A1A12", EM_WOOD = "#A0683A", EM_WOOD2 = "#784C28", EM_GOLD = "#FFD23A";
+
+// ---- the pictures ----
+function emWheel(x, cx, cy, r){
+  var i, j;
+  for(j = -r; j <= r; j++) for(i = -r; i <= r; i++){
+    var d2 = i * i + j * j; if(d2 > r * r + 1) continue;
+    x.fillStyle = (i === 0 || j === 0) && d2 <= (r - 1) * (r - 1) + 1 ? EM_DARK : d2 <= (r - 1) * (r - 1) + 1 ? EM_WOOD : EM_DARK; x.fillRect(cx + i, cy + j, 1, 1);
+  }
+}
+function emCart(){          // the small cart (28 x 20 with its handle; the wheels' bottom row is row 17, the ground), drawn once
+  if(emCartCv) return emCartCv;
+  var c = emMake(28, 20), x = c.x, px;
+  emR(x, EM_DARK, 0, 9, 4, 10); emR(x, EM_DARK, 3, 5, 25, 13); emR(x, EM_WOOD, 4, 6, 24, 12);
+  for(px = 8; px < 24; px += 5) emR(x, EM_WOOD2, px, 6, px, 12);
+  emR(x, "#BE824C", 4, 6, 24, 6);
+  emWheel(x, 8, 14, 3); emWheel(x, 20, 14, 3);
+  emCartCv = c.c; return emCartCv;
+}
+function emBuilding(x, th, bx, base, w, h, far, rng){
+  var main = th.bld[0], light = th.bld[1], dark = th.bld[2], k;
+  if(far){
+    emR(x, th.bldFar, bx, base - h, bx + w - 1, base); emR(x, emMix(th.bldFar, "#FFFFFF", .3), bx, base - h, bx + w - 1, base - h + 1);
+    for(k = 0; k < Math.max(1, Math.floor(w / 9)); k++){ var wx = bx + 3 + k * 8; if(wx + 2 < bx + w) emR(x, th.lantern ? th.win : emMix(th.bldFar, "#000000", .35), wx, base - h + 5, wx + 1, base - h + 7); }
+    return;
+  }
+  emR(x, main, bx, base - h, bx + w - 1, base);
+  emR(x, light, bx + w - 4, base - h, bx + w - 1, base);                                   // the shaded side
+  emR(x, dark, bx, base - h, bx + w - 1, base - h + 2);                                    // the flat roof's edge
+  emR(x, dark, bx - 1, base - h - 1, bx + w, base - h);
+  for(k = bx + 3; k < bx + w - 3; k += 6) emR(x, th.door, k, base - h + 3, k, base - h + 4);      // beam ends
+  var nw = Math.max(1, Math.floor((w - 12) / 9));
+  for(k = 0; k < nw; k++){
+    var wx2 = bx + 4 + k * 9, wy = base - h + 8;
+    if(wx2 + 3 < bx + w - 5){ emR(x, th.win, wx2, wy, wx2 + 3, wy + 5); emR(x, light, wx2 - 1, wy + 6, wx2 + 4, wy + 6); }
+  }
+  var dx = bx + Math.floor(w / 2) - 3;
+  emR(x, th.door, dx, base - 11, dx + 6, base); emR(x, th.door, dx + 1, base - 12, dx + 5, base - 12);
+  if(rng() < .55){                                                                         // a market awning
+    var ax0 = bx + 3, ax1 = bx + w - 5, ax;
+    for(ax = ax0; ax < ax1; ax++) emR(x, Math.floor((ax - ax0) / 3) % 2 === 0 ? th.awn[0] : th.awn[1], ax, base - 17, ax, base - 14);
+    emR(x, emMix(th.awn[0], "#000000", .3), ax0, base - 13, ax1 - 1, base - 13);
+  }
+  if(th.lantern && rng() < .8){ emR(x, EM_GOLD, bx + 2, base - 20, bx + 3, base - 18); emR(x, "#3C2814", bx + 2, base - 21, bx + 2, base - 21); }
+}
+function emPalm(x, px, base){
+  var k, L = [[-6, 0], [-4, -2], [0, -3], [5, -2], [7, 0], [-3, 2], [6, 2]];
+  emR(x, "#7A542E", px, base - 16, px + 1, base); emR(x, "#7A542E", px + 1, base - 22, px + 2, base - 16);
+  for(k = 0; k < L.length; k++){ emLine(x, "#2E9A3A", px + 2, base - 22, px + 2 + L[k][0], base - 22 + L[k][1]); emR(x, "#58D05C", px + 2 + L[k][0], base - 22 + L[k][1] + 1, px + 2 + L[k][0], base - 22 + L[k][1] + 1); }
+}
+// the six pictures of a round's scenery: the sky (as wide as the screen) and five strips that wrap round (TW wide) and scroll at their own speeds
+function emBuildLayers(ti){
+  var e = em, W = e.W, H = e.H, GY = e.GY, th = EM_THEMES[ti], TW = Math.max(320, Math.ceil((W + 80) / 16) * 16), L = {TW: TW}, c, x, i, j, k, rng, y0, y1, sh = GY - 18, bands = 14;
+  c = emMake(W, H); x = c.x;                                                              // the sky, and the sun
+  for(i = 0; i < bands; i++){ y0 = Math.floor(i * sh / bands); y1 = i === bands - 1 ? H : Math.floor((i + 1) * sh / bands); emR(x, emMix(th.sky[0], th.sky[1], i / (bands - 1)), 0, y0, W - 1, y1 - 1); }
+  var sx0 = Math.round(W * th.sun[1]), sy0 = GY - th.sun[2], sr = th.sun[3];
+  x.fillStyle = th.sun[0]; for(j = -sr; j <= sr; j++) for(i = -sr; i <= sr; i++) if(i * i + j * j <= sr * sr + 1) x.fillRect(sx0 + i, sy0 + j, 1, 1);
+  L.sky = c.c;
+  c = emMake(TW, H); x = c.x;                                                              // clouds
+  for(k = 0; k < 6; k++){
+    var cx0 = Math.floor(k * TW / 6 + 10), cy = 8 + (k * 11) % 24, cw = 20 + (k * 7) % 14, o;
+    for(o = 0; o >= -TW; o -= TW){ var q = cx0 + o; emR(x, th.cloud, q + 3, cy, q + cw - 4, cy + 1); emR(x, th.cloud, q, cy + 2, q + cw, cy + 4); emR(x, th.cloud, q + 6, cy - 2, q + cw - 10, cy); }
+  }
+  L.clouds = c.c;
+  c = emMake(TW, H); x = c.x;                                                              // mountains
+  [[.12, 20, 22], [.34, 26, 26], [.6, 18, 20], [.82, 24, 24]].forEach(function(pk){
+    var px = Math.round(pk[0] * TW), ph = pk[1], hw = pk[2], xx, base = GY - 22;
+    for(xx = px - hw; xx <= px + hw; xx++){
+      var top = base - Math.floor(ph * (1 - Math.abs(xx - px) / hw)), wx = ((xx % TW) + TW) % TW;
+      emR(x, th.mount, wx, top, wx, base); if(base - top > ph * .6) emR(x, th.snow, wx, top, wx, top + 1);
+    }
+  });
+  L.mount = c.c;
+  c = emMake(TW, H); x = c.x;                                                              // hills
+  [[th.hill1, GY - 24, 4, 3, 0], [th.hill2, GY - 19, 3, 5, 2]].forEach(function(hl){
+    var xx; for(xx = 0; xx < TW; xx++){ var yy = hl[1] + Math.round(hl[2] * Math.sin(2 * Math.PI * hl[3] * xx / TW + hl[4])); emR(x, hl[0], xx, yy, xx, GY - 8); }
+  });
+  L.hills = c.c;
+  rng = emRng(ti * 7 + 3);
+  c = emMake(TW, H); x = c.x;                                                              // the far houses: lighter, smaller
+  var bx = 0, w, h;
+  while(bx < TW){ w = 14 + Math.floor(rng() * 9); if(bx + w > TW - 12) w = TW - bx; h = 10 + Math.floor(rng() * 8); emBuilding(x, th, bx, GY - 14, w, h, true, rng); bx += w + (bx + w < TW ? Math.floor(rng() * 4) : 0); }
+  L.far = c.c;
+  c = emMake(TW, H); x = c.x; bx = 0;                                                      // the near houses and palms, and the street
+  while(bx < TW){
+    w = 26 + Math.floor(rng() * 13); if(bx + w > TW - 26) w = TW - bx; h = 26 + Math.floor(rng() * 11);
+    emBuilding(x, th, bx, GY - 7, w, h, false, rng); bx += w + (bx + w < TW ? Math.floor(rng() * 3) : 0);
+    if(bx < TW - 40 && rng() < .4){ emPalm(x, bx + 1, GY - 7); bx += 6; }
+  }
+  emR(x, th.road, 0, GY - 7, TW - 1, H - 1); emR(x, th.curb, 0, GY - 7, TW - 1, GY - 6);
+  var n = Math.floor(TW * (H - GY + 4) * .0384);
+  x.fillStyle = th.road2; for(i = 0; i < n; i++) x.fillRect(Math.floor(rng() * TW), GY - 4 + Math.floor(rng() * Math.max(1, H - GY + 2)), 1, 1);
+  for(i = 0; i < TW; i += 16) emR(x, th.road2, i, H - 5, i + 9, H - 4);                    // worn paving
+  emR(x, th.curb, 0, H - 2, TW - 1, H - 1);
+  L.near = c.c;
+  return L;
+}
+// the things on the street (x: the left edge, gy: the row the feet stand on)
+function emCrate(x, ox, gy, n){
+  var i; for(i = 0; i < n; i++){
+    var y1 = gy - i * 11;
+    emR(x, EM_DARK, ox, y1 - 11, ox + 11, y1); emR(x, EM_WOOD, ox + 1, y1 - 10, ox + 10, y1 - 1);
+    emLine(x, EM_WOOD2, ox + 1, y1 - 10, ox + 10, y1 - 1); emLine(x, EM_WOOD2, ox + 10, y1 - 10, ox + 1, y1 - 1);
+  }
+}
+function emJars(x, ox, gy){
+  var i, W2 = [[3, 6], [1, 8], [0, 9], [0, 9], [0, 9], [0, 9], [0, 9], [0, 9], [0, 9], [0, 9], [0, 9], [1, 8], [3, 6]], r;
+  for(i = 0; i < 2; i++){
+    var jx = ox + i * 11;
+    for(r = 0; r < W2.length; r++){ var yy = gy - 12 + r, a = W2[r][0], b = W2[r][1]; emR(x, EM_DARK, jx + a, yy, jx + b, yy); if(r > 0 && r < W2.length - 1) emR(x, "#C4683C", jx + Math.max(a, 0) + 1, yy, jx + b - 1, yy); }
+    emR(x, EM_DARK, jx + 2, gy - 15, jx + 7, gy - 11); emR(x, "#C4683C", jx + 3, gy - 14, jx + 6, gy - 11); emR(x, "#E29660", jx + 2, gy - 16, jx + 7, gy - 15); emR(x, "#F0AA78", jx + 3, gy - 7, jx + 3, gy - 7);
+  }
+}
+function emBump(x, ox, gy){
+  var rows = [[4, 12], [3, 13], [2, 14], [1, 15], [1, 15], [0, 16]], r;
+  for(r = 0; r < rows.length; r++) emR(x, EM_DARK, ox + rows[r][0], gy - 5 + r, ox + rows[r][1], gy - 5 + r);
+  var inner = [[5, 11], [4, 12], [3, 13], [3, 13]];
+  for(r = 0; r < inner.length; r++) emR(x, "#887E76", ox + inner[r][0], gy - 4 + r, ox + inner[r][1], gy - 4 + r);
+}
+function emSprite(x, name, ox, oy, flip, frame){
+  var im = emImg(name); if(!im.complete || !im.width) return;
+  var fw = Math.floor(im.width / 2);
+  x.save(); if(flip){ x.translate(ox + fw, oy); x.scale(-1, 1); x.drawImage(im, frame * fw, 0, fw, im.height, 0, 0, fw, im.height); } else x.drawImage(im, frame * fw, 0, fw, im.height, ox, oy, fw, im.height); x.restore();
+}
+function emPilgrim(x, ox, gy, pose){          // gy: the row the feet stand on; pose 0 and 1: running, 2: in the air
+  var top = gy - 16, f, f2, r;
+  emR(x, "#8A5A2E", ox + 11, top + 1, ox + 11, top + 15); emR(x, EM_GOLD, ox + 10, top, ox + 12, top + 1);
+  for(r = 7; r <= 14; r++){ f = (r - 7) / 7; emR(x, EM_DARK, ox + 2 - Math.round(f), top + r, ox + 9 + Math.round(f), top + r); }
+  for(r = 8; r <= 13; r++){ f2 = (r - 8) / 5; emR(x, "#B8692E", ox + 3 - Math.round(f2), top + r, ox + 8 + Math.round(f2), top + r); }
+  emR(x, EM_GOLD, ox + 3, top + 10, ox + 8, top + 10);
+  emR(x, EM_DARK, ox + 2, top, ox + 9, top + 8); emR(x, "#C97A3A", ox + 3, top + 1, ox + 8, top + 7); emR(x, "#F2C9A0", ox + 6, top + 3, ox + 9, top + 6); emR(x, EM_DARK, ox + 8, top + 4, ox + 8, top + 4);
+  if(pose === 2){ emR(x, EM_DARK, ox + 3, top + 14, ox + 6, top + 15); emR(x, EM_DARK, ox + 7, top + 13, ox + 10, top + 14); }
+  else if(pose === 1){ emR(x, EM_DARK, ox + 3, top + 14, ox + 5, top + 15); emR(x, EM_DARK, ox + 6, top + 14, ox + 9, top + 16); }
+  else { emR(x, EM_DARK, ox + 2, top + 14, ox + 4, top + 16); emR(x, EM_DARK, ox + 7, top + 14, ox + 10, top + 15); emR(x, "#F2C9A0", ox + 3, top + 15, ox + 3, top + 15); }
+}
+function emBurst(px, py, cols, n, sp){
+  var i; for(i = 0; i < n; i++){ var a = Math.random() * 6.2832, v = sp * (.4 + Math.random() * .8); em.parts.push({x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 25, t: 0, life: .5 + Math.random() * .4, c: cols[i % cols.length]}); }
+}
+
+// ---- the game ----
+function initEmmaus(){ em = {round: 0, chances: EM_CHANCES, mode: "ready", W: 0, H: 0, L: null, obs: null, interlude: null, last: performance.now(), t: 0}; }
+function emQuit(){ em = null; go("mainMenu"); }
+function emSetRound(r){          // a round starts: a new street, the pilgrim at the start line, and "Tap anywhere to start!"
+  var e = em, cfg = EM_ROUNDS[r];
+  e.round = r; e.speed = cfg.speed; e.len = Math.round(cfg.speed * cfg.secs); e.dist = 0; e.mode = "ready"; e.interlude = null; e.clearT = 0; e.flash = 0;
+  e.PX = Math.round(e.W / 4); e.GY = e.H - 17; e.rideLen = Math.round(e.W * EM_RIDE_SCREENS);
+  e.p = {h: 0, vy: 0, inv: 0, buf: 0}; e.ride = null; e.bump = null; e.junk = []; e.parts = [];
+  e.obs = emTrack(r); e.L = emBuildLayers(cfg.theme);
+}
+function emRestart(){ if(!em) return; var r = em.round; emSetRound(r); em.chances = EM_CHANCES; render(); }          // TRY AGAIN: the same round again, with all the chances (as in the other games)
+// the street of a round, made at the start: what comes, and where (distance from the start line). After a cart there is a long easy stretch (only low things, none that is a cart), so the ride is a rest.
+function emTrack(r){
+  var e = em, cfg = EM_ROUNDS[r], v = cfg.speed, ride = e.rideLen, len = e.len, list = [], x = Math.round(e.W * 1.15), cartAt = -999, end = len - 70, n = 0, pool = [];
+  Object.keys(cfg.mix).forEach(function(key){ var k; for(k = 0; k < cfg.mix[key]; k++) pool.push(key); });
+  var gapBase = Math.round(v * .833 * .85 + 14);
+  while(x < end && n < 300){
+    n++;
+    var zone = x < cartAt + ride + 24 + 60;
+    if(zone && x > cartAt + ride - 40){ x = cartAt + ride + 24 + 60; zone = false; }
+    if(x >= end) break;
+    var src = zone ? cfg.easy : pool, type = src[Math.floor(Math.random() * src.length)];
+    if(type === "cart" && x + ride + 24 + 80 > len) type = cfg.easy[0];
+    if(type === "dog") x += 40;
+    var def = EM_OB[type];
+    list.push({type: type, wx: x, w: def.w, h: def.h, vx: def.vx || 0, dead: false});
+    if(type === "cart") cartAt = x;
+    x = Math.round(x + def.w + gapBase + Math.random() * cfg.gap * (zone ? 1.3 : 1));
+  }
+  return list;
+}
+function screenEmmaus(){
+  if(!em) initEmmaus();
+  return '<div class="screen hglScreen emScreen" id="emScreen" onpointerdown="emDown(event)" oncontextmenu="return false"><canvas class="hglCanvas" id="emCanvas" width="100" height="100"></canvas>' +
+    '<div class="emHud"><div class="hgHearts" id="emHearts">' + chancesHeartsHtml(Math.max(0, em.chances), EM_CHANCES) + '</div><div class="hgRibbon">' + t("hg_level")(em.round + 1, EM_ROUNDS.length) + '</div><div class="emProg"><div class="emProgFill" id="emProgFill"></div><i class="emFlag"></i></div></div>' +
+    emOverlayHtml() + '</div>';
+}
+function emOverlayHtml(){
+  if(!em) return "";
+  if(em.interlude) return '<div class="hglRound">' + cloudsHtml() + pixRoundDoneHtml(em.interlude) + '</div>';
+  if(em.mode === "over") return '<div class="hgOhNo">' + t("hg_noChances") + '</div><div class="hglAgain">' + pixBtnHtml(t("tryAgain"), "emRestart()") + '</div>';
+  if(em.mode === "ready") return '<div class="emReady"><div class="emRName">' + t("em_names")[em.round] + '</div><div class="dpReady">' + t("dp_ready") + '</div>' + (em.round === 0 ? '<div class="emHint">' + t("em_hint") + '</div>' : '') + '</div>';
+  return "";
+}
+function emFit(){
+  var cv = document.getElementById("emCanvas"), scr = document.getElementById("emScreen"); if(!cv || !scr || !em) return;
+  if(hglUpright()) return;                                          // upright: the message is up, and the game waits as it is until the phone is turned back
+  var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  var W = Math.floor(scr.clientWidth / EM_SCALE), H = Math.floor(vh / EM_SCALE);
+  cv.width = W; cv.height = H; cv.style.width = (W * EM_SCALE) + "px"; cv.style.height = (H * EM_SCALE) + "px";
+  if(!em.L || em.W !== W || em.H !== H){
+    var first = !em.obs; em.W = W; em.H = H;
+    if(first) emSetRound(em.round);
+    else { em.PX = Math.round(W / 4); em.GY = H - 17; em.L = emBuildLayers(EM_ROUNDS[em.round].theme); }
+  }
+  emPaint();
+}
+window.addEventListener("resize", function(){ if(state.screen === "emmaus"){ emFit(); emLoopStart(); } });
+window.addEventListener("orientationchange", function(){ setTimeout(function(){ if(state.screen === "emmaus"){ emFit(); emLoopStart(); } }, 250); });
+function emJump(){ var p = em.p; if(p.h === 0 && p.vy === 0){ p.vy = EM_V0; pixSfxPlay("tap", false); } else p.buf = .13; }          // a tap just before landing counts when the feet touch down
+function emDown(ev){
+  if(!em || (em.mode !== "ready" && em.mode !== "play")) return;
+  if(ev && ev.preventDefault) ev.preventDefault();
+  if(pixAudioStale) pixReviveOnTap();
+  if(em.mode === "ready"){ em.mode = "play"; em.last = performance.now(); var rd = document.querySelector(".emReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd); return; }
+  emJump();
+}
+function emHit(o){
+  var e = em, p = e.p;
+  o.dead = true; e.chances--; e.flash = .45;
+  var last = e.chances <= 0;
+  pixSfxPlay(last ? "fmLast" : "fmMiss", true);                       // the same sounds as the other games
+  emBurst(e.PX, e.GY - p.h - (e.ride ? 24 : 8), ["#FF5A5A", "#FFB0A0", "#FFFFFF"], 12, 60);
+  var hh = document.getElementById("emHearts"); if(hh) hh.innerHTML = chancesHeartsHtml(Math.max(0, e.chances), EM_CHANCES);
+  if(e.ride) emThrow(true);
+  if(last){ e.mode = "over"; render(); return; }
+  p.inv = 1.2;
+}
+// the pilgrim leaves the cart: at the end of the ride the bump tips it over and throws him (no chance lost); a hit while riding does the same. The cart stays behind.
+function emThrow(byHit){
+  var e = em, p = e.p;
+  e.junk.push({wx: e.dist + e.PX - 14, t: 0});
+  e.ride = null; e.bump = null;
+  p.h += EM_CH; p.vy = byHit ? 70 : 115; p.inv = byHit ? 1.2 : .9; p.buf = 0;
+  emBurst(e.PX, e.GY - 3, ["#E2C28A", "#CFA96C", "#FFFFFF"], 14, 50);
+  if(!byHit) pixSfxPlay("jlCrumble", false);
+}
+function emStep(dt){
+  var e = em, p = e.p, PX = e.PX, i;
+  e.t += dt; e.flash = Math.max(0, e.flash - dt * 1.6);
+  e.parts.forEach(function(q){ q.t += dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 140 * dt; });
+  e.parts = e.parts.filter(function(q){ return q.t < q.life; });
+  e.junk.forEach(function(j){ j.t += dt; });
+  if(e.mode !== "play") return;
+  p.inv = Math.max(0, p.inv - dt); p.buf = Math.max(0, p.buf - dt);
+  e.dist += e.speed * dt;
+  e.junk = e.junk.filter(function(j){ return j.wx - e.dist > -60; });
+  e.obs.forEach(function(o){ if(o.vx && o.wx - e.dist < e.W + 10) o.wx -= o.vx * dt; });
+  // the jump
+  var prevH = p.h;
+  if(p.h > 0 || p.vy > 0){ p.vy -= EM_G * dt; p.h += p.vy * dt; if(p.h <= 0){ p.h = 0; p.vy = 0; } }
+  if(prevH > 0 && p.h === 0 && p.buf > 0){ p.buf = 0; p.vy = EM_V0; pixSfxPlay("tap", false); }
+  // coming down on the top of a cart: the ride begins
+  if(!e.ride && prevH >= EM_CH && p.h < EM_CH){
+    for(i = 0; i < e.obs.length; i++){
+      var c = e.obs[i]; if(c.type !== "cart" || c.dead) continue;
+      var csx = c.wx - e.dist;
+      if(PX >= csx && PX <= csx + c.w){
+        c.dead = true; e.obs.splice(i, 1);
+        e.ride = {end: e.dist + e.rideLen, bumped: false}; e.bump = {wx: e.dist + e.rideLen + PX - 4};
+        p.h = 0; p.vy = 0; p.buf = 0;
+        emBurst(PX, e.GY - 2, ["#E2C28A", "#FFFFFF"], 6, 30);
+        pixSfxPlay("wgPick", false);
+        break;
+      }
+    }
+  }
+  // the bump: it throws the pilgrim as soon as the cart is on the ground (if he is in the air when the bump comes, when he lands)
+  if(e.ride){
+    if(e.dist >= e.ride.end) e.ride.bumped = true;
+    if(e.ride.bumped && p.h <= 0) emThrow(false);
+  }
+  // hits
+  if(p.inv <= 0){
+    var riding = !!e.ride, hw = riding ? 6.5 : 3.5, y0 = p.h + (riding ? 6 : 1.5);      // (the wheels may brush a low thing: only the cart's body and the pilgrim count)
+    for(i = 0; i < e.obs.length; i++){
+      var o = e.obs[i]; if(o.dead) continue;
+      var sx = o.wx - e.dist; if(sx > PX + 40 || sx < PX - 40) continue;
+      if(PX + hw > sx + 1 && PX - hw < sx + o.w - 1 && y0 < o.h - .5){ emHit(o); if(e.mode !== "play") return; break; }
+    }
+  }
+  // the end of the road: a beat after the last thing is behind him (and he is on foot), ROUND X COMPLETED! comes up
+  if(e.dist >= e.len && !e.ride){
+    e.clearT += dt;
+    if(e.clearT >= .5){
+      e.mode = "round"; e.interlude = {n: e.round + 1, phase: "msg", award: false, final: e.round >= EM_ROUNDS.length - 1};
+      render();
+    }
+  }
+}
+function emPaint(){
+  var cv = document.getElementById("emCanvas"); if(!cv || !em || !em.L) return;
+  var e = em, x = cv.getContext("2d"), L = e.L, W = e.W, GY = e.GY, PX = e.PX, d0 = Math.floor(e.dist), p = e.p, k;
+  x.imageSmoothingEnabled = false;
+  x.drawImage(L.sky, 0, 0);
+  function lay(img, f, extra){ var o = Math.floor(d0 * f + (extra || 0)) % L.TW; x.drawImage(img, -o, 0); x.drawImage(img, L.TW - o, 0); }
+  lay(L.clouds, .05, e.t * 1.5); lay(L.mount, .1); lay(L.hills, .2); lay(L.far, .45); lay(L.near, 1);
+  e.junk.forEach(function(j){                                           // a cart left behind: it tips over forward, onto its front wheel, and lies there
+    var sx = Math.round(j.wx) - d0, a = Math.min(1, j.t / .45); a = 1 - (1 - a) * (1 - a);
+    x.save(); x.translate(sx + 20, GY); x.rotate(.9 * a); x.drawImage(emCart(), -20, -17); x.restore();
+  });
+  if(e.bump) emBump(x, Math.round(e.bump.wx) - d0, GY);
+  e.obs.forEach(function(o){
+    var sx = Math.round(o.wx) - d0; if(sx < -40 || sx > W + 10) return;
+    if(o.type === "crate") emCrate(x, sx, GY, 1);
+    else if(o.type === "crate2w"){ emCrate(x, sx, GY, 1); emCrate(x, sx + 12, GY, 1); }
+    else if(o.type === "stack") emCrate(x, sx, GY, 2);
+    else if(o.type === "jars") emJars(x, sx, GY);
+    else if(o.type === "sheep") emSprite(x, "sheep_near.png", sx, GY - 11, true, Math.floor(e.t * 4) % 2);
+    else if(o.type === "dog") emSprite(x, "dog.png", sx, GY - 12, true, Math.floor(e.t * 8) % 2);
+    else if(o.type === "cart") x.drawImage(emCart(), sx - 2, GY - 17);
+  });
+  var flick = p.inv > 0 && Math.floor(e.t * 14) % 2 === 0, hh = Math.round(p.h), riding = !!e.ride;
+  x.fillStyle = "rgba(40,24,8,.28)";
+  if(riding) x.fillRect(PX - 12, GY + 1, 24, 1); else x.fillRect(PX - 5, GY + 1, Math.max(4, 10 - Math.floor(hh / 5)), 1);
+  if(!flick){
+    if(riding){
+      x.drawImage(emCart(), PX - 14, GY - hh - 17);
+      for(k = 0; k < 3; k++){ var lx = PX - 20 - ((Math.floor(e.t * 40) + k * 5) % 10); emR(x, "#FFFFFF", lx - 5, GY - hh - 7 - k * 4, lx, GY - hh - 7 - k * 4); }
+    }
+    emPilgrim(x, PX - 6, GY - hh - (riding ? EM_CH : 0), hh > 0 ? 2 : (e.mode === "play" ? Math.floor(e.t * 10) % 2 : 0));
+  }
+  e.parts.forEach(function(q){ x.fillStyle = q.c; x.fillRect(Math.round(q.x), Math.round(q.y), 2, 2); });
+  if(e.flash > 0){ x.fillStyle = "rgba(255,60,60," + Math.min(.45, e.flash).toFixed(2) + ")"; x.fillRect(0, 0, W, e.H); }
+  var pf = document.getElementById("emProgFill"); if(pf) pf.style.width = Math.round(Math.min(1, e.dist / e.len) * 100) + "%";
+}
+function emLoop(now){
+  if(state.screen !== "emmaus"){ emRaf = 0; return; }
+  if(em){
+    var dt = Math.min(.05, (now - em.last) / 1000); em.last = now;
+    if(!hglUpright() && em.L){ emStep(dt); emPaint(); }                    // (nothing moves while the phone is upright)
+  }
+  emRaf = requestAnimationFrame(emLoop);
+}
+function emLoopStart(){ if(em) em.last = performance.now(); if(emRaf) return; emRaf = requestAnimationFrame(emLoop); }
+// the end of a ROUND X COMPLETED! screen: the lost chance is given back (after rounds 1 and 2), then the next round (or, after the last, the Mission Completed screen)
+function emInterlude(){
+  pixRoundRun("emmaus", function(){ return em; }, function(s){ if(em.chances >= EM_CHANCES) return false; em.chances++; return true; }, function(s){
+    if(s.interlude.final){ em = null; grantMission("emmaus"); return; }
+    emSetRound(em.round + 1); render();
+  });
+}
+
 /* ---------- Hope Garden, played on its side (stage 1) ---------- */
 
 // The new Hope Garden is played with the phone on its side (2026-10-27, per Dan; the upright one is saved as "Hope Garden v1"). It is built in stages. Stage 1: the garden of v1 turned a quarter turn,
@@ -8770,8 +9161,8 @@ var HGL_LAYOUT3 = [
 ];
 var HGL_ROUNDS = [
   {need: {0: 4, 2: 4, 4: 2, 6: 2}, bees: [0, 2], bfs: [4, 6], speed: 1, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT1},
-  {need: {4: 8, 6: 8, 0: 4, 2: 4}, bees: [4, 6], bfs: [0, 2], speed: 1.2, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2},
-  {need: {0: 12, 2: 12, 4: 6, 6: 6}, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3}
+  {need: {4: 8, 6: 8, 0: 4, 2: 4}, bees: [4, 6], bfs: [0, 2], speed: 1.2, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2, dfly: true},
+  {need: {0: 12, 2: 12, 4: 6, 6: 6}, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3, dfly: true}
 ];
 function hglColours(r){ return Object.keys(HGL_ROUNDS[r].need).map(Number); }
 var HGL_DELAYS = [2.5, 2, 1.5];
@@ -8822,7 +9213,7 @@ function hglPick(){
 // the start of round r: what has to land, and nothing on the board
 function hglSetRound(r){
   hgl.round = r; hgl.mode = "play"; hgl.interlude = null; hgl.need = {}; hgl.totalBy = {}; hgl.total = 0; hgl.landed = 0; hgl.landedBy = {0: 0, 2: 0, 4: 0, 6: 0};
-  hgl.lastGone = {0: -99, 2: -99, 4: -99, 6: -99}; hgl.nextSpawn = 1.2; hgl.bees = []; hgl.plans = []; hgl.particles = []; hgl.sel = null; hgl.drag = null;
+  hgl.lastGone = {0: -99, 2: -99, 4: -99, 6: -99}; hgl.nextSpawn = 1.2; hgl.dfly = null; hgl.dflyWait = HGL_DF_FIRST; hgl.bees = []; hgl.plans = []; hgl.particles = []; hgl.sel = null; hgl.drag = null;
   hglColours(r).forEach(function(ci){ hgl.need[ci] = HGL_ROUNDS[r].need[ci]; hgl.totalBy[ci] = hgl.need[ci]; hgl.total += hgl.need[ci]; });
   var info = hglDraw(hgl.bg, hgl.W, hgl.H, r); hgl.g = info.g; hgl.flowers = info.flowers;                  // the garden of this round
   hglDangerSfx(false); hglCountPaint();
@@ -8858,6 +9249,65 @@ function hglCheck(b){
       b.inF = inside; b.prevRa = ra;                                                // (in through the side, it just flies over)
     } else if(rx * rx + ry * ry <= f.r * f.r) hglHome(b, f);
   });
+}
+// The dragonfly (2026-10-28, per Dan), in rounds 2 and 3 only. It flies in at the fence at a random place and a random heading and flies for a random time; then it stops and hovers for a random time; then it picks another random heading,
+// turns to face it, and flies off again for a random time; and so on until the round is over. A bee or butterfly that touches it (one that is landing or buzzing at its flower is safe) is knocked off, and the player loses a chance.
+// It is faster than the bees (it flies at HGL_DF_SPEED, times the round's speed), bounces off the fence as they do, and a bee that is about to meet it gets the same pulsing dotted circle (and the dragonfly a green one).
+var HGL_DF_SPEED = 28, HGL_DF_R = 4.5, HGL_DF_FIRST = 5, HGL_DF_TURN = 3.2;      // (speed in picture pixels a second; collision radius; seconds into a round before it first comes; turning speed, radians a second)
+function hglDragonflySprite(frame){
+  var key = "DF" + frame; if(hgSprites[key]) return hgSprites[key];
+  var c = document.createElement("canvas"); c.width = 21; c.height = 21; var x = c.getContext("2d");
+  function wing(wx, wy, ww, wh){ x.fillStyle = "#6EAADC"; x.fillRect(wx, wy, ww, wh); x.fillStyle = "#D2EEFF"; x.fillRect(wx + 1, wy + 1, ww - 2, wh - 2); }
+  if(!frame){ wing(1, 5, 8, 3); wing(12, 5, 8, 3); wing(2, 9, 7, 3); wing(12, 9, 7, 3); }                       // wings out flat
+  else { wing(3, 4, 6, 3); wing(12, 4, 6, 3); wing(4, 8, 5, 3); wing(12, 8, 5, 3); }                          // wings swept up, a little shorter (so it seems to beat them)
+  x.fillStyle = "#1B1F3B"; x.fillRect(8, 1, 5, 4); x.fillRect(8, 5, 5, 6); x.fillRect(9, 11, 3, 9);
+  x.fillStyle = "#25B67C"; x.fillRect(9, 2, 3, 2); x.fillRect(9, 6, 3, 4); x.fillRect(10, 11, 1, 8);
+  x.fillStyle = "#1B1F3B"; x.fillRect(8, 2, 2, 2); x.fillRect(11, 2, 2, 2);                                       // the eyes
+  x.fillStyle = "#FFFFFF"; x.fillRect(9, 2, 1, 1); x.fillRect(11, 2, 1, 1);
+  x.fillStyle = "#F6E65A"; x.fillRect(9, 7, 3, 1); x.fillRect(10, 13, 1, 1); x.fillRect(10, 16, 1, 1);          // stripes
+  hgSprites[key] = c; return c;
+}
+function hglDflySpawn(){
+  var fe = hglFence(), k, ok = false, ex, ey, nx, ny;
+  for(k = 0; k < 30 && !ok; k++){                                                      // at a random place on the fence, and heading in (within 60 degrees of straight in)
+    var side = Math.floor(Math.random() * 4);
+    if(side === 0){ ex = hgRand(fe.x0 + 12, fe.x1 - 12); ey = fe.y0; nx = 0; ny = 1; } else if(side === 1){ ex = hgRand(fe.x0 + 12, fe.x1 - 12); ey = fe.y1; nx = 0; ny = -1; }
+    else if(side === 2){ ex = fe.x0; ey = hgRand(fe.y0 + 12, fe.y1 - 12); nx = 1; ny = 0; } else { ex = fe.x1; ey = hgRand(fe.y0 + 12, fe.y1 - 12); nx = -1; ny = 0; }
+    ok = !hgl.bees.some(function(b){ return Math.abs(b.x - ex) < 28 && Math.abs(b.y - ey) < 28; });
+  }
+  var a = Math.atan2(ny, nx) + hgRand(-1.05, 1.05);
+  hgl.dfly = {x: ex - Math.cos(a) * 7, y: ey - Math.sin(a) * 7, ang: a, tgt: a, sp: HGL_DF_SPEED * (HGL_ROUNDS[hgl.round].speed || 1), st: "fly", t: hgRand(2, 4.5), ph: 0};
+}
+function hglDflyAt(t){ var d = hgl.dfly; return d.st === "fly" ? {x: d.x + Math.cos(d.ang) * d.sp * t, y: d.y + Math.sin(d.ang) * d.sp * t} : {x: d.x, y: d.y}; }
+function hglDflyStep(dt){
+  if(!HGL_ROUNDS[hgl.round].dfly) return;
+  var d = hgl.dfly;
+  if(!d){ hgl.dflyWait -= dt; if(hgl.dflyWait <= 0) hglDflySpawn(); return; }
+  d.ph += dt * (d.st === "fly" ? 40 : 30);
+  if(d.st === "fly"){
+    var cs = Math.cos(d.ang), sn = Math.sin(d.ang), fe = hglFence(), bm = 7;
+    d.x += cs * d.sp * dt; d.y += sn * d.sp * dt;
+    if(d.x < fe.x0 + bm && cs < 0){ d.ang = Math.atan2(sn, -cs); d.x = fe.x0 + bm; } else if(d.x > fe.x1 - bm && cs > 0){ d.ang = Math.atan2(sn, -cs); d.x = fe.x1 - bm; }     // it bounces off the fence (one only just coming in is left alone)
+    cs = Math.cos(d.ang); sn = Math.sin(d.ang);
+    if(d.y < fe.y0 + bm && sn < 0){ d.ang = Math.atan2(-sn, cs); d.y = fe.y0 + bm; } else if(d.y > fe.y1 - bm && sn > 0){ d.ang = Math.atan2(-sn, cs); d.y = fe.y1 - bm; }
+    d.t -= dt; if(d.t <= 0){ d.st = "hover"; d.t = hgRand(1, 2.6); }              // its time is up: it stops and hovers for a while
+  } else if(d.st === "hover"){
+    d.t -= dt; if(d.t <= 0){ d.tgt = hgRand(0, 6.2832); d.st = "turn"; }            // then it picks another heading
+  } else {
+    var da = Math.atan2(Math.sin(d.tgt - d.ang), Math.cos(d.tgt - d.ang)), stp = HGL_DF_TURN * dt;
+    if(Math.abs(da) <= stp){ d.ang = d.tgt; d.st = "fly"; d.t = hgRand(1.5, 4); } else d.ang += da > 0 ? stp : -stp;          // it turns to face it, then flies off
+  }
+  var k; for(k = 0; k < hgl.bees.length && hgl.mode === "play"; k++){
+    var b = hgl.bees[k];
+    if(b.state !== "free" && b.state !== "follow" && b.state !== "hover") continue;                  // (one landing or buzzing at its flower is safe)
+    var dx = b.x - d.x, dy = b.y - d.y, rr = HGL_CR[b.kind] + HGL_DF_R;
+    if(!hglOn(b) || dx * dx + dy * dy >= rr * rr) continue;
+    hglBurst((b.x + d.x) / 2, (b.y + d.y) / 2, {c: "#FF5A5A", l: "#FFB0A0"}); hgl.flash = .4;
+    if(hgl.drag && hgl.drag.bee === b) hgl.drag = null;
+    if(hgl.sel && hgl.sel.bee === b) hgl.sel = null;
+    b.state = "done"; b.path = null;
+    hglLoseChance();
+  }
 }
 // Two bees / butterflies that touch (2026-10-27, per Dan; as in v1): a sparkle crash and the loss of a chance. A creature that is landing or buzzing at its flower stays; the others are knocked off
 // and come again later.
@@ -8937,6 +9387,18 @@ function hglDangerCheck(){
     }
     if(dmin < thr && dmin < d0 - .3){ A.dgT = B.dgT = hgl.t; }                  // closing in, and it would come within reach of a crash
   }
+  var df = hgl.dfly;
+  if(df) bs.forEach(function(B){
+    if(!hglOn(B) || B.state === "land" || B.state === "home") return;
+    var d0 = Math.sqrt((B.x - df.x) * (B.x - df.x) + (B.y - df.y) * (B.y - df.y));
+    if(d0 > HGL_DANGER_NEAR + 8) return;
+    var thr = HGL_CR[B.kind] + HGL_DF_R + HGL_DANGER_MARGIN, dmin = d0, kk;
+    for(kk = 1; kk <= 12; kk++){
+      var tt = kk * HGL_DANGER_T / 12, pa = hglAt(B, tt), pb = hglDflyAt(tt), dd = Math.sqrt((pa.x - pb.x) * (pa.x - pb.x) + (pa.y - pb.y) * (pa.y - pb.y));
+      if(dd < dmin) dmin = dd;
+    }
+    if(dmin < thr && dmin < d0 - .3){ B.dgT = df.dgT = hgl.t; }
+  });
   var any = hgl.mode === "play" && bs.some(function(b){ return hglDanger(b); });
   if(any && !hgl.dangerSnd) hglDangerSfx(true); else if(!any && hgl.dangerSnd) hglDangerSfx(false);
 }
@@ -9020,6 +9482,7 @@ function hglStep(dt){
       if(el >= HG_HOVER){ b.state = "done"; hglBurst(b.x, b.y, HG_COLORS[b.ci]); pixSfxPlay("missionDone", false); }
     }
   });
+  hglDflyStep(dt);
   var bs = hgl.bees, ci0, cj0;
   for(ci0 = 0; ci0 < bs.length && hgl.mode === "play"; ci0++) for(cj0 = ci0 + 1; cj0 < bs.length; cj0++){
     var A = bs[ci0], B = bs[cj0];
@@ -9085,6 +9548,12 @@ function hglPaint(){
       x.fillRect(bx2 - 9, by2 + 8, 3, 1); x.fillRect(bx2 - 9, by2 + 6, 1, 3); x.fillRect(bx2 + 7, by2 + 8, 3, 1); x.fillRect(bx2 + 9, by2 + 6, 1, 3);
     }
   });
+  var df = hgl.dfly;
+  if(df){                                                                              // the dragonfly, over the bees: it turns to the way it is going; hovering, it bobs
+    var dsp = hglDragonflySprite(Math.floor(df.ph) % 2), bob = df.st === "hover" ? Math.round(Math.sin(hgl.t * 9)) : 0;
+    x.fillStyle = "rgba(40,24,8,.28)"; x.fillRect(Math.round(df.x) - 4, Math.round(df.y) + 10, 8, 1);
+    x.save(); x.imageSmoothingEnabled = false; x.translate(Math.round(df.x), Math.round(df.y) + bob); x.rotate(df.ang + Math.PI / 2); x.drawImage(dsp, -10, -10); x.restore();
+  }
   hgl.particles.forEach(function(p){ x.fillStyle = p.c; x.fillRect(Math.round(p.x), Math.round(p.y), 2, 2); });
   if(hgl.flash > 0){ x.fillStyle = "rgba(255,60,60," + Math.min(.45, hgl.flash).toFixed(2) + ")"; x.fillRect(0, 0, hgl.W, hgl.H); }
   hglSignals();
@@ -9142,6 +9611,14 @@ function hglSignals(){
     o.beginPath(); o.arc(0, 0, r, 0, 6.2832); o.lineWidth = 1.3; o.globalAlpha = .7 + .3 * (1 - pulse); o.strokeStyle = col.c; o.stroke();
     o.restore();
   });
+  var df = hgl.dfly;                                                                        // round the dragonfly too, in green, while it is the danger
+  if(df && hgl.mode === "play" && df.dgT !== undefined && hgl.t - df.dgT < .3){
+    var dpl = (Math.sin(hgl.t * 9) + 1) / 2, dr = 11 + dpl * 1.8;
+    o.save(); o.translate(df.x, df.y); o.setLineDash([2.2, 2.4]); o.lineDashOffset = -hgl.t * 7;
+    o.beginPath(); o.arc(0, 0, dr, 0, 6.2832); o.lineWidth = 2.2; o.strokeStyle = "rgba(27,31,59,.55)"; o.stroke();
+    o.beginPath(); o.arc(0, 0, dr, 0, 6.2832); o.lineWidth = 1.3; o.globalAlpha = .7 + .3 * (1 - dpl); o.strokeStyle = "#3DDC97"; o.stroke();
+    o.restore();
+  }
 }
 // a butterfly in the colour of its flower (the shape of v1's butterflies)
 function hglButterflySprite(ci, frame){
@@ -9900,7 +10377,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 BW";
+var APP_BUILD = "2026-10-28 BY";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -9986,7 +10463,7 @@ var lastRenderedScreen = null;
 // screens (won / lost / solved), which have their own buttons -- and where
 // quitting would throw away a win that hasn't been collected yet.
 var EXIT_SCREENS = ["missionIntro","faithFlash","faithMatch","beTheLight","chooseJoy","followLight",
-  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder","hopeGarden","hopeGardenL"];
+  "wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder","hopeGarden","hopeGardenL","emmaus"];
 var EXIT_HIDDEN_STATUS = ["results","passed","complete","failed","solved","won"];
 
 function exitBarHtml(){
@@ -10021,15 +10498,16 @@ function exitMission(){
     case "fruitsSpirit": fsQuit(); break;
     case "jacobLadder": jlQuit(); break;
     case "hopeGardenIntro": case "hopeGarden": case "hopeGardenL": hgQuit(); break;
+    case "emmaus": emQuit(); break;
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
 }
 
-var LANDSCAPE_OK_SCREENS = ["hopeGardenL"];        // screens played on their side: the landscape Hope Garden (2026-10-27, per Dan)
+var LANDSCAPE_OK_SCREENS = ["hopeGardenL", "emmaus"];        // screens played on their side: the landscape Hope Garden (2026-10-27, per Dan) and The Road to Emmaus (2026-10-28)
 function rotateMsgUpdate(){
-  document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || (state.screen === "award" && state.awardMissionId === "hopeGarden"));      // (the Mission Completed screen of Hope Garden comes up with the phone still on its side)
-  document.body.classList.toggle("hglMode", state.screen === "hopeGardenL");
+  document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || (state.screen === "award" && state.awardMissionId === "emmaus"));      // (the Mission Completed screen of The Road to Emmaus comes up with the phone still on its side)
+  document.body.classList.toggle("hglMode", state.screen === "hopeGardenL" || state.screen === "emmaus");      // (the same full-width, no-bounce, rotate-me layout for both)
   var tx = document.getElementById("rotateText"), sub = document.getElementById("rotateSub");
   if(!tx || !sub) return;
   var es = state.lang === "es", unset = !state.lang;
@@ -10049,8 +10527,8 @@ function pixHoldUntilLoaded(app){
   pending.forEach(function(im){ im.addEventListener("load", one); im.addEventListener("error", one); });
   setTimeout(reveal, 1500);
 }
-// Every picture of the game (tiles/, all the .png and .jpg: 296 of them, about 5.6 MB), fetched a few at a time in the background after the first screen is up. New pictures put in tiles/ must be added to this list.
-var PRELOAD_LIST = "anamaria.png|anamaria_placeholder.png|badge_beads.png|badge_discipleship.png|badge_faith.png|badge_forgiveness.png|badge_friendship.png|badge_grace.png|badge_growth.png|badge_holiness.png|badge_hope.png|badge_light.png|badge_love.png|badge_mercy.png|badge_perseverance.png|badge_salvation.png|badge_scripture.png|badge_spirit.png|badge_truth.png|badge_wisdom.png|badges8/b8_faith.png|badges8/b8_forgiveness.png|badges8/b8_friendship.png|badges8/b8_grace.png|badges8/b8_holiness.png|badges8/b8_hope.png|badges8/b8_light.png|badges8/b8_love.png|badges8/b8_mercy.png|badges8/b8_salvation.png|badges96/b96_beads.png|badges96/b96_discipleship.png|badges96/b96_faith.png|badges96/b96_forgiveness.png|badges96/b96_friendship.png|badges96/b96_grace.png|badges96/b96_growth.png|badges96/b96_holiness.png|badges96/b96_hope.png|badges96/b96_light.png|badges96/b96_love.png|badges96/b96_mercy.png|badges96/b96_perseverance.png|badges96/b96_salvation.png|badges96/b96_scripture.png|badges96/b96_spirit.png|badges96/b96_truth.png|badges96/b96_wisdom.png|blessings.png|candle.png|card_back.png|cat.png|church_interior.png|church_interior2.png|clouds_1.png|clouds_2.png|clouds_3.png|clouds_menu.png|dog.png|dove.png|dove2.png|dove3.png|emoji/e_angel.png|emoji/e_apple.png|emoji/e_baby.png|emoji/e_boy.png|emoji/e_bread.png|emoji/e_cross.png|emoji/e_crown.png|emoji/e_cup.png|emoji/e_dove.png|emoji/e_earth.png|emoji/e_elephant.png|emoji/e_feet.png|emoji/e_fire.png|emoji/e_fish.png|emoji/e_heart.png|emoji/e_herb.png|emoji/e_house.png|emoji/e_jar.png|emoji/e_ladder.png|emoji/e_lion.png|emoji/e_moneybag.png|emoji/e_moon.png|emoji/e_mountain.png|emoji/e_ogre.png|emoji/e_oldman.png|emoji/e_people.png|emoji/e_pig.png|emoji/e_pray.png|emoji/e_rain.png|emoji/e_rainbow.png|emoji/e_sailboat.png|emoji/e_seedling.png|emoji/e_sheep.png|emoji/e_ship.png|emoji/e_snake.png|emoji/e_star.png|emoji/e_sun.png|emoji/e_sunrise.png|emoji/e_tablets.png|emoji/e_target.png|emoji/e_tower.png|emoji/e_tree.png|emoji/e_walk.png|emoji/e_wave.png|emoji/e_whale.png|faith_tile2_00.jpg|faith_tile2_01.jpg|faith_tile2_02.jpg|faith_tile2_03.jpg|faith_tile2_04.jpg|faith_tile2_05.jpg|faith_tile2_06.jpg|faith_tile2_07.jpg|faith_tile2_08.jpg|faith_tile2_09.jpg|faith_tile2_10.jpg|faith_tile2_11.jpg|faith_tile2_12.jpg|faith_tile2_13.jpg|faith_tile2_14.jpg|faith_tile2_15.jpg|faith_tile8_00.png|faith_tile8_01.png|faith_tile8_02.png|faith_tile8_03.png|faith_tile8_04.png|faith_tile8_05.png|faith_tile8_06.png|faith_tile8_07.png|faith_tile8_08.png|faith_tile8_09.png|faith_tile8_10.png|faith_tile8_11.png|faith_tile8_12.png|faith_tile8_13.png|faith_tile8_14.png|faith_tile8_15.png|fence_front.png|fence_front2.png|fence_front3.png|flame.png|fruits/fs_1.png|fruits/fs_2.png|fruits/fs_3.png|fruits/fs_4.png|fruits/fs_5.png|fruits/fs_6.png|fruits/fs_7.png|fruits/fs_8.png|fruits/fs_9.png|fruits/fs_9b.png|fruits/fs_9c.png|fruits/fs_9d.png|golden_ticket.png|hands.png|hands2.png|hands3.png|hb_scene.png|heart_empty.png|heart_full.png|hg_intro_scene.png|hg_qr.png|icons/ic_back.png|icons/ic_beTheLight.png|icons/ic_catchLight.png|icons/ic_chooseJoy.png|icons/ic_emojiStories.png|icons/ic_faithFlash.png|icons/ic_faithMatch.png|icons/ic_followLight.png|icons/ic_goldenTicket.png|icons/ic_hiddenBlessings.png|icons/ic_jesusTimeline.png|icons/ic_kindnessSort.png|icons/ic_lightCandle.png|icons/ic_lock.png|icons/ic_music.png|icons/ic_options.png|icons/ic_passport.png|icons/ic_pathOfLight.png|icons/ic_sacredSudoku.png|icons/ic_sound.png|icons/ic_stainedGlass.png|icons/ic_tbd.png|icons/ic_wordUnscramble.png|icons/lc_courage.png|icons/lc_family.png|icons/lc_friends.png|icons/lc_healing.png|icons/lc_peace.png|icons/lc_thanks.png|icons48/ic_back.png|icons48/ic_beTheLight.png|icons48/ic_catchLight.png|icons48/ic_chooseJoy.png|icons48/ic_dovePeace.png|icons48/ic_emojiStories.png|icons48/ic_faithFlash.png|icons48/ic_faithMatch.png|icons48/ic_followLight.png|icons48/ic_fruitsSpirit.png|icons48/ic_goldenTicket.png|icons48/ic_hiddenBlessings.png|icons48/ic_hopeGarden.png|icons48/ic_jacobLadder.png|icons48/ic_jesusTimeline.png|icons48/ic_kindnessSort.png|icons48/ic_lightCandle.png|icons48/ic_lock.png|icons48/ic_music.png|icons48/ic_mustardSeed.png|icons48/ic_options.png|icons48/ic_passport.png|icons48/ic_pathOfLight.png|icons48/ic_pilgrimRoad.png|icons48/ic_prayBeads.png|icons48/ic_sacredSudoku.png|icons48/ic_sound.png|icons48/ic_stainedGlass.png|icons48/ic_tbd.png|icons48/ic_wordGroups.png|icons48/ic_wordTrail.png|icons48/ic_wordUnscramble.png|icons48p/ic_back.png|icons48p/ic_beTheLight.png|icons48p/ic_catchLight.png|icons48p/ic_chooseJoy.png|icons48p/ic_dovePeace.png|icons48p/ic_emojiStories.png|icons48p/ic_faithFlash.png|icons48p/ic_faithMatch.png|icons48p/ic_followLight.png|icons48p/ic_fruitsSpirit.png|icons48p/ic_goldenTicket.png|icons48p/ic_hiddenBlessings.png|icons48p/ic_hopeGarden.png|icons48p/ic_jacobLadder.png|icons48p/ic_jesusTimeline.png|icons48p/ic_kindnessSort.png|icons48p/ic_lightCandle.png|icons48p/ic_lock.png|icons48p/ic_music.png|icons48p/ic_mustardSeed.png|icons48p/ic_options.png|icons48p/ic_passport.png|icons48p/ic_pathOfLight.png|icons48p/ic_pilgrimRoad.png|icons48p/ic_prayBeads.png|icons48p/ic_sacredSudoku.png|icons48p/ic_sound.png|icons48p/ic_stainedGlass.png|icons48p/ic_tbd.png|icons48p/ic_wordGroups.png|icons48p/ic_wordTrail.png|icons48p/ic_wordUnscramble.png|lawn.png|logo_8bit.png|logo_small.png|ms/ms_1.png|ms/ms_2.png|ms/ms_3.png|ms/ms_4.png|ms/ms_5.png|ms/ms_6.png|passport_bg.png|pilgrim.png|pilgrim_back.png|pr/church.png|puzzle/pz_01.jpg|puzzle/pz_02.jpg|puzzle/pz_03.jpg|puzzle/pz_04.jpg|puzzle/pz_05.jpg|puzzle/pz_06.jpg|puzzle/pz_07.jpg|puzzle/pz_08.jpg|puzzle/pz_09.jpg|puzzle/pz_10.jpg|puzzle/pz_11.jpg|puzzle/pz_12.jpg|qr_feyvida.png|scene_church.png|scene_home.png|scene_world.png|scene_world2.png|scene_world3.png|sheep.png|sheep_far.png|sheep_far2.png|sheep_near.png|sheep_near2.png|sky_menu.png|spark.png|stars_tile.png".split("|");
+// Every picture of the game (tiles/, all the .png and .jpg: 299 of them, about 5.6 MB), fetched a few at a time in the background after the first screen is up. New pictures put in tiles/ must be added to this list.
+var PRELOAD_LIST = "anamaria.png|anamaria_placeholder.png|badge_beads.png|badge_discipleship.png|badge_faith.png|badge_forgiveness.png|badge_friendship.png|badge_grace.png|badge_growth.png|badge_holiness.png|badge_hope.png|badge_light.png|badge_love.png|badge_mercy.png|badge_perseverance.png|badge_salvation.png|badge_scripture.png|badge_spirit.png|badge_truth.png|badge_wisdom.png|badges8/b8_faith.png|badges8/b8_forgiveness.png|badges8/b8_friendship.png|badges8/b8_grace.png|badges8/b8_holiness.png|badges8/b8_hope.png|badges8/b8_light.png|badges8/b8_love.png|badges8/b8_mercy.png|badges8/b8_salvation.png|badges96/b96_beads.png|badges96/b96_discipleship.png|badges96/b96_faith.png|badges96/b96_forgiveness.png|badges96/b96_friendship.png|badges96/b96_grace.png|badges96/b96_growth.png|badges96/b96_holiness.png|badges96/b96_hope.png|badges96/b96_light.png|badges96/b96_love.png|badges96/b96_mercy.png|badges96/b96_perseverance.png|badges96/b96_salvation.png|badges96/b96_scripture.png|badges96/b96_spirit.png|badges96/b96_truth.png|badges96/b96_wisdom.png|blessings.png|candle.png|card_back.png|cat.png|church_interior.png|church_interior2.png|clouds_1.png|clouds_2.png|clouds_3.png|clouds_menu.png|dog.png|dove.png|dove2.png|dove3.png|emoji/e_angel.png|emoji/e_apple.png|emoji/e_baby.png|emoji/e_boy.png|emoji/e_bread.png|emoji/e_cross.png|emoji/e_crown.png|emoji/e_cup.png|emoji/e_dove.png|emoji/e_earth.png|emoji/e_elephant.png|emoji/e_feet.png|emoji/e_fire.png|emoji/e_fish.png|emoji/e_heart.png|emoji/e_herb.png|emoji/e_house.png|emoji/e_jar.png|emoji/e_ladder.png|emoji/e_lion.png|emoji/e_moneybag.png|emoji/e_moon.png|emoji/e_mountain.png|emoji/e_ogre.png|emoji/e_oldman.png|emoji/e_people.png|emoji/e_pig.png|emoji/e_pray.png|emoji/e_rain.png|emoji/e_rainbow.png|emoji/e_sailboat.png|emoji/e_seedling.png|emoji/e_sheep.png|emoji/e_ship.png|emoji/e_snake.png|emoji/e_star.png|emoji/e_sun.png|emoji/e_sunrise.png|emoji/e_tablets.png|emoji/e_target.png|emoji/e_tower.png|emoji/e_tree.png|emoji/e_walk.png|emoji/e_wave.png|emoji/e_whale.png|faith_tile2_00.jpg|faith_tile2_01.jpg|faith_tile2_02.jpg|faith_tile2_03.jpg|faith_tile2_04.jpg|faith_tile2_05.jpg|faith_tile2_06.jpg|faith_tile2_07.jpg|faith_tile2_08.jpg|faith_tile2_09.jpg|faith_tile2_10.jpg|faith_tile2_11.jpg|faith_tile2_12.jpg|faith_tile2_13.jpg|faith_tile2_14.jpg|faith_tile2_15.jpg|faith_tile8_00.png|faith_tile8_01.png|faith_tile8_02.png|faith_tile8_03.png|faith_tile8_04.png|faith_tile8_05.png|faith_tile8_06.png|faith_tile8_07.png|faith_tile8_08.png|faith_tile8_09.png|faith_tile8_10.png|faith_tile8_11.png|faith_tile8_12.png|faith_tile8_13.png|faith_tile8_14.png|faith_tile8_15.png|fence_front.png|fence_front2.png|fence_front3.png|flame.png|fruits/fs_1.png|fruits/fs_2.png|fruits/fs_3.png|fruits/fs_4.png|fruits/fs_5.png|fruits/fs_6.png|fruits/fs_7.png|fruits/fs_8.png|fruits/fs_9.png|fruits/fs_9b.png|fruits/fs_9c.png|fruits/fs_9d.png|golden_ticket.png|hands.png|hands2.png|hands3.png|hb_scene.png|heart_empty.png|heart_full.png|hg_intro_scene.png|hg_qr.png|icons/ic_back.png|icons/ic_beTheLight.png|icons/ic_catchLight.png|icons/ic_chooseJoy.png|icons/ic_emojiStories.png|icons/ic_faithFlash.png|icons/ic_faithMatch.png|icons/ic_followLight.png|icons/ic_goldenTicket.png|icons/ic_hiddenBlessings.png|icons/ic_jesusTimeline.png|icons/ic_kindnessSort.png|icons/ic_lightCandle.png|icons/ic_lock.png|icons/ic_music.png|icons/ic_options.png|icons/ic_passport.png|icons/ic_pathOfLight.png|icons/ic_sacredSudoku.png|icons/ic_sound.png|icons/ic_stainedGlass.png|icons/ic_tbd.png|icons/ic_wordUnscramble.png|icons/lc_courage.png|icons/lc_family.png|icons/lc_friends.png|icons/lc_healing.png|icons/lc_peace.png|icons/lc_thanks.png|icons48/ic_back.png|icons48/ic_beTheLight.png|icons48/ic_catchLight.png|icons48/ic_chooseJoy.png|icons48/ic_dovePeace.png|icons48/ic_emojiStories.png|icons48/ic_faithFlash.png|icons48/ic_faithMatch.png|icons48/ic_followLight.png|icons48/ic_fruitsSpirit.png|icons48/ic_goldenTicket.png|icons48/ic_hiddenBlessings.png|icons48/ic_hopeGarden.png|icons48/ic_jacobLadder.png|icons48/ic_jesusTimeline.png|icons48/ic_kindnessSort.png|icons48/ic_lightCandle.png|icons48/ic_lock.png|icons48/ic_music.png|icons48/ic_mustardSeed.png|icons48/ic_options.png|icons48/ic_passport.png|icons48/ic_pathOfLight.png|icons48/ic_pilgrimRoad.png|icons48/ic_prayBeads.png|icons48/ic_sacredSudoku.png|icons48/ic_sound.png|icons48/ic_stainedGlass.png|icons48/ic_tbd.png|icons48/ic_wordGroups.png|icons48/ic_wordTrail.png|icons48/ic_wordUnscramble.png|icons48p/ic_back.png|icons48p/ic_beTheLight.png|icons48p/ic_catchLight.png|icons48p/ic_chooseJoy.png|icons48p/ic_dovePeace.png|icons48p/ic_emojiStories.png|icons48p/ic_faithFlash.png|icons48p/ic_faithMatch.png|icons48p/ic_followLight.png|icons48p/ic_fruitsSpirit.png|icons48p/ic_goldenTicket.png|icons48p/ic_hiddenBlessings.png|icons48p/ic_hopeGarden.png|icons48p/ic_jacobLadder.png|icons48p/ic_jesusTimeline.png|icons48p/ic_kindnessSort.png|icons48p/ic_lightCandle.png|icons48p/ic_lock.png|icons48p/ic_music.png|icons48p/ic_mustardSeed.png|icons48p/ic_options.png|icons48p/ic_passport.png|icons48p/ic_pathOfLight.png|icons48p/ic_pilgrimRoad.png|icons48p/ic_prayBeads.png|icons48p/ic_sacredSudoku.png|icons48p/ic_sound.png|icons48p/ic_stainedGlass.png|icons48p/ic_tbd.png|icons48p/ic_wordGroups.png|icons48p/ic_wordTrail.png|icons48p/ic_wordUnscramble.png|lawn.png|logo_8bit.png|logo_small.png|ms/ms_1.png|ms/ms_2.png|ms/ms_3.png|ms/ms_4.png|ms/ms_5.png|ms/ms_6.png|passport_bg.png|pilgrim.png|pilgrim_back.png|pr/church.png|puzzle/pz_01.jpg|puzzle/pz_02.jpg|puzzle/pz_03.jpg|puzzle/pz_04.jpg|puzzle/pz_05.jpg|puzzle/pz_06.jpg|puzzle/pz_07.jpg|puzzle/pz_08.jpg|puzzle/pz_09.jpg|puzzle/pz_10.jpg|puzzle/pz_11.jpg|puzzle/pz_12.jpg|qr_feyvida.png|scene_church.png|scene_home.png|scene_world.png|scene_world2.png|scene_world3.png|sheep.png|sheep_far.png|sheep_far2.png|sheep_near.png|sheep_near2.png|sky_menu.png|spark.png|stars_tile.png|icons/ic_emmaus.png|icons48/ic_emmaus.png|icons48p/ic_emmaus.png".split("|");
 var preloadKeep = [];
 function pixPreloadAll(){
   var i = 0, running = 0;
@@ -10099,6 +10577,7 @@ function render(){
     case "hopeGardenIntro": html = screenHopeGardenIntro(); break;
     case "hopeGarden": html = screenHopeGarden(); break;
     case "hopeGardenL": html = screenHopeGardenL(); break;
+    case "emmaus": html = screenEmmaus(); break;
     case "churchWalk": html = screenChurchWalk(); break;
     case "passport": html = screenPassport(); break;
     case "options": html = screenOptions(); break;
@@ -10205,6 +10684,8 @@ function render(){
   if(state.screen === "hopeGarden"){ hgFit(); hgDraw(); hgLoopStart(); }
   if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); }
   if(state.screen === "hopeGardenL" && hgl && hgl.interlude && !pixRoundRunning.hopeGardenL) hglInterlude();
+  if(state.screen === "emmaus"){ emFit(); emLoopStart(); }
+  if(state.screen === "emmaus" && em && em.interlude && !pixRoundRunning.emmaus) emInterlude();
   if(state.screen === "mainMenu") hgPlaceMenuIcon();
   if(state.screen === "hopeGardenIntro") hgiHorizon();
   if(state.screen === "churchWalk") cwStart();
