@@ -1523,7 +1523,10 @@ var MISSIONS = [
   // Mustard Seed (2026-10-23, per Dan): took the place of the third "TBD" tile. Own Growth badge since 2026-10-26.
   {id:"mustardSeed", icon:"🌱", badgeImg:"tiles/badge_growth.png", nameKey:"mustardSeedName", themeKey:"themeGrowth"},
   // Pray the Beads (2026-10-23, per Dan): took the place of the last "TBD" tile. Own Prayer badge since 2026-10-26.
-  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_beads.png", nameKey:"prayBeadsName", themeKey:"themePrayer"}
+  {id:"prayBeads", icon:"📿", badgeImg:"tiles/badge_beads.png", nameKey:"prayBeadsName", themeKey:"themePrayer"},
+  // Hope Garden (2026-10-28, per Dan: finishing it must give points, move the pilgrim and give a badge). It uses the Hope badge, which Choose Joy has too, until a badge of its own is made; swap badgeImg then.
+  // Its icon is in the sky on the Main Menu, not in the Missions window (see isMenuIconMission).
+  {id:"hopeGarden", icon:"🌼", badgeImg:"tiles/badge_hope.png", nameKey:"hopeGardenName", themeKey:"themeHope"}
 ];
 
 // Reusable badge <img> with a graceful fallback to the mission's emoji icon
@@ -1760,7 +1763,8 @@ function defaultState(){
       wordGroups: {done:false, badge:false},
       mustardSeed: {done:false, badge:false},
       prayBeads: {done:false, badge:false},
-      pilgrimRoad: {done:false, badge:false}
+      pilgrimRoad: {done:false, badge:false},
+      hopeGarden: {done:false, badge:false}
     },
     session: { faithFlash:null, faithMatch:null, chooseJoy:null,
       followLight:null, wordUnscramble:null, catchLight:null,
@@ -2320,6 +2324,7 @@ function startMission(id){
   else if(id === "mustardSeed"){ initMustardSeed(); go("mustardSeed"); }
   else if(id === "prayBeads"){ initPrayBeads(); go("prayBeads"); }
   else if(id === "pilgrimRoad"){ initPilgrimRoad(); go("pilgrimRoad"); }
+  else if(id === "hopeGarden"){ hgOpen(); }                       // the Unfinished screen first; PLAY HOPE GARDEN there starts the game
 }
 
 /* ---------- Home Screen (the Main Menu) ---------- */
@@ -2394,10 +2399,11 @@ function openFolder(icon){
 }
 function closeFolder(){ state.folderOpen = false; saveState(); render(); }
 
+function isMenuIconMission(id){ return id === MENU_ICON_MISSION || id === "hopeGarden"; }      // the missions whose icons hang in the sky on the Main Menu instead of being in the Missions window
 var MENU_ICON_MISSION = "chooseJoy";      // the mission whose icon is in the sky on the Main Menu, right of the church (2026-10-27, per Dan), not in the Missions window
 function folderHtml(){
   if(!state.folderOpen) return "";
-  var items = MISSIONS.filter(function(m){ return m.id !== MENU_ICON_MISSION; }).map(function(m){
+  var items = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); }).map(function(m){
     var done = state.missions[m.id].done;
     return appIconHtml({onclick:"openMission('" + m.id + "')", bg:ICON_BG[m.id], cls:done ? "done" : "", inner:iconSpr(m.id),
       label:t(m.nameKey), badge:done ? '<span class="doneBadge">&#10003;</span>' : ""});
@@ -2810,7 +2816,7 @@ function goBackToWelcome(){ go("welcome"); }
 
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
-  var inFolder = MISSIONS.filter(function(m){ return m.id !== MENU_ICON_MISSION; });
+  var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
   var doneCount = inFolder.filter(function(m){ return state.missions[m.id].done; }).length;
   var unlocked = goldenTicketUnlocked();
   var mini = ["faithFlash", "faithMatch", "dovePeace", "stainedGlass"].map(function(id){ return iconSpr(id); }).join("");
@@ -2832,7 +2838,7 @@ function screenMainMenu(){
     '<div class="homeGrid">' + icons + '</div>' +
     pilgrimSceneHtml() +
     '<div class="pixDoveLayer"><div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div></div>' +
-    '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeGardenName")}) + '</div>' +
+    '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"openMission('hopeGarden')", bg:ICON_BG.hopeGarden, cls:state.missions.hopeGarden.done ? "done" : "", inner:iconSpr("hopeGarden"), label:t("hopeGardenName"), badge:state.missions.hopeGarden.done ? '<span class="doneBadge">&#10003;</span>' : ""}) + '</div>' +
     '<div class="hgMenuIcon" id="cjMenuIcon">' + appIconHtml({onclick:"openMission('" + MENU_ICON_MISSION + "')", bg:ICON_BG[MENU_ICON_MISSION], cls:state.missions[MENU_ICON_MISSION].done ? "done" : "", inner:iconSpr(MENU_ICON_MISSION),
       label:t(missionById(MENU_ICON_MISSION).nameKey), badge:state.missions[MENU_ICON_MISSION].done ? '<span class="doneBadge">&#10003;</span>' : ""}) + '</div>' +
     folderHtml() +
@@ -2881,10 +2887,15 @@ function awardAutoReturn(){
   if(awardTimer && awardTimerFor === state.awardMissionId) return;      // already counting for this badge (a redraw of the same screen does not restart it)
   clearTimeout(awardTimer); awardTimer = 0;                // (a different badge: it gets its own full time)
   awardTimerFor = state.awardMissionId;
-  awardTimer = setTimeout(function(){
+  var waited = 0;
+  function leave(){
     awardTimer = 0;
-    if(state.screen === "award" && state.awardMissionId === awardTimerFor) afterAward();
-  }, AWARD_SHOW_MS);
+    if(state.screen !== "award" || state.awardMissionId !== awardTimerFor) return;
+    // Hope Garden is played on its side and the Main Menu is upright: the badge stays up until the phone is turned (for 12 s at most), so the pilgrim's walk is not hidden by the "rotate your phone" message
+    if(state.awardMissionId === "hopeGarden" && !hglUpright() && waited < 12000){ waited += 300; awardTimer = setTimeout(leave, 300); return; }
+    afterAward();
+  }
+  awardTimer = setTimeout(leave, AWARD_SHOW_MS);
 }
 function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
@@ -8692,16 +8703,16 @@ function hglFit(){
   }
   hglPlaceSigns(); hglPaint(); hglCountPaint();
 }
-// The two signs sit close to the name, one each side with the same small gap (2026-10-27, per Dan; they were further out). hgl.signL and hgl.signR are where they end (in game pixels), so no signal comes up under them.
-var HGL_SIGN_GAP = 12;
+// The two signs are centred in the room beside the name (2026-10-28, per Dan): the bee sign halfway between the left edge of the screen and the left edge of the name, the butterfly sign halfway between the right edge of the
+// name and the right edge of the screen. They are centred on that point (translateX -50%), so they stay centred when the numbers grow to two digits; hglCountPaint places them again after every change of the counts.
 function hglPlaceSigns(){
   var scr = document.getElementById("hglScreen"), a = scr && scr.querySelector(".hglSignL"), b = scr && scr.querySelector(".hglSignR"), n = scr && scr.querySelector(".hglBanner");
-  if(!a || !b || !n || !hgl) return;
-  var sr = scr.getBoundingClientRect(), nr = n.getBoundingClientRect(), aw = a.getBoundingClientRect().width;
-  a.style.right = "auto"; a.style.left = Math.round(nr.left - sr.left - HGL_SIGN_GAP - aw) + "px";
-  b.style.right = "auto"; b.style.left = Math.round(nr.right - sr.left + HGL_SIGN_GAP) + "px";
-  hgl.signL = (a.getBoundingClientRect().left - sr.left) / HG_SCALE;
-  hgl.signR = (b.getBoundingClientRect().right - sr.left) / HG_SCALE;
+  if(!a || !b || !n) return;
+  var sr = scr.getBoundingClientRect(), nr = n.getBoundingClientRect(), left = nr.left - sr.left, right = nr.right - sr.left, xb = document.querySelector(".exitBtn"), aw = a.getBoundingClientRect().width;
+  var ac = left / 2;
+  if(xb) ac = Math.max(ac, xb.getBoundingClientRect().right - sr.left + 6 + aw / 2);                  // (on a narrow phone the red X is in the way: the sign is then as far left as it can go beside it)
+  a.style.right = "auto"; a.style.left = Math.round(ac) + "px"; a.style.transform = "translateX(-50%)";
+  b.style.right = "auto"; b.style.left = Math.round((right + sr.width) / 2) + "px"; b.style.transform = "translateX(-50%)";
 }
 window.addEventListener("resize", function(){ if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); } });
 window.addEventListener("orientationchange", function(){ setTimeout(function(){ if(state.screen === "hopeGardenL"){ hglFit(); hglLoopStart(); } }, 250); });
@@ -8803,6 +8814,7 @@ function hglCountPaint(){
   if(a) a.textContent = sum(R.bees, hgl.landedBy) + "/" + sum(R.bees, hgl.totalBy);
   if(b) b.textContent = sum(R.bfs, hgl.landedBy) + "/" + sum(R.bfs, hgl.totalBy);
   var h = document.getElementById("hglHearts"); if(h) h.innerHTML = chancesHeartsHtml(Math.max(0, hgl.chances), HG_CHANCES);
+  hglPlaceSigns();                                                  // (a count that grows to two digits widens its sign: it is centred again)
 }
 function hglEnter(p){
   var bee = hglIsBee(p.ci), sp = (bee ? HGL_SPEED : HGL_BF_SPEED) * (HGL_ROUNDS[hgl.round].speed || 1) * hgRand(.9, 1.15);
@@ -8863,7 +8875,12 @@ function hglPlayAgain(){ hglDangerSfx(false); hgl = null; render(); }           
 // the end of a ROUND X COMPLETED! screen: the lost chance is given back (after rounds 1 and 2), then the next round starts; after the last round the end message comes up
 function hglInterlude(){
   pixRoundRun("hopeGardenL", function(){ return hgl; }, function(s){ if(hgl.chances >= HG_CHANCES) return false; hgl.chances++; return true; }, function(s){
-    if(s.interlude.final){ hgl.interlude = null; hgl.mode = "complete"; } else hglSetRound(hgl.round + 1);
+    if(s.interlude.final){                                           // all three rounds done: the Mission Completed screen with the badge, the 100 points and a step for the pilgrim, as for the other games (2026-10-28, per Dan)
+      hglDangerSfx(false); hgl = null; state.session.hopeGarden = null;
+      grantMission("hopeGarden");
+      return;
+    }
+    hglSetRound(hgl.round + 1);
     render();
   });
 }
@@ -9859,7 +9876,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 BO";
+var APP_BUILD = "2026-10-28 BR";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -9987,7 +10004,7 @@ function exitMission(){
 
 var LANDSCAPE_OK_SCREENS = ["hopeGardenL"];        // screens played on their side: the landscape Hope Garden (2026-10-27, per Dan)
 function rotateMsgUpdate(){
-  document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1);
+  document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || (state.screen === "award" && state.awardMissionId === "hopeGarden"));      // (the Mission Completed screen of Hope Garden comes up with the phone still on its side)
   document.body.classList.toggle("hglMode", state.screen === "hopeGardenL");
   var tx = document.getElementById("rotateText"), sub = document.getElementById("rotateSub");
   if(!tx || !sub) return;
@@ -10078,6 +10095,7 @@ function render(){
     if(el && !(wasSky && el.classList.contains("pixSky"))) el.classList.add("screen-enter");
   }
   if(state.screen === "mainMenu"){ pilgrimInit(isNewScreen); pixMusicStart(); }   // the music starts the first time the Main Menu is shown
+  else if(state.screen !== "language" && state.screen !== "welcome") pixMusicStart();      // ...and on any other screen after that: a phone that slept can reload the page on the Unfinished screen or in a game, and the music has to come back there too (2026-10-28, per Dan)
   if(state.screen === "passport"){
     var track = document.getElementById("passportTrack");
     if(track){
