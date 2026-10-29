@@ -8714,7 +8714,7 @@ window.addEventListener("resize", function(){ if(state.screen === "mainMenu") hg
 var EM_SCALE = 4, EM_CHANCES = 3, EM_V0 = 150, EM_G = 360;      // a jump leaves the ground at 150 px/s and falls back at 360 px/s squared: 31 pixels high, 0.83 s in the air
 var EM_V0B = 190, EM_V0B2 = 330;          // (the purple basket throws him 3 times as high: 150 pixels, up to the clouds)
 var EM_SKY = 100;          // the first cloud's height above the street          // a basket throws the pilgrim up at this speed (50 pixels high, against 31 for a jump), for the coins that hang up in the air (2026-10-28, per Dan)
-var EM_RIDE_SCREENS = 2.5, EM_CH = 13;                          // the ride lasts this many screen widths; the floor of a cart is this high (the pilgrim's feet stand 13 pixels up on it)
+var EM_RIDE_SCREENS = 2.2, EM_CH = 13;                          // the ride lasts this many screen widths; the floor of a cart is this high (the pilgrim's feet stand 13 pixels up on it)
 var EM_ROUNDS = [
   {speed: 58, secs: 40, theme: 0, mix: {cart: 3, crate: 3, sheep: 2, herd: 2, jars: 2}, easy: ["crate", "sheep"], gap: 60},                           // morning in the village: carts, crates, sheep
   {speed: 74, secs: 55, theme: 1, mix: {cart: 3, stack: 3, jars: 4, crate: 2, crate2w: 1, herd: 1}, easy: ["crate", "sheep"], gap: 50},      // midday at the market: crate stacks, jars, carts
@@ -8951,8 +8951,9 @@ function emTrack(r){
     var zone = x < cartAt + ride + 24 + 60;
     if(zone && x > cartAt + ride - 40){ x = cartAt + ride + 24 + 60; zone = false; }
     if(x >= end) break;
+    var bzone = x < cartAt + ride + 24 + 60 + Math.round(v * 1.2);          // a basket waits until there is room after a ride, to come down off the cart and jump onto it
     if(sc && x + 34 > sc.a && x < sc.b){ x = Math.round(sc.b); if(x >= end) break; }          // (where he comes down from the last cloud the street is kept empty)
-    if(!zone && b2 && x >= b2At && x < end - 1100){          // the purple basket (2026-10-28, per Dan): it throws him up to a course of clouds, with coins on the way up, on the clouds and on the way down; the street beneath is empty
+    if(!bzone && b2 && x >= b2At && x < end - 1100){          // the purple basket (2026-10-28, per Dan): it throws him up to a course of clouds, with coins on the way up, on the clouds and on the way down; the street beneath is empty
       var bd2 = EM_OB.basket2, bxc = x + bd2.w / 2, ci = 0, lastY = EM_SKY, tt;
       list.push({type: "basket2", wx: x, w: bd2.w, h: bd2.h, vx: 0, soft: true, dead: false}); b2 = false;
       for(k = 0; k < 4; k++){ tt = .3 + k * .2; coins.push({wx: bxc + v * tt, cy: 16 + EM_V0B2 * tt - 180 * tt * tt, got: false}); }
@@ -8971,7 +8972,7 @@ function emTrack(r){
       x = Math.round(x + bd2.w + v * .45);          // and under the clouds the street goes on, with its things and coins, for the one who does not go up
       continue;
     }
-    if(!zone && bi < bAt.length && x >= bAt[bi] && x < end - 230){          // a basket (outside a ride's stretch): and, up in the air where a jump from it reaches, a row of coins; then room to come down
+    if(!bzone && bi < bAt.length && x >= bAt[bi] && x < end - 230){          // a basket (outside a ride's stretch): and, up in the air where a jump from it reaches, a row of coins; then room to come down
       var bd = EM_OB.basket, cyB = Math.min(54, e.GY - 14), dtc = Math.max(12 / v, .12);
       list.push({type: "basket", wx: x, w: bd.w, h: bd.h, vx: 0, soft: true, dead: false}); bi++;
       for(k = 0; k < 4; k++) coins.push({wx: x + bd.w / 2 + v * (.53 + (k - 1.5) * dtc), cy: cyB, got: false});
@@ -9095,7 +9096,7 @@ function emDown(ev){
   if(!em || (em.mode !== "ready" && em.mode !== "play")) return;
   if(ev && ev.preventDefault) ev.preventDefault();
   if(pixAudioStale) pixReviveOnTap();
-  if(em.mode === "ready"){ em.mode = "play"; em.last = performance.now(); var rd = document.querySelector(".emReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd); return; }
+  if(em.mode === "ready"){ em.mode = "play"; em.last = performance.now(); var rd = document.querySelector(".emReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd); emJump(); return; }          // (the tap that starts a round is also a jump, 2026-10-28, per Dan)
   emJump();
 }
 function emHit(o){
@@ -9380,8 +9381,8 @@ var HGL_LAYOUT3 = [
 ];
 var HGL_ROUNDS = [
   {need: {0: 4, 2: 4, 4: 2, 6: 2}, bees: [0, 2], bfs: [4, 6], speed: 1, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT1},
-  {need: {4: 8, 6: 8, 0: 4, 2: 4}, bees: [4, 6], bfs: [0, 2], speed: 1.2, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2, dfly: true},
-  {need: {0: 12, 2: 12, 4: 6, 6: 6}, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3, dfly: true}
+  {need: {4: 8, 6: 8, 0: 4, 2: 4}, bees: [4, 6], bfs: [0, 2], speed: 1.2, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2, dfly: 2},
+  {need: {0: 12, 2: 12, 4: 6, 6: 6}, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3, dfly: 3, dfSpd: 1.12}
 ];
 function hglColours(r){ return Object.keys(HGL_ROUNDS[r].need).map(Number); }
 var HGL_DELAYS = [2.5, 2, 1.5];
@@ -9469,9 +9470,10 @@ function hglCheck(b){
     } else if(rx * rx + ry * ry <= f.r * f.r) hglHome(b, f);
   });
 }
-// The dragonfly (2026-10-28, per Dan), in rounds 2 and 3 only. It flies in at the fence at a random place and a random heading and flies for a random time; then it stops and hovers for a random time; then it picks another random heading,
-// turns to face it, and flies off again for a random time; and so on until the round is over. A bee or butterfly that touches it (one that is landing or buzzing at its flower is safe) is knocked off, and the player loses a chance.
-// It is faster than the bees (it flies at HGL_DF_SPEED, times the round's speed), vanishes when it reaches the fence (and flies in again a moment later), and a bee that is about to meet it gets the same pulsing dotted circle (and the dragonfly a green one).
+// The dragonfly (2026-10-28, per Dan), in rounds 2 and 3 only. It appears at a random place on any side of the fence and flies off at a random heading (into the garden), in a straight line. Where it meets the fence it is reflected (the angle it leaves at
+// equals the angle it came at). In round 2 it is reflected twice and the third time it meets the fence it vanishes; in round 3 it is reflected three times and vanishes at the fourth (`dfly` in HGL_ROUNDS is that number of reflections); then, after a random time,
+// it appears again somewhere else on the fence at a new heading. Round 3's dragonfly is a little faster (`dfSpd`). A bee or butterfly that touches it (one that is landing or buzzing at its flower is safe) is knocked off, and the player loses a chance.
+// It is faster than the bees (it flies at HGL_DF_SPEED, times the round's speed), and a bee that is about to meet it gets the same pulsing dotted circle (and the dragonfly a green one).
 var HGL_DF_SPEED = 28, HGL_DF_R = 4.5, HGL_DF_FIRST = 5, HGL_DF_TURN = 3.2;      // (speed in picture pixels a second; collision radius; seconds into a round before it first comes; turning speed, radians a second)
 function hglDragonflySprite(frame){
   var key = "DF" + frame; if(hgSprites[key]) return hgSprites[key];
@@ -9495,26 +9497,22 @@ function hglDflySpawn(){
     ok = !hgl.bees.some(function(b){ return Math.abs(b.x - ex) < 28 && Math.abs(b.y - ey) < 28; }) && !(hgl.dflyGone && Math.abs(hgl.dflyGone.x - ex) < 60 && Math.abs(hgl.dflyGone.y - ey) < 60);          // (not by a bee, and not where it just vanished)
   }
   var a = Math.atan2(ny, nx) + hgRand(-1.05, 1.05);
-  hgl.dfly = {x: ex - Math.cos(a) * 7, y: ey - Math.sin(a) * 7, ang: a, tgt: a, sp: HGL_DF_SPEED * (HGL_ROUNDS[hgl.round].speed || 1), st: "fly", t: hgRand(2, 4.5), ph: 0};
+  hgl.dfly = {x: ex - Math.cos(a) * 7, y: ey - Math.sin(a) * 7, ang: a, tgt: a, sp: HGL_DF_SPEED * (HGL_ROUNDS[hgl.round].speed || 1) * (HGL_ROUNDS[hgl.round].dfSpd || 1), st: "fly", hits: 0, ph: 0};
 }
 function hglDflyAt(t){ var d = hgl.dfly; return d.st === "fly" ? {x: d.x + Math.cos(d.ang) * d.sp * t, y: d.y + Math.sin(d.ang) * d.sp * t} : {x: d.x, y: d.y}; }
 function hglDflyStep(dt){
   if(!HGL_ROUNDS[hgl.round].dfly) return;
   var d = hgl.dfly;
   if(!d){ hgl.dflyWait -= dt; if(hgl.dflyWait <= 0) hglDflySpawn(); return; }
-  d.ph += dt * (d.st === "fly" ? 40 : 30);
-  if(d.st === "fly"){
-    var cs = Math.cos(d.ang), sn = Math.sin(d.ang), fe = hglFence(), bm = 7;
-    d.x += cs * d.sp * dt; d.y += sn * d.sp * dt;
-    if((d.x < fe.x0 + bm && cs < 0) || (d.x > fe.x1 - bm && cs > 0) || (d.y < fe.y0 + bm && sn < 0) || (d.y > fe.y1 - bm && sn > 0)){          // it reaches the fence (one only just coming in is left alone): it vanishes, and comes in again after a short delay (2026-10-28, per Dan)
-      hgl.dflyGone = {x: d.x, y: d.y}; hgl.dfly = null; hgl.dflyWait = hgRand(1.5, 5); return;
-    }
-    d.t -= dt; if(d.t <= 0){ d.st = "hover"; d.t = hgRand(1, 2.6); }              // its time is up: it stops and hovers for a while
-  } else if(d.st === "hover"){
-    d.t -= dt; if(d.t <= 0){ d.tgt = hgRand(0, 6.2832); d.st = "turn"; }            // then it picks another heading
-  } else {
-    var da = Math.atan2(Math.sin(d.tgt - d.ang), Math.cos(d.tgt - d.ang)), stp = HGL_DF_TURN * dt;
-    if(Math.abs(da) <= stp){ d.ang = d.tgt; d.st = "fly"; d.t = hgRand(1.5, 4); } else d.ang += da > 0 ? stp : -stp;          // it turns to face it, then flies off
+  d.ph += dt * 40;
+  var cs = Math.cos(d.ang), sn = Math.sin(d.ang), fe = hglFence(), bm = 7, hitX = false, hitY = false;
+  d.x += cs * d.sp * dt; d.y += sn * d.sp * dt;
+  if(d.x < fe.x0 + bm && cs < 0){ hitX = true; d.x = fe.x0 + bm; } else if(d.x > fe.x1 - bm && cs > 0){ hitX = true; d.x = fe.x1 - bm; }          // (one only just coming in is left alone)
+  if(d.y < fe.y0 + bm && sn < 0){ hitY = true; d.y = fe.y0 + bm; } else if(d.y > fe.y1 - bm && sn > 0){ hitY = true; d.y = fe.y1 - bm; }
+  if(hitX || hitY){
+    d.hits++;
+    if(d.hits > HGL_ROUNDS[hgl.round].dfly){ hgl.dflyGone = {x: d.x, y: d.y}; hgl.dfly = null; hgl.dflyWait = hgRand(1.5, 5); return; }          // the last time it meets the fence it vanishes, and comes in again after a random time somewhere else
+    d.ang = Math.atan2(hitY ? -sn : sn, hitX ? -cs : cs);                                  // otherwise it is reflected: the side it met flips its direction across it
   }
   var k; for(k = 0; k < hgl.bees.length && hgl.mode === "play"; k++){
     var b = hgl.bees[k];
@@ -10596,7 +10594,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 CF";
+var APP_BUILD = "2026-10-28 CI";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
