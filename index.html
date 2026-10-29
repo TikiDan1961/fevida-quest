@@ -1174,6 +1174,7 @@
 <body>
 <div id="app"></div>
 <div id="rotateMsg" class="rotateMsg" role="alert"><div class="rotatePhone"></div><div class="rotateText" id="rotateText">PLEASE ROTATE YOUR PHONE</div><div class="rotateSub" id="rotateSub"></div></div>
+<script src="emmaus_layout.js"></script>
 <script>
 "use strict";
 
@@ -1223,7 +1224,7 @@ var T = {
       fruitsSpirit:{d:"Match fruit to collect all 8 fruits of the Spirit.", h:["Swipe a fruit toward a neighbor to swap them. Make a row or column of 3 or more of the same fruit, or they slide back.", "The words below the board count each fruit you collect, like 3/5. Fill all 8 to finish a level.", "Match 4 or more to make a flame. The flame is wild: put it next to 2 matching fruit and the whole row or column clears.", "Stuck? Tap HINT (3 in the whole game) to light up a match."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 3 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. Finish all 3 rounds to win."]},
       pilgrimRoad:{d:"Turn the road tiles to lead the pilgrim to the church.", h:["Tap a road tile to turn it a quarter turn.", "Join the road from the pilgrim, on the left, all the way to the church. The road must go through every tile on the board, with no tile left out. The road you have joined so far turns gold, and \"Road\" counts the tiles in it. When it is done, the pilgrim walks it.", "There are no chances: take as many turns as you need. Finish all 3 rounds, on bigger boards each time, to win."]},
-      emmaus:{d:"Run along the road to Emmaus. Tap to jump over what is in your way.", h:["You run by yourself. Tap anywhere on the screen to jump.", "Jump over sacks, stones, jars, sheep, dogs and the holes in the road. Hit one, or fall in a hole, and you lose a chance. You have 3 chances.", "Land on top of a cart to ride it! Tap, and the cart and you jump together. After a while a bump throws you off, and you run on.", "Pick up the gold coins! Land on a basket and it throws you extra high, up to the coins in the air.", "In rounds 2 and 3, land on the purple basket for a super bounce up to the clouds! Walk on the clouds, jump from cloud to cloud and collect the coins, until you fall back to the street.", "Reach the end of the road to finish a round. The road gets longer and faster each round. Finish all 3 rounds to win."]},
+      emmaus:{d:"Run along the road to Emmaus. Tap to jump over what is in your way.", h:["You run by yourself. Tap anywhere on the screen to jump.", "Jump over sacks, stones, jars, sheep, dogs and the holes in the road. Hit one, or fall in a hole, and you lose a chance. You have 3 chances.", "Land on top of a cart to ride it! Tap, and the cart and you jump together. After a while a bump throws you off, and you run on.", "Pick up the gold coins! Land on a basket and it throws you extra high, up to the coins in the air. Pick up a heart to win back a lost chance.", "In rounds 2 and 3, land on the purple basket for a super bounce up to the clouds! Walk on the clouds, jump from cloud to cloud and collect the coins, until you fall back to the street.", "Reach the end of the road to finish a round. The road gets longer and faster each round. Finish all 3 rounds to win."]},
       prayBeads:{d:"Tap each rosary bead when it is in the ring.", h:["Rosary beads glide down the string toward the gold ring.", "Tap anywhere on the screen, or the TAP button, when a bead is in the ring (the TAP button lights up; the rest of the screen does not). Some beads come close together, so tap quickly, once for each bead.", "A tap that is too early, or a bead you miss, costs a chance. You have 3 chances. Each round is one whole rosary of 60 beads, 7 large and 53 small, in the order of a real one, and the beads move faster each round. Finish all 3 rounds to win."]},
       mustardSeed:{d:"Drop plants into columns and grow a tiny seed into a great tree.", h:["A plant jumps from column to column above the grid. Tap DROP TILE to let it fall into the column it is over.", "When a plant lands on one of the same kind, the two grow into the next stage: seed, sprout, plant, bush, tree, great tree. It can chain!", "Grow the goal plant (shown at the top) as many times as the counter says, and each one is picked. If any column fills to the top, the garden is full. The plant jumps faster each round. Finish all 3 rounds to win."]},
       wordGroups:{d:"Sort the words into groups that belong together.", h:["Touch a word and drag it onto another word to swap their places.", "Put the words of one group together in the same row. When a row is right, it changes color and locks.", "Sort every row to finish the round. Finish all 3 rounds to win."]}
@@ -1379,7 +1380,7 @@ var T = {
       fruitsSpirit:{d:"Combina frutas para reunir los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que reúnes, como 3/5. Llena las 8 para terminar un nivel.", "Junta 4 o más para crear una llama. La llama es un comodín: ponla junto a 2 frutas iguales y toda la fila o columna desaparece.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
       pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
-      emmaus:{d:"Corre por el camino a Ema\u00fas. Toca para saltar lo que se cruce en tu camino.", h:["Corres solo. Toca en cualquier parte de la pantalla para saltar.", "Salta sobre costales, piedras, vasijas, ovejas, perros y los baches del camino. Si chocas con uno o caes en un bache, pierdes una oportunidad. Tienes 3 oportunidades.", "\u00a1Cae sobre un carro para viajar en \u00e9l! Toca, y el carro y t\u00fa saltan juntos. Despu\u00e9s de un rato un bache te lanza y sigues corriendo.", "\u00a1Recoge las monedas de oro! Cae sobre una cesta y te lanza muy alto, hasta las monedas del aire.", "\u00a1En las rondas 2 y 3, cae sobre la cesta morada para un s\u00faper rebote hasta las nubes! Camina sobre las nubes, salta de nube en nube y recoge las monedas, hasta que caigas otra vez a la calle.", "Llega al final del camino para terminar una ronda. El camino es m\u00e1s largo y r\u00e1pido en cada ronda. Termina las 3 rondas para ganar."]},
+      emmaus:{d:"Corre por el camino a Ema\u00fas. Toca para saltar lo que se cruce en tu camino.", h:["Corres solo. Toca en cualquier parte de la pantalla para saltar.", "Salta sobre costales, piedras, vasijas, ovejas, perros y los baches del camino. Si chocas con uno o caes en un bache, pierdes una oportunidad. Tienes 3 oportunidades.", "\u00a1Cae sobre un carro para viajar en \u00e9l! Toca, y el carro y t\u00fa saltan juntos. Despu\u00e9s de un rato un bache te lanza y sigues corriendo.", "\u00a1Recoge las monedas de oro! Cae sobre una cesta y te lanza muy alto, hasta las monedas del aire. Recoge un coraz\u00f3n para recuperar una oportunidad perdida.", "\u00a1En las rondas 2 y 3, cae sobre la cesta morada para un s\u00faper rebote hasta las nubes! Camina sobre las nubes, salta de nube en nube y recoge las monedas, hasta que caigas otra vez a la calle.", "Llega al final del camino para terminar una ronda. El camino es m\u00e1s largo y r\u00e1pido en cada ronda. Termina las 3 rondas para ganar."]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca en cualquier parte de la pantalla, o el botón TOCAR, cuando una cuenta esté dentro del aro (el botón TOCAR se ilumina; el resto de la pantalla no). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. Cada ronda es un rosario completo de 60 cuentas, 7 grandes y 53 pequeñas, en el orden de uno de verdad, y las cuentas van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
       wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
@@ -1971,7 +1972,10 @@ var PIX_SFX = {
   hglDanger:{url:"sounds/sfx_hgl_danger.wav", gain:0.3},
   // The Road to Emmaus baskets (2026-10-28, per Dan): sound_effect_18 off the small basket, sound_effect_19 off the big purple one (8-Bit Sounds folder, made mono, silence at the ends cut off; peaks 0.57 and 0.71)
   emBasket1:{url:"sounds/sfx_em_basket1.wav", gain:0.45},
-  emBasket2:{url:"sounds/sfx_em_basket2.wav", gain:0.4}
+  emBasket2:{url:"sounds/sfx_em_basket2.wav", gain:0.4},
+  // The Road to Emmaus coins and hearts (2026-10-29, per Dan): Coin Pickup.wav and Heart Pickup.wav (8-Bit Sounds folder; made mono, the silence cut off, the coin's cut to 0.7 s, the heart's to 0.6 s)
+  emCoin:{url:"sounds/sfx_em_coin.wav", gain:0.22},
+  emHeart:{url:"sounds/sfx_em_heart.wav", gain:0.25}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -8708,7 +8712,7 @@ window.addEventListener("resize", function(){ if(state.screen === "mainMenu") hg
 // that scrolls by from right to left, always a quarter of the way in from the left edge. Tap anywhere to jump (one jump, always the same size). Grain sacks, stone blocks, jars, sheep and dogs come along the street, and
 // a hit costs one of the 3 chances (a red flash, a flicker, and the pilgrim keeps running). Land on top of a cart and the pilgrim rides it; the cart jumps with him; after a set distance a bump tips the
 // cart over, which throws him off (no chance lost), and he goes on on foot. The stretch of road after every cart has only low things on it, so a ride is a rest. Three rounds, longer and faster each time;
-// the lost chance is given back after rounds 1 and 2 (the same ROUND X COMPLETED! screens as the other games). Finishing round 3 completes the mission (100 Quest Points, a step for the pilgrim, the Hope badge).
+// the ROUND X COMPLETED! screens are the same as the other games, but no lost chance is given back (2026-10-29, per Dan): hearts to pick up on the road give them back. Finishing round 3 completes the mission (100 Quest Points, a step for the pilgrim, the Hope badge).
 // The picture is 1 pixel = 4 x 4 screen pixels, measured from the screen (emFit), and drawn in four layers that scroll at four speeds: sky and clouds (slowest), mountains and hills, the far houses, then the near
 // houses, the street and everything on it (the speed of the ground). The feet stand on the line GY, 17 game pixels (68 screen pixels) above the bottom of the screen, clear of the phone's bottom-edge swipe.
 var EM_SCALE = 4, EM_CHANCES = 3, EM_V0 = 150, EM_G = 360;      // a jump leaves the ground at 150 px/s and falls back at 360 px/s squared: 31 pixels high, 0.83 s in the air
@@ -8877,6 +8881,19 @@ function emJars(x, ox, gy){
     emR(x, EM_DARK, jx + 2, gy - 15, jx + 7, gy - 11); emR(x, "#C4683C", jx + 3, gy - 14, jx + 6, gy - 11); emR(x, "#E29660", jx + 2, gy - 16, jx + 7, gy - 15); emR(x, "#F0AA78", jx + 3, gy - 7, jx + 3, gy - 7);
   }
 }
+function emDrawOb(x, type, sx, gy, t){          // a thing on the street: sx its left edge, gy the street's row under it
+  if(type === "crate") emSack(x, sx, gy);
+  else if(type === "crate2w"){ emSack(x, sx, gy); emSack(x, sx + 12, gy); }
+  else if(type === "stack") emBlock(x, sx, gy, 2);
+  else if(type === "jars") emJars(x, sx, gy);
+  else if(type === "sheep") emSprite(x, "sheep_near.png", sx, gy - 11, true, Math.floor(t * 4) % 2);
+  else if(type === "dog") emSprite(x, "dog.png", sx, gy - 12, true, Math.floor(t * 8) % 2);
+  else if(type === "cart") x.drawImage(emCart(), sx - 2, gy - 17);
+  else if(type === "basket") emBasket(x, sx, gy);
+  else if(type === "basket2") emBasket(x, sx, gy, true);
+  else if(type === "hole") emHole(x, sx, gy, EM_OB.hole.w);
+  else if(type === "bump") emBump(x, sx, gy);
+}
 function emBump(x, ox, gy){
   var rows = [[4, 12], [3, 13], [2, 14], [1, 15], [1, 15], [0, 16]], r;
   for(r = 0; r < rows.length; r++) emR(x, EM_DARK, ox + rows[r][0], gy - 5 + r, ox + rows[r][1], gy - 5 + r);
@@ -8923,6 +8940,13 @@ function emSupport(e, wxp, fromH){          // the height of what he stands on: 
   return best;
 }
 function emCoinTxt(n){ n = Math.min(99, n); return (n < 10 ? "0" : "") + n; }
+var emHeartImg = null;
+function emHeartCv(){          // a heart to pick up (9 x 8)
+  if(emHeartImg) return emHeartImg;
+  var rows = [".DDD.DDD.", "DRRRDRRRD", "DRWRRRRRD", "DRRRRRRRD", ".DRRRRRD.", "..DRRRD..", "...DRD...", "....D...."], m = emMake(9, 8), r, c, ch, cols = {D: "#7A1020", R: "#FF4B5C", W: "#FFC0C8"};
+  for(r = 0; r < 8; r++) for(c = 0; c < 9; c++){ ch = rows[r].charAt(c); if(ch !== "."){ m.x.fillStyle = cols[ch]; m.x.fillRect(c, r, 1, 1); } }
+  emHeartImg = m.c; return emHeartImg;
+}
 function emBasket(x, ox, gy, big){          // the small basket (18 x 8): a rim and a woven body; the big one (2026-10-28, per Dan) is purple
   var r, c, a, b;
   emR(x, EM_DARK, ox, gy - 7, ox + 17, gy - 7); emR(x, EM_DARK, ox, gy - 6, ox, gy - 6); emR(x, big ? "#D9C8FF" : "#F0C27A", ox + 1, gy - 6, ox + 16, gy - 6); emR(x, EM_DARK, ox + 17, gy - 6, ox + 17, gy - 6);
@@ -8955,13 +8979,44 @@ function emBurst(px, py, cols, n, sp){
 
 // ---- the game ----
 function initEmmaus(){ em = {round: 0, coins: 0, coinBase: 0, chances: EM_CHANCES, mode: "ready", W: 0, H: 0, L: null, obs: null, interlude: null, last: performance.now(), t: 0}; }
-function emQuit(){ em = null; go("mainMenu"); }
+function emQuit(){ if(em && em.test && window.edBack){ edBack(); return; } em = null; go("mainMenu"); }
 function emSetRound(r){          // a round starts: a new street, the pilgrim at the start line, and "Tap anywhere to start!"
   var e = em, cfg = EM_ROUNDS[r];
   e.round = r; e.speed = cfg.speed; e.len = Math.round(cfg.speed * cfg.secs); e.dist = 0; e.mode = "ready"; e.interlude = null; e.clearT = 0; e.flash = 0;
   e.PX = Math.round(e.W / 4); e.GY = e.H - 17; e.rideLen = Math.round(e.W * EM_RIDE_SCREENS);
-  e.cam = 0; e.gnd = true; e.runX = 0; e.runT = 0; e.p = {h: 0, vy: 0, inv: 0, buf: 0}; e.ride = null; e.bump = null; e.junk = []; e.parts = [];
-  e.obs = emTrack(r); e.L = emBuildLayers(cfg.theme);
+  e.cam = 0; e.gnd = true; e.runX = 0; e.runT = 0; e.p = {h: 0, vy: 0, inv: 0, buf: 0}; e.ride = null; e.bump = null; e.junk = []; e.parts = []; e.bumps = null; e.hl = [];
+  var lay = emLayoutFor(r);          // a street made by hand (2026-10-29, per Dan): the things where the level editor put them
+  if(lay){ e.rideLen = EM_LAYOUT_RIDE; e.obs = emFromLayout(lay); } else e.obs = emTrack(r);
+  if(e.startDist) e.dist = e.startDist;          // (a test play from the middle of the street)
+  e.L = emBuildLayers(cfg.theme);
+}
+var EM_LAYOUT_RIDE = Math.round(212 * EM_RIDE_SCREENS);          // (a hand made street has a ride of the same length on every phone)
+function emLayoutFor(r){
+  var d = window.EM_LAYOUT_TEST || window.EM_LAYOUT_DATA, a = d && d.rounds && d.rounds[r];
+  return a && a.length ? a : null;
+}
+function emFromLayout(items){          // each item is [type, x, y] ([cloud, x, y, width]); y is the height above the street (for a coin, of its middle; for a cloud, of its top)
+  var e = em, list = [], coins = [], hearts = [];
+  e.clouds = [];
+  var bumps = [];
+  items.forEach(function(it){
+    var t = it[0], x = +it[1] || 0, y = +it[2] || 0, d = EM_OB[t];
+    if(t === "bump") bumps.push({wx: x, cart: null});          // the block that stops a cart (2026-10-29, per Dan)
+    else if(t === "coin") coins.push({wx: x, cy: y, got: false});
+    else if(t === "heart") hearts.push({wx: x, cy: y, got: false});
+    else if(t === "cloud") e.clouds.push({wx: x, w: +it[3] || 70, y: y});
+    else if(d) list.push({type: t, wx: x, w: d.w, h: d.h, vx: d.vx || 0, y: t === "cart" || t === "hole" ? 0 : y, soft: t === "basket" || t === "basket2", dead: false});
+  });
+  coins.sort(function(a, b){ return a.wx - b.wx; });          // (the coins are picked up in order)
+  e.cl = coins;
+  hearts.sort(function(a, b){ return a.wx - b.wx; });
+  e.hl = hearts;
+  bumps.sort(function(a, b){ return a.wx - b.wx; });
+  list.filter(function(o){ return o.type === "cart"; }).sort(function(a, b){ return a.wx - b.wx; }).forEach(function(c){          // each cart rolls on to the first block ahead of it that no cart has taken
+    var i; for(i = 0; i < bumps.length; i++) if(!bumps[i].cart && bumps[i].wx > c.wx + 8){ bumps[i].cart = c; c.bump = bumps[i]; break; }
+  });
+  e.bumps = bumps;
+  return list;
 }
 function emRestart(){ if(!em) return; var r = em.round; emSetRound(r); em.chances = EM_CHANCES; em.coins = em.coinBase; render(); }          // (the coins picked up in the round go back too)          // TRY AGAIN: the same round again, with all the chances (as in the other games)
 // the street of a round, made at the start: what comes, and where (distance from the start line). After a cart there is a long easy stretch (only low things, none that is a cart), so the ride is a rest.
@@ -9084,13 +9139,27 @@ function emTrack(r){
   }
   coins.sort(function(a, b){ return a.wx - b.wx; });
   e.cl = coins;
+  // hearts to pick up, to win a lost chance back (2026-10-29, per Dan; finishing a round no longer gives one): in a free place, a jump up from the street (or at the height of the cart, in a ride)
+  var hearts = [], nHt = [1, 2, 2][r];
+  for(i = 0; i < nHt; i++){
+    var hf = nHt === 1 ? .55 : .36 + i * .38, ho2, hxx = -1;
+    for(ho2 = 0; ho2 < 400 && hxx < 0; ho2 += 6){
+      var cand = len * hf + (ho2 % 12 ? ho2 : -ho2);
+      if(cand < s0 || cand > end - 60) continue;
+      var tak = holes.some(function(o){ return cand > o.wx - 16 && cand < o.wx + o.w + 16; }) || list.some(function(o){ return o.type === "basket2" ? (cand > o.wx - 30 && cand < o.wx + o.w + v * .5) : o.type === "basket" ? (cand > o.wx - 30 && cand < o.wx + o.w + v * 1.2 + 30) : (cand > o.wx - (o.type === "dog" ? 34 : 16) && cand < o.wx + o.w + 16); }) || coins.some(function(c){ return Math.abs(c.wx - cand) < 22; }) || hearts.some(function(c){ return Math.abs(c.wx - cand) < 200; }) || (sc && cand > sc.a - 20 && cand < sc.b + 10);
+      if(!tak) hxx = cand;
+    }
+    if(hxx >= 0) hearts.push({wx: Math.round(hxx), cy: inRide(hxx) ? EM_CH + 27 : 22, got: false});
+  }
+  e.hl = hearts;
   return list.concat(holes);
 }
 function screenEmmaus(){
   if(!em) initEmmaus();
   return '<div class="screen hglScreen emScreen" id="emScreen" onpointerdown="emDown(event)" oncontextmenu="return false"><canvas class="hglCanvas" id="emCanvas" width="100" height="100"></canvas>' +
-    '<div class="emHud"><div class="hgHearts" id="emHearts">' + chancesHeartsHtml(Math.max(0, em.chances), EM_CHANCES) + '</div><div class="hgRibbon">' + t("hg_level")(em.round + 1, EM_ROUNDS.length) + '</div><div class="emCoinBox"><img src="' + emCoinCv(0).toDataURL() + '" alt=""><b id="emCoins">' + emCoinTxt(em.coins) + '</b></div><div class="emProg"><div class="emProgFill" id="emProgFill"></div><i class="emFlag"></i></div></div>' +
-    emOverlayHtml() + '</div>';
+    '<div class="emHud"><div class="hgHearts" id="emHearts">' + chancesHeartsHtml(Math.max(0, em.chances), EM_CHANCES) + '</div><div class="hgRibbon">' + t("hg_level")(em.round + 1, EM_ROUNDS.length) + '</div><div class="emCoinBox"><img src="' + emCoinCv(0).toDataURL() + '" alt=""><b id="emCoins">' + emCoinTxt(em.coins) + '</b></div><div class="emProg"><div class="emProgFill" id="emProgFill"></div><i class="emFlag"></i></div>' +
+    (em.test ? '<button class="emTestBtn" onpointerdown="event.stopPropagation()" onclick="emRestart()">RESTART</button>' : '') +          // (a test play from the level editor: back to where it began, waiting for the tap; on the top row, to the right of the distance bar)
+    '</div>' + emOverlayHtml() + '</div>';
 }
 function emOverlayHtml(){
   if(!em) return "";
@@ -9175,14 +9244,14 @@ function emStep(dt){
   }
   if(landed && p.buf > 0){ p.buf = 0; p.vy = EM_V0; pixSfxPlay("jlBounce", false); }
   // coming down on a basket: it throws the pilgrim high (a basket does no harm if he runs into it)
-  if(!e.ride && prevH >= 8 && p.h < 8 && p.vy <= 0){
+  if(!e.ride && p.vy <= 0){
     for(i = 0; i < e.obs.length; i++){
       var bk = e.obs[i]; if(bk.type !== "basket" && bk.type !== "basket2") continue;
-      var bsx = bk.wx - e.dist;
-      if(PX >= bsx - 1 && PX <= bsx + bk.w + 1){
+      var btop = (bk.y || 0) + 8, bsx = bk.wx - e.dist;
+      if(prevH >= btop && p.h < btop && PX >= bsx - 1 && PX <= bsx + bk.w + 1){
         var big = bk.type === "basket2";
-        p.h = 8; p.vy = big ? EM_V0B2 : EM_V0B; p.buf = 0;
-        emBurst(PX, e.GY - 6, big ? ["#D9C8FF", "#8E6BFF", "#FFFFFF"] : ["#F0C27A", "#C98A45", "#FFFFFF"], big ? 14 : 8, big ? 60 : 40);
+        p.h = btop; p.vy = big ? EM_V0B2 : EM_V0B; p.buf = 0;
+        emBurst(PX, e.GY - btop + 2, big ? ["#D9C8FF", "#8E6BFF", "#FFFFFF"] : ["#F0C27A", "#C98A45", "#FFFFFF"], big ? 14 : 8, big ? 60 : 40);
         pixSfxPlay(big ? "emBasket2" : "emBasket1", false);          // sound_effect_19 / sound_effect_18 (2026-10-28, per Dan)
         break;
       }
@@ -9195,7 +9264,8 @@ function emStep(dt){
       var csx = c.wx - e.dist;
       if(PX >= csx && PX <= csx + c.w){
         c.dead = true; e.obs.splice(i, 1);
-        e.ride = {end: e.dist + e.rideLen, bumped: false}; e.bump = {wx: e.dist + e.rideLen + PX - 4};
+        if(c.bump){ var endD = Math.max(c.bump.wx + 4 - PX, e.dist + 20); e.ride = {end: endD, bumped: false}; e.bump = {wx: endD + PX - 4}; }          // (the cart rolls until the pilgrim reaches its block)
+        else { e.ride = {end: e.dist + e.rideLen, bumped: false}; e.bump = {wx: e.dist + e.rideLen + PX - 4}; }
         p.h = 0; p.vy = 0; p.buf = 0;
         emBurst(PX, e.GY - 2, ["#E2C28A", "#FFFFFF"], 6, 30);
         pixSfxPlay("wgPick", false);
@@ -9211,12 +9281,12 @@ function emStep(dt){
   e.gnd = p.vy === 0 && Math.abs(p.h - emSupport(e, e.dist + PX, p.h)) < .01;
   // hits
   if(p.inv <= 0){
-    var riding = !!e.ride, hw = riding ? 6.5 : 3.5, y0 = p.h + (riding ? 6 : 1.5);      // (the wheels may brush a low thing: only the cart's body and the pilgrim count)
+    var riding = !!e.ride, hw = riding ? 6.5 : 3.5, y0 = p.h + (riding ? 6 : 1.5), yt = p.h + (riding ? EM_CH + 15 : 15);      // (the wheels may brush a low thing: only the cart's body and the pilgrim count)
     for(i = 0; i < e.obs.length; i++){
       var o = e.obs[i]; if(o.dead || o.soft) continue;
       var sx = o.wx - e.dist; if(sx > PX + 40 || sx < PX - 40) continue;
       if(o.type === "hole"){ if(!riding && p.h < 3 && PX > sx + 2 && PX < sx + o.w - 2){ emHit(o); if(e.mode !== "play") return; break; } continue; }          // a hole only catches him when he is on the road over it
-      if(PX + hw > sx + 1 && PX - hw < sx + o.w - 1 && y0 < o.h - .5){ emHit(o); if(e.mode !== "play") return; break; }
+      if(PX + hw > sx + 1 && PX - hw < sx + o.w - 1 && y0 < (o.y || 0) + o.h - .5 && yt > (o.y || 0) + .5){ emHit(o); if(e.mode !== "play") return; break; }
     }
   }
   // a sheep jumped over baas, one of its two baas at random (2026-10-28, per Dan)
@@ -9234,7 +9304,18 @@ function emStep(dt){
       cn.got = true; e.coins++;
       var ce = document.getElementById("emCoins"); if(ce) ce.textContent = emCoinTxt(e.coins);
       emBurst(PX, e.GY - cn.cy, ["#FFD23A", "#FFF6B8"], 5, 28);
-      pixSfxPlay("clCatch", false);
+      pixSfxPlay("emCoin", false);          // Coin Pickup.wav (2026-10-29, per Dan)
+    }
+  }
+  // the hearts (2026-10-29, per Dan): picking one up gives a lost chance back (with all 3 chances he still hears it, but there is no fourth)
+  for(i = 0; i < e.hl.length; i++){
+    var ht = e.hl[i]; if(ht.got) continue;
+    var hdx = ht.wx - e.dist - PX; if(hdx > 9) break; if(hdx < -9) continue;
+    if(feet + 14 >= ht.cy - 5 && feet + 2 <= ht.cy + 5){
+      ht.got = true;
+      if(e.chances < EM_CHANCES){ e.chances++; var hhh = document.getElementById("emHearts"); if(hhh) hhh.innerHTML = chancesHeartsHtml(Math.max(0, e.chances), EM_CHANCES); }
+      emBurst(PX, e.GY - ht.cy, ["#FF4B5C", "#FFC0C8", "#FFFFFF"], 7, 32);
+      pixSfxPlay("emHeart", false);          // Heart Pickup.wav
     }
   }
   // the end of the road, with the pilgrim on foot and on the ground: he runs off the screen
@@ -9255,25 +9336,22 @@ function emPaint(){
     var sx = Math.round(j.wx) - d0, a = Math.min(1, j.t / .45); a = 1 - (1 - a) * (1 - a);
     x.save(); x.translate(sx + 20, GY); x.rotate(.9 * a); x.drawImage(emCart(), -20, -17); x.restore();
   });
+  if(e.bumps) e.bumps.forEach(function(b){ if(b.cart && e.obs.indexOf(b.cart) >= 0){ var bsx = Math.round(b.wx) - d0; if(bsx > -30 && bsx < W + 10) emBump(x, bsx, GY); } });          // (the block shows while its cart is still waiting)
   if(e.bump) emBump(x, Math.round(e.bump.wx) - d0, GY);
   e.obs.forEach(function(o){
     var sx = Math.round(o.wx) - d0; if(sx < -40 || sx > W + 10) return;
-    if(o.type === "crate") emSack(x, sx, GY);
-    else if(o.type === "crate2w"){ emSack(x, sx, GY); emSack(x, sx + 12, GY); }
-    else if(o.type === "stack") emBlock(x, sx, GY, 2);
-    else if(o.type === "jars") emJars(x, sx, GY);
-    else if(o.type === "sheep") emSprite(x, "sheep_near.png", sx, GY - 11, true, Math.floor(e.t * 4) % 2);
-    else if(o.type === "dog") emSprite(x, "dog.png", sx, GY - 12, true, Math.floor(e.t * 8) % 2);
-    else if(o.type === "cart") x.drawImage(emCart(), sx - 2, GY - 17);
-    else if(o.type === "basket") emBasket(x, sx, GY);
-    else if(o.type === "basket2") emBasket(x, sx, GY, true);
-    else if(o.type === "hole") emHole(x, sx, GY, o.w);
+    emDrawOb(x, o.type, sx, GY - (o.y || 0), e.t);
   });
   e.clouds.forEach(function(c){ var csx = Math.round(c.wx) - d0; if(csx > W + 10 || csx + c.w < -10) return; emCloud(x, csx, GY - c.y + 1, c.w); });
   e.cl.forEach(function(c){
     if(c.got) return;
     var cx = Math.round(c.wx - d0) - 4; if(cx < -10 || cx > W + 4) return;
     x.drawImage(emCoinCv((Math.floor(e.t * 9) + Math.floor(c.wx / 9)) % 6), cx, GY - c.cy - 4);
+  });
+  e.hl.forEach(function(c){
+    if(c.got) return;
+    var hx = Math.round(c.wx - d0) - 4; if(hx < -10 || hx > W + 4) return;
+    x.drawImage(emHeartCv(), hx, GY - c.cy - 4 + Math.round(Math.sin(e.t * 4 + c.wx * .1)));
   });
   var flick = p.inv > 0 && Math.floor(e.t * 14) % 2 === 0, hh = Math.round(p.h), riding = !!e.ride;
   x.fillStyle = "rgba(40,24,8,.28)";
@@ -9302,11 +9380,459 @@ function emLoop(now){
 function emLoopStart(){ if(em) em.last = performance.now(); if(emRaf) return; emRaf = requestAnimationFrame(emLoop); }
 // the end of a ROUND X COMPLETED! screen: the lost chance is given back (after rounds 1 and 2), then the next round (or, after the last, the Mission Completed screen)
 function emInterlude(){
-  pixRoundRun("emmaus", function(){ return em; }, function(s){ if(em.chances >= EM_CHANCES) return false; em.chances++; return true; }, function(s){
+  pixRoundRun("emmaus", function(){ return em; }, null, function(s){
+    if(em.test && window.edBack){ edBack(); return; }          // (a test play from the level editor goes back to it, and never gives the mission)
     if(s.interlude.final){ em = null; grantMission("emmaus"); return; }
     em.coinBase = em.coins; emSetRound(em.round + 1); render();
   });
 }
+
+/* ---------- The Road to Emmaus level editor (2026-10-29, per Dan) ---------- */
+
+// Open the app with ?editor at the end of its address (or open "Emmaus Level Editor.html" in the same folder). It covers the whole window: every screen of a round side by side, with the things the pilgrim can
+// touch (sacks, stones, jars, sheep, dogs, carts, baskets, pot holes, clouds and coins) on a layer of their own, to drag about. SAVE writes emmaus_layout.js next to the app, which the game loads: a round
+// that is in it is played as it was made; a round that is not is made at random each time, as before. TEST PLAY plays the round on the screen, and goes back to the editor when it is left.
+// Sizes are game pixels (1 pixel = 4 screen pixels in the game). x is the distance along the road, y the height above the street (of a coin's middle, of a cloud's top). A cart and a pot hole stay on the street.
+var ED_W = 212, ED_GY = 200, ED_H = 217, ED_GH = 97, ED_PAD = 4, ED_KEY = "fevidaEmmausEditor";          // (a screen is 212 pixels wide, the street 200 pixels up from the bottom of a tall picture; a phone shows the bottom ED_GH of it)
+var ED_TYPES = [
+  {k: "crate", n: "Grain sack", w: 12, h: 12, c: "obj"},
+  {k: "crate2w", n: "Two sacks", w: 24, h: 12, c: "obj"},
+  {k: "stack", n: "Stone blocks", w: 12, h: 23, c: "obj"},
+  {k: "jars", n: "Wine jars", w: 21, h: 17, c: "obj"},
+  {k: "sheep", n: "Sheep", w: 16, h: 12, c: "obj"},
+  {k: "dog", n: "Dog", w: 18, h: 13, c: "obj"},
+  {k: "cart", n: "Cart", w: 24, h: 13, c: "obj", lock: true},
+  {k: "basket", n: "Basket", w: 18, h: 8, c: "obj"},
+  {k: "basket2", n: "Purple basket", w: 18, h: 8, c: "obj"},
+  {k: "hole", n: "Pot hole", w: 18, h: 0, c: "obj", lock: true},
+  {k: "bump", n: "Cart stop block", w: 17, h: 6, c: "obj", lock: true},
+  {k: "cloud", n: "Cloud", w: 70, h: 9, c: "cloud"},
+  {k: "coin", n: "Coin", w: 8, h: 8, c: "coin"},
+  {k: "heart", n: "Heart (a chance)", w: 9, h: 8, c: "coin"}
+];
+var ed = null;
+function edT(k){ var i; for(i = 0; i < ED_TYPES.length; i++) if(ED_TYPES[i].k === k) return ED_TYPES[i]; return null; }
+function edE(id){ return document.getElementById(id); }
+function edMsg(s){ var m = edE("edMsg"); if(m) m.textContent = s; }
+function edSnap(v){ return Math.round(v / ed.snap) * ed.snap; }
+function edClamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+function edById(id){ var i, a = ed.rounds[ed.round]; for(i = 0; i < a.length; i++) if(a[i].id === id) return a[i]; return null; }
+function edSel(){ return ed.rounds[ed.round].filter(function(it){ return ed.sel[it.id]; }); }
+
+// ---- the data: a round is a list of {t: type, x, y, w (clouds)}
+function edFromArr(a){ return a.map(function(r){ return {id: ++ed.nid, t: r[0], x: +r[1] || 0, y: +r[2] || 0, w: r[0] === "cloud" ? (+r[3] || 70) : undefined}; }); }
+function edToArr(it){ return it.t === "cloud" ? [it.t, Math.round(it.x), Math.round(it.y), Math.round(it.w)] : [it.t, Math.round(it.x), Math.round(it.y)]; }
+function edGenerate(r){          // a street made at random by the game's own maker, as a place to start
+  var saved = em, cfg = EM_ROUNDS[r], items = [];
+  em = {W: ED_W, H: ED_GH, GY: ED_GH - 17, PX: Math.round(ED_W / 4), round: r, speed: cfg.speed, len: Math.round(cfg.speed * cfg.secs), rideLen: EM_LAYOUT_RIDE};
+  try{
+    var list = emTrack(r), e = em;
+    list.forEach(function(o){ items.push([o.type, Math.round(o.wx), 0]); });
+    e.clouds.forEach(function(c){ items.push(["cloud", Math.round(c.wx), Math.round(c.y), c.w]); });
+    e.cl.forEach(function(c){ items.push(["coin", Math.round(c.wx), Math.round(c.cy)]); });
+    e.hl.forEach(function(c){ items.push(["heart", Math.round(c.wx), Math.round(c.cy)]); });
+    list.forEach(function(o){ if(o.type === "cart") items.push(["bump", Math.round(o.wx + 12 + EM_LAYOUT_RIDE - 4), 0]); });          // (a cart carries him as far as the game's ride is long)
+  } finally { em = saved; }
+  return edFromArr(items);
+}
+function edLayoutObj(forceRound){          // what is saved: the rounds that are in use (and the one that is being tested)
+  return {version: 1, ride: EM_LAYOUT_RIDE, rounds: [0, 1, 2].map(function(r){
+    var a = ed.rounds[r]; if(!a || !(ed.use[r] || r === forceRound)) return null;
+    return a.slice().sort(function(p, q){ return p.x - q.x; }).map(edToArr);
+  })};
+}
+function edLayoutText(obj){
+  var out = "// The Road to Emmaus: the street of each round, made with the level editor (open the app with ?editor). A round that is null is made at random each time.\nwindow.EM_LAYOUT_DATA = {\n  \"version\": 1, \"ride\": " + obj.ride + ",\n  \"rounds\": [\n";
+  out += obj.rounds.map(function(a){
+    if(!a) return "    null";
+    var lines = [], i; for(i = 0; i < a.length; i += 6) lines.push("      " + a.slice(i, i + 6).map(function(r){ return JSON.stringify(r); }).join(", "));
+    return "    [\n" + lines.join(",\n") + "\n    ]";
+  }).join(",\n");
+  return out + "\n  ]\n};\n";
+}
+function edAutosave(){
+  try{ localStorage.setItem(ED_KEY, JSON.stringify({rounds: ed.rounds.map(function(a){ return a ? a.map(edToArr) : null; }), use: ed.use})); }catch(e){}
+}
+function edLoadObj(d, keepUse){
+  var r; for(r = 0; r < 3; r++){ var a = d && d.rounds && d.rounds[r]; ed.rounds[r] = a && a.length ? edFromArr(a) : null; ed.use[r] = !!(a && a.length); if(ed.rounds[r]) edEnsureBumps(ed.rounds[r]); }
+}
+function edEnsureBumps(items){          // a round made before the stop blocks were in the editor gets one at the end of each cart's ride
+  if(items.some(function(it){ return it.t === "bump"; })) return;
+  items.slice().forEach(function(it){ if(it.t === "cart") items.push({id: ++ed.nid, t: "bump", x: it.x + 12 + EM_LAYOUT_RIDE - 4, y: 0}); });
+}
+function edPairs(items){          // the block each cart rolls to (the same rule as the game's): the first one ahead of it that no cart has taken
+  var carts = items.filter(function(it){ return it.t === "cart"; }).sort(function(a, b){ return a.x - b.x; }), bumps = items.filter(function(it){ return it.t === "bump"; }).sort(function(a, b){ return a.x - b.x; }), used = {}, map = {};
+  carts.forEach(function(c){ var i; for(i = 0; i < bumps.length; i++) if(!used[bumps[i].id] && bumps[i].x > c.x + 8){ used[bumps[i].id] = true; map[c.id] = bumps[i]; break; } });
+  return map;
+}
+function edStored(){
+  try{ var d = JSON.parse(localStorage.getItem(ED_KEY)); if(d && d.rounds){ edLoadObj(d); if(d.use) ed.use = d.use.slice(0, 3); return true; } }catch(e){}
+  return false;
+}
+function edChanged(){          // anything the person did: the round is now one of his, and the draft is kept
+  ed.use[ed.round] = true; ed.dirty = true; edAutosave(); edUi(); edMap();
+}
+function edPush(){          // a picture of the round to go back to (undo)
+  var r = ed.round; ed.undo[r].push(JSON.stringify(ed.rounds[r].map(edToArr))); if(ed.undo[r].length > 80) ed.undo[r].shift(); ed.redo[r] = [];
+}
+function edUndo(back){
+  var r = ed.round, from = back ? ed.redo[r] : ed.undo[r], to = back ? ed.undo[r] : ed.redo[r]; if(!from.length) return;
+  to.push(JSON.stringify(ed.rounds[r].map(edToArr)));
+  ed.rounds[r] = edFromArr(JSON.parse(from.pop())); ed.sel = {};
+  ed.use[r] = true; ed.dirty = true; edAutosave(); edBuildObjs(); edGuides(); edUi(); edMap();
+}
+
+// ---- the pictures
+function edBox(it){          // the thing's box in game pixels: x, y (top), w, h; the street's line is at ED_GY
+  var T = edT(it.t);
+  if(T.c === "cloud") return {x: it.x, y: ED_GY - it.y, w: it.w, h: 9};
+  if(T.c === "coin") return {x: it.x - 4, y: ED_GY - it.y - 4, w: T.w, h: T.h};
+  if(it.t === "hole") return {x: it.x, y: ED_GY - 3, w: T.w, h: 6};
+  return {x: it.x, y: ED_GY - it.y - T.h, w: T.w, h: T.h};
+}
+function edSpriteOf(it){          // the picture, with a margin of ED_PAD all round
+  var T = edT(it.t), b = edBox(it), m = emMake(b.w + 2 * ED_PAD, b.h + 2 * ED_PAD);
+  if(T.c === "cloud") emCloud(m.x, ED_PAD, ED_PAD + 1, it.w);
+  else if(it.t === "heart") m.x.drawImage(emHeartCv(), ED_PAD, ED_PAD);
+  else if(T.c === "coin") m.x.drawImage(emCoinCv(0), ED_PAD, ED_PAD);
+  else emDrawOb(m.x, it.t, ED_PAD, ED_PAD + (it.t === "hole" ? 3 : T.h), 0);
+  return m.c;
+}
+function edPlace(it){
+  var el = it.el, b = edBox(it), S = ed.S; if(!el) return;
+  el.style.left = (b.x * S) + "px"; el.style.top = (b.y * S) + "px"; el.style.width = (b.w * S) + "px"; el.style.height = (b.h * S) + "px";
+  el.title = edT(it.t).n + ": x " + Math.round(it.x) + ", y " + Math.round(it.y);
+  el.className = "edIt edc_" + edT(it.t).c + (ed.sel[it.id] ? " sel" : "");
+}
+function edMakeEl(it){
+  var el = document.createElement("div"), cv = edSpriteOf(it), S = ed.S;
+  cv.style.cssText = "width:" + (cv.width * S) + "px;height:" + (cv.height * S) + "px;left:" + (-ED_PAD * S) + "px;top:" + (-ED_PAD * S) + "px";
+  el.appendChild(cv); el.setAttribute("data-id", it.id); it.el = el; edPlace(it);
+  return el;
+}
+function edBuildObjs(){          // the layer of things: clouds at the back, then the things on the street, then the coins
+  var host = edE("edObjs"), order = ["cloud", "obj", "coin"];
+  host.innerHTML = ""; host.style.width = (ed.WW * ed.S) + "px"; host.style.height = (ED_H * ed.S) + "px";
+  order.forEach(function(c){ ed.rounds[ed.round].forEach(function(it){ if(edT(it.t).c === c) host.appendChild(edMakeEl(it)); }); });
+}
+function edBuildTiles(){          // every screen of the round, the way it is drawn in the game, one after the other
+  var r = ed.round, cfg = EM_ROUNDS[r], th = EM_THEMES[cfg.theme], saved = em, L, k, host = edE("edTiles"), S = ed.S;
+  ed.len = Math.round(cfg.speed * cfg.secs); ed.nT = Math.ceil(ed.len / ED_W) + 1; ed.WW = ed.nT * ED_W;
+  em = {W: ED_W, H: ED_H, GY: ED_GY};
+  try{ L = emBuildLayers(cfg.theme); } finally { em = saved; }
+  host.innerHTML = ""; host.style.width = (ed.WW * S) + "px"; host.style.height = (ED_H * S) + "px";
+  edE("edWorld").style.width = (ed.WW * S) + "px"; edE("edWorld").style.height = (ED_H * S) + "px";
+  for(k = 0; k < ed.nT; k++){
+    var d0 = k * ED_W, wrap = document.createElement("div"), cv = document.createElement("canvas"), x, lb = document.createElement("div");
+    cv.width = ED_W; cv.height = ED_H; cv.style.width = (ED_W * S) + "px"; cv.style.height = (ED_H * S) + "px";
+    x = cv.getContext("2d"); x.imageSmoothingEnabled = false;
+    var lay = function(img, f, extra){ var o = Math.floor(d0 * f + (extra || 0)) % L.TW; x.drawImage(img, -o, 0); x.drawImage(img, L.TW - o, 0); };
+    x.fillStyle = th.sky[0]; x.fillRect(0, 0, ED_W, ED_H); x.drawImage(L.sky, 0, 0);
+    lay(L.clouds, .05, 0); emPuffs(x, d0, ED_W, ED_GY, 60); lay(L.mount, .1); lay(L.hills, .2); lay(L.far, .45); lay(L.near, 1);
+    wrap.className = "edTile"; wrap.style.width = (ED_W * S) + "px"; lb.className = "edTileNo"; lb.textContent = "Screen " + (k + 1) + "   x " + d0;
+    wrap.appendChild(cv); wrap.appendChild(lb); host.appendChild(wrap);
+  }
+}
+function edGuides(){          // the start, the finish, the top of a phone's picture, and how far each cart carries the pilgrim
+  var host = edE("edGuides"), S = ed.S, PX = Math.round(ED_W / 4), html = "";
+  function box(cls, x, y, w, h, label){ return '<div class="' + cls + '" style="left:' + (x * S) + 'px;top:' + (y * S) + 'px;width:' + (w * S) + 'px;height:' + (h * S) + 'px"><i>' + (label || "") + '</i></div>'; }
+  host.style.width = (ed.WW * S) + "px"; host.style.height = (ED_H * S) + "px";
+  html += box("edTopLine", 0, ED_GY - (ED_GH - 17), ed.WW, 0, "top of a phone's picture while he is on the street");
+  html += box("edStart", PX, 0, 0, ED_H, "START (the pilgrim, " + PX + ")");
+  html += box("edFinish", ed.len + PX, 0, 0, ED_H, "FINISH (" + (ed.len + PX) + ")");
+  var pairs = edPairs(ed.rounds[ed.round]);
+  ed.rounds[ed.round].forEach(function(it){
+    if(it.t !== "cart") return;
+    var b = pairs[it.id];
+    if(b) html += box("edRide", it.x, ED_GY - 40, b.x + 17 - it.x, 40, "the ride: " + Math.max(0, Math.round(b.x + 4 - (it.x + 12))) + " px, to its stop block");
+    else html += box("edRide edNoStop", it.x, ED_GY - 40, 12 + EM_LAYOUT_RIDE, 40, "no stop block: the ride is " + EM_LAYOUT_RIDE + " px");
+  });
+  host.innerHTML = html;
+}
+function edMap(){          // the whole round in a strip: click or drag it to go there
+  var cv = edE("edMapCv"); if(!cv || !ed.WW) return;
+  var w = cv.clientWidth || 800, h = 44, x, k = w / ed.WW, vy = h / ED_H, scr = edE("edScroll");
+  if(cv.width !== w){ cv.width = w; cv.height = h; }
+  x = cv.getContext("2d"); x.fillStyle = "#15181e"; x.fillRect(0, 0, w, h);
+  x.fillStyle = "#2a3040"; x.fillRect(0, (ED_GY) * vy, w, h - ED_GY * vy);
+  var cols = {cloud: "#cfe6ff", coin: "#ffd23a", heart: "#ff4b5c", cart: "#c98a45", basket: "#f0c27a", basket2: "#9b7bff", hole: "#000000", bump: "#887e76", sheep: "#ffffff", dog: "#b07040", jars: "#e08850", crate: "#d2b070", crate2w: "#d2b070", stack: "#cdbe9c"};
+  ed.rounds[ed.round].forEach(function(it){ var b = edBox(it); x.fillStyle = cols[it.t] || "#fff"; x.fillRect(Math.round(b.x * k), Math.round(b.y * vy), Math.max(1, Math.round(b.w * k)), Math.max(2, Math.round(b.h * vy))); });
+  x.fillStyle = "#ff5a5a"; x.fillRect(Math.round((ed.len + Math.round(ED_W / 4)) * k), 0, 1, h);
+  x.strokeStyle = "#ffe44d"; x.lineWidth = 1; x.strokeRect(Math.round(scr.scrollLeft / ed.S * k) + .5, .5, Math.max(4, Math.round(scr.clientWidth / ed.S * k)), h - 1);
+}
+
+// ---- the window
+function edBuildDom(){
+  var css = '#edRoot{position:fixed;left:0;top:0;right:0;bottom:0;z-index:100000;display:none;flex-direction:column;background:#1a1d24;color:#e8ebf2;font:13px/1.35 system-ui,Segoe UI,Arial,sans-serif}' +
+    '#edRoot *{box-sizing:border-box}#edRoot button,#edRoot select,#edRoot input{font:inherit}' +
+    '#edBar{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:6px 10px;background:#262b36;border-bottom:1px solid #000}' +
+    '#edBar b{color:#ffd23a;margin-right:6px}#edBar .g{display:flex;gap:4px;align-items:center}' +
+    '#edRoot button{background:#394155;color:#fff;border:1px solid #505a73;border-radius:5px;padding:4px 9px;cursor:pointer}#edRoot button:hover{background:#4a5470}' +
+    '#edRoot button.on{background:#ffd23a;color:#222;border-color:#ffd23a}#edRoot button.go{background:#2f9e57;border-color:#41c070}#edRoot button.go:hover{background:#38b565}' +
+    '#edRoot select,#edRoot input[type=number]{background:#15181e;color:#fff;border:1px solid #505a73;border-radius:4px;padding:3px 5px}#edRoot input[type=number]{width:64px}' +
+    '.emHud .emTestBtn{flex:none;margin-left:18px;pointer-events:auto;background:#2f9e57;color:#fff;border:2px solid #fff;border-radius:6px;padding:4px 10px;font:bold 13px system-ui,Arial,sans-serif;cursor:pointer;opacity:.9}.emHud .emTestBtn:hover{opacity:1}' +
+    '#edMap{height:44px;background:#15181e;border-bottom:1px solid #000;position:relative;cursor:pointer}#edMapCv{width:100%;height:44px;display:block}' +
+    '#edMain{flex:1;display:flex;min-height:0}#edScroll{flex:1;overflow:auto;position:relative;background:#3a3f4b}' +
+    '#edWorld{position:relative;margin:0}#edTiles{display:flex;position:absolute;left:0;top:0}#edTiles canvas{display:block;image-rendering:pixelated}' +
+    '.edTile{position:relative;flex:none;border-left:1px dashed rgba(255,255,255,.55)}.edTileNo{position:absolute;left:4px;top:3px;font-size:11px;color:#fff;background:rgba(0,0,0,.45);padding:1px 5px;border-radius:3px;pointer-events:none}' +
+    '.edHideBg #edTiles canvas{visibility:hidden}.edHideBg .edTile{background:repeating-conic-gradient(#3a3f4b 0 25%,#434956 0 50%) 0 0/32px 32px}' +
+    '#edGuides,#edObjs{position:absolute;left:0;top:0}#edGuides{pointer-events:none}' +
+    '.edTopLine{position:absolute;border-top:1px dashed #fff;opacity:.8}.edTopLine i,.edStart i,.edFinish i,.edRide i{position:absolute;font:11px system-ui;color:#fff;font-style:normal;white-space:nowrap;background:rgba(0,0,0,.45);padding:0 4px;border-radius:3px}' +
+    '.edTopLine i{left:4px;top:2px}.edStart,.edFinish{position:absolute;border-left:2px solid #41c070}.edFinish{border-color:#ff5a5a}.edStart i,.edFinish i{left:4px;bottom:20px}' +
+    '.edRide{position:absolute;background:rgba(65,192,112,.16);border:1px solid rgba(65,192,112,.7)}.edNoStop{background:rgba(255,90,90,.12);border-color:rgba(255,90,90,.7)}.edRide i{left:3px;top:2px}' +
+    '.edHideGuides #edGuides{display:none}.edHideObj .edc_obj,.edHideCoin .edc_coin,.edHideCloud .edc_cloud{display:none}' +
+    '.edIt{position:absolute;cursor:grab;touch-action:none}.edIt canvas{position:absolute;pointer-events:none;image-rendering:pixelated}.edIt:hover{outline:1px dashed #fff}.edIt.sel{outline:2px solid #ffe44d;background:rgba(255,228,77,.2)}' +
+    '.edMarq{position:absolute;border:1px solid #ffe44d;background:rgba(255,228,77,.15);pointer-events:none}' +
+    '#edSide{width:250px;flex:none;overflow:auto;background:#262b36;border-left:1px solid #000;padding:8px 10px}#edSide h4{margin:10px 0 5px;color:#ffd23a;font-size:12px;letter-spacing:.04em;text-transform:uppercase}#edSide h4:first-child{margin-top:0}' +
+    '#edPal{display:grid;grid-template-columns:1fr 1fr;gap:4px}#edPal button{display:flex;align-items:center;gap:6px;text-align:left;padding:3px 6px}#edPal canvas{image-rendering:pixelated;width:30px;height:24px;object-fit:contain;flex:none;background:#566;border-radius:3px}' +
+    '#edSide .row{display:flex;gap:6px;align-items:center;margin:4px 0}#edSide .row label{width:18px;color:#aab}#edSide small{color:#aab;display:block}#edSide .help{color:#aab;font-size:12px}#edSide .help b{color:#ddd}' +
+    '#edStat{display:flex;gap:14px;padding:4px 10px;background:#262b36;border-top:1px solid #000;color:#aab;font-size:12px}#edMsg{color:#ffd23a;flex:1;text-align:right}';
+  var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+  var root = document.createElement("div"); root.id = "edRoot";
+  root.innerHTML = '<div id="edBar"><b>Road to Emmaus: level editor</b>' +
+    '<div class="g" id="edTabs"></div><div class="g"><label><input type="checkbox" id="edUse"> use this layout in the game</label></div>' +
+    '<div class="g">Zoom <select id="edZoom"><option value="1">1x</option><option value="2" selected>2x</option><option value="3">3x</option></select></div>' +
+    '<div class="g">Snap <select id="edSnapSel"><option value="1">1 px</option><option value="2">2 px</option><option value="4">4 px</option><option value="8">8 px</option><option value="16">16 px</option></select></div>' +
+    '<div class="g" id="edLayers"></div>' +
+    '<div class="g"><button id="edUndoB" title="Ctrl+Z">Undo</button><button id="edRedoB" title="Ctrl+Y">Redo</button></div>' +
+    '<div class="g"><button id="edRoll" title="Throw the round away and make a new random one to start from">New random</button><button id="edRevert" title="Go back to what is in the saved file">Back to saved</button></div>' +
+    '<div class="g"><button class="go" id="edTest">Test play</button><button class="go" id="edTestView" title="Start at the left edge of what you see">Test from here</button></div>' +
+    '<div class="g"><button id="edSave" title="Ctrl+S">Save</button><button id="edLoad">Open file...</button><input type="file" id="edFile" accept=".js,.json" style="display:none"></div></div>' +
+    '<div id="edMap"><canvas id="edMapCv"></canvas></div>' +
+    '<div id="edMain"><div id="edScroll"><div id="edWorld"><div id="edTiles"></div><div id="edGuides"></div><div id="edObjs"></div></div></div>' +
+    '<div id="edSide"><h4>Add</h4><div id="edPal"></div><h4>Selected</h4><div id="edInfo"></div><h4>This round</h4><div id="edCount"></div>' +
+    '<h4>Keys</h4><div class="help"><b>Drag</b> a thing to move it, <b>drag</b> on empty space to select a group, <b>Shift+click</b> adds to a selection. <b>Arrows</b> nudge (Shift: 8). <b>Del</b> deletes, <b>Ctrl+D</b> copies, <b>Ctrl+Z</b> undoes, <b>Ctrl+S</b> saves. The wheel scrolls along the road. Dogs trot toward the pilgrim: x is where one starts. A cart rolls until the pilgrim reaches the <b>stop block</b> after it.</div></div></div>' +
+    '<div id="edStat"><span id="edPos"></span><span id="edMsg"></span></div>';
+  document.body.appendChild(root); ed.root = root; ed.scr = edE("edScroll");
+  // the buttons
+  var tabs = edE("edTabs"); [0, 1, 2].forEach(function(r){ var b = document.createElement("button"); b.id = "edTab" + r; b.textContent = "Round " + (r + 1); b.onclick = function(){ edSwitchRound(r); }; tabs.appendChild(b); });
+  var lay = edE("edLayers"); [["Bg", "edHideBg"], ["Things", "edHideObj"], ["Clouds", "edHideCloud"], ["Coins, hearts", "edHideCoin"], ["Guides", "edHideGuides"]].forEach(function(l){
+    var lab = document.createElement("label"), cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = true;
+    cb.onchange = function(){ root.classList[cb.checked ? "remove" : "add"](l[1]); };
+    (ed.layerCb = ed.layerCb || {})[l[1]] = cb;
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(" " + l[0] + "  ")); lay.appendChild(lab);
+  });
+  edE("edUse").onchange = function(){ ed.use[ed.round] = this.checked; ed.dirty = true; edAutosave(); edUi(); };
+  edE("edZoom").onchange = function(){ var c = ed.scr.scrollLeft / ed.S; ed.S = +this.value; edRebuild(); ed.scr.scrollLeft = c * ed.S; };
+  edE("edSnapSel").onchange = function(){ ed.snap = +this.value; };
+  edE("edUndoB").onclick = function(){ edUndo(false); }; edE("edRedoB").onclick = function(){ edUndo(true); };
+  edE("edRoll").onclick = function(){ if(!confirm("Throw this round away and make a new random one to start from?")) return; edPush(); ed.rounds[ed.round] = edGenerate(ed.round); ed.use[ed.round] = true; ed.sel = {}; ed.dirty = true; edAutosave(); edBuildObjs(); edGuides(); edUi(); edMap(); };
+  edE("edRevert").onclick = function(){
+    var d = window.EM_LAYOUT_DATA, a = d && d.rounds && d.rounds[ed.round];
+    if(!confirm(a ? "Go back to this round as it is in the saved file?" : "This round is not in the saved file. Make it random again?")) return;
+    edPush(); ed.rounds[ed.round] = a && a.length ? edFromArr(a) : edGenerate(ed.round); edEnsureBumps(ed.rounds[ed.round]); ed.use[ed.round] = !!(a && a.length); ed.sel = {}; edAutosave(); edBuildObjs(); edGuides(); edUi(); edMap();
+  };
+  edE("edTest").onclick = function(){ edTest(false); }; edE("edTestView").onclick = function(){ edTest(true); };
+  edE("edSave").onclick = edSave; edE("edLoad").onclick = function(){ edE("edFile").click(); };
+  edE("edFile").onchange = function(){
+    var f = this.files && this.files[0]; if(!f) return; var rd = new FileReader();
+    rd.onload = function(){
+      try{
+        var txt = String(rd.result), d = JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
+        edLoadObj(d); ed.undo = [[], [], []]; ed.redo = [[], [], []]; edAutosave(); edSwitchRound(ed.round); edMsg("Opened " + f.name);
+      }catch(err){ edMsg("That file could not be read."); }
+    };
+    rd.readAsText(f); this.value = "";
+  };
+  // the mouse and the keys
+  var world = edE("edObjs");
+  world.addEventListener("pointerdown", edDown); world.addEventListener("pointermove", edMove); world.addEventListener("pointerup", edUp); world.addEventListener("pointercancel", edUp);
+  ed.scr.addEventListener("scroll", function(){ edMap(); });
+  ed.scr.addEventListener("wheel", function(ev){ if(ev.ctrlKey) return; if(ed.scr.scrollHeight <= ed.scr.clientHeight + 2 || ev.shiftKey){ ed.scr.scrollLeft += ev.deltaY + ev.deltaX; ev.preventDefault(); } }, {passive: false});
+  var mp = edE("edMap"), mapGo = function(ev){ var r = mp.getBoundingClientRect(); ed.scr.scrollLeft = ((ev.clientX - r.left) / r.width * ed.WW - ed.scr.clientWidth / ed.S / 2) * ed.S; };
+  mp.addEventListener("pointerdown", function(ev){ mapGo(ev); mp.setPointerCapture(ev.pointerId); ed.mapDrag = true; });
+  mp.addEventListener("pointermove", function(ev){ if(ed.mapDrag) mapGo(ev); });
+  mp.addEventListener("pointerup", function(){ ed.mapDrag = false; });
+  document.addEventListener("keydown", edKey);
+  window.addEventListener("resize", function(){ if(ed.root.style.display !== "none") edMap(); });
+}
+function edPalette(){          // (made once the sheep and the dog have loaded)
+  var pal = edE("edPal"); pal.innerHTML = "";
+  ED_TYPES.forEach(function(T){
+    var b = document.createElement("button"), it = {t: T.k, x: 0, y: 0, w: T.k === "cloud" ? 40 : undefined}, cv = edSpriteOf(it);
+    b.appendChild(cv); b.appendChild(document.createTextNode(T.n)); b.title = "Add a " + T.n.toLowerCase() + " where you are looking";
+    b.onclick = function(){ edAdd(T.k); }; pal.appendChild(b);
+  });
+}
+function edWorldPos(ev){ var r = edE("edObjs").getBoundingClientRect(); return {x: (ev.clientX - r.left) / ed.S, y: (ev.clientY - r.top) / ed.S}; }
+function edRefreshSel(){ ed.rounds[ed.round].forEach(edPlace); edInfo(); }
+function edDown(ev){
+  if(ev.button !== 0) return;
+  var el = ev.target.closest ? ev.target.closest(".edIt") : null, pos = edWorldPos(ev);
+  if(el){
+    var it = edById(+el.getAttribute("data-id"));
+    if(ev.shiftKey){ if(ed.sel[it.id]) delete ed.sel[it.id]; else ed.sel[it.id] = true; edRefreshSel(); ev.preventDefault(); return; }
+    if(!ed.sel[it.id]){ ed.sel = {}; ed.sel[it.id] = true; }
+    edRefreshSel();
+    var orig = {}; edSel().forEach(function(s){ orig[s.id] = {x: s.x, y: s.y}; });
+    ed.drag = {x0: pos.x, y0: pos.y, orig: orig, moved: false, snap: JSON.stringify(ed.rounds[ed.round].map(edToArr))};
+  } else {
+    if(!ev.shiftKey) ed.sel = {};
+    edRefreshSel();
+    var mq = document.createElement("div"); mq.className = "edMarq"; edE("edObjs").appendChild(mq);
+    ed.marq = {x0: pos.x, y0: pos.y, el: mq, base: ev.shiftKey ? JSON.parse(JSON.stringify(ed.sel)) : {}};
+  }
+  edE("edObjs").setPointerCapture(ev.pointerId); ev.preventDefault();
+}
+function edMove(ev){
+  var pos = edWorldPos(ev), S = ed.S;
+  edE("edPos").textContent = "x " + Math.round(pos.x) + "   height " + Math.round(ED_GY - pos.y) + "   (screen " + (Math.floor(pos.x / ED_W) + 1) + ")";
+  if(ed.drag){
+    var d = ed.drag, dx = edSnap(pos.x - d.x0), dy = edSnap(pos.y - d.y0);
+    if(!d.moved && !dx && !dy) return;
+    d.moved = true;
+    edSel().forEach(function(it){
+      var o = d.orig[it.id], T = edT(it.t), b;
+      it.x = edClamp(o.x + dx, T.c === "coin" ? 4 : 0, ed.WW - (T.c === "coin" ? 4 : T.c === "cloud" ? it.w : T.w));
+      if(T.lock) it.y = 0;
+      else if(T.c === "cloud") it.y = edClamp(o.y - dy, 6, ED_GY - 10);
+      else if(T.c === "coin") it.y = edClamp(o.y - dy, 0, ED_GY - 5);
+      else { var ny = o.y - dy; it.y = edClamp(ny < 3 ? 0 : ny, 0, ED_GY - T.h); }          // (a thing on the street clings to it when it is close)
+      edPlace(it);
+    });
+    edGuides(); edInfo();
+    return;
+  }
+  if(ed.marq){
+    var m = ed.marq, x0 = Math.min(m.x0, pos.x), x1 = Math.max(m.x0, pos.x), y0 = Math.min(m.y0, pos.y), y1 = Math.max(m.y0, pos.y);
+    m.el.style.left = (x0 * S) + "px"; m.el.style.top = (y0 * S) + "px"; m.el.style.width = ((x1 - x0) * S) + "px"; m.el.style.height = ((y1 - y0) * S) + "px";
+    ed.sel = JSON.parse(JSON.stringify(m.base));
+    ed.rounds[ed.round].forEach(function(it){
+      var c = edT(it.t).c; if((c === "obj" && ed.root.classList.contains("edHideObj")) || (c === "coin" && ed.root.classList.contains("edHideCoin")) || (c === "cloud" && ed.root.classList.contains("edHideCloud"))) return;
+      var b = edBox(it); if(b.x < x1 && b.x + b.w > x0 && b.y < y1 && b.y + b.h > y0) ed.sel[it.id] = true;
+    });
+    ed.rounds[ed.round].forEach(edPlace);
+  }
+}
+function edUp(ev){
+  if(ed.drag){
+    var d = ed.drag; ed.drag = null;
+    if(d.moved){ ed.undo[ed.round].push(d.snap); if(ed.undo[ed.round].length > 80) ed.undo[ed.round].shift(); ed.redo[ed.round] = []; edChanged(); }
+  }
+  if(ed.marq){ if(ed.marq.el.parentNode) ed.marq.el.parentNode.removeChild(ed.marq.el); ed.marq = null; edInfo(); }
+  try{ edE("edObjs").releasePointerCapture(ev.pointerId); }catch(e){}
+}
+function edKey(ev){
+  if(!ed || ed.root.style.display === "none") return;
+  var tag = ev.target && ev.target.tagName, k = ev.key;
+  if(tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+  var sel = edSel(), ctrl = ev.ctrlKey || ev.metaKey;
+  if(ctrl && (k === "z" || k === "Z")){ edUndo(ev.shiftKey); ev.preventDefault(); }
+  else if(ctrl && (k === "y" || k === "Y")){ edUndo(true); ev.preventDefault(); }
+  else if(ctrl && (k === "s" || k === "S")){ edSave(); ev.preventDefault(); }
+  else if(ctrl && (k === "d" || k === "D")){ edDup(); ev.preventDefault(); }
+  else if(ctrl && (k === "a" || k === "A")){ ed.sel = {}; ed.rounds[ed.round].forEach(function(it){ ed.sel[it.id] = true; }); edRefreshSel(); ev.preventDefault(); }
+  else if(k === "Delete" || k === "Backspace"){ edDelete(); ev.preventDefault(); }
+  else if(k === "Escape"){ ed.sel = {}; edRefreshSel(); }
+  else if(sel.length && (k === "ArrowLeft" || k === "ArrowRight" || k === "ArrowUp" || k === "ArrowDown")){
+    var st = ev.shiftKey ? 8 : 1, dx = k === "ArrowLeft" ? -st : k === "ArrowRight" ? st : 0, dy = k === "ArrowUp" ? st : k === "ArrowDown" ? -st : 0;
+    edPush(); sel.forEach(function(it){ var T = edT(it.t); it.x = Math.max(T.c === "coin" ? 4 : 0, it.x + dx); if(!T.lock) it.y = Math.max(T.c === "cloud" ? 6 : 0, it.y + dy); edPlace(it); });
+    edGuides(); edInfo(); edChanged(); ev.preventDefault();
+  }
+}
+function edAdd(k){
+  var T = edT(k), it = {id: ++ed.nid, t: k, x: 0, y: k === "cloud" ? 100 : k === "coin" || k === "heart" ? 24 : 0, w: k === "cloud" ? 70 : undefined};
+  it.x = Math.round(edClamp((ed.scr.scrollLeft + ed.scr.clientWidth * .4) / ed.S, 4, ed.WW - 30));
+  edPush(); ed.rounds[ed.round].push(it); ed.sel = {}; ed.sel[it.id] = true;
+  var host = edE("edObjs"); host.appendChild(edMakeEl(it)); edRefreshSel(); edGuides(); edChanged();
+  var lc = {obj: "edHideObj", cloud: "edHideCloud", coin: "edHideCoin"}[T.c], shown = "";          // (a new thing is always shown: its layer is switched on, and the view moves to it)
+  if(lc && ed.root.classList.contains(lc)){ ed.layerCb[lc].checked = true; ed.root.classList.remove(lc); shown = " (its layer was hidden: it is shown again)"; }
+  edReveal(it);
+  edMsg("Added " + T.n.toLowerCase() + " at x " + Math.round(it.x) + ", height " + Math.round(it.y) + ": it is selected, drag it where you want it." + shown);
+}
+function edReveal(it){          // scroll the editor so that the thing can be seen
+  var b = edBox(it), S = ed.S, sc = ed.scr, m = 60, x0 = b.x * S, y0 = b.y * S, x1 = x0 + b.w * S, y1 = y0 + b.h * S;
+  if(x0 < sc.scrollLeft + m) sc.scrollLeft = Math.max(0, x0 - m); else if(x1 > sc.scrollLeft + sc.clientWidth - m) sc.scrollLeft = x1 - sc.clientWidth + m;
+  if(y0 < sc.scrollTop + m) sc.scrollTop = Math.max(0, y0 - m); else if(y1 > sc.scrollTop + sc.clientHeight - m) sc.scrollTop = y1 - sc.clientHeight + m;
+}
+function edDelete(){
+  var sel = edSel(); if(!sel.length) return;
+  edPush(); sel.forEach(function(it){ if(it.el && it.el.parentNode) it.el.parentNode.removeChild(it.el); });
+  ed.rounds[ed.round] = ed.rounds[ed.round].filter(function(it){ return !ed.sel[it.id]; }); ed.sel = {};
+  edGuides(); edInfo(); edChanged();
+}
+function edDup(){
+  var sel = edSel(); if(!sel.length) return; edPush(); var nsel = {};
+  sel.forEach(function(it){ var c = {id: ++ed.nid, t: it.t, x: it.x + 16, y: it.y, w: it.w}; ed.rounds[ed.round].push(c); edE("edObjs").appendChild(edMakeEl(c)); nsel[c.id] = true; });
+  ed.sel = nsel; edRefreshSel(); edGuides(); edChanged();
+}
+function edInfo(){
+  var sel = edSel(), h = edE("edInfo"), it;
+  if(!sel.length){ h.innerHTML = '<small>Nothing selected.</small>'; return; }
+  if(sel.length > 1){ h.innerHTML = '<small>' + sel.length + ' things selected: drag one of them, or use the arrow keys, to move them all.</small><div class="row"><button id="edDel">Delete</button><button id="edDupB">Copy</button></div>'; }
+  else {
+    it = sel[0]; var T = edT(it.t);
+    h.innerHTML = '<div><b>' + T.n + '</b></div>' +
+      '<div class="row"><label>x</label><input type="number" id="edX" value="' + Math.round(it.x) + '"><small>along the road</small></div>' +
+      '<div class="row"><label>y</label><input type="number" id="edY" value="' + Math.round(it.y) + '"' + (T.lock ? ' disabled' : '') + '><small>' + (T.lock ? 'stays on the street' : T.c === "cloud" ? 'height of its top' : T.c === "coin" ? 'height of its middle' : 'height above the street') + '</small></div>' +
+      (T.c === "cloud" ? '<div class="row"><label>w</label><input type="number" id="edW" value="' + Math.round(it.w) + '"><small>width</small></div>' : '') +
+      '<div class="row"><button id="edDel">Delete</button><button id="edDupB">Copy</button></div>';
+    var apply = function(){
+      var xv = +edE("edX").value, yv = edE("edY") ? +edE("edY").value : it.y, wv = edE("edW") ? +edE("edW").value : it.w;
+      edPush(); it.x = Math.max(T.c === "coin" ? 4 : 0, xv || 0); if(!T.lock) it.y = Math.max(T.c === "cloud" ? 6 : 0, yv || 0); if(T.c === "cloud" && wv !== it.w){ it.w = edClamp(wv || 70, 24, 300); edBuildObjs(); }
+      edPlace(it); edGuides(); edChanged();
+    };
+    ["edX", "edY", "edW"].forEach(function(id){ var f = edE(id); if(f) f.onchange = apply; });
+  }
+  edE("edDel").onclick = edDelete; edE("edDupB").onclick = edDup;
+}
+function edUi(){
+  var r = ed.round, a = ed.rounds[r] || [], n = {obj: 0, coin: 0, cloud: 0, heart: 0}, tot = 0;
+  [0, 1, 2].forEach(function(q){ var b = edE("edTab" + q); b.className = q === r ? "on" : ""; b.textContent = "Round " + (q + 1) + (ed.use[q] ? "  (mine)" : "  (random)"); if(ed.rounds[q] && (ed.use[q] || q === r)) tot += ed.rounds[q].filter(function(it){ return it.t === "coin"; }).length; });
+  a.forEach(function(it){ n[it.t === "heart" ? "heart" : edT(it.t).c]++; });
+  edE("edUse").checked = !!ed.use[r];
+  edE("edCount").innerHTML = 'Things on the street: <b>' + n.obj + '</b><br>Clouds: <b>' + n.cloud + '</b><br>Coins: <b>' + n.coin + '</b><br>Hearts: <b>' + n.heart + '</b><small>All the rounds you use or are looking at: ' + tot + ' coins (the counter stops at 99).</small>' +
+    '<small>' + (ed.use[r] ? 'The game plays this round as it is here (once it is saved).' : 'The game still makes this round at random each time. Move something, or tick the box, to use it.') + '</small>';
+  edE("edUndoB").disabled = !ed.undo[r].length; edE("edRedoB").disabled = !ed.redo[r].length;
+  edInfo();
+}
+function edRebuild(){ edBuildTiles(); edBuildObjs(); edGuides(); edMap(); }
+function edSwitchRound(r){
+  ed.round = r; ed.sel = {};
+  if(!ed.rounds[r]){ ed.rounds[r] = edGenerate(r); ed.use[r] = false; }
+  edRebuild(); edUi(); ed.scr.scrollLeft = 0;
+}
+function edPreload(cb){
+  var names = ["sheep_near.png", "dog.png"], left = names.length, done = false;
+  function one(){ left--; if(left <= 0 && !done){ done = true; cb(); } }
+  names.forEach(function(n){ var im = emImg(n); if(im.complete && im.width) one(); else { im.addEventListener("load", one); im.addEventListener("error", one); } });
+  setTimeout(function(){ if(!done){ done = true; cb(); } }, 3000);
+}
+function edOpen(){
+  if(!ed){
+    ed = {round: 0, S: 2, snap: 1, nid: 0, rounds: [null, null, null], use: [false, false, false], sel: {}, undo: [[], [], []], redo: [[], [], []], drag: null, marq: null, fileHandle: null, dirty: false};
+    if(!edStored() && window.EM_LAYOUT_DATA) edLoadObj(window.EM_LAYOUT_DATA);
+    edBuildDom();
+  }
+  ed.root.style.display = "flex";
+  edPreload(function(){ edPalette(); edSwitchRound(ed.round); });
+  if(location.protocol === "file:") edMsg("Opened as a file, so the game's sounds cannot load (only the button beeps work). Use Start Level Editor.bat in the Design Documents folder.");          // (a browser will not fetch the sound files from a file: address)
+}
+function edSave(){
+  var txt = edLayoutText(edLayoutObj(-1));
+  function download(){
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], {type: "text/javascript"})); a.download = "emmaus_layout.js"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    edMsg("Downloaded emmaus_layout.js: put it in the same folder as the app (replace the old one).");
+  }
+  if(!window.showSaveFilePicker){ download(); return; }
+  var pick = ed.fileHandle ? Promise.resolve(ed.fileHandle) : window.showSaveFilePicker({suggestedName: "emmaus_layout.js", types: [{description: "JavaScript file", accept: {"text/javascript": [".js"]}}]});
+  pick.then(function(h){
+    ed.fileHandle = h;
+    return h.createWritable().then(function(w){ return w.write(txt).then(function(){ return w.close(); }); }).then(function(){ ed.dirty = false; edMsg("Saved " + h.name + " (" + new Date().toLocaleTimeString() + ")"); });
+  }).catch(function(err){ if(err && err.name === "AbortError") return; download(); });
+}
+function edTest(fromView){
+  var r = ed.round, sd = fromView ? Math.max(0, Math.floor(ed.scr.scrollLeft / ed.S)) : 0;
+  window.EM_LAYOUT_TEST = edLayoutObj(r);
+  ed.root.style.display = "none"; ed.scrollKeep = ed.scr.scrollLeft;
+  em = null; initEmmaus(); em.round = r; em.test = true; em.startDist = sd;
+  go("emmaus");
+}
+function edBack(){          // the test play is over (the X, or the end of the round)
+  window.EM_LAYOUT_TEST = null; em = null; go("mainMenu");
+  ed.root.style.display = "flex"; ed.scr.scrollLeft = ed.scrollKeep || 0; edMap();
+}
+if(/[?&]editor\b/.test(location.search)) window.addEventListener("load", function(){ edOpen(); });
 
 /* ---------- Hope Garden, played on its side (stage 1) ---------- */
 
@@ -10618,7 +11144,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-29 CJ";
+var APP_BUILD = "2026-10-29 CQ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
