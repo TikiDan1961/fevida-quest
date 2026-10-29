@@ -8939,7 +8939,11 @@ function emSupport(e, wxp, fromH){          // the height of what he stands on: 
   for(i = 0; i < e.clouds.length; i++){ c = e.clouds[i]; if(c.y <= fromH + .5 && c.y > best && wxp >= c.wx - 2 && wxp <= c.wx + c.w + 2) best = c.y; }
   return best;
 }
-function emCoinTxt(n){ n = Math.min(99, n); return (n < 10 ? "0" : "") + n; }
+function emCoinTxt(n){          // two digits in rounds 1 and 2, three in round 3 (2026-10-29, per Dan: round 3 has more than 99 coins)
+  var w = em && em.round >= 2 ? 3 : 2, s = String(Math.min(n, 999));
+  while(s.length < w) s = "0" + s;
+  return s;
+}
 var emHeartImg = null;
 function emHeartCv(){          // a heart to pick up (9 x 8)
   if(emHeartImg) return emHeartImg;
@@ -9787,7 +9791,7 @@ function edUi(){
   [0, 1, 2].forEach(function(q){ var b = edE("edTab" + q); b.className = q === r ? "on" : ""; b.textContent = "Round " + (q + 1) + (ed.use[q] ? "  (mine)" : "  (not yet mine)"); if(ed.rounds[q] && (ed.use[q] || q === r)) tot += ed.rounds[q].filter(function(it){ return it.t === "coin"; }).length; });
   a.forEach(function(it){ n[it.t === "heart" ? "heart" : edT(it.t).c]++; });
   edE("edUse").checked = !!ed.use[r];
-  edE("edCount").innerHTML = 'Things on the street: <b>' + n.obj + '</b><br>Clouds: <b>' + n.cloud + '</b><br>Coins: <b>' + n.coin + '</b><br>Hearts: <b>' + n.heart + '</b><small>All the rounds you use or are looking at: ' + tot + ' coins (the counter stops at 99).</small>' +
+  edE("edCount").innerHTML = 'Things on the street: <b>' + n.obj + '</b><br>Clouds: <b>' + n.cloud + '</b><br>Coins: <b>' + n.coin + '</b><br>Hearts: <b>' + n.heart + '</b><small>All the rounds you use or are looking at: ' + tot + ' coins (the counter shows three digits in round 3 and stops at 999).</small>' +
     '<small>' + (ed.use[r] ? 'The game plays this round as it is here (once it is saved).' : 'This is a fixed street the game plays until this round is made here (it is the same every time, never random). Move something, or tick the box, to make it yours.') + '</small>';
   edE("edUndoB").disabled = !ed.undo[r].length; edE("edRedoB").disabled = !ed.redo[r].length;
   edInfo();
@@ -9936,11 +9940,11 @@ var HGL_LAYOUT3 = [
   {ci: 6, fx: 88.8, fy: 43.9}                                 // purple open flower
 ];
 // (2026-10-29, per Dan) nb bees and nf butterflies in a round, in a fixed order: the bees come one after the other, in the two colours of the round in turn, and a butterfly comes together with every second bee (bee 2, 4, 6 ...)
-// until there are nf of them, also in its two colours in turn. Round 1: 12 bees, 5 butterflies (with bees 2 4 6 8 10); round 2: 16 and 7 (with 2 to 14); round 3: 22 and 9 (with 2 to 18).
+// until there are nf of them, also in its two colours in turn. Round 1: 12 bees, 5 butterflies (with bees 2 4 6 8 10); round 2: 16 and 7 (with 2 to 14); round 3: 22 and 10 (with 2 to 20).
 var HGL_ROUNDS = [
   {nb: 12, nf: 5, bees: [0, 2], bfs: [4, 6], speed: 1, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT1},
   {nb: 16, nf: 7, bees: [4, 6], bfs: [0, 2], speed: 1.2, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2, dfly: 2},
-  {nb: 22, nf: 9, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3, dfly: 3, dfSpd: 1.12}
+  {nb: 22, nf: 10, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3, dfly: 3, dfSpd: 1.12}
 ];
 HGL_ROUNDS.forEach(function(R){          // each round's list of spawns [{b: bee colour, f: butterfly colour or null}] and how many of each colour must land
   var i, nfDone = 0; R.seq = []; R.need = {};
@@ -11165,7 +11169,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-29 CS";
+var APP_BUILD = "2026-10-29 CT";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
