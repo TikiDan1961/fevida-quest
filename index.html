@@ -8716,9 +8716,9 @@ var EM_V0B = 190, EM_V0B2 = 330;          // (the purple basket throws him 3 tim
 var EM_SKY = 100;          // the first cloud's height above the street          // a basket throws the pilgrim up at this speed (50 pixels high, against 31 for a jump), for the coins that hang up in the air (2026-10-28, per Dan)
 var EM_RIDE_SCREENS = 2.5, EM_CH = 13;                          // the ride lasts this many screen widths; the floor of a cart is this high (the pilgrim's feet stand 13 pixels up on it)
 var EM_ROUNDS = [
-  {speed: 56, secs: 40, theme: 0, mix: {cart: 3, crate: 3, sheep: 2, herd: 2}, easy: ["crate", "sheep"], gap: 60},                           // morning in the village: carts, crates, sheep
-  {speed: 70, secs: 55, theme: 1, mix: {cart: 3, stack: 3, jars: 2, crate: 2, crate2w: 1, herd: 1}, easy: ["crate", "sheep"], gap: 50},      // midday at the market: crate stacks, jars, carts
-  {speed: 84, secs: 70, theme: 2, mix: {cart: 3, jars: 2, dog: 3, stack: 2, crate: 1, herd: 1}, easy: ["crate", "dog"], gap: 45}            // evening on the road: jars, dogs (they trot towards you), tall crates
+  {speed: 58, secs: 40, theme: 0, mix: {cart: 3, crate: 3, sheep: 2, herd: 2, jars: 2}, easy: ["crate", "sheep"], gap: 60},                           // morning in the village: carts, crates, sheep
+  {speed: 74, secs: 55, theme: 1, mix: {cart: 3, stack: 3, jars: 4, crate: 2, crate2w: 1, herd: 1}, easy: ["crate", "sheep"], gap: 50},      // midday at the market: crate stacks, jars, carts
+  {speed: 90, secs: 70, theme: 2, mix: {cart: 3, jars: 4, dog: 3, stack: 2, crate: 1, herd: 1}, easy: ["crate", "dog"], gap: 45}            // evening on the road: jars, dogs (they trot towards you), tall crates
 ];
 var EM_OB = {      // what is on the street: width and height in game pixels (a dog trots left at vx pixels a second on top of the road's speed)
   crate: {w: 12, h: 12}, crate2w: {w: 24, h: 12}, stack: {w: 12, h: 23}, jars: {w: 21, h: 17}, sheep: {w: 16, h: 12}, dog: {w: 18, h: 13, vx: 20}, cart: {w: 24, h: EM_CH}, basket: {w: 18, h: 8}, basket2: {w: 18, h: 8}, hole: {w: 18, h: 0}
@@ -8942,7 +8942,7 @@ function emSetRound(r){          // a round starts: a new street, the pilgrim at
 function emRestart(){ if(!em) return; var r = em.round; emSetRound(r); em.chances = EM_CHANCES; em.coins = em.coinBase; render(); }          // (the coins picked up in the round go back too)          // TRY AGAIN: the same round again, with all the chances (as in the other games)
 // the street of a round, made at the start: what comes, and where (distance from the start line). After a cart there is a long easy stretch (only low things, none that is a cart), so the ride is a rest.
 function emTrack(r){
-  var e = em, cfg = EM_ROUNDS[r], v = cfg.speed, ride = e.rideLen, len = e.len, list = [], x = Math.round(e.W * 1.15), cartAt = -999, end = len - 70, n = 0, pool = [], coins = [], bAt = [Math.round(len * .3), Math.round(len * .64)], bi = 0, i, k, arc = [0, 3, 4, 3, 0], b2 = r >= 1, b2At = Math.round(len * (r === 1 ? .47 : .5));
+  var e = em, cfg = EM_ROUNDS[r], v = cfg.speed, ride = e.rideLen, len = e.len, list = [], x = Math.round(e.W * 1.15), cartAt = -999, end = len - 60, n = 0, pool = [], coins = [], bAt = [Math.round(len * .3), Math.round(len * .64)], bi = 0, i, k, arc = [0, 3, 4, 3, 0], b2 = r >= 1, b2At = Math.round(len * (r === 1 ? .47 : .5)), sc = null;
   e.clouds = [];
   Object.keys(cfg.mix).forEach(function(key){ var k2; for(k2 = 0; k2 < cfg.mix[key]; k2++) pool.push(key); });
   var gapBase = Math.round(v * .833 * .85 + 14);
@@ -8951,6 +8951,7 @@ function emTrack(r){
     var zone = x < cartAt + ride + 24 + 60;
     if(zone && x > cartAt + ride - 40){ x = cartAt + ride + 24 + 60; zone = false; }
     if(x >= end) break;
+    if(sc && x + 34 > sc.a && x < sc.b){ x = Math.round(sc.b); if(x >= end) break; }          // (where he comes down from the last cloud the street is kept empty)
     if(!zone && b2 && x >= b2At && x < end - 1100){          // the purple basket (2026-10-28, per Dan): it throws him up to a course of clouds, with coins on the way up, on the clouds and on the way down; the street beneath is empty
       var bd2 = EM_OB.basket2, bxc = x + bd2.w / 2, ci = 0, lastY = EM_SKY, tt;
       list.push({type: "basket2", wx: x, w: bd2.w, h: bd2.h, vx: 0, soft: true, dead: false}); b2 = false;
@@ -8966,8 +8967,8 @@ function emTrack(r){
       }
       var lc = e.clouds[e.clouds.length - 1], xe = lc.wx + lc.w;
       for(k = 1; k <= 6; k++){ tt = k * .14; if(lc.y - 180 * tt * tt < 12) break; coins.push({wx: xe + v * tt, cy: lc.y - 180 * tt * tt + 8, got: false}); }          // the way down
-      list[list.length - 1].skyEnd = xe + v + 70;
-      x = Math.round(xe + v * .85 + 70);
+      sc = {a: xe - 10, b: xe + v * .85 + 70};
+      x = Math.round(x + bd2.w + v * .45);          // and under the clouds the street goes on, with its things and coins, for the one who does not go up
       continue;
     }
     if(!zone && bi < bAt.length && x >= bAt[bi] && x < end - 230){          // a basket (outside a ride's stretch): and, up in the air where a jump from it reaches, a row of coins; then room to come down
@@ -8990,12 +8991,34 @@ function emTrack(r){
       list.push({type: type, wx: x, w: def.w, h: def.h, vx: def.vx || 0, dead: false});
       if(type === "cart") cartAt = x;
     }
-    x = Math.round(x + def.w + gapBase + Math.random() * cfg.gap * (zone ? 1.3 : 1) + (!zone && type !== "dog" && type !== "cart" && Math.random() < .75 ? 18 + v * .6 : 0));          // (some gaps are longer, with room for a pot hole)
+    var tail = x > len - e.W * 3;          // the last three screens are busier: shorter gaps, and none left long for a hole
+    x = Math.round(x + def.w + (tail ? gapBase * .85 + Math.random() * cfg.gap * .6 : gapBase + Math.random() * cfg.gap * (zone ? 1.3 : 1) + (!zone && type !== "dog" && type !== "cart" && Math.random() < .75 ? 18 + v * .6 : 0)));          // (some gaps are longer, with room for a pot hole)
   }
   // the coins (2026-10-28, per Dan): an arc over some of the things on the street; and in some of the long gaps a row of low coins (run through them), a row of high ones (jump for them), or, during a ride, a row at the height of the cart
   var carts = list.filter(function(o){ return o.type === "cart"; });
   function inRide(px){ return carts.some(function(c){ return px > c.wx + 26 && px < c.wx + 24 + ride - 30; }); }
   function add(wx, cy){ if(wx < len - 30) coins.push({wx: wx, cy: cy, got: false}); }
+  // no more than about a screen of empty road anywhere (2026-10-28, per Dan): between two things (a ride counts as a thing, and so do a basket's landing room and the place under the last cloud), and at the end, where he runs off
+  list.sort(function(a, b){ return a.wx - b.wx; });
+  var Gmax = Math.round(e.W * .9), simple = Object.keys(cfg.mix).filter(function(kk){ return kk !== "cart" && kk !== "dog" && kk !== "herd"; }), clr = Math.round(v * .7);
+  var spans = list.map(function(o){ return o.type === "cart" ? [o.wx - 6, o.wx + 24 + ride + 24] : o.type === "dog" ? [o.wx - 100, o.wx + o.w] : o.type === "basket" ? [o.wx - 6, o.wx + o.w + v * 1.1 + 30] : [o.wx - 4, o.wx + o.w + 4]; });
+  if(sc) spans.push([sc.a, sc.b]);
+  spans.push([0, e.PX + Math.round(e.W * .05)]); spans.push([len + Math.round(e.W * .62), len + 4000]);
+  spans.sort(function(a, b){ return a[0] - b[0]; });
+  var cover = spans[0][1];
+  for(i = 1; i < spans.length; i++){
+    if(spans[i][0] - cover > Gmax){
+      var fp = cover + clr + Math.random() * 20;
+      while(true){
+        var ft = simple[Math.floor(Math.random() * simple.length)], fd = EM_OB[ft];
+        if(fp + fd.w + clr > spans[i][0]) break;
+        list.push({type: ft, wx: Math.round(fp), w: fd.w, h: fd.h, vx: 0, dead: false});
+        fp += fd.w + gapBase + Math.random() * cfg.gap * .8;
+      }
+    }
+    cover = Math.max(cover, spans[i][1]);
+  }
+  list.sort(function(a, b){ return a.wx - b.wx; });
   var cm = [.4, .18, .25][r];          // (cm: fewer coins on the longer streets, so a whole game stays under 100)
   for(i = 0; i < list.length; i++){
     var o = list[i], nx = list[i + 1];
@@ -9012,6 +9035,7 @@ function emTrack(r){
   var holes = [], hw0 = EM_OB.hole.w;
   function addHole(hx){
     if(carts.some(function(c){ return hx + hw0 > c.wx - 10 && hx < c.wx + 24 + ride + 40; })) return false;
+    if(sc && hx + hw0 > sc.a - 24 && hx < sc.b + 12) return false;
     holes.push({type: "hole", wx: Math.round(hx), w: hw0, h: 0, vx: 0, dead: false});
     coins.forEach(function(c){ if(c.cy <= 10 && c.wx > hx - 8 && c.wx < hx + hw0 + 8) c.cy = 24; });
     return true;
@@ -9028,7 +9052,7 @@ function emTrack(r){
   var nS = [7, 6, 6][r], s0 = Math.round(e.W * 1.15) + 40, span = end - 60 - s0;          // and a few single coins, spread along the whole route (2026-10-28, per Dan): low, at a short jump's height, or (in a ride) at the cart's height
   for(i = 0; i < nS; i++){
     var sx0 = s0 + span * (i + .2 + Math.random() * .6) / nS;
-    var busy = holes.some(function(o){ return sx0 > o.wx - 14 && sx0 < o.wx + o.w + 14; }) || list.some(function(o){ return o.type === "basket2" ? (sx0 > o.wx - 30 && sx0 < o.skyEnd) : o.type === "basket" ? (sx0 > o.wx - 30 && sx0 < o.wx + o.w + v * 1.2 + 30) : (sx0 > o.wx - (o.type === "dog" ? 34 : 14) && sx0 < o.wx + o.w + 14); }) || coins.some(function(c){ return Math.abs(c.wx - sx0) < 20; });
+    var busy = holes.some(function(o){ return sx0 > o.wx - 14 && sx0 < o.wx + o.w + 14; }) || list.some(function(o){ return o.type === "basket2" ? (sx0 > o.wx - 30 && sx0 < o.wx + o.w + v * .5) : o.type === "basket" ? (sx0 > o.wx - 30 && sx0 < o.wx + o.w + v * 1.2 + 30) : (sx0 > o.wx - (o.type === "dog" ? 34 : 14) && sx0 < o.wx + o.w + 14); }) || coins.some(function(c){ return Math.abs(c.wx - sx0) < 20; });
     if(busy) continue;
     var rs = Math.random();
     coins.push({wx: sx0, cy: inRide(sx0) ? EM_CH + 27 : rs < .55 ? 7 : rs < .8 ? 20 : 28, got: false});
@@ -9235,7 +9259,7 @@ function emPaint(){
       x.drawImage(emCart(), PX - 14, GY - hh - 17);
       for(k = 0; k < 3; k++){ var lx = PX - 20 - ((Math.floor(e.t * 40) + k * 5) % 10); emR(x, "#FFFFFF", lx - 5, GY - hh - 7 - k * 4, lx, GY - hh - 7 - k * 4); }
     }
-    emPilgrim(x, PX - 6 + rx, GY - hh - (riding ? EM_CH : 0), !e.gnd ? 2 : (e.mode === "play" ? Math.floor(e.t * 10) % 2 : e.mode === "exit" ? Math.floor(e.t * 18) % 2 : 0));
+    emPilgrim(x, PX - 6 + rx, GY - hh - (riding ? EM_CH : 0), !e.gnd ? 2 : (e.mode === "play" ? Math.floor(e.t * e.speed / 5.6) % 2 : e.mode === "exit" ? Math.floor(e.t * 18) % 2 : 0));
   }
   e.parts.forEach(function(q){ x.fillStyle = q.c; x.fillRect(Math.round(q.x), Math.round(q.y), 2, 2); });
   x.restore();
@@ -10572,7 +10596,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-28 CE";
+var APP_BUILD = "2026-10-28 CF";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
