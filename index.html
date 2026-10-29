@@ -8986,14 +8986,30 @@ function emSetRound(r){          // a round starts: a new street, the pilgrim at
   e.PX = Math.round(e.W / 4); e.GY = e.H - 17; e.rideLen = Math.round(e.W * EM_RIDE_SCREENS);
   e.cam = 0; e.gnd = true; e.runX = 0; e.runT = 0; e.p = {h: 0, vy: 0, inv: 0, buf: 0}; e.ride = null; e.bump = null; e.junk = []; e.parts = []; e.bumps = null; e.hl = [];
   var lay = emLayoutFor(r);          // a street made by hand (2026-10-29, per Dan): the things where the level editor put them
-  if(lay){ e.rideLen = EM_LAYOUT_RIDE; e.obs = emFromLayout(lay); } else e.obs = emTrack(r);
+  e.rideLen = EM_LAYOUT_RIDE; e.obs = emFromLayout(lay);          // (never made at random: the player learns the street, 2026-10-29, per Dan)
   if(e.startDist) e.dist = e.startDist;          // (a test play from the middle of the street)
   e.L = emBuildLayers(cfg.theme);
 }
 var EM_LAYOUT_RIDE = Math.round(212 * EM_RIDE_SCREENS);          // (a hand made street has a ride of the same length on every phone)
-function emLayoutFor(r){
+function emLayoutFor(r){          // the street of a round: the one made with the level editor, or (until there is one) a fixed street, the same on every play and every phone
   var d = window.EM_LAYOUT_TEST || window.EM_LAYOUT_DATA, a = d && d.rounds && d.rounds[r];
-  return a && a.length ? a : null;
+  if(a && a.length) return a;
+  return EM_FIXED[r] || (EM_FIXED[r] = emGenItems(r, EM_SEEDS[r]));
+}
+var EM_FIXED = [], EM_SEEDS = [20261120, 20261121, 20261122];
+function emGenItems(r, seed){          // a street made by the game's own maker as a list of [type, x, y(, w)]: with a seed it is always the same one (without, a new one each time, for the editor's NEW RANDOM)
+  var saved = em, rnd = Math.random, cfg = EM_ROUNDS[r], items = [], s = seed;
+  if(seed) Math.random = function(){ s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; };
+  em = {W: ED_W, H: ED_GH, GY: ED_GH - 17, PX: Math.round(ED_W / 4), round: r, speed: cfg.speed, len: Math.round(cfg.speed * cfg.secs), rideLen: EM_LAYOUT_RIDE};
+  try{
+    var list = emTrack(r), e = em;
+    list.forEach(function(o){ items.push([o.type, Math.round(o.wx), 0]); });
+    e.clouds.forEach(function(c){ items.push(["cloud", Math.round(c.wx), Math.round(c.y), c.w]); });
+    e.cl.forEach(function(c){ items.push(["coin", Math.round(c.wx), Math.round(c.cy)]); });
+    e.hl.forEach(function(c){ items.push(["heart", Math.round(c.wx), Math.round(c.cy)]); });
+    list.forEach(function(o){ if(o.type === "cart") items.push(["bump", Math.round(o.wx + 12 + EM_LAYOUT_RIDE - 4), 0]); });          // (a cart carries him as far as the game's ride is long)
+  } finally { em = saved; Math.random = rnd; }
+  return items;
 }
 function emFromLayout(items){          // each item is [type, x, y] ([cloud, x, y, width]); y is the height above the street (for a coin, of its middle; for a cloud, of its top)
   var e = em, list = [], coins = [], hearts = [];
@@ -9391,7 +9407,7 @@ function emInterlude(){
 
 // Open the app with ?editor at the end of its address (or open "Emmaus Level Editor.html" in the same folder). It covers the whole window: every screen of a round side by side, with the things the pilgrim can
 // touch (sacks, stones, jars, sheep, dogs, carts, baskets, pot holes, clouds and coins) on a layer of their own, to drag about. SAVE writes emmaus_layout.js next to the app, which the game loads: a round
-// that is in it is played as it was made; a round that is not is made at random each time, as before. TEST PLAY plays the round on the screen, and goes back to the editor when it is left.
+// that is in it is played as it was made; a round that is not plays a fixed street (made by the game's own maker once, and the same every time), because nothing in this game is random: the player learns the street. TEST PLAY plays the round on the screen, and goes back to the editor when it is left.
 // Sizes are game pixels (1 pixel = 4 screen pixels in the game). x is the distance along the road, y the height above the street (of a coin's middle, of a cloud's top). A cart and a pot hole stay on the street.
 var ED_W = 212, ED_GY = 200, ED_H = 217, ED_GH = 97, ED_PAD = 4, ED_KEY = "fevidaEmmausEditor";          // (a screen is 212 pixels wide, the street 200 pixels up from the bottom of a tall picture; a phone shows the bottom ED_GH of it)
 var ED_TYPES = [
@@ -9422,18 +9438,8 @@ function edSel(){ return ed.rounds[ed.round].filter(function(it){ return ed.sel[
 // ---- the data: a round is a list of {t: type, x, y, w (clouds)}
 function edFromArr(a){ return a.map(function(r){ return {id: ++ed.nid, t: r[0], x: +r[1] || 0, y: +r[2] || 0, w: r[0] === "cloud" ? (+r[3] || 70) : undefined}; }); }
 function edToArr(it){ return it.t === "cloud" ? [it.t, Math.round(it.x), Math.round(it.y), Math.round(it.w)] : [it.t, Math.round(it.x), Math.round(it.y)]; }
-function edGenerate(r){          // a street made at random by the game's own maker, as a place to start
-  var saved = em, cfg = EM_ROUNDS[r], items = [];
-  em = {W: ED_W, H: ED_GH, GY: ED_GH - 17, PX: Math.round(ED_W / 4), round: r, speed: cfg.speed, len: Math.round(cfg.speed * cfg.secs), rideLen: EM_LAYOUT_RIDE};
-  try{
-    var list = emTrack(r), e = em;
-    list.forEach(function(o){ items.push([o.type, Math.round(o.wx), 0]); });
-    e.clouds.forEach(function(c){ items.push(["cloud", Math.round(c.wx), Math.round(c.y), c.w]); });
-    e.cl.forEach(function(c){ items.push(["coin", Math.round(c.wx), Math.round(c.cy)]); });
-    e.hl.forEach(function(c){ items.push(["heart", Math.round(c.wx), Math.round(c.cy)]); });
-    list.forEach(function(o){ if(o.type === "cart") items.push(["bump", Math.round(o.wx + 12 + EM_LAYOUT_RIDE - 4), 0]); });          // (a cart carries him as far as the game's ride is long)
-  } finally { em = saved; }
-  return edFromArr(items);
+function edGenerate(r, fresh){          // the street the game plays for a round that is not made by hand (always the same one), or, with fresh, a new random one to start from
+  return edFromArr(fresh ? emGenItems(r, 0) : emLayoutFor(r).map(function(it){ return it.slice(); }));
 }
 function edLayoutObj(forceRound){          // what is saved: the rounds that are in use (and the one that is being tested)
   return {version: 1, ride: EM_LAYOUT_RIDE, rounds: [0, 1, 2].map(function(r){
@@ -9442,7 +9448,7 @@ function edLayoutObj(forceRound){          // what is saved: the rounds that are
   })};
 }
 function edLayoutText(obj){
-  var out = "// The Road to Emmaus: the street of each round, made with the level editor (open the app with ?editor). A round that is null is made at random each time.\nwindow.EM_LAYOUT_DATA = {\n  \"version\": 1, \"ride\": " + obj.ride + ",\n  \"rounds\": [\n";
+  var out = "// The Road to Emmaus: the street of each round, made with the level editor (open the app with ?editor). A round that is null plays a fixed street, the same every time.\nwindow.EM_LAYOUT_DATA = {\n  \"version\": 1, \"ride\": " + obj.ride + ",\n  \"rounds\": [\n";
   out += obj.rounds.map(function(a){
     if(!a) return "    null";
     var lines = [], i; for(i = 0; i < a.length; i += 6) lines.push("      " + a.slice(i, i + 6).map(function(r){ return JSON.stringify(r); }).join(", "));
@@ -9595,7 +9601,7 @@ function edBuildDom(){
     '<div class="g">Snap <select id="edSnapSel"><option value="1">1 px</option><option value="2">2 px</option><option value="4">4 px</option><option value="8">8 px</option><option value="16">16 px</option></select></div>' +
     '<div class="g" id="edLayers"></div>' +
     '<div class="g"><button id="edUndoB" title="Ctrl+Z">Undo</button><button id="edRedoB" title="Ctrl+Y">Redo</button></div>' +
-    '<div class="g"><button id="edRoll" title="Throw the round away and make a new random one to start from">New random</button><button id="edRevert" title="Go back to what is in the saved file">Back to saved</button></div>' +
+    '<div class="g"><button id="edRoll" title="Throw the round away and make a new random street to start from">New random</button><button id="edRevert" title="Go back to what is in the saved file">Back to saved</button></div>' +
     '<div class="g"><button class="go" id="edTest">Test play</button><button class="go" id="edTestView" title="Start at the left edge of what you see">Test from here</button></div>' +
     '<div class="g"><button id="edSave" title="Ctrl+S">Save</button><button id="edLoad">Open file...</button><input type="file" id="edFile" accept=".js,.json" style="display:none"></div></div>' +
     '<div id="edMap"><canvas id="edMapCv"></canvas></div>' +
@@ -9616,7 +9622,7 @@ function edBuildDom(){
   edE("edZoom").onchange = function(){ var c = ed.scr.scrollLeft / ed.S; ed.S = +this.value; edRebuild(); ed.scr.scrollLeft = c * ed.S; };
   edE("edSnapSel").onchange = function(){ ed.snap = +this.value; };
   edE("edUndoB").onclick = function(){ edUndo(false); }; edE("edRedoB").onclick = function(){ edUndo(true); };
-  edE("edRoll").onclick = function(){ if(!confirm("Throw this round away and make a new random one to start from?")) return; edPush(); ed.rounds[ed.round] = edGenerate(ed.round); ed.use[ed.round] = true; ed.sel = {}; ed.dirty = true; edAutosave(); edBuildObjs(); edGuides(); edUi(); edMap(); };
+  edE("edRoll").onclick = function(){ if(!confirm("Throw this round away and make a new random one to start from?")) return; edPush(); ed.rounds[ed.round] = edGenerate(ed.round, true); ed.use[ed.round] = true; ed.sel = {}; ed.dirty = true; edAutosave(); edBuildObjs(); edGuides(); edUi(); edMap(); };
   edE("edRevert").onclick = function(){
     var d = window.EM_LAYOUT_DATA, a = d && d.rounds && d.rounds[ed.round];
     if(!confirm(a ? "Go back to this round as it is in the saved file?" : "This round is not in the saved file. Make it random again?")) return;
@@ -9778,11 +9784,11 @@ function edInfo(){
 }
 function edUi(){
   var r = ed.round, a = ed.rounds[r] || [], n = {obj: 0, coin: 0, cloud: 0, heart: 0}, tot = 0;
-  [0, 1, 2].forEach(function(q){ var b = edE("edTab" + q); b.className = q === r ? "on" : ""; b.textContent = "Round " + (q + 1) + (ed.use[q] ? "  (mine)" : "  (random)"); if(ed.rounds[q] && (ed.use[q] || q === r)) tot += ed.rounds[q].filter(function(it){ return it.t === "coin"; }).length; });
+  [0, 1, 2].forEach(function(q){ var b = edE("edTab" + q); b.className = q === r ? "on" : ""; b.textContent = "Round " + (q + 1) + (ed.use[q] ? "  (mine)" : "  (not yet mine)"); if(ed.rounds[q] && (ed.use[q] || q === r)) tot += ed.rounds[q].filter(function(it){ return it.t === "coin"; }).length; });
   a.forEach(function(it){ n[it.t === "heart" ? "heart" : edT(it.t).c]++; });
   edE("edUse").checked = !!ed.use[r];
   edE("edCount").innerHTML = 'Things on the street: <b>' + n.obj + '</b><br>Clouds: <b>' + n.cloud + '</b><br>Coins: <b>' + n.coin + '</b><br>Hearts: <b>' + n.heart + '</b><small>All the rounds you use or are looking at: ' + tot + ' coins (the counter stops at 99).</small>' +
-    '<small>' + (ed.use[r] ? 'The game plays this round as it is here (once it is saved).' : 'The game still makes this round at random each time. Move something, or tick the box, to use it.') + '</small>';
+    '<small>' + (ed.use[r] ? 'The game plays this round as it is here (once it is saved).' : 'This is a fixed street the game plays until this round is made here (it is the same every time, never random). Move something, or tick the box, to make it yours.') + '</small>';
   edE("edUndoB").disabled = !ed.undo[r].length; edE("edRedoB").disabled = !ed.redo[r].length;
   edInfo();
 }
@@ -9905,8 +9911,8 @@ function hglBurst(x, y, col){
   for(k = 0; k < 16; k++){ var a = Math.random() * 6.2832, sp = hgRand(14, 44); hgl.particles.push({x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 8, t: 0, life: hgRand(.45, .9), c: cols[k % cols.length]}); }
 }
 var HGL_IN = [0, 2, 4, 6];            // the colours that come: red and yellow bees, blue and purple butterflies (2026-10-27, per Dan)
-// Round 1 (2026-10-27, per Dan): the player must land 8 bees (4 red, 4 yellow) and 4 butterflies (2 blue, 2 purple). Two of one colour are never on the board together (a signal counts as being on it), and
-// after one has gone (landed, or flown off) the next of its colour waits a while: HGL_DELAYS[round] seconds, shorter with each round. One that flies off without landing has to come again.
+// Round 1 (2026-10-27, per Dan): the player must land 12 bees (6 red, 6 yellow) and 5 butterflies since 2026-10-29. Two of one colour are never on the board together (a signal counts as being on it): a spawn waits until its colours are
+// clear. A spawn follows the one before it HGL_DELAYS[round] seconds later, shorter with each round. One that is lost without landing (flown off, knocked off) comes again as the next spawn.
 // Each round: need = how many of each colour must land, bees / bfs = which colours are bees and which butterflies, speed = how fast everything flies compared with round 1,
 // signs = the colours of the bee and the butterfly on the two signs, layout = where the flowers are (see hglDrawLayout). Where each colour comes in is worked out from its flower (hglFarZone).
 // Round 2 (2026-10-27, per Dan): blue and purple funnel flowers (bees), red and yellow open flowers (butterflies); 16 bees and 8 butterflies; a little faster; from the top, bottom and right edges.
@@ -9929,13 +9935,25 @@ var HGL_LAYOUT3 = [
   {ci: 4, fx: 44.3, fy: 71.6},                                // blue open flower
   {ci: 6, fx: 88.8, fy: 43.9}                                 // purple open flower
 ];
+// (2026-10-29, per Dan) nb bees and nf butterflies in a round, in a fixed order: the bees come one after the other, in the two colours of the round in turn, and a butterfly comes together with every second bee (bee 2, 4, 6 ...)
+// until there are nf of them, also in its two colours in turn. Round 1: 12 bees, 5 butterflies (with bees 2 4 6 8 10); round 2: 16 and 7 (with 2 to 14); round 3: 22 and 9 (with 2 to 18).
 var HGL_ROUNDS = [
-  {need: {0: 4, 2: 4, 4: 2, 6: 2}, bees: [0, 2], bfs: [4, 6], speed: 1, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT1},
-  {need: {4: 8, 6: 8, 0: 4, 2: 4}, bees: [4, 6], bfs: [0, 2], speed: 1.2, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2, dfly: 2},
-  {need: {0: 12, 2: 12, 4: 6, 6: 6}, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3, dfly: 3, dfSpd: 1.12}
+  {nb: 12, nf: 5, bees: [0, 2], bfs: [4, 6], speed: 1, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT1},
+  {nb: 16, nf: 7, bees: [4, 6], bfs: [0, 2], speed: 1.2, signs: {bee: 4, bf: 0}, layout: HGL_LAYOUT2, dfly: 2},
+  {nb: 22, nf: 9, bees: [0, 2], bfs: [4, 6], speed: 1.4, signs: {bee: 2, bf: 4}, layout: HGL_LAYOUT3, dfly: 3, dfSpd: 1.12}
 ];
+HGL_ROUNDS.forEach(function(R){          // each round's list of spawns [{b: bee colour, f: butterfly colour or null}] and how many of each colour must land
+  var i, nfDone = 0; R.seq = []; R.need = {};
+  R.bees.concat(R.bfs).forEach(function(ci){ R.need[ci] = 0; });
+  for(i = 1; i <= R.nb; i++){
+    var ev = {b: R.bees[(i - 1) % 2], f: null};
+    R.need[ev.b]++;
+    if(i % 2 === 0 && nfDone < R.nf){ ev.f = R.bfs[nfDone % 2]; R.need[ev.f]++; nfDone++; }
+    R.seq.push(ev);
+  }
+});
 function hglColours(r){ return Object.keys(HGL_ROUNDS[r].need).map(Number); }
-var HGL_DELAYS = [2.5, 2, 1.5];
+var HGL_DELAYS = [3, 2.4, 1.8];          // the time between two spawns, in seconds: shorter with every round (2026-10-29, per Dan)
 var HGL_BF_SPEED = HGL_SPEED / 2, HGL_WARN_S = 1.4;     // butterflies fly half the speed of bees (2026-10-27, per Dan); a signal shows this long before the bee or butterfly comes in
 function hglIsBee(ci){ return HGL_ROUNDS[hgl.round].bees.indexOf(ci) !== -1; }
 // The play area is the wooden fence round the garden (2026-10-28, per Dan): the bees and butterflies come in at the fence, bounce off it, and never go over the scenery or near the edges of the screen (where the
@@ -9972,17 +9990,20 @@ function hglPlan(ci){
   hgl.plans.push({ci: ci, ex: ex, ey: ey, ux: ux, uy: uy, ix: ex + nx * 10.5, iy: ey + ny * 10.5, t: 0});
   return true;
 }
-// which colour comes next: one that still has to land, that is not on the board, and whose wait since the last of its colour has passed
-function hglPick(){
-  var d = HGL_DELAYS[Math.min(hgl.round, HGL_DELAYS.length - 1)];
-  var c = hglColours(hgl.round).filter(function(ci){
-    return hgl.need[ci] > 0 && !hgl.bees.some(function(b){ return b.ci === ci; }) && !hgl.plans.some(function(p){ return p.ci === ci; }) && hgl.t - hgl.lastGone[ci] >= d * (hglIsBee(ci) ? 1 : HGL_BF_WAIT);       // (butterflies wait twice as long as bees: there are half as many, so some are always about, 2026-10-28, per Dan)
-  });
-  return c.length ? c[Math.floor(Math.random() * c.length)] : null;
+// the next spawn in the round's fixed order (bee, and every second time a butterfly with it): it only comes when its colours are not on the board; true = it has been signalled
+function hglSpawnNext(){
+  var ev = hgl.seq[0];
+  if(!ev) return false;
+  function busy(ci){ return hgl.bees.some(function(b){ return b.ci === ci; }) || hgl.plans.some(function(p){ return p.ci === ci; }); }
+  if((ev.b !== null && busy(ev.b)) || (ev.f !== null && busy(ev.f))) return false;
+  if(ev.b !== null){ if(!hglPlan(ev.b)) return false; ev.b = null; }          // (if the butterfly cannot be placed yet, only it is left to come)
+  if(ev.f !== null && !hglPlan(ev.f)) return false;
+  hgl.seq.shift();
+  return true;
 }
 // the start of round r: what has to land, and nothing on the board
 function hglSetRound(r){
-  hgl.round = r; hgl.mode = "play"; hgl.interlude = null; hgl.need = {}; hgl.totalBy = {}; hgl.total = 0; hgl.landed = 0; hgl.landedBy = {0: 0, 2: 0, 4: 0, 6: 0};
+  hgl.round = r; hgl.mode = "play"; hgl.interlude = null; hgl.seq = HGL_ROUNDS[r].seq.map(function(ev){ return {b: ev.b, f: ev.f}; }); hgl.need = {}; hgl.totalBy = {}; hgl.total = 0; hgl.landed = 0; hgl.landedBy = {0: 0, 2: 0, 4: 0, 6: 0};
   hgl.lastGone = {0: -99, 2: -99, 4: -99, 6: -99}; hgl.nextSpawn = 1.2; hgl.dfly = null; hgl.dflyGone = null; hgl.dflyWait = HGL_DF_FIRST; hgl.bees = []; hgl.plans = []; hgl.particles = []; hgl.sel = null; hgl.drag = null;
   hglColours(r).forEach(function(ci){ hgl.need[ci] = HGL_ROUNDS[r].need[ci]; hgl.totalBy[ci] = hgl.need[ci]; hgl.total += hgl.need[ci]; });
   var info = hglDraw(hgl.bg, hgl.W, hgl.H, r); hgl.g = info.g; hgl.flowers = info.flowers;                  // the garden of this round
@@ -10003,7 +10024,7 @@ function hglEnter(p){
 }
 function hglHome(b, f){
   b.state = "home"; b.fl = f; b.path = null; b.t0 = hgl.t; b.nt = 0; b.tx = b.x; b.ty = b.y;
-  hgl.need[b.ci]--; hgl.landed++; hgl.landedBy[b.ci]++; hglCountPaint();
+  hgl.need[b.ci]--; hgl.landed++; hgl.landedBy[b.ci]++; b.won = true; hglCountPaint();
   if(hgl.drag && hgl.drag.bee === b) hgl.drag = null;
   hglBurst(f.x, f.y, HG_COLORS[b.ci]); pixSfxPlay("clCatch", false);
 }
@@ -10194,7 +10215,7 @@ function hglStep(dt){
   hgl.t += dt; hgl.flash = Math.max(0, hgl.flash - dt * 1.5);
   if(hgl.mode !== "play"){ hglDangerSfx(false); hgl.particles.forEach(function(p){ p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 40 * dt; }); hgl.particles = hgl.particles.filter(function(p){ return p.t < p.life; }); return; }
   hgl.nextSpawn -= dt;
-  if(hgl.mode === "play" && hgl.nextSpawn <= 0){ var pc = hglPick(); if(pc !== null && hglPlan(pc)) hgl.nextSpawn = HGL_GAP; else hgl.nextSpawn = .4; }
+  if(hgl.mode === "play" && hgl.nextSpawn <= 0){ if(hglSpawnNext()) hgl.nextSpawn = Math.max(HGL_GAP, HGL_DELAYS[Math.min(hgl.round, HGL_DELAYS.length - 1)]); else hgl.nextSpawn = .4; }
   hgl.plans.forEach(function(p){ p.t += dt; if(p.t >= HGL_WARN_S){ p.go = true; hglEnter(p); } });
   hgl.plans = hgl.plans.filter(function(p){ return !p.go; });
   hgl.bees.forEach(function(b){
@@ -10259,7 +10280,7 @@ function hglStep(dt){
     if(cx0 * cx0 + cy0 * cy0 < rr0 * rr0){ hglCrash(A, B); break; }
   }
   hglDangerCheck();
-  hgl.bees.forEach(function(b){ if(b.state === "done") hgl.lastGone[b.ci] = hgl.t; });
+  hgl.bees.forEach(function(b){ if(b.state === "done"){ hgl.lastGone[b.ci] = hgl.t; if(!b.won) hgl.seq.unshift(b.kind === "bee" ? {b: b.ci, f: null} : {b: null, f: b.ci}); } });          // (one that was lost without landing comes again, next)
   hgl.bees = hgl.bees.filter(function(b){ return b.state !== "done"; });
   // every one has landed: ROUND X COMPLETED! comes up on a screen of its own, as in the other games, but only once the last bee has finished buzzing and its sparkle has died away, and a beat after that
   // (2026-10-27, per Dan: the round ended before the last bee's sparkle showed)
@@ -11144,7 +11165,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-29 CQ";
+var APP_BUILD = "2026-10-29 CS";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
