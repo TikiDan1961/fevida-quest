@@ -8746,7 +8746,7 @@ var EM_THEMES = [
   {sky: ["#3F9BEA", "#BFE3FF"], mount: "#B7CBE8", snow: "#FFFFFF", hill1: "#9AD98A", hill2: "#78C46B", bldFar: "#F1E6C6", bld: ["#F4E7C4", "#DCCB9C", "#C2AE7E"], door: "#5A3A22", win: "#3B2A1E", road: "#E2C28A", road2: "#D3AE72", curb: "#B58A50",
     awn: ["#2FA64A", "#FFD23A"], lantern: false, cloud: "#FFFFFF", sun: ["#FFFBE0", .55, 68, 4]},
   {sky: ["#3B2A6B", "#F29A5B"], mount: "#7C5E9C", snow: "#F4C4AA", hill1: "#5E4A86", hill2: "#4B3A70", bldFar: "#9A7B8A", bld: ["#B8906A", "#97704E", "#7A5A3E"], door: "#2A1A12", win: "#FFD23A", road: "#B8905E", road2: "#A07A4C", curb: "#7A5A3E",
-    awn: ["#B04FD8", "#F6C84A"], lantern: true, cloud: "#E8A8A0", sun: ["#FFB040", .72, 30, 9]}
+    awn: ["#B04FD8", "#2FB5B0"], lantern: true, cloud: "#E8A8A0", sun: ["#FFB040", .72, 30, 9]}
 ];
 var em = null, emRaf = 0, emImgs = {}, emCartCv = {}, emCoinCache = {};
 
@@ -11193,7 +11193,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-29 CY";
+var APP_BUILD = "2026-10-30 CZ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
