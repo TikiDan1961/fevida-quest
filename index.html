@@ -278,6 +278,10 @@
   .emCoinBox img{width:24px;height:24px;image-rendering:pixelated;}
   .emCoinBox b{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.7rem;line-height:1;min-width:1.15em;color:#FFE45E;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B,0 3px 0 #1B1F3B;}
   .emHud .emTestBtn{flex:none;margin-left:18px;pointer-events:auto;background:#2f9e57;color:#fff;border:2px solid #fff;border-radius:6px;padding:4px 10px;font:bold 13px system-ui,Arial,sans-serif;cursor:pointer;opacity:.9;}      /* the temporary RESTART button (see EM_TEMP_RESTART) */
+  .emConfirm{position:absolute;left:0;right:0;top:0;bottom:0;z-index:12;display:flex;align-items:center;justify-content:center;background:rgba(14,16,48,.55);}
+  .emConfirm .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
+  .emConfirm .emConfirmBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
+  .emConfirm .emConfirmBtns .btn.pixBtn.pixBtnSm{width:auto;min-width:130px;margin:0;}
   .emPerfect{position:absolute;left:0;right:0;top:0;bottom:0;z-index:9;display:flex;align-items:center;justify-content:center;pointer-events:none;}
   .emPerfect .pixRoundDone{min-width:280px;text-align:center;}
   .emReady{position:absolute;left:0;right:0;top:30%;text-align:center;pointer-events:none;z-index:4;}
@@ -1319,7 +1323,7 @@ var T = {
     fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_shuffling:"SHUFFLING", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
-    emmausName:"The Road to Emmaus", em_perfect:"PERFECT!", em_perfectBody:"You found all the coins!", em_names:["Morning in the village", "Midday at the market", "Evening on the road"], em_hint:"Tap to jump. Land on a cart to ride it!",
+    emmausName:"The Road to Emmaus", em_perfect:"PERFECT!", em_perfectBody:"You found all the coins!", em_leaveTitle:"Leave the game?", em_leaveBody:"You will go back to the Main Menu.", em_keep:"KEEP PLAYING", em_leave:"LEAVE", em_names:["Morning in the village", "Midday at the market", "Evening on the road"], em_hint:"Tap to jump. Land on a cart to ride it!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
@@ -1474,7 +1478,7 @@ var T = {
     fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
-    em_perfect:"\u00a1PERFECTO!", em_perfectBody:"\u00a1Encontraste todas las monedas!", emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
+    em_leaveTitle:"\u00bfSalir del juego?", em_leaveBody:"Volver\u00e1s al Men\u00fa Principal.", em_keep:"SEGUIR JUGANDO", em_leave:"SALIR", em_perfect:"\u00a1PERFECTO!", em_perfectBody:"\u00a1Encontraste todas las monedas!", emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
@@ -1854,7 +1858,40 @@ function saveState(){
 
 var state = loadState();
 
-function go(screen){ state.screen = screen; saveState(); render(); }
+// A small event log (2026-10-30, per Dan's report of the PLEASE ROTATE YOUR PHONE screen coming up in the middle of the Road to Emmaus): every change of screen (and what called it), every resize / turn of the phone,
+// the page being hidden, shown or loaded again. It is kept in this tab (sessionStorage, the last 90 lines); Options > tap the "Build" line shows it.
+var DBG_KEY = "fevidaLog", dbgLast = "";
+function dbgLog(msg){
+  try{
+    if(msg === dbgLast) return; dbgLast = msg;
+    var a = JSON.parse(sessionStorage.getItem(DBG_KEY) || "[]"), d = new Date(), p = function(n){ return (n < 10 ? "0" : "") + n; };
+    a.push(p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) + " " + msg);
+    if(a.length > 90) a = a.slice(a.length - 90);
+    sessionStorage.setItem(DBG_KEY, JSON.stringify(a));
+  }catch(e){}
+}
+function dbgWho(){
+  try{ throw new Error(); }catch(e){
+    return String(e.stack || "").split("\n").map(function(l){ return l.replace(/\s+/g, " ").replace(/^ ?at /, "").replace(/@.*[\/]/, "@").replace(/\(.*[\/]/, "(").slice(0, 46); }).filter(function(l){ return l && !/^(Error|dbgWho|go)[ @(]/.test(l + " "); }).slice(0, 3).join(" < ");
+  }
+}
+function dbgView(){ return window.innerWidth + "x" + window.innerHeight + ((window.matchMedia && window.matchMedia("(orientation:portrait)").matches) ? " portrait" : " landscape"); }
+function dbgShow(){
+  var old = document.getElementById("dbgBox"); if(old){ old.parentNode.removeChild(old); return; }
+  var a = []; try{ a = JSON.parse(sessionStorage.getItem(DBG_KEY) || "[]"); }catch(e){}
+  var b = document.createElement("div"); b.id = "dbgBox";
+  b.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;z-index:100001;background:#101418;color:#9f9;font:11px/1.35 ui-monospace,Menlo,monospace;padding:10px;overflow:auto;white-space:pre-wrap;word-break:break-all;touch-action:pan-y;";
+  b.textContent = "EVENT LOG (newest first) - tap here to close\n" + a.slice().reverse().join("\n");
+  b.onclick = function(){ if(b.parentNode) b.parentNode.removeChild(b); };
+  document.body.appendChild(b);
+}
+window.addEventListener("resize", function(){ dbgLog("resize " + dbgView() + " screen:" + state.screen); });
+window.addEventListener("orientationchange", function(){ dbgLog("orientationchange " + dbgView() + " screen:" + state.screen); });
+document.addEventListener("visibilitychange", function(){ dbgLog("visibility " + document.visibilityState + " screen:" + state.screen); });
+window.addEventListener("pagehide", function(){ dbgLog("pagehide screen:" + state.screen); });
+window.addEventListener("pageshow", function(e){ dbgLog("pageshow persisted:" + e.persisted + " " + dbgView()); });
+window.addEventListener("error", function(e){ dbgLog("ERROR " + (e.message || "") + " @" + (e.lineno || "") + ":" + (e.colno || "")); });
+function go(screen){ dbgLog("go " + state.screen + " -> " + screen + " by " + dbgWho()); state.screen = screen; saveState(); render(); }
 
 function shuffle(arr){
   var a = arr.slice();
@@ -8996,8 +9033,12 @@ function emBurst(px, py, cols, n, sp){
 
 // ---- the game ----
 function initEmmaus(){ em = {round: 0, coins: 0, coinBase: 0, chances: EM_CHANCES, mode: "ready", W: 0, H: 0, L: null, obs: null, interlude: null, last: performance.now(), t: 0}; }
+function emAskLeave(){ if(!em || em.confirm) return; dbgLog("emmaus: X touched, asking to leave (mode " + em.mode + ", dist " + Math.round(em.dist) + ")"); em.confirm = true; render(); }          // the game stands still behind the question
+function emStay(){ if(!em) return; em.confirm = false; em.last = performance.now(); render(); }
+function emLeave(){ if(!em) return; em.confirm = false; emQuit(); }
 function emQuit(){ if(em && em.test && window.edBack){ edBack(); return; } em = null; go("mainMenu"); }
-function emSetRound(r){          // a round starts: a new street, the pilgrim at the start line, and "Tap anywhere to start!"
+function emSetRound(r){
+  dbgLog("emmaus round " + (r + 1) + " set up");          // a round starts: a new street, the pilgrim at the start line, and "Tap anywhere to start!"
   var e = em, cfg = EM_ROUNDS[r];
   e.round = r; e.speed = cfg.speed; e.len = Math.round(cfg.speed * cfg.secs); e.dist = 0; e.mode = "ready"; e.interlude = null; e.clearT = 0; e.flash = 0;
   e.PX = Math.round(e.W / 4); e.GY = e.H - 17; e.rideLen = Math.round(e.W * EM_RIDE_SCREENS);
@@ -9197,6 +9238,7 @@ function screenEmmaus(){
 var EM_TEMP_RESTART = true;          // TEMPORARY (2026-10-29, per Dan, for play testing): a RESTART button in the real game too, not only in a test play from the editor. Set false (or delete) before the event.
 function emOverlayHtml(){
   if(!em) return "";
+  if(em.confirm) return '<div class="emConfirm"><div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("em_leaveTitle") + '</div><p class="pixResBody">' + t("em_leaveBody") + '</p><div class="emConfirmBtns">' + pixBtnHtml(t("em_keep"), "emStay()") + pixBtnHtml(t("em_leave"), "emLeave()", true) + '</div></div></div>';
   if(em.interlude) return '<div class="hglRound">' + cloudsHtml() + pixRoundDoneHtml(em.interlude) + '</div>';
   if(em.mode === "perfect") return '<div class="emPerfect"><div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("em_perfect") + '</div><p class="pixResBody">' + t("em_perfectBody") + '</p></div></div>';          // every coin of the round found (2026-10-29, per Dan)
   if(em.mode === "over") return '<div class="hgOhNo">' + t("hg_noChances") + '</div><div class="hglAgain">' + pixBtnHtml(t("tryAgain"), "emRestart()") + '</div>';
@@ -9222,7 +9264,7 @@ var EM_PERFECT_MS = 2500;          // the PERFECT! window stays up this long (th
 function emJump(){ var p = em.p; if(em.gnd){ p.vy = EM_V0; pixSfxPlay("jlBounce", false); } else p.buf = .13; }          // the jump: sound_effect_14 (2026-10-28, per Dan)
           // a tap just before landing counts when the feet touch down
 function emDown(ev){
-  if(!em || (em.mode !== "ready" && em.mode !== "play")) return;
+  if(!em || em.confirm || (em.mode !== "ready" && em.mode !== "play")) return;
   if(ev && ev.preventDefault) ev.preventDefault();
   if(pixAudioStale) pixReviveOnTap();
   if(em.mode === "ready"){ em.mode = "play"; em.last = performance.now(); var rd = document.querySelector(".emReady"); if(rd && rd.parentNode) rd.parentNode.removeChild(rd); emJump(); return; }          // (the tap that starts a round is also a jump, 2026-10-28, per Dan)
@@ -9417,7 +9459,7 @@ function emLoop(now){
   if(state.screen !== "emmaus"){ emRaf = 0; return; }
   if(em){
     var dt = Math.min(.05, (now - em.last) / 1000); em.last = now;
-    if(!hglUpright() && em.L){ emStep(dt); emPaint(); }                    // (nothing moves while the phone is upright)
+    if(!hglUpright() && em.L){ if(!em.confirm) emStep(dt); emPaint(); }                    // (nothing moves while the phone is upright)
   }
   emRaf = requestAnimationFrame(emLoop);
 }
@@ -11193,7 +11235,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-30 CZ";
+var APP_BUILD = "2026-10-30 DA";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11206,7 +11248,7 @@ function screenOptions(){
       optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
       optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
-    '<div class="optBuild">Build ' + APP_BUILD + '</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -11314,7 +11356,7 @@ function exitMission(){
     case "fruitsSpirit": fsQuit(); break;
     case "jacobLadder": jlQuit(); break;
     case "hopeGardenIntro": case "hopeGarden": case "hopeGardenL": hgQuit(); break;
-    case "emmaus": emQuit(); break;
+    case "emmaus": if(em && !em.test) emAskLeave(); else emQuit(); break;          // (a finger on the X leaves at once, and in this game thumbs are always on the screen: it asks first, 2026-10-30, per Dan)
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -11520,6 +11562,7 @@ function render(){
 window.addEventListener("pagehide", saveState);
 window.addEventListener("visibilitychange", saveState);
 
+dbgLog("page loaded " + APP_BUILD + " " + dbgView() + " nav:" + (function(){ try{ return performance.getEntriesByType("navigation")[0].type; }catch(e){ return "?"; } })() + " screen:" + state.screen);
 render();
 // Kicked off at boot, not when Faith Match is opened (2026-09-29, per Dan —
 // the first tile tapped showed blank white until its image finished
