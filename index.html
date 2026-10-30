@@ -538,6 +538,7 @@
   @media (max-height:640px){ .pixMission .pixIntroTitle{font-size:1.75rem;margin-bottom:8px;} .pixMission .pixIntroMid{padding-top:0;} }
   .pixMission .pixIntroTopOnly{flex:none;display:flex;flex-direction:column;}
   .pixMission .pixIntroTopOnly > .pixIntroTitle{margin-top:0;}
+  .pixMission .pixTopFill{flex:1 1 0;min-height:calc(env(safe-area-inset-top,0px) + 58px);margin-top:calc(-1 * (env(safe-area-inset-top,0px) + 58px));}      /* (with the button's zone below, which reaches the bottom edge, it puts the title and window in the exact vertical middle of the screen: 2026-10-29, per Dan) */
   .pixMission .pixBtnZone{flex:1;min-height:56px;width:100%;margin-bottom:calc(-1 * (env(safe-area-inset-bottom,0px) + 22px));display:flex;align-items:center;justify-content:center;}      /* (reaches down to the very bottom of the screen, past the screen's own bottom padding, so the button is centred between the window and the bottom edge) */
   .pixMission.pixLower .pixBtnZone .btn.pixBtn.pixBtnSm{margin:0 auto;}
   @media (max-height:620px){ .pixIntroTopOnly > .pixIntroTitle{font-size:1.5rem;margin-bottom:6px;} .pixIntroTopOnly .pixPaper{padding:8px 10px;} .pixIntroTopOnly .pixGuideDesc{font-size:.9375rem;margin-bottom:7px;} .pixIntroTopOnly .pixGuide li{font-size:.8125rem;line-height:1.2;margin-bottom:5px;padding-left:17px;} }      /* (the smallest phones, 568 px tall: the Road to Emmaus instructions still need no scrolling) */
@@ -2957,9 +2958,9 @@ function screenMissionIntro(){
   if(!guide){ state.introMission = null; return screenMainMenu(); }
   var steps = guide.h.map(function(line){ return '<li>' + line + '</li>'; }).join("");
   var mission = MISSIONS.filter(function(m){ return m.id === id; })[0];
-  if(id === "emmaus") return pixShell('<div class="pixIntroTopOnly"><h2 class="pixMTitle pixIntroTitle">' + t(mission.nameKey) + '</h2>' +
+  if(id === "emmaus") return pixShell('<div class="pixTopFill"></div><div class="pixIntroTopOnly"><h2 class="pixMTitle pixIntroTitle">' + t(mission.nameKey) + '</h2>' +
     '<div class="pixPaper pixGuide"><p class="pixGuideDesc">' + guide.d + '</p><ul>' + steps + '</ul></div></div>' +
-    '<div class="pixBtnZone">' + pixBtnHtml(t("startMission"), "startMission(state.introMission)") + '</div>', "pixLower");          // (2026-10-29, per Dan: a short text that needs no scrolling, and the button halfway between the window and the bottom of the screen)
+    '<div class="pixBtnZone">' + pixBtnHtml(t("startMission"), "startMission(state.introMission)") + '</div>', "pixLower");          // (2026-10-29, per Dan: a short text that needs no scrolling, the title and window in the vertical middle of the screen, and the button halfway between the window and the bottom of the screen)
   return pixShell('<div class="pixIntroMid"><h2 class="pixMTitle pixIntroTitle">' + t(mission.nameKey) + '</h2>' +
     '<div class="pixPaper pixGuide"><p class="pixGuideDesc">' + guide.d + '</p><ul>' + steps + '</ul></div></div>' +
     pixBtnHtml(t("startMission"), "startMission(state.introMission)"), "pixLower");   // no MAIN MENU button: the red X closes it (2026-10-22, per Dan)
@@ -11177,7 +11178,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-29 CU";
+var APP_BUILD = "2026-10-29 CV";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
