@@ -277,6 +277,8 @@
   .emCoinBox{flex:none;display:flex;align-items:center;gap:5px;}
   .emCoinBox img{width:24px;height:24px;image-rendering:pixelated;}
   .emCoinBox b{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.7rem;line-height:1;min-width:1.15em;color:#FFE45E;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B,0 3px 0 #1B1F3B;}
+  .emPerfect{position:absolute;left:0;right:0;top:0;bottom:0;z-index:9;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .emPerfect .pixRoundDone{min-width:280px;text-align:center;}
   .emReady{position:absolute;left:0;right:0;top:30%;text-align:center;pointer-events:none;z-index:4;}
   .emReady .emRName{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:2rem;line-height:1.05;letter-spacing:.04em;color:#FFE45E;text-transform:uppercase;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B,0 3px 0 #1B1F3B;}
   .emReady .dpReady{position:static;margin-top:6px;}
@@ -1316,7 +1318,7 @@ var T = {
     fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_shuffling:"SHUFFLING", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
-    emmausName:"The Road to Emmaus", em_names:["Morning in the village", "Midday at the market", "Evening on the road"], em_hint:"Tap to jump. Land on a cart to ride it!",
+    emmausName:"The Road to Emmaus", em_perfect:"PERFECT!", em_perfectBody:"You found all the coins!", em_names:["Morning in the village", "Midday at the market", "Evening on the road"], em_hint:"Tap to jump. Land on a cart to ride it!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
@@ -1471,7 +1473,7 @@ var T = {
     fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
-    emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
+    em_perfect:"\u00a1PERFECTO!", em_perfectBody:"\u00a1Encontraste todas las monedas!", emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
@@ -9193,6 +9195,7 @@ function screenEmmaus(){
 function emOverlayHtml(){
   if(!em) return "";
   if(em.interlude) return '<div class="hglRound">' + cloudsHtml() + pixRoundDoneHtml(em.interlude) + '</div>';
+  if(em.mode === "perfect") return '<div class="emPerfect"><div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("em_perfect") + '</div><p class="pixResBody">' + t("em_perfectBody") + '</p></div></div>';          // every coin of the round found (2026-10-29, per Dan)
   if(em.mode === "over") return '<div class="hgOhNo">' + t("hg_noChances") + '</div><div class="hglAgain">' + pixBtnHtml(t("tryAgain"), "emRestart()") + '</div>';
   if(em.mode === "ready") return '<div class="emReady"><div class="emRName">' + t("em_names")[em.round] + '</div><div class="dpReady">' + t("dp_ready") + '</div>' + (em.round === 0 ? '<div class="emHint">' + t("em_hint") + '</div>' : '') + '</div>';
   return "";
@@ -9212,6 +9215,7 @@ function emFit(){
 }
 window.addEventListener("resize", function(){ if(state.screen === "emmaus"){ emFit(); emLoopStart(); } });
 window.addEventListener("orientationchange", function(){ setTimeout(function(){ if(state.screen === "emmaus"){ emFit(); emLoopStart(); } }, 250); });
+var EM_PERFECT_MS = 2500;          // the PERFECT! window stays up this long (the same time as a badge screen), then ROUND X COMPLETED!
 function emJump(){ var p = em.p; if(em.gnd){ p.vy = EM_V0; pixSfxPlay("jlBounce", false); } else p.buf = .13; }          // the jump: sound_effect_14 (2026-10-28, per Dan)
           // a tap just before landing counts when the feet touch down
 function emDown(ev){
@@ -9256,8 +9260,16 @@ function emStep(dt){
     if(e.dustT <= 0){ e.dustT = .04; e.parts.push({x: PX - 6 + e.runX, y: e.GY - 1, vx: -30 - Math.random() * 20, vy: -10 - Math.random() * 20, t: 0, life: .3, c: "#E2C28A"}); }
     if(e.runX > e.W - PX + 24){
       e.clearT += dt;
-      if(e.clearT >= .3){ e.mode = "round"; e.interlude = {n: e.round + 1, phase: "msg", award: false, final: e.round >= EM_ROUNDS.length - 1}; render(); }
+      if(e.clearT >= .3){
+        if(e.cl.length && e.cl.every(function(c){ return c.got; })){ e.mode = "perfect"; e.perfectT = 0; render(); }          // (every coin found: the PERFECT! window first, 2026-10-29, per Dan)
+        else { e.mode = "round"; e.interlude = {n: e.round + 1, phase: "msg", award: false, final: e.round >= EM_ROUNDS.length - 1}; render(); }
+      }
     }
+    return;
+  }
+  if(e.mode === "perfect"){
+    e.perfectT += dt;
+    if(e.perfectT * 1000 >= EM_PERFECT_MS){ e.mode = "round"; e.interlude = {n: e.round + 1, phase: "msg", award: false, final: e.round >= EM_ROUNDS.length - 1}; render(); }
     return;
   }
   if(e.mode !== "play") return;
@@ -11178,7 +11190,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-29 CV";
+var APP_BUILD = "2026-10-29 CW";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
