@@ -1983,7 +1983,8 @@ var PIX_SFX = {
   emBasket2:{url:"sounds/sfx_em_basket2.wav", gain:0.4},
   // The Road to Emmaus coins and hearts (2026-10-29, per Dan): Coin Pickup.wav and Heart Pickup.wav (8-Bit Sounds folder; made mono, the silence cut off, the coin's cut to 0.7 s, the heart's to 0.6 s)
   emCoin:{url:"sounds/sfx_em_coin.wav", gain:0.22},
-  emHeart:{url:"sounds/sfx_em_heart.wav", gain:0.25}
+  emHeart:{url:"sounds/sfx_em_heart.wav", gain:0.25},
+  emPerfect:{url:"sounds/sfx_em_perfect.wav", gain:0.3}          // the PERFECT! window (2026-10-29, per Dan): sound_effect_12 (8-Bit Sounds folder; made mono, the silence at both ends cut off, 1.5 s)
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -9261,7 +9262,7 @@ function emStep(dt){
     if(e.runX > e.W - PX + 24){
       e.clearT += dt;
       if(e.clearT >= .3){
-        if(e.cl.length && e.cl.every(function(c){ return c.got; })){ e.mode = "perfect"; e.perfectT = 0; render(); }          // (every coin found: the PERFECT! window first, 2026-10-29, per Dan)
+        if(e.cl.length && e.cl.every(function(c){ return c.got; })){ e.mode = "perfect"; e.perfectT = 0; render(); pixSfxPlay("emPerfect", false); }          // (every coin found: the PERFECT! window first, 2026-10-29, per Dan)
         else { e.mode = "round"; e.interlude = {n: e.round + 1, phase: "msg", award: false, final: e.round >= EM_ROUNDS.length - 1}; render(); }
       }
     }
@@ -11190,7 +11191,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-29 CW";
+var APP_BUILD = "2026-10-29 CX";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
