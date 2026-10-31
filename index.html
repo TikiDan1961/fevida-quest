@@ -280,8 +280,7 @@
   .emCoinBox b{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.7rem;line-height:1;min-width:1.15em;color:#FFE45E;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B,0 3px 0 #1B1F3B;}
   .emHud .emTestCol{position:relative;flex:none;margin-left:18px;}
   .emHud .emTestCol .emTestBtn{margin:0;}
-  .emHud .emTestCol .emNextBtn{position:absolute;left:0;right:0;top:calc(100% + 6px);}
-  .emHud .emTestBtn{flex:none;margin-left:18px;pointer-events:auto;background:#2f9e57;color:#fff;border:2px solid #fff;border-radius:6px;padding:4px 10px;font:bold 13px system-ui,Arial,sans-serif;cursor:pointer;opacity:.9;}      /* the temporary RESTART button (see EM_TEMP_RESTART) */
+  .emHud .emTestBtn{flex:none;margin-left:18px;pointer-events:auto;background:#2f9e57;color:#fff;border:2px solid #fff;border-radius:6px;padding:4px 10px;font:bold 13px system-ui,Arial,sans-serif;cursor:pointer;opacity:.9;}      /* the RESTART button of a test play from the level editor */
   .emConfirm{position:absolute;left:0;right:0;top:0;bottom:0;z-index:12;display:flex;align-items:center;justify-content:center;background:rgba(14,16,48,.55);}
   .emConfirm .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
   .emConfirm .emConfirmBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
@@ -9240,11 +9239,9 @@ function screenEmmaus(){
   if(!em) initEmmaus();
   return '<div class="screen hglScreen emScreen" id="emScreen" onpointerdown="emDown(event)" oncontextmenu="return false"><canvas class="hglCanvas" id="emCanvas" width="100" height="100"></canvas>' +
     '<div class="emHud"><div class="hgHearts" id="emHearts">' + chancesHeartsHtml(Math.max(0, em.chances), EM_CHANCES) + '</div><div class="hgRibbon">' + t("hg_level")(em.round + 1, EM_ROUNDS.length) + '</div><div class="emCoinBox"><img src="' + emCoinCv(0).toDataURL() + '" alt=""><b id="emCoins">' + emCoinTxt(em.coins) + '</b></div><div class="emProg"><div class="emProgFill" id="emProgFill"></div><i class="emFlag"></i></div>' +
-    ((em.test || EM_TEMP_RESTART) ? '<div class="emTestCol"><button class="emTestBtn" onpointerdown="event.stopPropagation()" onclick="emRestart()">RESTART</button>' + ((EM_TEMP_RESTART && !em.test && em.round < EM_ROUNDS.length - 1) ? '<button class="emTestBtn emNextBtn" onpointerdown="event.stopPropagation()" onclick="emNext()">NEXT</button>' : '') + '</div>' : '') +          // (a test play from the level editor: back to where it began, waiting for the tap; on the top row, to the right of the distance bar)
+    (em.test ? '<div class="emTestCol"><button class="emTestBtn" onpointerdown="event.stopPropagation()" onclick="emRestart()">RESTART</button></div>' : '') +          // (a test play from the level editor: back to where it began, waiting for the tap; on the top row, to the right of the distance bar)
     '</div>' + emOverlayHtml() + '</div>';
 }
-var EM_TEMP_RESTART = true;          // TEMPORARY (2026-10-29, per Dan, for play testing): a RESTART button in the real game too, not only in a test play from the editor, and (2026-10-30) a NEXT button under it that skips to the next round (rounds 1 and 2). Set false (or delete) before the event.
-function emNext(){ if(!em || em.round >= EM_ROUNDS.length - 1) return; dbgLog("emmaus: NEXT button, round " + (em.round + 1) + " -> " + (em.round + 2)); em.confirm = false; em.coinBase = em.coins; emSetRound(em.round + 1); render(); }
 function emOverlayHtml(){
   if(!em) return "";
   if(em.confirm) return '<div class="emConfirm"><div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("em_leaveTitle") + '</div><p class="pixResBody">' + t("em_leaveBody") + '</p><div class="emConfirmBtns">' + pixBtnHtml(t("em_keep"), "emStay()") + pixBtnHtml(t("em_leave"), "emLeave()", true) + '</div></div></div>';
@@ -11254,7 +11251,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-30 DD";
+var APP_BUILD = "2026-10-30 DE";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
