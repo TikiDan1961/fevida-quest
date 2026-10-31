@@ -241,6 +241,7 @@
   .rotatePhone::after{content:"";position:absolute;left:50%;bottom:4px;width:8px;height:3px;margin-left:-4px;background:#fff;}
   @keyframes rotateHint{0%,25%{transform:rotate(90deg);}60%,100%{transform:rotate(0deg);}}
   @media (orientation:landscape) and (max-height:500px) and (pointer:coarse){ body:not(.landscapeOK) .rotateMsg{display:flex;} }
+  body.awardRotate .rotateMsg{display:flex;}          /* after the Road to Emmaus badge screen: "rotate your phone back to portrait" (shown whatever the screen, until the phone is upright and the Main Menu comes) */
   /* Hope Garden on its side (stage 1, 2026-10-27, per Dan): the screen is as wide as the phone, with no side margins */
   body.hglMode #app{max-width:none;padding:0 env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px);overflow:hidden;}
   body.hglMode, body.hglMode #app, body.hglMode .hglScreen{overscroll-behavior:none;touch-action:none;}      /* no pull-down / bounce of the page while playing (the phone's own swipe-down from the top edge cannot be switched off by a web page) */
@@ -2963,18 +2964,21 @@ function grantMission(id, missionState){
 // "Mission Complete!" message and what was won, like the other result screens.
 // No RETURN TO MAIN MENU button (2026-10-23, per Dan): the screen shows for 2.5 seconds (it was 2) and the Main Menu comes by itself (see awardAutoReturn, which
 // render() calls).
-var AWARD_SHOW_MS = 2500, awardTimer = 0, awardTimerFor = null;      // (2.5 s since 2026-10-25, per Dan; it was 2 s)
+var AWARD_SHOW_MS = 2500, awardTimer = 0, awardTimerFor = null, awardRotateWait = false;      // (2.5 s since 2026-10-25, per Dan; it was 2 s)
 function awardAutoReturn(){
-  if(state.screen !== "award"){ clearTimeout(awardTimer); awardTimer = 0; return; }
+  if(state.screen !== "award"){ clearTimeout(awardTimer); awardTimer = 0; awardRotateWait = false; return; }
   if(awardTimer && awardTimerFor === state.awardMissionId) return;      // already counting for this badge (a redraw of the same screen does not restart it)
   clearTimeout(awardTimer); awardTimer = 0;                // (a different badge: it gets its own full time)
   awardTimerFor = state.awardMissionId;
-  var waited = 0;
   function leave(){
     awardTimer = 0;
-    if(state.screen !== "award" || state.awardMissionId !== awardTimerFor) return;
-    // The Road to Emmaus is played on its side and the Main Menu is upright: the badge stays up until the phone is turned (for 12 s at most), so the pilgrim's walk is not hidden by the "rotate your phone" message
-    if(state.awardMissionId === "emmaus" && !hglUpright() && waited < 12000){ waited += 300; awardTimer = setTimeout(leave, 300); return; }
+    if(state.screen !== "award" || state.awardMissionId !== awardTimerFor){ awardRotateWait = false; return; }
+    // The Road to Emmaus is played on its side and the Main Menu is upright: once the badge screen has had its time, a message asks the player to turn the phone back to portrait (2026-10-30, per Dan), and the Main Menu comes when it is turned
+    if(state.awardMissionId === "emmaus" && !hglUpright()){
+      if(!awardRotateWait){ awardRotateWait = true; rotateMsgUpdate(); }
+      awardTimer = setTimeout(leave, 300); return;
+    }
+    awardRotateWait = false;
     afterAward();
   }
   awardTimer = setTimeout(leave, AWARD_SHOW_MS);
@@ -11250,7 +11254,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-30 DC";
+var APP_BUILD = "2026-10-30 DD";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11381,9 +11385,16 @@ var LANDSCAPE_OK_SCREENS = ["hopeGardenL", "emmaus"];        // screens played o
 function rotateMsgUpdate(){
   document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || (state.screen === "award" && state.awardMissionId === "emmaus"));      // (the Mission Completed screen of The Road to Emmaus comes up with the phone still on its side)
   document.body.classList.toggle("hglMode", state.screen === "hopeGardenL" || state.screen === "emmaus");      // (the same full-width, no-bounce, rotate-me layout for both)
+  var back = awardRotateWait && state.screen === "award";           // the Road to Emmaus badge screen has had its time: "turn the phone back to portrait" (2026-10-30, per Dan)
+  document.body.classList.toggle("awardRotate", back);
   var tx = document.getElementById("rotateText"), sub = document.getElementById("rotateSub");
   if(!tx || !sub) return;
   var es = state.lang === "es", unset = !state.lang;
+  if(back){
+    tx.textContent = es ? "GIRA TU TELÉFONO A POSICIÓN VERTICAL" : "ROTATE YOUR PHONE BACK TO PORTRAIT";
+    sub.textContent = es ? "para volver al Menú Principal" : "to return to the Main Menu";
+    return;
+  }
   tx.textContent = es ? "POR FAVOR, GIRA TU TELÉFONO" : "PLEASE ROTATE YOUR PHONE";
   sub.textContent = unset ? "POR FAVOR, GIRA TU TELÉFONO" : "";             // before a language is chosen both are shown
 }
