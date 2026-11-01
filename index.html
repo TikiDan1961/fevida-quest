@@ -2050,7 +2050,7 @@ var PIX_SFX = {
   // 2026-10-31, per Dan. The Road to Emmaus: moving_cart.wav (2.35 s) loops while the pilgrim rides a cart on the street, running.wav (8.4 s) loops while he runs on the street, and neither plays while he is in the air or on a cloud
   // (see emMoveSfxWant); sound_effect_13 when the cart hits the block and throws him. Dove of Peace: bird_flap.wav, once for each tap that lifts the dove. All made mono; the loops keep their whole length (so their rhythm holds), the one-shots have the silence at the ends cut off.
   emCart:{url:"sounds/sfx_em_cart.wav", gain:0.9},                // peak 0.41
-  emRun:{url:"sounds/sfx_em_thump.wav", gain:0.9},                // soft thump loop for the pilgrim's footsteps, peak 0.55 (2026-11-01, replaces running.wav, per Dan)
+  emRun:{url:"sounds/sfx_em_thump.wav", gain:1.7},                // soft thump loop for the pilgrim's footsteps, peak 0.55, so 0.93 at this gain (2026-11-01, replaces running.wav, per Dan; louder the next day: the gain was 0.9)
   emCrash:{url:"sounds/sfx_em_crash.wav", gain:0.4},              // peak 0.56
   dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35}                // peak 0.99
 };
@@ -11115,6 +11115,7 @@ function pzDown(ev, id){
   pzDrag = {id:id, pointerId:ev.pointerId, el:el, x:0, y:0};
   el.style.transition = "none";
   el.classList.add("dragging");
+  pixSfxPlayHeld("wgPick", false);                                       // picking a piece up: the soft pick-up sound of Word Groups (2026-11-01, per Dan)
   document.getElementById("pzSvg").appendChild(el); // bring to the front
   pzMove(ev);
   window.addEventListener("pointermove", pzMove);
@@ -11162,6 +11163,7 @@ function pzUp(ev){
   } else {
     d.el.style.transition = "transform .2s ease";
     pzSetPos(d.el, piece.tx, piece.ty, piece.k);
+    pixSfxPlay("fmMiss", false);                                       // a piece dropped in the wrong place goes back to the tray: the Faith Match miss sound (2026-11-01, per Dan)
   }
 }
 
@@ -11367,7 +11369,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-01 DK";
+var APP_BUILD = "2026-11-01 DL";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
