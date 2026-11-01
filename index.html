@@ -1102,7 +1102,12 @@
   .pzOutline{fill:none;stroke:var(--gold);stroke-width:2.5;stroke-linejoin:round;pointer-events:none;}
   .pzPiece.dragging .pzOutline{stroke:#fff;}
   .pzSvg.solved .pzOutline{display:none;}
-  .pzFull{pointer-events:none;animation:pzFade .4s ease-out;}
+  .pzFull{pointer-events:none;}      /* no fade any more (2026-11-01, per Dan): it was laid over an emptied board, which showed as a dark frame */
+  .pzNoteBox{display:grid;}      /* the instruction and "Solved!" sit on top of each other: the box is as tall as the taller one, so nothing moves when it is solved (2026-11-01, per Dan) */
+  .pzNoteBox > .pixNote{grid-area:1 / 1;align-self:center;margin:0;}
+  .pzNoteBox > .pixNote.good,.pzNoteBox.solved > .pixNote{visibility:hidden;}
+  .pzNoteBox.solved > .pixNote.good{visibility:visible;}
+  .pixMission.pixLower > .pzNoteBox{margin:0 0 4px;}
   @keyframes pzFade{from{opacity:0;}to{opacity:1;}}
   .pzMsg{min-height:1.6em;text-align:center;font-weight:700;margin:2px 0;}
   .pzMsg.good{color:var(--good);font-size:1.2rem;}
@@ -11202,7 +11207,7 @@ function pzUp(ev){
     if(s.placed.length >= pzCtx.n){
       s.status = "solved"; saveState();
       pixSfxPlay("fmFanfare", false);                                  // a finished puzzle: sound_effect_3 (2026-10-26, per Dan), the fanfare Faith Match plays too
-      setTimeout(function(){ if(state.screen === "stainedGlass") render(); }, 250);
+      pzShowSolved(s);                                                 // (2026-11-01, per Dan) the screen is not drawn again any more: that cleared the board for a frame and moved the picture up a few pixels
     } else {
       saveState();
     }
@@ -11211,6 +11216,26 @@ function pzUp(ev){
     pzSetPos(d.el, piece.tx, piece.ty, piece.k);
     pixSfxPlay("fmMiss", false);                                       // a piece dropped in the wrong place goes back to the tray: the Faith Match miss sound (2026-11-01, per Dan)
   }
+}
+
+// The last piece is in (2026-11-01, per Dan: "after the puzzle is completed, the puzzle area goes black for a frame ... and then the puzzle is higher on the screen by a few pixels"). The screen used to be
+// drawn again with the finished look: the board was emptied (the whole picture then faded in over it, a dark frame) and the "Solved!" line, which is bigger than the instruction line, moved the picture
+// up. Now the finished look is put on the screen that is already there: the piece lines go (class "solved"), the whole picture is laid over the pieces with no fade, the "Solved!" line shows in the
+// place of the instruction (both sit in one box, so the box is always as tall as the taller one) and the last square of the row of squares turns gold. Nothing moves. The advance to the next level is
+// scheduled here too, as screenStainedGlass does when it is drawn in the solved state (a reload during the hold).
+function pzShowSolved(s){
+  var svg = document.getElementById("pzSvg"); if(!svg || !s) return;
+  var img = s.imgs[s.round];
+  var full = document.createElementNS("http://www.w3.org/2000/svg", "image");
+  full.setAttribute("class", "pzFull" + (img.indexOf("tiles/puzzle/") === 0 ? " smooth" : ""));
+  full.setAttribute("href", img); full.setAttribute("x", "0"); full.setAttribute("y", "0");
+  full.setAttribute("width", PZ_W); full.setAttribute("height", PZ_W); full.setAttribute("preserveAspectRatio", "none");
+  svg.appendChild(full);
+  var gone = svg.querySelectorAll(".pzPiece"); for(var gi = 0; gi < gone.length; gi++) gone[gi].style.display = "none";      // the pieces are covered by the whole picture; the last one is still sliding into its place and must not show beyond the frame
+  svg.classList.add("solved");
+  var box = document.querySelector(".pzNoteBox"); if(box) box.classList.add("solved");
+  var pips = document.querySelectorAll(".pixPips .pixPip"); if(pips[s.round]) pips[s.round].className = "pixPip done";
+  if(!pzAdvancing){ pzAdvancing = true; setTimeout(function(){ pixAfterSfx("fmFanfare", pzAdvance); }, PZ_SOLVED_MS); }
 }
 
 // Makes the picture frame and the tray of pieces fit on the screen (2026-10-22, per Dan: the tray used to hang off the bottom). Called after every
@@ -11317,7 +11342,7 @@ function screenStainedGlass(){
   return pixShell('<h2 class="pixMTitle">' + t("stainedGlassName") + '</h2>' +
     pixPipsHtml(PZ_LEVELS.length, s.round, solved ? "done" : "now", t("pz_round")(s.round+1, PZ_LEVELS.length)) +
     '<div class="pixNote">' + t("pz_round")(s.round+1, PZ_LEVELS.length) + ' &nbsp;|&nbsp; <span id="pzProgress">' + t("pz_pieces")(solved ? g.n : s.placed.length, g.n) + '</span></div>' +
-    (solved ? '<div class="pixNote good">' + t("pz_solved") + '</div>' : '<div class="pixNote">' + t("pz_intro") + '</div>') +
+    '<div class="pzNoteBox' + (solved ? ' solved' : '') + '"><div class="pixNote">' + t("pz_intro") + '</div><div class="pixNote good">' + t("pz_solved") + '</div></div>' +
     svg +
     '<div class="spacer"></div>');
 }
@@ -11415,7 +11440,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-01 DN";
+var APP_BUILD = "2026-11-01 DO";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
