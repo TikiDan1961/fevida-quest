@@ -2140,7 +2140,7 @@ function pixAfterSfx(name, fn, early){
 }
 
 // Plays a sound once. exclusive = true stops the previous answer/level sound first, so they never pile up. Returns true if it started.
-function pixSfxPlay(name, exclusive){
+function pixSfxPlayNow(name, exclusive){      // (pixSfxPlay, below the revive code, holds the sound first while a finger is down and the engine is not trusted)
   var ctx = pixCtx(); if(!ctx) return false;
   var buf = pixSfxBuf[name];
   if(!buf){ pixSfxDecode(name, function(){ pixSfxPlay(name, exclusive); }); return false; }
@@ -2259,9 +2259,20 @@ setInterval(function(){ var now = Date.now(), gap = now - pixAudioBeat; pixAudio
 // screens that act on the finger going down call this with no event; for those it only tries to wake the engine and leaves the engine marked as it was, so
 // the end of the same touch still replaces it. (Before, such a call used up the mark with an engine that could not start, and the sound stayed dead:
 // 2026-10-23, per Dan, no sound after the phone woke from sleep.)
+// A dead engine that still says "running" (2026-11-01, per Dan: the sounds took a few moves to come back after another app): at the end of a touch, an engine that reports running but whose clock has barely
+// moved since the end of the last touch is dead, and is marked as not trusted so that this very touch replaces it. (The events that mark it after sleep or switching apps can be missed.)
+var pixClockChk = null;
+function pixClockStuck(){
+  var c = pixAudioCtx; if(!c) return false;
+  var now = performance.now(), ct = c.currentTime, prev = pixClockChk, stuck = false;
+  if(prev && prev.c === c && c.state === "running" && now - prev.t > 600 && (ct - prev.ct) * 1000 < (now - prev.t) * .25) stuck = true;
+  pixClockChk = {c: c, t: now, ct: ct};
+  return stuck;
+}
 function pixReviveOnTap(ev){
   if(!pixAudioCtx) return;
   var endOfTouch = !!(ev && !pixTapSynth && (ev.type === "touchend" || ev.type === "pointerup" || ev.type === "click"));     // a click made by the tap-on-touch code below is not the end of a touch
+  if(endOfTouch && !pixAudioStale && pixClockStuck()){ dbgLog("audio: engine says " + pixAudioCtx.state + " but its clock is stuck, replacing it (screen " + state.screen + ")"); pixAudioStale = true; }
   var interrupted = pixAudioCtx.state === "interrupted";
   if(!endOfTouch || (!pixAudioStale && !interrupted)){
     // a healthy engine that has been put to sleep (suspended) is woken by any tap, including taps on things that make their own sound
@@ -2278,9 +2289,29 @@ function pixReviveOnTap(ev){
 // new engine, which is made when the finger lifts, and plays then; if that does not happen within 0.7 s it plays anyway. (2026-10-25, per Dan)
 var pixReviveQueue = [];
 function pixSfxPlayHeld(name, exclusive){
-  if(!pixAudioStale){ pixSfxPlay(name, exclusive); return; }
-  var done = false, job = function(){ if(done) return; done = true; pixSfxPlay(name, exclusive); };
+  if(!pixAudioStale){ pixSfxPlayNow(name, exclusive); return; }
+  pixHoldForEngine(function(){ pixSfxPlayNow(name, exclusive); });
+}
+// ---- every sound made while a finger is down waits for the new engine (2026-11-01, per Dan: after leaving for another app, the sounds took a few moves to come back) ----
+// A new sound engine can only start when the finger LIFTS, but most games make their sounds when the finger goes down or moves (the answer in Faith Flash, the swap in Fruits of the Spirit, a swipe over
+// letters, a flap of the dove...). While the engine is not trusted, a sound made with a finger on the screen is therefore kept until the finger lifts and the new engine is made (0.7 s at the most), then
+// played. A sound made with no finger down (a timer, an animation) plays at once, as before. pixHeldRun stops a held sound from being held again when it is let go after the 0.7 s.
+var pixFingers = {}, pixHeldRun = false;
+document.addEventListener("pointerdown", function(e){ pixFingers[e.pointerId] = performance.now(); }, true);
+function pixFingerUp(e){ delete pixFingers[e.pointerId]; }
+document.addEventListener("pointerup", pixFingerUp, true);
+document.addEventListener("pointercancel", pixFingerUp, true);
+document.addEventListener("touchend", function(e){ if(!e.touches || !e.touches.length) pixFingers = {}; }, true);
+document.addEventListener("touchcancel", function(){ pixFingers = {}; }, true);
+function pixFingerDown(){ var now = performance.now(); for(var k in pixFingers){ if(now - pixFingers[k] < 3000) return true; } return false; }      // (a finger held for more than 3 s counts as lifted: a lift can get lost)
+function pixShouldHold(){ return pixAudioStale && !pixHeldRun && pixFingerDown(); }
+function pixHoldForEngine(fn){
+  var done = false, job = function(){ if(done) return; done = true; pixHeldRun = true; try { fn(); } finally { pixHeldRun = false; } };
   pixReviveQueue.push(job); setTimeout(job, 700);
+}
+function pixSfxPlay(name, exclusive){
+  if(pixShouldHold()){ pixHoldForEngine(function(){ pixSfxPlayNow(name, exclusive); }); return false; }
+  return pixSfxPlayNow(name, exclusive);
 }
 // A fix for "no sounds after the phone slept" in Faith Flash (2026-10-25, per Dan). An answer there counts the moment the finger TOUCHES it, and the screen is drawn again at once, so the button the
 // finger is on is thrown away before the finger lifts. The touchend / pointerup of that touch are then sent to a button that is no longer on the page, and an event for a thrown-away element never
@@ -3789,7 +3820,7 @@ var FL_LEVEL_HYMN = [0, 1, 2, 3, 4, 5, 6, 4];
 // cents apart so that it shimmers, and two overtones that die away quickly
 function pixChime(freq){
   try {
-    if(pixAudioStale) pixReviveOnTap();
+    if(pixShouldHold()){ pixHoldForEngine(function(){ pixChime(freq); }); return; }       // a finger is down and the engine is not trusted: wait for the new engine (see pixHoldForEngine)
     var ctx = pixCtx(); if(!ctx) return;
     if(ctx.state !== "running" && ctx.resume) ctx.resume();
     var now = ctx.currentTime, f = freq * 4;                                   // two octaves up
@@ -3808,7 +3839,7 @@ function pixChime(freq){
 }
 function flPlayTone(tileIdx, ms){
   try {
-    if(pixAudioStale) pixReviveOnTap();          // first tap after coming back from another app: wake the sound engine before the note
+    if(pixShouldHold()){ pixHoldForEngine(function(){ flPlayTone(tileIdx, ms); }); return; }       // first tap after coming back from another app: the note waits for the new engine (see pixHoldForEngine)
     var ctx = pixCtx(); if(!ctx) return;
     if(ctx.state !== "running" && ctx.resume) ctx.resume();
     var fs = state.session.followLight, hymn = fs ? FL_HYMNS[FL_LEVEL_HYMN[(fs.level || 0) % FL_LEVEL_HYMN.length]] : null;
@@ -3914,6 +3945,7 @@ function flInterlude(){
 // gesture) and reused rather than rebuilt on every wrong tap.
 function flPlayFailSound(){
   try {
+    if(pixShouldHold()){ pixHoldForEngine(flPlayFailSound); return; }
     var ctx = pixCtx(); if(!ctx) return;
     if(ctx.state !== "running" && ctx.resume) ctx.resume();
     var osc = ctx.createOscillator(), gain = ctx.createGain();
@@ -7539,7 +7571,21 @@ function fsHint(){
   fsPaintHintBtn(s);
   pixSfxPlay("clCatch", false);                                             // a hint is used: sound_effect_1 (2026-10-25, per Dan)
 }
+// (2026-11-01, per Dan: after leaving for another app, it took a few moves for the sounds to come back.) A swipe makes its swap while the finger is still moving, but a phone only lets a new
+// sound engine start when the finger LIFTS, so every sound of that first swipe went into the dead engine. While the engine is not trusted, the swap now waits for the new engine (made when the
+// finger lifts; 0.7 s at the most) and then plays with its sounds, as pixSfxPlayHeld does for a single sound.
 function fsSwap(a, b){
+  var s = state.session.fruitsSpirit;
+  if(!s || s.busy || s.interlude || s.status !== "playing") return;
+  if(pixAudioStale){
+    s.busy = true;
+    var went = false, go2 = function(){ if(went) return; went = true; if(!fsAlive(s)) return; s.busy = false; fsSwapNow(a, b); };
+    pixReviveQueue.push(go2); setTimeout(go2, 700);
+    return;
+  }
+  fsSwapNow(a, b);
+}
+function fsSwapNow(a, b){
   var s = state.session.fruitsSpirit;
   if(!s || s.busy || s.interlude || s.status !== "playing") return;
   if(s.sel !== -1 && fsEls[s.sel]) fsEls[s.sel].classList.remove("sel");
@@ -11369,7 +11415,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-01 DL";
+var APP_BUILD = "2026-11-01 DN";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
