@@ -1211,10 +1211,11 @@ var T = {
     welcomeBody:"Complete faith-filled missions around the booth to earn digital badges. Finish any five of them to unlock your Golden Ticket for a chance at swag prizes. Ready?",
     startQuest:"START YOUR QUEST", changeLanguage:"CHANGE LANGUAGE",
     // the window that explains the game, on the first Main Menu (2026-10-31, per Dan)
-    howTitle:"How It Works", howIntro:"A pilgrim needs help getting to church, and you can help him!",
-    howMissions:function(need, n){ return "Complete any " + need + " of the " + n + " missions. Each mission earns you 100 points."; },
-    howTicket:function(pts){ return "At " + pts + " points you win a Golden Ticket! Take it to the Fe y Vida booth (#301) to earn a special prize."; },
-    howHope:"You can also play Anamaria’s Hope Garden, and visit Anamaria in person at the Unfinished booth (#400).", howGo:"LET’S GO!",
+    howTitle:"How It Works", howIntro:"Uh-oh! A pilgrim is trying to get to church, and he can’t make it without you. Ready to be his hero?",
+    howMissions:function(need, n){ return "Dive into the Missions folder and conquer any " + need + " of the " + n + " missions. Pick your favorites, play them in any order, and have fun!"; },
+    howPoints:"Every mission you finish scores 100 points and a shiny badge for your Passport. Watch the bar at the top fill up!",
+    howTicket:function(pts){ return "Hit " + pts + " points and you win a Golden Ticket! Tap it and show your screen to the crew at the Fe y Vida booth (#301) for a special prize!"; },
+    howHope:"Bonus fun: play Anamaria’s Hope Garden, then come meet Anamaria in person at the Unfinished booth (#400)!", howGo:"LET’S GO!",
     mainMenu:"MAIN MENU", returnToMenu:"RETURN TO MENU", returnToMainMenu:"RETURN TO MAIN MENU",
     exitMenu:"← MENU",
     questPoints:"Quest Points",
@@ -1372,10 +1373,11 @@ var T = {
     welcomeTitle:"¡Bienvenido a Fe y Vida Quest!",
     welcomeBody:"Completa misiones llenas de fe en el stand para ganar insignias digitales. Termina cinco de ellas para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
     startQuest:"COMIENZA TU AVENTURA", changeLanguage:"CAMBIAR IDIOMA",
-    howTitle:"¿Cómo se juega?", howIntro:"Un peregrino necesita ayuda para llegar a la iglesia, ¡y tú puedes ayudarlo!",
-    howMissions:function(need, n){ return "Completa " + need + " de las " + n + " misiones, las que quieras. Cada misión te da 100 puntos."; },
-    howTicket:function(pts){ return "Con " + pts + " puntos ganas un Boleto Dorado. Llévalo al stand de Fe y Vida (#301) para ganar un premio especial."; },
-    howHope:"También puedes jugar el Jardín de la Esperanza de Anamaria y visitarla en persona en el stand de Unfinished (#400).", howGo:"¡VAMOS!",
+    howTitle:"¿Cómo se juega?", howIntro:"¡Ay, no! Un peregrino quiere llegar a la iglesia y no puede lograrlo sin ti. ¿Te animas a ser su héroe?",
+    howMissions:function(need, n){ return "Abre la carpeta de Misiones y conquista " + need + " de las " + n + " misiones. Escoge tus favoritas, juégalas en el orden que quieras y ¡diviértete!"; },
+    howPoints:"¡Cada misión que termines te da 100 puntos y una insignia brillante para tu Pasaporte! Mira cómo se llena la barra de arriba.",
+    howTicket:function(pts){ return "¡Llega a " + pts + " puntos y ganas un Boleto Dorado! Tócalo y muestra tu pantalla al equipo del stand de Fe y Vida (#301) para ganar un premio especial."; },
+    howHope:"¡Diversión extra: juega el Jardín de la Esperanza de Anamaria y ven a conocerla en persona al stand de Unfinished (#400)!", howGo:"¡VAMOS!",
     mainMenu:"MENÚ PRINCIPAL", returnToMenu:"VOLVER AL MENÚ", returnToMainMenu:"VOLVER AL MENÚ PRINCIPAL",
     exitMenu:"← MENÚ",
     questPoints:"Puntos de Aventura",
@@ -2922,7 +2924,7 @@ function goBackToWelcome(){ go("welcome"); }
 function howHtml(inFolderCount){
   if(state.howSeen) return "";
   return '<div class="howOverlay"><div class="pixPaper pixGuide howPaper"><div class="pixResTitle howTitle">' + t("howTitle") + '</div>' +
-    '<p class="pixGuideDesc">' + t("howIntro") + '</p><ul><li>' + t("howMissions")(GOLDEN_TICKET_MISSIONS_NEEDED, inFolderCount) + '</li><li>' + t("howTicket")(GOLDEN_TICKET_POINTS) + '</li><li>' + t("howHope") + '</li></ul>' +
+    '<p class="pixGuideDesc">' + t("howIntro") + '</p><ul><li>' + t("howMissions")(GOLDEN_TICKET_MISSIONS_NEEDED, inFolderCount) + '</li><li>' + t("howPoints") + '</li><li>' + t("howTicket")(GOLDEN_TICKET_POINTS) + '</li><li>' + t("howHope") + '</li></ul>' +
     '<div class="howBtn">' + pixBtnHtml(t("howGo"), "howClose()") + '</div></div></div>';
 }
 function howClose(){ state.howSeen = true; saveState(); render(); }
@@ -11311,7 +11313,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-31 DG";
+var APP_BUILD = "2026-11-01 DI";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
