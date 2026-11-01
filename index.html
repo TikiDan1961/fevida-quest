@@ -9637,6 +9637,19 @@ function emMoveSfxSet(name){
     src.start(); emMoveSrc = src; emMoveName = name; emMoveCtx = ctx;
   } catch(e){}
 }
+// The feet speed up with the pilgrim as he runs off the screen at the end of a round (2026-11-01, per Dan): he runs at 1.4 times the speed of the road and then faster every moment (see emStep), so the
+// footsteps play at that many times their speed too (the sound's pitch rises with it), up to EM_RUN_RATE_MAX so that it stays a footstep. Everywhere else the rate is 1.
+var EM_RUN_RATE_MAX = 2.6;
+function emRunRate(){
+  var e = em;
+  if(e && e.mode === "exit" && e.speed > 0) return Math.min(EM_RUN_RATE_MAX, 1.4 + 300 * e.runT / e.speed);
+  return 1;
+}
+function emMoveSfxRate(){
+  if(!emMoveSrc || emMoveName !== "emRun") return;
+  var r = emRunRate();
+  try { if(Math.abs(emMoveSrc.playbackRate.value - r) > .001) emMoveSrc.playbackRate.value = r; } catch(e){}
+}
 document.addEventListener("visibilitychange", function(){ if(document.hidden) emMoveSfxSet(""); });
 function emLoop(now){
   if(state.screen !== "emmaus"){ emRaf = 0; emMoveSfxSet(""); return; }
@@ -9645,6 +9658,7 @@ function emLoop(now){
     if(!hglUpright() && em.L){ if(!em.confirm) emStep(dt); emPaint(); }                    // (nothing moves while the phone is upright)
   }
   emMoveSfxSet(emMoveSfxWant());
+  emMoveSfxRate();
   emRaf = requestAnimationFrame(emLoop);
 }
 function emLoopStart(){ if(em) em.last = performance.now(); if(emRaf) return; emRaf = requestAnimationFrame(emLoop); }
@@ -11440,7 +11454,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-01 DO";
+var APP_BUILD = "2026-11-01 DP";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
