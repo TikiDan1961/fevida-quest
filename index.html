@@ -139,7 +139,8 @@
   .cwPilgrim{position:absolute;aspect-ratio:11/15;}
   .cwSprite{width:100%;height:100%;background:url("tiles/pilgrim_back.png") 0 0 / 200% 100% no-repeat;image-rendering:pixelated;animation:pilgrimBreath 1.8s steps(1) infinite;}
   .cwPilgrim.walking .cwSprite{animation:pilgrimStep .5s steps(1) infinite,pilgrimBob .5s steps(1) infinite;}
-  .cwTicket{position:absolute;display:none;image-rendering:auto;}      /* the ticket is a smooth 640 x 640 picture (tiles/golden_ticket.png), no longer the 48 x 48 pixel icon (2026-10-25, per Dan) */
+  .cwTicket{position:absolute;display:none;image-rendering:auto;}      /* the ticket is a smooth picture (tiles/golden_ticket.png, 1100 x 700 with GOLDEN TICKET on it since 2026-11-01), no longer the 48 x 48 pixel icon (2026-10-25, per Dan) */
+  .cwConfetti{position:fixed;left:0;top:0;width:100%;height:100%;z-index:60;pointer-events:none;}
   .cwTicket.show{display:block;animation:cwTicketPop .45s ease-out 1,cwTicketGlow 1s ease-in-out .45s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,230,120,.95));}
   @keyframes cwTicketPop{0%{transform:scale(0);opacity:0;}65%{transform:scale(1.18);opacity:1;}100%{transform:scale(1);opacity:1;}}
   @keyframes cwTicketGlow{0%{filter:drop-shadow(0 0 5px rgba(255,230,120,.8));}100%{filter:drop-shadow(0 0 16px rgba(255,240,150,1));}}
@@ -346,6 +347,7 @@
     background:rgba(10,20,70,.55);animation:folderFade .2s ease-out;}
   @keyframes folderFade{from{opacity:0;}to{opacity:1;}}
   .pixHome.pixSky > .howOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:31;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(10,20,70,.6);animation:folderFade .2s ease-out;}      /* (2026-10-31, per Dan) the window that explains the game, on the first Main Menu */
+  .pixMenu.howOpen .pilgrim,.pixMenu.howOpen .pixPet,.pixMenu.howOpen .pilgrimBubble{visibility:hidden;}      /* the pilgrim and the pets are not started until the window is closed (2026-11-01, per Dan) */
   .howPaper{width:100%;max-width:400px;max-height:100%;overflow-y:auto;box-sizing:border-box;animation:folderPop .24s ease-out;}
   .howPaper .howTitle{text-align:center;font-size:1.75rem;margin-bottom:8px;}
   .howPaper .pixGuideDesc{font-size:1.0625rem;}
@@ -2048,7 +2050,7 @@ var PIX_SFX = {
   // 2026-10-31, per Dan. The Road to Emmaus: moving_cart.wav (2.35 s) loops while the pilgrim rides a cart on the street, running.wav (8.4 s) loops while he runs on the street, and neither plays while he is in the air or on a cloud
   // (see emMoveSfxWant); sound_effect_13 when the cart hits the block and throws him. Dove of Peace: bird_flap.wav, once for each tap that lifts the dove. All made mono; the loops keep their whole length (so their rhythm holds), the one-shots have the silence at the ends cut off.
   emCart:{url:"sounds/sfx_em_cart.wav", gain:0.9},                // peak 0.41
-  emRun:{url:"sounds/sfx_em_run.wav", gain:1.0},                  // peak 0.42
+  emRun:{url:"sounds/sfx_em_thump.wav", gain:0.9},                // soft thump loop for the pilgrim's footsteps, peak 0.55 (2026-11-01, replaces running.wav, per Dan)
   emCrash:{url:"sounds/sfx_em_crash.wav", gain:0.4},              // peak 0.56
   dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35}                // peak 0.99
 };
@@ -2187,7 +2189,7 @@ function pixClickSfx(name){
 // start), plus a very short silent <audio> clip to wake the phone's media session. The decoded sounds are plain data and carry over. The old
 // context is kept (closing one can silence its replacement) and only the oldest are closed.
 var pixAudioStale = false, pixAudioOld = [], pixSilentWavUrl = null;
-function pixMarkAudioStale(){ if(pixAudioCtx) pixAudioStale = true; }
+function pixMarkAudioStale(){ if(pixAudioCtx){ if(!pixAudioStale) dbgLog("audio: engine no longer trusted (state " + pixAudioCtx.state + ", screen " + state.screen + ")"); pixAudioStale = true; } }
 function pixPlaySilentClip(){
   try {
     if(!pixSilentWavUrl){
@@ -2233,7 +2235,7 @@ function pixFreshAudio(){
     pixMusicRestart();
     if(old){ pixAudioOld.push(old); while(pixAudioOld.length > 2){ try { pixAudioOld.shift().close(); } catch(e){} } }
     var c = pixAudioCtx, t0 = c.currentTime;
-    setTimeout(function(){ if(c === pixAudioCtx && c.currentTime <= t0 + 0.05) pixAudioStale = true; }, 500);   // clock not moving: a dead engine, replace it again on the next tap
+    setTimeout(function(){ if(c === pixAudioCtx){ var moving = c.currentTime > t0 + 0.05; dbgLog("audio: half a second after the new engine: state " + c.state + ", clock " + (moving ? "moving" : "NOT moving")); if(!moving) pixAudioStale = true; } }, 500);   // clock not moving: a dead engine, replace it again on the next tap
     return true;
   } catch(e){ return false; }
 }
@@ -2267,7 +2269,9 @@ function pixReviveOnTap(ev){
     return;
   }
   pixAudioStale = false;
-  if(!pixFreshAudio()) pixAudioStale = true;       // not made (a moment ago one was, or none could be): still not trusted, so the next touch tries again
+  var madeFresh = pixFreshAudio();
+  dbgLog("audio: " + (ev ? ev.type : "?") + " on " + state.screen + " -> " + (madeFresh ? "new engine, state " + pixAudioCtx.state : "no new engine (state " + (pixAudioCtx ? pixAudioCtx.state : "none") + ")"));      // for the event log on the Options screen (2026-11-01, no sound after returning to the puzzle)
+  if(!madeFresh) pixAudioStale = true;             // not made (a moment ago one was, or none could be): still not trusted, so the next touch tries again
   else if(pixReviveQueue.length){ var q = pixReviveQueue; pixReviveQueue = []; q.forEach(function(job){ job(); }); }      // the sounds that were waiting for the new engine
 }
 // A sound that is made by the finger going down while the engine is not trusted (the first answer in Faith Flash after the phone slept) would play into a dead engine. It waits for the
@@ -2767,18 +2771,67 @@ function pilgrimEnter(el){
 // behind and getting smaller; three quarters of the way to the altar a large pixelated Golden Ticket appears above it, with sound_effect_12. Two seconds
 // later the Main Menu comes back with the Golden Ticket icon unlocked. The scene is laid over the picture in picture pixels (125 x 270), so everything
 // stays on the aisle at any screen size.
-var CW = {W: 125, H: 270, x: 62.5, yStart: 274, yEnd: 206, dur: 4400, ticketAt: .75, ticketMs: 2000, scaleNear: 2.3, scaleFar: .55, ticketScale: 2, ticketY: 90};
+// (2026-11-01, per Dan) The ticket stays up for 5.5 seconds instead of 2, with a big burst of confetti, and it is a new, smoother picture with the name on it (1100 x 700, so ticketW is its width in
+// picture pixels and ticketAspect its height over its width).
+var CW = {W: 125, H: 270, x: 62.5, yStart: 274, yEnd: 206, dur: 4400, ticketAt: .75, ticketMs: 5500, scaleNear: 2.3, scaleFar: .55, ticketW: 92, ticketAspect: 700 / 1100, ticketY: 90};
 function cwPreload(){ ["tiles/pilgrim_back.png", "tiles/golden_ticket.png", "tiles/church_interior2.png"].forEach(function(src){ var im = new Image(); im.src = src; }); }
 function screenChurchWalk(){
-  var ts = CW.ticketScale;
+  var tw = CW.ticketW, th = tw * CW.ticketAspect;
   return '<div class="screen pixHome pixChurch cwScreen"><div class="cwScene" id="cwScene">' +
-    '<img class="cwTicket" id="cwTicket" src="tiles/golden_ticket.png" alt="" style="left:' + ((CW.x - 24 * ts) / CW.W * 100) + '%;top:' + ((CW.ticketY - 24 * ts) / CW.H * 100) + '%;width:' + (48 * ts / CW.W * 100) + '%">' +
+    '<img class="cwTicket" id="cwTicket" src="tiles/golden_ticket.png" alt="" style="left:' + ((CW.x - tw / 2) / CW.W * 100) + '%;top:' + ((CW.ticketY - th / 2) / CW.H * 100) + '%;width:' + (tw / CW.W * 100) + '%">' +
     '<div class="cwPilgrim walking" id="cwPilgrim"><div class="cwSprite"></div></div>' +
   '</div></div>';
 }
-var cwRunning = false, cwRaf = 0, cwTimer = 0;
+var cwRunning = false, cwRaf = 0, cwTimer = 0, cwConfettiRaf = 0, cwConfettiCv = null;
+// A big burst of confetti when the Golden Ticket appears (2026-11-01, per Dan): about 170 paper strips shot up and out of the ticket, and about 130 more rain down from the top of the screen a
+// moment later. They are drawn on one canvas over the whole screen, which takes no touches and goes away by itself when the last piece has fallen out of sight.
+function cwConfettiStop(){
+  cancelAnimationFrame(cwConfettiRaf); cwConfettiRaf = 0;
+  if(cwConfettiCv && cwConfettiCv.parentNode) cwConfettiCv.parentNode.removeChild(cwConfettiCv);
+  cwConfettiCv = null;
+}
+function cwConfetti(tk){
+  cwConfettiStop();
+  var scr = document.querySelector(".cwScreen"); if(!scr || !tk) return;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2), vw = window.innerWidth, vh = window.innerHeight, k = vw / 390;
+  var cv = document.createElement("canvas"); cv.className = "cwConfetti";
+  cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr);
+  scr.appendChild(cv); cwConfettiCv = cv;
+  var g = cv.getContext("2d"); g.scale(dpr, dpr);
+  var r = tk.getBoundingClientRect(), ox = r.left + r.width / 2, oy = r.top + r.height / 2;
+  var colors = ["#FFC93A", "#FFE27A", "#E8433B", "#3B82E8", "#3FBF5F", "#F28AC0", "#FFFFFF", "#8A5CE0", "#FF8A2B"];
+  var bits = [];
+  function add(x, y, vx, vy, delay){
+    bits.push({x: x, y: y, vx: vx, vy: vy, w: (6 + Math.random() * 8) * k, h: (3 + Math.random() * 5) * k, rot: Math.random() * 6.28, vr: (Math.random() - .5) * 14,
+      flip: Math.random() * 6.28, vf: 4 + Math.random() * 8, c: colors[Math.floor(Math.random() * colors.length)], delay: delay || 0});
+  }
+  var i, a, sp;
+  for(i = 0; i < 170; i++){                                   // the burst: a wide fan, mostly upwards
+    a = -Math.PI / 2 + (Math.random() - .5) * Math.PI * 1.5; sp = (260 + Math.random() * 620) * k;
+    add(ox + (Math.random() - .5) * r.width * .6, oy + (Math.random() - .5) * r.height * .4, Math.cos(a) * sp, Math.sin(a) * sp, 0);
+  }
+  for(i = 0; i < 130; i++) add(Math.random() * vw, -20 - Math.random() * 60 * k, (Math.random() - .5) * 90 * k, (60 + Math.random() * 140) * k, .5 + Math.random() * 1.6);      // the rain
+  var last = performance.now(), t = 0;
+  function frame(now){
+    if(!cwConfettiCv) return;
+    var dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
+    g.clearRect(0, 0, vw, vh);
+    var alive = 0;
+    bits.forEach(function(b){
+      if(t < b.delay){ alive++; return; }
+      b.vy += 760 * k * dt; b.vx *= (1 - .9 * dt); b.vy *= (1 - .35 * dt);       // gravity, and the air slows them down
+      b.x += b.vx * dt; b.y += b.vy * dt; b.rot += b.vr * dt; b.flip += b.vf * dt;
+      if(b.y > vh + 30) return;
+      alive++;
+      g.save(); g.translate(b.x, b.y); g.rotate(b.rot); g.scale(1, Math.cos(b.flip));       // the flip makes each strip turn over as it falls
+      g.fillStyle = b.c; g.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); g.restore();
+    });
+    if(alive && t < 9) cwConfettiRaf = requestAnimationFrame(frame); else cwConfettiStop();
+  }
+  cwConfettiRaf = requestAnimationFrame(frame);
+}
 function cwFinish(){
-  cwRunning = false; cancelAnimationFrame(cwRaf); clearTimeout(cwTimer);
+  cwRunning = false; cancelAnimationFrame(cwRaf); clearTimeout(cwTimer); cwConfettiStop();
   if(state.screen !== "churchWalk") return;
   state.ticketUnlocked = true; saveState();
   go("mainMenu");                      // the ticket icon is unlocked now
@@ -2805,7 +2858,8 @@ function cwStart(){
       shown = true;
       if(tk) tk.classList.add("show");
       pixSfxPlay("ticket", true);                                  // sound_effect_12
-      cwTimer = setTimeout(cwFinish, CW.ticketMs);                 // after 2 seconds, back to the Main Menu
+      cwConfetti(tk);                                              // a big burst of confetti (2026-11-01, per Dan)
+      cwTimer = setTimeout(cwFinish, CW.ticketMs);                 // after 5.5 seconds, back to the Main Menu
     }
     if(p >= 1){ el.classList.remove("walking"); el.classList.add("still"); return; }
     cwRaf = requestAnimationFrame(frame);
@@ -2927,7 +2981,8 @@ function howHtml(inFolderCount){
     '<p class="pixGuideDesc">' + t("howIntro") + '</p><ul><li>' + t("howMissions")(GOLDEN_TICKET_MISSIONS_NEEDED, inFolderCount) + '</li><li>' + t("howPoints") + '</li><li>' + t("howTicket")(GOLDEN_TICKET_POINTS) + '</li><li>' + t("howHope") + '</li></ul>' +
     '<div class="howBtn">' + pixBtnHtml(t("howGo"), "howClose()") + '</div></div></div>';
 }
-function howClose(){ state.howSeen = true; saveState(); render(); }
+var howJustClosed = false;
+function howClose(){ state.howSeen = true; howJustClosed = true; saveState(); render(); }
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
@@ -2941,7 +2996,7 @@ function screenMainMenu(){
     appIconHtml({onclick:unlocked ? "openFromIcon(this,'goldenTicket')" : "ticketLocked()", bg:unlocked ? ICON_BG.goldenTicket : ICON_BG.lock,
       cls:unlocked ? "" : "locked", inner:iconSpr(unlocked ? "goldenTicket" : "lock"), label:t("goldenTicketLabel")}) +
     appIconHtml({onclick:"openFromIcon(this,'options')", bg:ICON_BG.options, inner:iconSpr("options"), label:t("optionsLabel")});
-  return '<div class="screen pixHome pixSky pixMenu">' +
+  return '<div class="screen pixHome pixSky pixMenu' + (state.howSeen ? '' : ' howOpen') + '">' +
     cloudsHtml() +
     '<button class="backBtn" onclick="goBackToWelcome()" aria-label="' + t("backLabel") + '"><img src="tiles/icons48p/ic_back.png" alt=""></button>' +
     '<h1 class="pixMenuTitle">Fe y Vida Quest</h1>' +
@@ -11002,7 +11057,7 @@ function pzBuild(s){
 // pictures at random from these and the Faith Match tiles together. To use only the new ones, make PZ_POOL = PZ_PICS.
 var PZ_PICS = [];
 for(var pzi = 1; pzi <= 12; pzi++) PZ_PICS.push("tiles/puzzle/pz_" + ("0" + pzi).slice(-2) + ".jpg");
-var PZ_POOL = PZ_PICS.concat(MATCH_SYMBOLS);
+var PZ_POOL = PZ_PICS;       // only the smooth drawn pictures now (2026-11-01, per Dan: the pixelated Faith Match tiles that were mixed in were far too blocky when enlarged)
 // The new pictures are fetched when a puzzle game starts (only the 4 it uses), and the puzzle waits for them.
 var pzPicsHeld = {};            // src -> the loaded Image, kept so the phone does not throw the decoded picture away
 var pzPicsLoading = false;
@@ -11216,7 +11271,6 @@ function screenStainedGlass(){
     '<div class="pixNote">' + t("pz_round")(s.round+1, PZ_LEVELS.length) + ' &nbsp;|&nbsp; <span id="pzProgress">' + t("pz_pieces")(solved ? g.n : s.placed.length, g.n) + '</span></div>' +
     (solved ? '<div class="pixNote good">' + t("pz_solved") + '</div>' : '<div class="pixNote">' + t("pz_intro") + '</div>') +
     svg +
-    (solved && !lastLevel ? '<div class="pixNote">' + t("pz_next") + '</div>' : '') +
     '<div class="spacer"></div>');
 }
 
@@ -11313,7 +11367,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-01 DI";
+var APP_BUILD = "2026-11-01 DK";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11540,7 +11594,11 @@ function render(){
     // black flash between START MISSION and the game. Screens with other backgrounds still fade in.
     if(el && !(wasSky && el.classList.contains("pixSky"))) el.classList.add("screen-enter");
   }
-  if(state.screen === "mainMenu"){ pilgrimInit(isNewScreen); pixMusicStart(); }   // the music starts the first time the Main Menu is shown
+  if(state.screen === "mainMenu"){
+    // the pilgrim and the pets wait until the How It Works window has been closed (2026-11-01, per Dan); closing it starts them as on a fresh Main Menu
+    if(state.howSeen){ pilgrimInit(isNewScreen || howJustClosed); howJustClosed = false; }
+    pixMusicStart();                                                                  // the music starts the first time the Main Menu is shown
+  }
   else if(state.screen !== "language" && state.screen !== "welcome") pixMusicStart();      // ...and on any other screen after that: a phone that slept can reload the page on the Unfinished screen or in a game, and the music has to come back there too (2026-10-28, per Dan)
   if(state.screen === "passport"){
     var track = document.getElementById("passportTrack");
