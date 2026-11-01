@@ -345,6 +345,13 @@
   .pixHome.pixSky > .folderOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:18px;
     background:rgba(10,20,70,.55);animation:folderFade .2s ease-out;}
   @keyframes folderFade{from{opacity:0;}to{opacity:1;}}
+  .pixHome.pixSky > .howOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:31;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(10,20,70,.6);animation:folderFade .2s ease-out;}      /* (2026-10-31, per Dan) the window that explains the game, on the first Main Menu */
+  .howPaper{width:100%;max-width:400px;max-height:100%;overflow-y:auto;box-sizing:border-box;animation:folderPop .24s ease-out;}
+  .howPaper .howTitle{text-align:center;font-size:1.75rem;margin-bottom:8px;}
+  .howPaper .pixGuideDesc{font-size:1.0625rem;}
+  .howPaper .howBtn{display:flex;justify-content:center;margin-top:14px;}
+  .howPaper .howBtn .btn.pixBtn.pixBtnSm{width:auto;min-width:150px;margin:0;}
+  @media (max-height:700px){ .howPaper{padding:12px 12px;} .howPaper .howTitle{font-size:1.5rem;margin-bottom:4px;} .howPaper .pixGuideDesc{font-size:.9375rem;margin-bottom:8px;} .howPaper .pixGuide li{font-size:.875rem;line-height:1.22;margin-bottom:6px;} .howPaper .howBtn{margin-top:10px;} }
   .folderPanel{position:relative;width:100%;max-width:420px;max-height:86%;overflow-y:auto;background:#223A8C;border:4px solid #FFC93A;border-radius:22px;
     padding:14px 12px 18px;box-shadow:0 6px 0 rgba(0,0,0,.35);transform-origin:var(--ox,50%) var(--oy,50%);animation:folderPop .24s ease-out;}
   @keyframes folderPop{from{transform:scale(.2);opacity:0;}to{transform:scale(1);opacity:1;}}
@@ -1203,6 +1210,11 @@ var T = {
     welcomeTitle:"Welcome to Fe y Vida Quest!",
     welcomeBody:"Complete faith-filled missions around the booth to earn digital badges. Finish any five of them to unlock your Golden Ticket for a chance at swag prizes. Ready?",
     startQuest:"START YOUR QUEST", changeLanguage:"CHANGE LANGUAGE",
+    // the window that explains the game, on the first Main Menu (2026-10-31, per Dan)
+    howTitle:"How It Works", howIntro:"A pilgrim needs help getting to church, and you can help him!",
+    howMissions:function(need, n){ return "Complete any " + need + " of the " + n + " missions. Each mission earns you 100 points."; },
+    howTicket:function(pts){ return "At " + pts + " points you win a Golden Ticket! Take it to the Fe y Vida booth (#301) to earn a special prize."; },
+    howHope:"You can also play Anamaria’s Hope Garden, and visit Anamaria in person at the Unfinished booth (#400).", howGo:"LET’S GO!",
     mainMenu:"MAIN MENU", returnToMenu:"RETURN TO MENU", returnToMainMenu:"RETURN TO MAIN MENU",
     exitMenu:"← MENU",
     questPoints:"Quest Points",
@@ -1360,6 +1372,10 @@ var T = {
     welcomeTitle:"¡Bienvenido a Fe y Vida Quest!",
     welcomeBody:"Completa misiones llenas de fe en el stand para ganar insignias digitales. Termina cinco de ellas para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
     startQuest:"COMIENZA TU AVENTURA", changeLanguage:"CAMBIAR IDIOMA",
+    howTitle:"¿Cómo se juega?", howIntro:"Un peregrino necesita ayuda para llegar a la iglesia, ¡y tú puedes ayudarlo!",
+    howMissions:function(need, n){ return "Completa " + need + " de las " + n + " misiones, las que quieras. Cada misión te da 100 puntos."; },
+    howTicket:function(pts){ return "Con " + pts + " puntos ganas un Boleto Dorado. Llévalo al stand de Fe y Vida (#301) para ganar un premio especial."; },
+    howHope:"También puedes jugar el Jardín de la Esperanza de Anamaria y visitarla en persona en el stand de Unfinished (#400).", howGo:"¡VAMOS!",
     mainMenu:"MENÚ PRINCIPAL", returnToMenu:"VOLVER AL MENÚ", returnToMainMenu:"VOLVER AL MENÚ PRINCIPAL",
     exitMenu:"← MENÚ",
     questPoints:"Puntos de Aventura",
@@ -1819,7 +1835,8 @@ function defaultState(){
     volMusic: 60,   // music volume, 0-100: it starts at 60 (2026-10-22, per Dan; the slider's 100% is a quiet background level)
     musicScale: 2,  // marks a game saved with the new music slider
     passportPage: 0,
-    introMission: null   // the game whose instruction screen is showing
+    introMission: null,  // the game whose instruction screen is showing
+    howSeen: false       // the "How It Works" window of the first Main Menu has been closed (2026-10-31)
   };
 }
 
@@ -2025,7 +2042,13 @@ var PIX_SFX = {
   // The Road to Emmaus coins and hearts (2026-10-29, per Dan): Coin Pickup.wav and Heart Pickup.wav (8-Bit Sounds folder; made mono, the silence cut off, the coin's cut to 0.7 s, the heart's to 0.6 s)
   emCoin:{url:"sounds/sfx_em_coin.wav", gain:0.22},
   emHeart:{url:"sounds/sfx_em_heart.wav", gain:0.25},
-  emPerfect:{url:"sounds/sfx_em_perfect.wav", gain:0.3}          // the PERFECT! window (2026-10-29, per Dan): sound_effect_12 (8-Bit Sounds folder; made mono, the silence at both ends cut off, 1.5 s)
+  emPerfect:{url:"sounds/sfx_em_perfect.wav", gain:0.3},         // the PERFECT! window (2026-10-29, per Dan): sound_effect_12 (8-Bit Sounds folder; made mono, the silence at both ends cut off, 1.5 s)
+  // 2026-10-31, per Dan. The Road to Emmaus: moving_cart.wav (2.35 s) loops while the pilgrim rides a cart on the street, running.wav (8.4 s) loops while he runs on the street, and neither plays while he is in the air or on a cloud
+  // (see emMoveSfxWant); sound_effect_13 when the cart hits the block and throws him. Dove of Peace: bird_flap.wav, once for each tap that lifts the dove. All made mono; the loops keep their whole length (so their rhythm holds), the one-shots have the silence at the ends cut off.
+  emCart:{url:"sounds/sfx_em_cart.wav", gain:0.9},                // peak 0.41
+  emRun:{url:"sounds/sfx_em_run.wav", gain:1.0},                  // peak 0.42
+  emCrash:{url:"sounds/sfx_em_crash.wav", gain:0.4},              // peak 0.56
+  dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35}                // peak 0.99
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -2895,6 +2918,14 @@ function pilgrimWalk(el, target, calm){
 // before that. Nothing is changed here: the score, the badges, the pilgrim and the volumes all stay exactly as they are.
 function goBackToWelcome(){ go("welcome"); }
 
+// The first Main Menu opens with a window that explains the game (2026-10-31, per Dan): the pilgrim, 5 of the missions, 100 points each, the Golden Ticket and the booth, Anamaria's Hope Garden. The button closes it for good (state.howSeen).
+function howHtml(inFolderCount){
+  if(state.howSeen) return "";
+  return '<div class="howOverlay"><div class="pixPaper pixGuide howPaper"><div class="pixResTitle howTitle">' + t("howTitle") + '</div>' +
+    '<p class="pixGuideDesc">' + t("howIntro") + '</p><ul><li>' + t("howMissions")(GOLDEN_TICKET_MISSIONS_NEEDED, inFolderCount) + '</li><li>' + t("howTicket")(GOLDEN_TICKET_POINTS) + '</li><li>' + t("howHope") + '</li></ul>' +
+    '<div class="howBtn">' + pixBtnHtml(t("howGo"), "howClose()") + '</div></div></div>';
+}
+function howClose(){ state.howSeen = true; saveState(); render(); }
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
@@ -2922,7 +2953,7 @@ function screenMainMenu(){
     '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeGardenName")}) + '</div>' +
     '<div class="hgMenuIcon" id="cjMenuIcon">' + appIconHtml({onclick:"openMission('" + MENU_ICON_MISSION + "')", bg:ICON_BG[MENU_ICON_MISSION], cls:state.missions[MENU_ICON_MISSION].done ? "done" : "", inner:iconSpr(MENU_ICON_MISSION),
       label:t(missionById(MENU_ICON_MISSION).nameKey), badge:state.missions[MENU_ICON_MISSION].done ? '<span class="doneBadge">&#10003;</span>' : ""}) + '</div>' +
-    folderHtml() +
+    folderHtml() + howHtml(inFolder.length) +
   '</div>';
 }
 
@@ -6707,7 +6738,7 @@ function dpFlap(){
     dpNewPair(s);
   }
   dp.vy = DP_FLAP; dp.flapAt = performance.now();
-  if(!(dp.inv > 0)) pixSfxPlay("tap", false);                              // (after a hit the dove is held in the middle of the gap for a moment: nothing to control, so no sound)
+  if(!(dp.inv > 0)) pixSfxPlay("dpFlap", false);                           // bird_flap.wav, once per tap (2026-10-31, per Dan; it was the button sound). After a hit the dove is held in the middle of the gap for a moment: nothing to control, so no sound
 }
 // the middle of the safe space between the clouds: the gap of the pair the dove is in or is flying towards (the middle of the sky if there is none left)
 function dpSafeY(){
@@ -9294,7 +9325,7 @@ function emThrow(byHit){
   e.ride = null; e.bump = null;
   p.h += EM_CH; p.vy = byHit ? 70 : 115; p.inv = byHit ? 1.2 : .9; p.buf = 0;
   emBurst(e.PX, e.GY - 3, ["#E2C28A", "#CFA96C", "#FFFFFF"], 14, 50);
-  pixSfxPlay("jlSuper", false);                                      // thrown from the cart: sound_effect_15 (2026-10-28, per Dan)
+  pixSfxPlay(byHit ? "jlSuper" : "emCrash", false);                  // thrown from the cart: sound_effect_15 (2026-10-28, per Dan); when the cart hits the block, sound_effect_13 (2026-10-31, per Dan)
 }
 function emStep(dt){
   var e = em, p = e.p, PX = e.PX, i;
@@ -9471,12 +9502,41 @@ function emPaint(){
   if(e.flash > 0){ x.fillStyle = "rgba(255,60,60," + Math.min(.45, e.flash).toFixed(2) + ")"; x.fillRect(0, 0, W, e.H); }
   var pf = document.getElementById("emProgFill"); if(pf) pf.style.width = Math.round(Math.min(1, e.dist / e.len) * 100) + "%";
 }
+// The sound of the road (2026-10-31, per Dan): the cart's wheels while he rides on the street, his feet while he runs on the street (also as he runs off the screen at the end of a round); nothing while he is in the air (a jump, a basket)
+// or up on a cloud, while the game waits (the tap to start, the Leave question, the phone upright) and on every screen that is not the game. It loops: the sound is picked afresh every frame (emLoop) and only changes when it must.
+var emMoveSrc = null, emMoveName = "", emMoveCtx = null;
+function emMoveSfxWant(){
+  var e = em;
+  if(!e || !e.L || e.confirm || hglUpright()) return "";
+  if(e.mode === "exit") return "emRun";
+  if(e.mode !== "play") return "";
+  if(e.p.vy !== 0 || e.p.h > .01) return "";
+  return e.ride ? "emCart" : "emRun";
+}
+function emMoveSfxSet(name){
+  var ctx = pixCtx();
+  if(name === emMoveName && emMoveCtx === ctx) return;              // (a new audio engine, made after the phone slept, starts it again)
+  if(emMoveSrc){ try { emMoveSrc.stop(); } catch(e){} emMoveSrc = null; }
+  emMoveName = ""; emMoveCtx = null;
+  if(!name || !ctx) return;
+  var buf = pixSfxBuf[name];
+  if(!buf){ pixSfxDecode(name); return; }                         // not decoded yet: tried again on the next frame
+  try {
+    if(ctx.state !== "running" && ctx.resume) ctx.resume();
+    var src = ctx.createBufferSource(), g = ctx.createGain();
+    src.buffer = buf; src.loop = true; g.gain.value = PIX_SFX[name].gain;
+    src.connect(g); g.connect(pixBus(ctx, "sfx"));
+    src.start(); emMoveSrc = src; emMoveName = name; emMoveCtx = ctx;
+  } catch(e){}
+}
+document.addEventListener("visibilitychange", function(){ if(document.hidden) emMoveSfxSet(""); });
 function emLoop(now){
-  if(state.screen !== "emmaus"){ emRaf = 0; return; }
+  if(state.screen !== "emmaus"){ emRaf = 0; emMoveSfxSet(""); return; }
   if(em){
     var dt = Math.min(.05, (now - em.last) / 1000); em.last = now;
     if(!hglUpright() && em.L){ if(!em.confirm) emStep(dt); emPaint(); }                    // (nothing moves while the phone is upright)
   }
+  emMoveSfxSet(emMoveSfxWant());
   emRaf = requestAnimationFrame(emLoop);
 }
 function emLoopStart(){ if(em) em.last = performance.now(); if(emRaf) return; emRaf = requestAnimationFrame(emLoop); }
@@ -11251,7 +11311,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-10-30 DE";
+var APP_BUILD = "2026-10-31 DG";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
