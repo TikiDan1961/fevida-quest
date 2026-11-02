@@ -2453,7 +2453,7 @@ function screenWelcome(){
     '<div class="pixBtnDock">' +
       '<button class="btn pixBtn ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'mainMenu\')">' + t("startQuest") + '</button>' +
       '<button class="btn pixBtn secondary ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'language\')">' + t("changeLanguage") + '</button>' +
-      instBtnHtml() +
+      instBtnHtml(fit) +
     '</div>' +
   '</div>';
 }
@@ -3063,7 +3063,7 @@ function instPlatform(){
   return "";
 }
 function instCanShow(){ return !instInstalled && !instStandalone() && (!!instPrompt || instPlatform() !== ""); }
-function instBtnHtml(){ return instCanShow() ? '<button class="btn pixBtn secondary pixBtnSm instBtn" onpointerdown="pixPressSfx()" onclick="pixClickSfx();installTap()">' + t("install_btn") + '</button>' : ""; }
+function instBtnHtml(fit){ fit = fit || (t("install_btn").length > 16 ? "pixBtnSm" : "pixBtnMd"); return instCanShow() ? '<button class="btn pixBtn secondary ' + fit + ' instBtn" onpointerdown="pixPressSfx()" onclick="pixClickSfx();installTap()">' + t("install_btn") + '</button>' : ""; }
 function installTap(){
   if(instPrompt){
     var p = instPrompt; instPrompt = null;
@@ -11521,7 +11521,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-02 DT";
+var APP_BUILD = "2026-11-02 DU";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
