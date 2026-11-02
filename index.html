@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Fe y Vida Quest</title>
+<!-- Installable app (2026-11-02, per Dan): opens full screen from the home screen, with no browser address bar. manifest.webmanifest, sw.js and icons/ go next to this file. -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3A1C5A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fe y Vida Quest">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <style>
   :root{
     --gold:#D9A63B;
@@ -350,6 +359,13 @@
   @keyframes folderFade{from{opacity:0;}to{opacity:1;}}
   .pixHome.pixSky > .howOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:31;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(10,20,70,.6);animation:folderFade .2s ease-out;}      /* (2026-10-31, per Dan) the window that explains the game, on the first Main Menu */
   .pixMenu.howOpen .pilgrim,.pixMenu.howOpen .pixPet,.pixMenu.howOpen .pilgrimBubble{visibility:hidden;}      /* the pilgrim and the pets are not started until the window is closed (2026-11-01, per Dan) */
+  .instOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(10,20,70,.6);animation:folderFade .2s ease-out;}      /* the window that shows how to put the game on the home screen (2026-11-02, per Dan) */
+  .instOverlay .howPaper{color:#1E2F7A;}
+  .instOverlay .instShare{display:inline-block;vertical-align:-3px;width:18px;height:18px;margin:0 1px;}
+  .instOverlay .pixGuide li b{color:#B3262C;}
+  .pixBtnDock .btn.pixBtn.instBtn{margin-top:10px;}
+  .optInstall{margin:16px 0 0;width:100%;}
+  .optInstall .btn.pixBtn.instBtn{margin:0 auto;display:flex;}
   .howPaper{width:100%;max-width:400px;max-height:100%;overflow-y:auto;box-sizing:border-box;animation:folderPop .24s ease-out;}
   .howPaper .howTitle{text-align:center;font-size:1.75rem;margin-bottom:8px;}
   .howPaper .pixGuideDesc{font-size:1.0625rem;}
@@ -1225,6 +1241,12 @@ var T = {
     howPoints:"Every mission you finish scores 100 points and a shiny badge for your Passport. Watch the bar at the top fill up!",
     howTicket:function(pts){ return "Hit " + pts + " points and you win a Golden Ticket! Tap it and show your screen to the crew at the Fe y Vida booth (#301) for a special prize!"; },
     howHope:"Bonus fun: play Anamaria’s Hope Garden, then come meet Anamaria in person at the Unfinished booth (#400)!", howGo:"LET’S GO!",
+    // the button and the window that help a player put the game on the phone's home screen (2026-11-02, per Dan; wording drafted for the client to approve). {share} is the Share icon, drawn by the game
+    install_btn:"INSTALL THE APP", install_title:"Add to Home Screen", install_why:"Fe y Vida Quest opens full screen like any other app, and plays even without internet.",
+    install_safari:"Open this page in Safari first: tap the ••• or Share button and choose “Open in Safari”. Then:",
+    install_ios1:"Tap the Share button {share} at the bottom of Safari.", install_ios2:"Scroll down and tap “Add to Home Screen”.", install_ios3:"Tap “Add”. That’s it! Fe y Vida Quest is on your phone now.",
+    install_and1:"Tap the ⋮ menu of your browser.", install_and2:"Tap “Install app” (or “Add to Home screen”).", install_and3:"Tap “Install”. That’s it! Fe y Vida Quest is on your phone now.",
+    install_ok:"GOT IT",
     mainMenu:"MAIN MENU", returnToMenu:"RETURN TO MENU", returnToMainMenu:"RETURN TO MAIN MENU",
     exitMenu:"← MENU",
     questPoints:"Quest Points",
@@ -1387,6 +1409,11 @@ var T = {
     howPoints:"¡Cada misión que termines te da 100 puntos y una insignia brillante para tu Pasaporte! Mira cómo se llena la barra de arriba.",
     howTicket:function(pts){ return "¡Llega a " + pts + " puntos y ganas un Boleto Dorado! Tócalo y muestra tu pantalla al equipo del stand de Fe y Vida (#301) para ganar un premio especial."; },
     howHope:"¡Diversión extra: juega el Jardín de la Esperanza de Anamaria y ven a conocerla en persona al stand de Unfinished (#400)!", howGo:"¡VAMOS!",
+    install_btn:"INSTALAR LA APP", install_title:"Añadir a la pantalla de inicio", install_why:"Fe y Vida Quest se abre en pantalla completa como cualquier otra app y funciona incluso sin internet.",
+    install_safari:"Primero abre esta página en Safari: toca el botón ••• o Compartir y elige «Abrir en Safari». Luego:",
+    install_ios1:"Toca el botón Compartir {share} en la parte inferior de Safari.", install_ios2:"Desplázate hacia abajo y toca «Añadir a pantalla de inicio».", install_ios3:"Toca «Añadir». ¡Listo! Fe y Vida Quest ya está en tu teléfono.",
+    install_and1:"Toca el menú ⋮ de tu navegador.", install_and2:"Toca «Instalar aplicación» (o «Añadir a la pantalla de inicio»).", install_and3:"Toca «Instalar». ¡Listo! Fe y Vida Quest ya está en tu teléfono.",
+    install_ok:"ENTENDIDO",
     mainMenu:"MENÚ PRINCIPAL", returnToMenu:"VOLVER AL MENÚ", returnToMainMenu:"VOLVER AL MENÚ PRINCIPAL",
     exitMenu:"← MENÚ",
     questPoints:"Puntos de Aventura",
@@ -2426,6 +2453,7 @@ function screenWelcome(){
     '<div class="pixBtnDock">' +
       '<button class="btn pixBtn ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'mainMenu\')">' + t("startQuest") + '</button>' +
       '<button class="btn pixBtn secondary ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'language\')">' + t("changeLanguage") + '</button>' +
+      instBtnHtml() +
     '</div>' +
   '</div>';
 }
@@ -3021,6 +3049,43 @@ function howHtml(inFolderCount){
 }
 var howJustClosed = false;
 function howClose(){ state.howSeen = true; howJustClosed = true; saveState(); render(); }
+
+// ---- Install the app (2026-11-02, per Dan): players scan the QR code, the game opens in the browser, and an INSTALL THE APP button (Welcome and Options screens) gets it onto the home screen ----
+// Android (Chrome) gives the page an install prompt that one tap opens (beforeinstallprompt); an iPhone has no such prompt, so a small window shows the two taps in Safari. The button is
+// not there once the game is running as an installed app, or on a computer that cannot install it.
+var instPrompt = null, instInstalled = false;
+function instStandalone(){ return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true; }
+function instPlatform(){
+  var ua = navigator.userAgent || "";
+  var ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if(ios) return /CriOS|FxiOS|EdgiOS|OPiOS|FBAN|FBAV|Instagram|Line\/|GSA\//.test(ua) ? "iosOther" : "ios";      // (an iPhone can only add to the home screen from Safari itself)
+  if(/Android/.test(ua)) return "android";
+  return "";
+}
+function instCanShow(){ return !instInstalled && !instStandalone() && (!!instPrompt || instPlatform() !== ""); }
+function instBtnHtml(){ return instCanShow() ? '<button class="btn pixBtn secondary pixBtnSm instBtn" onpointerdown="pixPressSfx()" onclick="pixClickSfx();installTap()">' + t("install_btn") + '</button>' : ""; }
+function installTap(){
+  if(instPrompt){
+    var p = instPrompt; instPrompt = null;
+    try { var pr = p.prompt(); if(pr && pr.catch) pr.catch(function(){ installShow(); }); if(p.userChoice) p.userChoice.then(function(c){ if(c && c.outcome === "accepted") instInstalled = true; instRefresh(); }, function(){}); return; } catch(e){}
+  }
+  installShow();
+}
+function instRefresh(){ if(state.screen === "welcome" || state.screen === "options") render(); }
+function installShow(){
+  if(document.getElementById("instOverlay")) return;
+  var plat = instPlatform(), share = '<svg class="instShare" viewBox="0 0 24 24" fill="none" stroke="#1E2F7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+  var steps = plat === "android" || plat === "" ? [t("install_and1"), t("install_and2"), t("install_and3")] : [t("install_ios1"), t("install_ios2"), t("install_ios3")];
+  var lis = (plat === "iosOther" ? '<li>' + t("install_safari") + '</li>' : "") + steps.map(function(s, i){ return '<li><b>' + (i + 1) + '.</b> ' + s.replace("{share}", share) + '</li>'; }).join("");
+  var el = document.createElement("div");
+  el.id = "instOverlay"; el.className = "instOverlay";
+  el.innerHTML = '<div class="pixPaper pixGuide howPaper"><div class="pixResTitle howTitle">' + t("install_title") + '</div><p class="pixGuideDesc">' + t("install_why") + '</p><ul>' + lis + '</ul>' +
+    '<div class="howBtn">' + pixBtnHtml(t("install_ok"), "installClose()") + '</div></div>';
+  document.body.appendChild(el);
+}
+function installClose(){ var el = document.getElementById("instOverlay"); if(el && el.parentNode) el.parentNode.removeChild(el); }
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); instPrompt = e; instRefresh(); });
+window.addEventListener("appinstalled", function(){ instInstalled = true; instPrompt = null; installClose(); instRefresh(); });
 function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
@@ -11456,7 +11521,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-02 DR";
+var APP_BUILD = "2026-11-02 DT";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11469,6 +11534,7 @@ function screenOptions(){
       optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
       optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
+    (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
@@ -11623,8 +11689,26 @@ function pixPreloadAll(){
       running++;
       pixLoad(pixAbs("tiles/" + PRELOAD_LIST[i++]), function(){ running--; next(); });
     }
-    if(!running && i >= PRELOAD_LIST.length && !pixPreloadDone){ pixPreloadDone = true; if(pixGuard) pixGuard.disconnect(); dbgLog("assets: every picture is loaded and decoded"); }
+    if(!running && i >= PRELOAD_LIST.length && !pixPreloadDone){ pixPreloadDone = true; if(pixGuard) pixGuard.disconnect(); dbgLog("assets: every picture is loaded and decoded"); pixWarmSounds(); }
   }
+  next();
+}
+// With the app installed (a service worker is in charge), every sound is fetched once in the background too, so the game plays completely offline, not only the sounds that have been heard (2026-11-02, per Dan).
+// The pictures too: on the very first visit the worker takes charge only after some of them were fetched, so they are asked for once more, through it. Done once per build on a phone.
+var pixWarmStarted = false;
+function pixWarmSounds(){
+  if(pixWarmStarted || !(navigator.serviceWorker && navigator.serviceWorker.controller)) return;
+  try { if(localStorage.getItem("fevidaWarm") === APP_BUILD) return; } catch(e){}
+  pixWarmStarted = true;
+  var urls = [PIX_MUSIC_URL], i = 0, running = 0;
+  Object.keys(PIX_SFX).forEach(function(k){ var u = PIX_SFX[k] && PIX_SFX[k].url; if(u && urls.indexOf(u) === -1) urls.push(u); });
+  PRELOAD_LIST.forEach(function(n){ urls.push("tiles/" + n); });
+  urls.push("tiles/Jersey10.ttf", "tiles/PixelifySans.ttf", "emmaus_layout.js", location.pathname);      // (the page itself too: the first visit is not one the worker saw)
+  function next(){
+    while(running < 3 && i < urls.length){ running++; fetch(urls[i++]).then(function(r){ return r.blob(); }).then(done, done); }
+    if(!running && i >= urls.length){ try { localStorage.setItem("fevidaWarm", APP_BUILD); } catch(e){} dbgLog("offline: everything is saved on this phone"); }
+  }
+  function done(){ running--; next(); }
   next();
 }
 
@@ -11918,6 +12002,11 @@ dbgLog("page loaded " + APP_BUILD + " " + dbgView() + " nav:" + (function(){ try
 pixFontsLoad();
 pixGuardStart();
 render();
+// The service worker (sw.js) saves the game on the phone so it opens from the home screen and plays without a connection. It is registered with the build in its address, so every new build is a new worker with a fresh cache.
+if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener("load", function(){ try { navigator.serviceWorker.register("sw.js?v=" + encodeURIComponent(APP_BUILD)).catch(function(){}); } catch(e){} });
+  navigator.serviceWorker.addEventListener("controllerchange", function(){ if(pixPreloadDone) pixWarmSounds(); });
+}
 // Kicked off at boot, not when Faith Match is opened (2026-09-29, per Dan —
 // the first tile tapped showed blank white until its image finished
 // loading). Starting the fetch this early gives it the whole language
