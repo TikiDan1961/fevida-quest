@@ -296,6 +296,11 @@
   .emHud .emTestCol .emTestBtn{margin:0;}
   .emHud .emTestBtn{flex:none;margin-left:18px;pointer-events:auto;background:#2f9e57;color:#fff;border:2px solid #fff;border-radius:6px;padding:4px 10px;font:bold 13px system-ui,Arial,sans-serif;cursor:pointer;opacity:.9;}      /* the RESTART button of a test play from the level editor */
   .emConfirm{position:absolute;left:0;right:0;top:0;bottom:0;z-index:12;display:flex;align-items:center;justify-content:center;background:rgba(14,16,48,.55);}
+  .quitOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(10,20,70,.6);touch-action:none;animation:folderFade .2s ease-out;}      /* "Are you sure you want to quit?" over the game, which is dimmed and stands still (2026-11-03, per Dan) */
+  .quitOverlay .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
+  .quitOverlay .quitBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
+  .quitOverlay .quitBtns .btn.pixBtn.pixBtnSm{width:auto;min-width:130px;margin:0;}
+  body.quitPaused #app *{animation-play-state:paused !important;}
   .emConfirm .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
   .emConfirm .emConfirmBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
   .emConfirm .emConfirmBtns .btn.pixBtn.pixBtnSm{width:auto;min-width:130px;margin:0;}
@@ -1231,6 +1236,31 @@
 <script>
 "use strict";
 
+// "Are you sure you want to quit?" (2026-11-03, per Dan): while that window is up the game stands still. Every animation frame and every timer that comes due in the meantime is held back (and the CSS motion
+// is stopped, see body.quitPaused), then released when the player goes back to the game, so no game needs its own pause. The functions that open and close the window are quitAskOpen / quitAskClose, next to exitMission.
+var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [];
+(function(){
+  var raf = window.requestAnimationFrame.bind(window), caf = window.cancelAnimationFrame.bind(window), st = window.setTimeout.bind(window), ct = window.clearTimeout.bind(window);
+  window.requestAnimationFrame = function(cb){
+    var id = raf(function(ts){ if(quitAsk) quitRafQ.push({id: id, cb: cb}); else cb(ts); });
+    return id;
+  };
+  window.cancelAnimationFrame = function(id){ quitRafQ = quitRafQ.filter(function(q){ return q.id !== id; }); caf(id); };
+  window.setTimeout = function(fn, ms){
+    if(typeof fn !== "function") return st.apply(window, arguments);
+    var extra = [].slice.call(arguments, 2), id = st(function(){ if(quitAsk) quitTimerQ.push({id: id, fn: fn, args: extra}); else fn.apply(window, extra); }, ms);
+    return id;
+  };
+  window.clearTimeout = function(id){ quitTimerQ = quitTimerQ.filter(function(q){ return q.id !== id; }); ct(id); };
+  ["pointerdown","pointermove","pointerup","pointercancel","touchstart","touchmove","touchend","touchcancel","mousedown","mousemove","mouseup"].forEach(function(type){
+    window.addEventListener(type, function(e){
+      if(!quitAsk) return;
+      if(type === "pointerdown" && e.target && e.target.closest && e.target.closest(".quitOverlay .pixBtn") && typeof pixPressSfx === "function") pixPressSfx();
+      e.stopImmediatePropagation();                // nothing reaches the game behind the window (a tap on it must not start a round or steer)
+    }, true);
+  });
+})();
+
 var STORAGE_KEY = "fevidaQuestState_v1";
 
 var T = {
@@ -1379,7 +1409,7 @@ var T = {
     fs_found:"COLLECT EACH FRUIT", fs_hint:"HINT", fs_shuffling:"SHUFFLING", fs_names:["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness"],
     dovePeaceName:"Dove of Peace", dp_intro:"Tap anywhere on the screen to flap. Fly through the gaps in the storm clouds to carry the olive branch.", dp_ready:"Tap anywhere to start!",
     dp_clouds:function(n,total){return "Clouds: "+n+" / "+total;}, dp_failTitle:"Blown Off Course!", dp_failBody:"The dove hit too many clouds. Try again!",
-    emmausName:"The Road to Emmaus", em_perfect:"PERFECT!", em_perfectBody:"You found all the coins!", em_leaveTitle:"Leave the game?", em_leaveBody:"You will go back to the Main Menu.", em_keep:"KEEP PLAYING", em_leave:"LEAVE", em_names:["Morning in the village", "Midday at the market", "Evening on the road"], em_hint:"Tap to jump. Land on a cart to ride it!",
+    emmausName:"The Road to Emmaus", em_perfect:"PERFECT!", em_perfectBody:"You found all the coins!", quitTitle:"Are you sure you want to quit?", em_leaveTitle:"Leave the game?", em_leaveBody:"You will go back to the Main Menu.", em_keep:"KEEP PLAYING", em_leave:"LEAVE", em_names:["Morning in the village", "Midday at the market", "Evening on the road"], em_hint:"Tap to jump. Land on a cart to ride it!",
     pilgrimRoadName:"Pilgrim's Road", pr_intro:"Tap a tile to turn it. Build one road through every tile, from the pilgrim to the church.", pr_turns:function(n){return "Turns: "+n;}, pr_road:function(n,total){return "Road: "+n+" / "+total;}, pr_start:"START", pr_church:"CHURCH",
     wordGroupsName:"Word Groups", themeUnderstanding:"Understanding", wg_intro:"Drag a word onto another to swap them. Put each group in its own row.", wg_found:function(n){return "Group found: " + n + "!";}, wg_left:function(n){return n === 1 ? "1 group left" : n + " groups left";},
     wordTrailName:"Word Trail", themeTruth:"Truth", wt_intro:"Drag from letter to letter to spell the words below.", wt_left:function(n){return n === 1 ? "1 word left" : n + " words left";},
@@ -1548,7 +1578,7 @@ var T = {
     fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
     dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
-    em_leaveTitle:"\u00bfSalir del juego?", em_leaveBody:"Volver\u00e1s al Men\u00fa Principal.", em_keep:"SEGUIR JUGANDO", em_leave:"SALIR", em_perfect:"\u00a1PERFECTO!", em_perfectBody:"\u00a1Encontraste todas las monedas!", emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
+    quitTitle:"\u00bfSeguro que quieres salir?", em_leaveTitle:"\u00bfSalir del juego?", em_leaveBody:"Volver\u00e1s al Men\u00fa Principal.", em_keep:"SEGUIR JUGANDO", em_leave:"SALIR", em_perfect:"\u00a1PERFECTO!", em_perfectBody:"\u00a1Encontraste todas las monedas!", emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
     pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
@@ -3244,8 +3274,9 @@ function roundContGo(){
 function roundContMenu(){
   var id = state.contFor;
   state.contFor = null;
+  state.folderOpen = false;          // the Missions window is closed, so the player sees the pilgrim walk, as after the last round of a game (2026-11-03, per Dan)
   if(id === "emmaus"){ emQuit(); return; }
-  if(id && state.session[id]){ state.screen = id; exitMission(); return; }      // leaves the game the way its red X does (clears it, stops what it was doing, shows the Main Menu)
+  if(id && state.session[id]){ state.screen = id; exitMissionNow(); return; }      // leaves the game the way its red X does (clears it, stops what it was doing, shows the Main Menu)
   go("mainMenu");
 }
 
@@ -4775,8 +4806,8 @@ function clStart(){
   clUpdateHandPosition();
   if(clDragging) clMoveHandTo(clPtrX);          // the finger is still down from the round before: the hands go straight to it
   clUpdateHud();
-  clTimers.spawn = setInterval(clSpawnIcon, s ? CL_LEVELS[s.level].spawnMs : CL_LEVELS[0].spawnMs);
-  clTimers.tick = setInterval(clCollisionTick, CL_TICK_MS);
+  clTimers.spawn = setInterval(function(){ if(!quitAsk) clSpawnIcon(); }, s ? CL_LEVELS[s.level].spawnMs : CL_LEVELS[0].spawnMs);      // (nothing happens while the quit question is up)
+  clTimers.tick = setInterval(function(){ if(!quitAsk) clCollisionTick(); }, CL_TICK_MS);
 }
 
 function clEndRound(reason){
@@ -11590,7 +11621,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-03 ED";
+var APP_BUILD = "2026-11-03 EF";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11689,7 +11720,39 @@ function exitBarHtml(){
 
 // Leaves the current mission the same way its own MAIN MENU button does
 // (clears its saved game and stops any timers), then shows the Main Menu.
+// The red X (2026-11-03, per Dan): the game is paused, the screen is dimmed and a window asks "Are you sure you want to quit?", with KEEP PLAYING (back to the game as it was) and MAIN MENU
+// (leaves it, and the Main Menu comes back with the Missions window open). The instruction screens have no game to lose, and the Emmaus test play from the editor has its own way out: those leave at once.
 function exitMission(){
+  if(state.screen === "missionIntro" || (state.screen === "emmaus" && em && em.test)){ exitMissionNow(); return; }
+  quitAskOpen();
+}
+function quitAskOpen(){
+  if(quitAsk) return;
+  quitAsk = true; quitAskScreen = state.screen;
+  document.body.classList.add("quitPaused");
+  try { if(typeof emMoveSfxSet === "function") emMoveSfxSet(""); if(typeof hglDangerSfx === "function") hglDangerSfx(false); } catch(e){}      // (a looping sound would go on while the game stands still)
+  var el = document.createElement("div");
+  el.className = "quitOverlay";
+  el.innerHTML = '<div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("quitTitle") + '</div><div class="quitBtns">' + pixBtnHtml(t("em_keep"), "quitAskStay()") + pixBtnHtml(t("mainMenu"), "quitAskLeave()", true) + '</div></div>';
+  document.body.appendChild(el);
+}
+function quitAskEnd(){          // takes the window away and lets what was held back go on
+  quitAsk = false; quitAskScreen = null;
+  document.body.classList.remove("quitPaused");
+  var el = document.querySelector(".quitOverlay"); if(el && el.parentNode) el.parentNode.removeChild(el);
+  var rq = quitRafQ, tq = quitTimerQ; quitRafQ = []; quitTimerQ = [];
+  rq.forEach(function(q){ requestAnimationFrame(q.cb); });
+  tq.forEach(function(q){ setTimeout(function(){ q.fn.apply(window, q.args); }, 0); });
+}
+function quitAskStay(){ quitAskEnd(); }
+function quitAskLeave(){
+  var scr = quitAskScreen;
+  quitAskEnd();
+  if(state.screen !== scr) return;          // (the screen changed behind the window, e.g. the game ended: nothing to leave)
+  if(scr.indexOf("hopeGarden") !== 0 && !isMenuIconMission(scr)) state.folderOpen = true;      // the Missions window is open when the Main Menu comes back (Hope Garden and Choose Joy are not in it)
+  exitMissionNow();
+}
+function exitMissionNow(){
   switch(state.screen){
     case "faithFlash": ffQuit(); break;
     case "faithMatch": fmQuit(); break;
@@ -11712,7 +11775,7 @@ function exitMission(){
     case "fruitsSpirit": fsQuit(); break;
     case "jacobLadder": jlQuit(); break;
     case "hopeGardenIntro": case "hopeGarden": case "hopeGardenL": hgQuit(); break;
-    case "emmaus": if(em && !em.test) emAskLeave(); else emQuit(); break;          // (a finger on the X leaves at once, and in this game thumbs are always on the screen: it asks first, 2026-10-30, per Dan)
+    case "emmaus": emQuit(); break;          // (it asks first, like every game: see exitMission; before 2026-11-03 it had a question of its own, emAskLeave)
     case "stainedGlass": pzQuit(); break;
     default: go("mainMenu");
   }
@@ -11950,6 +12013,7 @@ function renderApply(html){
   var enteringPassportFresh = state.screen === "passport" && isNewScreen;
   var prevScreen = lastRenderedScreen;
   lastRenderedScreen = state.screen;
+  if(quitAsk && state.screen !== quitAskScreen) quitAskEnd();          // the screen changed behind the quit question (e.g. the game ended): the question goes
   rotateMsgUpdate();
   var wasSky = !!app.querySelector(".screen.pixSky");     // the screen being replaced was a sky screen
   var oldSky = prevScreen === "award" && state.screen === "roundCont" && app.querySelector(".screen.pixSky");
