@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Fe y Vida Quest">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=EA">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=EA">
 <style>
   :root{
     --gold:#D9A63B;
@@ -1302,6 +1302,9 @@ var T = {
     bl_title:"Be the Light",
     bl_body:"Head to the Fe y Vida Hope Wall and post an encouraging message for someone else. Once you've done it, tap the button below.",
     missionCompleted:"MISSION COMPLETED",
+    continuePlaying:"CONTINUE PLAYING",
+    cont_title:"Keep Going?",
+    cont_body:"You can keep playing this game, or go back to the Main Menu and try another one.",
     cj_title:"Choose Joy",
     cj_body:"Go to the Fe y Vida booth (#301) to have a joyful instant photo taken with a friend! Once you've done it, tap the button below.",
     awardTitle:"Mission Complete!",
@@ -1469,6 +1472,9 @@ var T = {
     bl_title:"Sé la Luz",
     bl_body:"Ve al Muro de la Esperanza de Fe y Vida y escribe un mensaje de aliento para alguien más. Cuando termines, toca el botón de abajo.",
     missionCompleted:"MISIÓN COMPLETADA",
+    continuePlaying:"SEGUIR JUGANDO",
+    cont_title:"¿Seguir jugando?",
+    cont_body:"Puedes seguir jugando este juego o volver al Menú Principal y probar otro.",
     cj_title:"Elige la Alegría",
     cj_body:"¡Ve al stand de Fe y Vida (#301) para hacerte una foto instantánea alegre con un amigo! Cuando termines, toca el botón de abajo.",
     awardTitle:"¡Misión Completada!",
@@ -1871,6 +1877,8 @@ function defaultState(){
       followLight:null, wordUnscramble:null, catchLight:null,
       kindnessSort:null, hiddenBlessings:null, stainedGlass:null, lightCandle:null, emojiStories:null, jesusTimeline:null, sacredSudoku:null, wordTrail:null, wordGroups:null, mustardSeed:null, prayBeads:null, pilgrimRoad:null, dovePeace:null, fruitsSpirit:null, jacobLadder:null, hopeGarden:null, emmaus:null },
     awardMissionId: null,
+    contFor: null,       // the game whose round-1 badge was just given: the "keep playing or Main Menu" screen is about it (2026-11-02, per Dan)
+    pilgrimOwed: false,  // a game was finished (round 1) and the pilgrim has not walked for it yet: he walks the next time the Main Menu is shown
     folderOpen: false,
     pilgrimP: null,
     pilgrimIn: false,    // the pilgrim has gone into the church (after the 5th game)
@@ -3094,6 +3102,7 @@ function installClose(){ var el = document.getElementById("instOverlay"); if(el 
 window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); instPrompt = e; instRefresh(); });
 window.addEventListener("appinstalled", function(){ instInstalled = true; instPrompt = null; installClose(); instRefresh(); });
 function screenMainMenu(){
+  if(state.pilgrimOwed && state.screen === "mainMenu"){ state.pilgrimOwed = false; pilgrimAward = state.pilgrimIn ? null : "great"; }      // a game was finished since the last Main Menu: he says "Great job!" and walks (2026-11-02, per Dan)
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
   var doneCount = inFolder.filter(function(m){ return state.missions[m.id].done; }).length;
@@ -3146,8 +3155,25 @@ function openPassport(){ go("passport"); }
 // Only the games earn Quest Points (2026-10-22, per Dan), so the points bar on the Main Menu fills only with games, the same ones that walk the pilgrim to
 // the church. Be the Light, Choose Joy and Light a Candle give their badge and nothing else.
 function missionIsGame(id){ return PILGRIM_NON_GAMES.indexOf(id) === -1; }
+// A game's badge and its 100 points are given at the end of ROUND 1 (2026-11-02, per Dan), then a screen asks whether to keep playing or go to the Main Menu (screenRoundCont). The pilgrim walks the first time the
+// Main Menu is shown after that (state.pilgrimOwed). The rounds after that give nothing more: finishing the game takes the player straight to the Main Menu (see grantMission).
+// Returns true when it took over (the caller stops); false for a game that has been given already, and for the games that are not games (Choose Joy), and the Emmaus test play from the editor.
+function roundOneGrant(key){
+  if(!missionIsGame(key) || !state.missions[key] || state.missions[key].done) return false;
+  if(key === "emmaus" && em && em.test) return false;
+  state.contFor = key;
+  grantMission(key);
+  return true;
+}
 function grantMission(id, missionState){
+  if(missionIsGame(id) && state.missions[id].done){      // the badge and the points came after round 1: all the rounds are played now, so back to the Main Menu (the pilgrim walks there if he has not yet)
+    Object.assign(state.missions[id], missionState || {});
+    state.awardMissionId = null; state.contFor = null; state.folderOpen = false;
+    go("mainMenu");
+    return;
+  }
   state.missions[id].done = true;
+  if(missionIsGame(id)) state.pilgrimOwed = true;
   var gm = missionById(id);
   state.missions[id].badge = !(gm && gm.noBadge);
   if(missionIsGame(id)){ state.points += 100; state.pilgrimSteps = (state.pilgrimSteps || 0) + 1; }
@@ -3190,11 +3216,36 @@ function screenAward(){
 function afterAward(){
   var awardedId = state.awardMissionId;
   state.awardMissionId = null;
+  if(awardedId && state.contFor === awardedId){ saveState(); go("roundCont"); return; }      // after round 1: keep playing, or the Main Menu
   state.folderOpen = false;          // the Missions window is closed, so the player can watch the pilgrim (2026-10-22, per Dan)
   pilgrimAward = (state.pilgrimIn || !missionIsGame(awardedId)) ? null : "great";            // see pilgrimArrived (once he is in the church there is no pilgrim to speak). A mission that is not a game (Choose Joy) does not move him, so there is no "great" and no waiting: the icons stay as they are (2026-10-25, per Dan)
   // (It used to open the Golden Ticket screen the moment the points reached the line. Now the 5th game walks the pilgrim into the church, and the
   // church scene unlocks the ticket: see pilgrimEnter and screenChurchWalk, 2026-10-23, per Dan.)
   saveState();
+  go("mainMenu");
+}
+
+// The screen after the round 1 badge (2026-11-02, per Dan): a window that says the player can keep playing or go to the Main Menu and try another game, with CONTINUE PLAYING and MAIN MENU under it.
+// CONTINUE PLAYING goes back into the game, which was kept as it was (round 2 starts); MAIN MENU leaves it like the red X does, and the pilgrim walks.
+function roundContAlive(id){ return id === "emmaus" ? !!em : !!(id && state.session[id]); }
+function screenRoundCont(){
+  var id = state.contFor, m = id && missionById(id);
+  if(!m || !roundContAlive(id)){ state.contFor = null; state.screen = "mainMenu"; return screenMainMenu(); }      // (the game was lost, e.g. the page was reloaded: just the Main Menu)
+  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("cont_title"), body:t("cont_body"),
+    buttons:pixBtnHtml(t("continuePlaying"), "roundContGo()") + pixBtnHtml(t("mainMenu"), "roundContMenu()", true)});
+}
+function roundContGo(){
+  var id = state.contFor, s = id === "emmaus" ? em : (id && state.session[id]);
+  state.contFor = null;
+  if(!s){ go("mainMenu"); return; }
+  if(s.interlude) s.interlude.resumed = true;           // the interlude of round 1 is still there: it ends at once and round 2 starts (see pixRoundRun)
+  go(id);
+}
+function roundContMenu(){
+  var id = state.contFor;
+  state.contFor = null;
+  if(id === "emmaus"){ emQuit(); return; }
+  if(id && state.session[id]){ state.screen = id; exitMission(); return; }      // leaves the game the way its red X does (clears it, stops what it was doing, shows the Main Menu)
   go("mainMenu");
 }
 
@@ -3317,8 +3368,12 @@ function pixRoundRun(key, getSession, giveAward, finish){
   function alive(){ return getSession() === s && s.interlude && state.screen === key; }   // the player has not left
   function done(){
     pixRoundRunning[key] = false;
-    if(alive()) finish(s);
+    if(!alive()) return;
+    // Round 1 done (2026-11-02, per Dan): the badge and the 100 points come now, then the screen that asks whether to keep playing (see roundOneGrant); CONTINUE PLAYING comes back here with interlude.resumed
+    if(s.interlude.n === 1 && !s.interlude.final && !s.interlude.resumed && roundOneGrant(key)) return;
+    finish(s);
   }
+  if(s.interlude.resumed){ setTimeout(done, 0); return; }      // back from the "keep playing" screen: straight on to the next round, with no second ROUND 1 COMPLETED!
   if(s.interlude.phase === "award"){ setTimeout(done, 1200 + ROUND_SHOW_EXTRA_MS); return; }   // reloaded after the heart was given: just let it be seen, then go on
   var buf = pixSfxBuf.ffRound;
   // the very last ROUND COMPLETED goes to the Mission Completed screen as soon as its sound is over: no extra wait (2026-10-23, per Dan, shorter)
@@ -3337,6 +3392,7 @@ function pixRoundRun(key, getSession, giveAward, finish){
   }, FF_INTERLUDE_AWARD_MS);
 }
 function pixRoundDoneHtml(il){
+  if(il.resumed) return '<div class="pixRoundMid"></div>';      // (the moment between CONTINUE PLAYING and the next round: nothing is said twice)
   return '<div class="pixRoundMid"><div class="pixPaper pixRoundDone"><div class="pixResTitle">' + t("ff_roundDone")(il.n) + '</div>' +
     (il.award ? '<img class="pixBigHeart" src="tiles/heart_full.png" alt=""><div class="pixResTitle">' + t("ff_awarded") + '</div>' : '') +
   '</div></div>';
@@ -3356,9 +3412,11 @@ function ffInterlude(){
   function finish(){
     ffInterludeRunning = false;
     if(!alive()) return;
+    if(s.interlude.n === 1 && !lastRound && !s.interlude.resumed && roundOneGrant("faithFlash")) return;      // round 1: the badge and 100 points, then "keep playing?" (2026-11-02, per Dan)
     s.interlude = null;
     ffNext();
   }
+  if(s.interlude.resumed){ setTimeout(finish, 0); return; }      // back from the "keep playing" screen: on to round 2
   if(s.interlude.phase === "award"){ setTimeout(finish, 1200 + ROUND_SHOW_EXTRA_MS); return; }   // reloaded after the heart was given: just let it be seen, then go on
   var buf = pixSfxBuf.ffRound;
   var lastRound = s.index >= s.order.length - 1;       // the last one goes to the Mission Completed screen as soon as its sound is over (2026-10-23, per Dan)
@@ -3406,7 +3464,7 @@ function missionById(id){ return MISSIONS.filter(function(m){ return m.id === id
 function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission pixLower' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
 
 // a pixel button with the glow and the press sound; secondary = the blue one
-function pixBigLabel(label){ return label === t("hg_play") || label === t("tryAgain") || label === t("playAgain") || label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu"); }
+function pixBigLabel(label){ return label === t("hg_play") || label === t("tryAgain") || label === t("playAgain") || label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu") || label === t("continuePlaying"); }
 function pixBtnHtml(label, js, secondary){
   return '<button class="btn pixBtn pixBtnSm' + (pixBigLabel(label) ? ' pixBtnBig' : '') + (secondary ? ' secondary' : '') + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '">' + label + '</button>';
 }
@@ -5515,8 +5573,10 @@ function sdNextPuzzle(s){
   s.done = false; s.celebrate = false;
   if(s.level >= s.levels.length - 1){ sdCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
   else {
+    var first = s.level === 0;
     s.level++; var nl = s.levels[s.level];
     s.cells = nl.puz.slice(); s.hinted = []; s.hints = SD_HINTS; s.sel = sdFirstEmpty(nl.puz); s.busy = false;
+    if(first && roundOneGrant("sacredSudoku")) return;      // the first puzzle is round 1 (2026-11-02, per Dan): the badge and 100 points, then "keep playing?"; the second puzzle is already set up
   }
   saveState(); render();
 }
@@ -11530,7 +11590,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-02 DY";
+var APP_BUILD = "2026-11-02 EA";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11838,6 +11898,7 @@ function render(){
     case "welcome": html = screenWelcome(); break;
     case "mainMenu": html = screenMainMenu(); break;
     case "award": html = screenAward(); break;
+    case "roundCont": html = screenRoundCont(); break;
     case "missionIntro": html = screenMissionIntro(); break;
     case "faithFlash": html = screenFaithFlash(); break;
     case "faithMatch": html = screenFaithMatch(); break;
