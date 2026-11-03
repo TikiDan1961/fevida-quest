@@ -419,7 +419,8 @@
   @keyframes sparkBlink{0%{opacity:0;}55%{opacity:1;}65%{opacity:.35;}75%{opacity:1;}85%{opacity:0;}100%{opacity:0;}}
   /* The dove flies across the whole screen, in front of the icons in the sky (2026-10-27, per Dan), and never takes a tap: the layer lets every touch through to the icons below it. */
   .pixHome.pixSky > .pixDoveLayer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none;z-index:8;}
-  .pixDove{position:absolute;left:-14%;top:185px;width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-delay:-3s;pointer-events:none;}
+  .pixDove{position:absolute;left:-14%;top:225px;      /* (40 px lower than before, 2026-11-03, per Dan: it was 185px; every time the Main Menu is drawn the flight starts again at this height) */
+width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-delay:-3s;pointer-events:none;}
   @keyframes doveFly{0%{left:-14%;}55%{left:112%;}100%{left:112%;}}
   .pixDoveBob{width:100%;height:100%;animation:doveBob 3.2s ease-in-out infinite alternate;}
   @keyframes doveBob{from{transform:translateY(-35%);}to{transform:translateY(35%);}}
@@ -2417,9 +2418,20 @@ document.addEventListener("pointerdown", pixArmRevive, true);
 // made again at the end of the touch, so it is played here, when the finger lifts.
 var pixTapSynth = false, tapSwallow = false, tapSwallowTimer = 0, tapHeldSound, pixDownT = 0;     // pixDownT = when the finger touched (the event's own time), for the games that judge timing
 var TAP_SOUND_ONLY = /^\s*(?:if\s*\(\s*!\s*this\.disabled\s*\)\s*)?(?:pixPressSfx|tlPress|ebPress|ffPress)\(([^)]*)\)\s*;?\s*$/;
+// A button touched by a pointer that the phone calls "not primary" while no other finger is down (2026-11-03, per Dan: on Faith Match, after round 1, MAIN MENU on the Keep Going screen made its sound and lit up
+// but did nothing until it was pressed again). A touch whose end was lost (Faith Match redraws under the finger) can leave the phone believing a first finger is still down, so the next touch is not primary and,
+// being a second finger, gets neither this tap nor a click. Such a touch on a button now counts as a normal tap when no other finger has been down in the last 3 seconds (the pixFingers rule above).
+function pixLoneTouch(e){
+  var now = performance.now(), k;
+  for(k in pixFingers){ if(String(k) !== String(e.pointerId) && now - pixFingers[k] < 3000) return false; }
+  if(!(e.target && e.target.closest && e.target.closest(".btn"))) return false;
+  dbgLog("tap: a button was touched by a pointer that is not primary, with no other finger down: counted as a normal tap (" + state.screen + ")");
+  return true;
+}
 function tapOnTouch(e){
   tapSwallow = false; tapHeldSound = undefined;
-  if(!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+  if(e.pointerType === "mouse" && e.button !== 0) return;
+  if(!e.isPrimary && !pixLoneTouch(e)) return;
   var el = e.target && e.target.closest ? e.target.closest("[onclick]") : null;
   if(!el || el.disabled || el.getAttribute("aria-disabled") === "true" || el.classList.contains("disabled")) return;
   var pd = el.getAttribute("onpointerdown"), m = pd && TAP_SOUND_ONLY.exec(pd);
@@ -11621,7 +11633,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-03 EF";
+var APP_BUILD = "2026-11-03 EH";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
