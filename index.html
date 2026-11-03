@@ -11590,7 +11590,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-02 EC";
+var APP_BUILD = "2026-11-03 ED";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11948,10 +11948,23 @@ function renderApply(html){
   if(boot){ boot.style.opacity = "0"; setTimeout(function(){ if(boot.parentNode) boot.parentNode.removeChild(boot); }, 300); }
   var isNewScreen = state.screen !== lastRenderedScreen;
   var enteringPassportFresh = state.screen === "passport" && isNewScreen;
+  var prevScreen = lastRenderedScreen;
   lastRenderedScreen = state.screen;
   rotateMsgUpdate();
   var wasSky = !!app.querySelector(".screen.pixSky");     // the screen being replaced was a sky screen
-  app.innerHTML = exitBarHtml() + html;
+  var oldSky = prevScreen === "award" && state.screen === "roundCont" && app.querySelector(".screen.pixSky");
+  if(oldSky){
+    // The badge screen to the Keep Going screen (2026-11-03, per Dan: a flash between them on his iPhone): the sky and its three cloud layers stay exactly as they are and only the title, the card and the buttons are swapped, so
+    // nothing of the sky is built or painted again (the two screens have the same sky, and no red X).
+    var box = document.createElement("div"); box.innerHTML = exitBarHtml() + html;
+    var nsky = box.querySelector(".screen.pixSky");
+    if(nsky && !box.querySelector(".exitBar") && !app.querySelector(".exitBar")){
+      [].slice.call(oldSky.children).forEach(function(c){ if(!c.classList.contains("pixSkyClouds")) oldSky.removeChild(c); });
+      [].slice.call(nsky.children).forEach(function(c){ if(!c.classList.contains("pixSkyClouds")) oldSky.appendChild(c); });
+      oldSky.className = nsky.className;
+    } else oldSky = null;
+  }
+  if(!oldSky) app.innerHTML = exitBarHtml() + html;
   if(isNewScreen) pixHoldUntilLoaded(app);
   if(isNewScreen){
     var el = app.querySelector(".screen");
