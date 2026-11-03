@@ -890,6 +890,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .jlHalf i{width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);}
   .jlHalf.l i{border-right:16px solid #FFC93A;} .jlHalf.r i{border-left:16px solid #FFC93A;}
   .jlHalf.held{background:rgba(255,255,255,.22);}
+  .optPrivacy{margin:12px auto 0;max-width:340px;padding:0 14px;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-size:1rem;line-height:1.15;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}      /* the anonymous-counting line under the sliders (2026-11-03) */
   .optBuild{margin:14px auto 0;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-size:1.05rem;font-weight:700;color:#1B1F3B;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;}
   /* Pray the Beads (2026-10-23): a dark starry stage, the rosary string, the beads and the gold cross to tap them on. The beads and the string are placed by pbPlace. */
   .pbArea{width:min(100%,380px);margin:0 auto;}
@@ -1361,7 +1362,7 @@ var T = {
     comingSoon:"COMING SOON", comingSoonToast:"Coming soon!",
     missionsFolder:"Missions", goldenTicketLabel:"Golden Ticket",
     sheepSays:"baaaa", backLabel:"Back to the welcome screen",
-    optionsLabel:"Options", optionsTitle:"Options", sfxVolume:"Sound Effects", musicVolume:"Music",
+    optionsLabel:"Options", optionsTitle:"Options", privacyNote:"This game counts anonymous usage, like which games are played, to help us improve it. It does not collect your name or any personal information.", sfxVolume:"Sound Effects", musicVolume:"Music",
     pilgrimStart:"Hi, I'm Pilgrim! Open Missions to start our journey.", pilgrimNice:"Great job! Let's keep walking with faith.", pilgrimGreat:"Great job!", pilgrimTryAnother:function(n){return "Try another mission: "+n+"!";},
     pilgrimTry:function(n){return "Try "+n+" next!";}, pilgrimToGo:function(n){return n+" more game"+(n === 1 ? "" : "s")+" to reach the church!";},
     pilgrimTicket:"Your Golden Ticket is ready! Tap it to see it.",
@@ -1530,7 +1531,7 @@ var T = {
     comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
     missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
     sheepSays:"beeee", backLabel:"Volver a la pantalla de bienvenida",
-    optionsLabel:"Opciones", optionsTitle:"Opciones", sfxVolume:"Efectos de sonido", musicVolume:"Música",
+    optionsLabel:"Opciones", optionsTitle:"Opciones", privacyNote:"Este juego cuenta el uso de forma anónima, por ejemplo qué juegos se juegan, para ayudarnos a mejorarlo. No recopila tu nombre ni información personal.", sfxVolume:"Efectos de sonido", musicVolume:"Música",
     pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.", pilgrimGreat:"¡Buen trabajo!", pilgrimTryAnother:function(n){return "¡Prueba otra misión: "+n+"!";},
     pilgrimTry:function(n){return "¡Prueba "+n+"!";}, pilgrimToGo:function(n){return n === 1 ? "¡Falta 1 juego para llegar a la iglesia!" : "¡Faltan "+n+" juegos para llegar a la iglesia!";},
     pilgrimTicket:"¡Tu Boleto Dorado está listo! Tócalo para verlo.",
@@ -1995,7 +1996,142 @@ document.addEventListener("visibilitychange", function(){ dbgLog("visibility " +
 window.addEventListener("pagehide", function(){ dbgLog("pagehide screen:" + state.screen); });
 window.addEventListener("pageshow", function(e){ dbgLog("pageshow persisted:" + e.persisted + " " + dbgView()); });
 window.addEventListener("error", function(e){ dbgLog("ERROR " + (e.message || "") + " @" + (e.lineno || "") + ":" + (e.colno || "")); });
-function go(screen){ dbgLog("go " + state.screen + " -> " + screen + " by " + dbgWho()); state.screen = screen; saveState(); render(); }
+function go(screen){ dbgLog("go " + state.screen + " -> " + screen + " by " + dbgWho()); phOnGo(state.screen, screen); state.screen = screen; saveState(); render(); }
+
+/* ---------- Analytics: PostHog (2026-11-03, per Dan; the plan is the "Fe y Vida Quest: PostHog Analytics Plan" document) ----------
+   Anonymous counts only: no names, no cookies, no session recording, no autocapture, no IP kept (set "Discard client IP data" in the PostHog project settings). Every event goes through track(), which never lets a problem reach the game.
+   The two project keys are public "write only" keys: paste them here. With a key left empty nothing is sent (and posthog.js is not even loaded). A link with ?test (remembered on that phone; ?test=0 clears it) and the local
+   test server use the test project and keep a list of what was sent in phLog (and in the event log in Options). A link with ?src=name is remembered as the source of the visit. */
+var PH_KEY_LIVE = "phc_B6G5F3oGWsiCSipjpkxXZY5C7dUkBpAvpGJi8fptSaSD", PH_KEY_TEST = "phc_AFHxrzpj9jJqbdshJHCNBsFqbWLYF2LfFz6hW4Xd6krJ";          // Event project and Test project (Dan, 2026-11-03)
+var PH_REGION = "us";                                   // "us" or "eu": the same as the PostHog project, and the same as the hosts in the _redirects file
+var PH_UI = {us: "https://us.posthog.com", eu: "https://eu.posthog.com"}, PH_DIRECT = {us: "https://us.i.posthog.com", eu: "https://eu.i.posthog.com"};
+var phOn = false, phLoaded = false, phQ = [], phLog = [], phTest = false, phT0 = Date.now(), phErrN = 0, phHiddenAt = 0, phAtt = {}, phMissionT0 = {}, phIntroT0 = 0, phHowT0 = 0, phTicketViews = 0, phRotateT0 = 0, phRotateFor = "", phBootGame = false, phG = null;
+function phGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function phSet(k, v){ try{ if(v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); }catch(e){} }
+function phSecs(t0){ return Math.max(0, Math.min(3600, Math.round((Date.now() - t0) / 1000))); }
+(function(){
+  try{
+    var q = location.search || "", m = /[?&]test(?:=([^&]*))?/.exec(q), s = /[?&]src=([\w\-]{1,24})/.exec(q);
+    if(m) phSet("fevidaTest", m[1] === "0" ? null : "1");
+    if(s && !phGet("fevidaSrc")) phSet("fevidaSrc", s[1]);          // the first link that brought this phone is the source
+    phTest = phGet("fevidaTest") === "1" || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  }catch(e){}
+})();
+function phBase(){
+  return {language: state.lang || null, points: state.points || 0, games_done: pilgrimGamesDone(), ticket_unlocked: !!goldenTicketUnlocked(), screen: state.screen};
+}
+function track(name, props){
+  try{
+    var p = phBase(), k;
+    if(props) for(k in props) p[k] = props[k];
+    if(phTest){ phLog.push({e: name, p: p, t: Date.now() - phT0}); if(phLog.length > 400) phLog.shift(); dbgLog("analytics: " + name + " " + JSON.stringify(props || {}).slice(0, 90)); }
+    if(!phOn) return;
+    if(phLoaded) window.posthog.capture(name, p);
+    else { phQ.push([name, p]); if(phQ.length > 60) phQ.shift(); }
+  }catch(e){}
+}
+function phInit(){
+  try{
+    var key = phTest ? PH_KEY_TEST : PH_KEY_LIVE, first = !phGet("fevidaSeen");
+    phSet("fevidaSeen", "1");
+    phOn = !!key && /^https?:$/.test(location.protocol);
+    var res = EXIT_SCREENS.indexOf(state.screen) !== -1 && state.screen !== "missionIntro";
+    track("app_opened", {first_screen: state.screen, returning: !first});
+    if(res){ phBootGame = true; track("game_resumed_after_reload", {mission_id: phMissionId(state.screen)}); }
+    if(!phOn) return;
+    var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);       // the local test server has no /ingest path: it talks to PostHog directly
+    var sc = document.createElement("script");
+    sc.async = true; sc.src = "posthog.js";
+    sc.onload = function(){
+      try{
+        window.posthog.init(key, {
+          api_host: local ? PH_DIRECT[PH_REGION] : "/ingest", ui_host: PH_UI[PH_REGION],
+          autocapture: false, capture_pageview: false, capture_pageleave: false, capture_dead_clicks: false, capture_exceptions: false, capture_heatmaps: false, capture_performance: false,
+          disable_session_recording: true, disable_surveys: true, advanced_disable_flags: true, advanced_disable_decide: true,
+          person_profiles: "identified_only", persistence: "localStorage"
+        });
+        window.posthog.register({build: APP_BUILD, display_mode: instStandalone() ? "home_screen" : "browser", source: phGet("fevidaSrc") || "unknown", is_test: phTest, $geoip_disable: true});
+        phLoaded = true;
+        var q = phQ; phQ = [];
+        q.forEach(function(a){ try{ window.posthog.capture(a[0], a[1]); }catch(e){} });
+      }catch(e){ phOn = false; phQ = []; }
+    };
+    sc.onerror = function(){ phOn = false; phQ = []; };          // blocked or offline: the game goes on without analytics
+    setTimeout(function(){ try{ document.head.appendChild(sc); }catch(e){} }, 1500);          // after the first screen is up
+  }catch(e){}
+}
+function phMissionId(screen){ return (screen === "hopeGardenL" || screen === "hopeGarden" || screen === "hopeGardenIntro") ? "hopeGarden" : screen; }
+function phGameObj(screen){ return screen === "emmaus" ? em : screen === "hopeGardenL" ? hgl : state.session[screen]; }
+// screens being entered: the ones that are events of their own
+function phOnGo(prev, next){
+  try{
+    if(prev === next) return;
+    if(next === "mainMenu" && prev === "welcome") track("quest_started");
+    else if(next === "passport") track("passport_opened", {badges_earned: MISSIONS.filter(function(m){ return !m.noBadge && state.missions[m.id].done; }).length});
+    else if(next === "options") track("options_opened");
+    else if(next === "goldenTicket"){ track("golden_ticket_tapped", {locked: false}); track("golden_ticket_viewed", {views_so_far: ++phTicketViews}); }
+    else if(next === "missionIntro" || next === "hopeGardenIntro"){ phIntroT0 = Date.now(); track("mission_intro_viewed", {mission_id: next === "hopeGardenIntro" ? "hopeGarden" : state.introMission}); }
+  }catch(e){}
+}
+function phMissionStart(id){
+  try{
+    phAtt[id] = (phAtt[id] || 0) + 1; phMissionT0[id] = Date.now();
+    track("mission_started", {mission_id: id, intro_seconds: phIntroT0 ? phSecs(phIntroT0) : null, attempt: phAtt[id]});
+    phIntroT0 = 0;
+  }catch(e){}
+}
+function phMissionDone(id){ track("mission_completed", {mission_id: id, seconds_total: phMissionT0[id] ? phSecs(phMissionT0[id]) : null, attempts: phAtt[id] || 1}); }
+// Rounds, seen from the screens: every game keeps its state in state.session (the Road to Emmaus in em, the landscape Hope Garden in hgl), and the ROUND X COMPLETED! step and the failed state look the same in all of them,
+// so one look after each drawing finds the round that began, the round that was won and the round that was lost. (Games with no ROUND X COMPLETED! step give only the mission events.)
+function phWatch(){
+  try{
+    var scr = state.screen;
+    if(scr === "award" || scr === "roundCont") return;          // the game is still there behind these: CONTINUE PLAYING comes back to it
+    if(EXIT_SCREENS.indexOf(scr) === -1 || scr === "missionIntro"){ phG = null; return; }
+    var id = phMissionId(scr), s = phGameObj(scr);
+    if(!s || typeof s !== "object") return;
+    var failed = s.status === "failed" || s.mode === "over";
+    if(!phG || phG.id !== id || phG.s !== s){
+      if(phG && phG.id === id && phG.intl && !phG.final){          // a new session object while ROUND X COMPLETED! was up is the next round (Faith Match makes a new one for each level)
+        phG.s = s; phG.round = phG.intl + 1; phG.intl = 0; phG.t0 = Date.now(); track("round_started", {mission_id: id, round: phG.round});
+        return;
+      }
+      var retry = !!(phG && phG.id === id && phG.failed);
+      if(retry){ phAtt[id] = (phAtt[id] || 1) + 1; track("mission_retry", {mission_id: id, after_round: phG.round}); }
+      phG = {id: id, s: s, round: 1, t0: Date.now(), intl: 0, final: false, failed: false};
+      if(phBootGame && !retry) phBootGame = false; else track("round_started", {mission_id: id, round: 1});
+      return;
+    }
+    var il = (s.interlude && s.interlude.n) ? s.interlude.n : 0;
+    if(il && il !== phG.intl){
+      phG.intl = il; phG.final = !!s.interlude.final;
+      track("round_completed", {mission_id: id, round: il, seconds: phSecs(phG.t0), chances_left: typeof s.chances === "number" ? s.chances : null, final: phG.final});
+    } else if(!il && phG.intl){
+      var done = phG.intl; phG.intl = 0;
+      if(!phG.final){ phG.round = done + 1; phG.t0 = Date.now(); track("round_started", {mission_id: id, round: phG.round}); }
+    }
+    if(failed && !phG.failed){ phG.failed = true; track("round_failed", {mission_id: id, round: phG.round, seconds: phSecs(phG.t0)}); }
+  }catch(e){}
+}
+// "please rotate your phone" for the two games played on their side
+function phRotateCheck(){
+  try{
+    var need = (state.screen === "hopeGardenL" || state.screen === "emmaus") && hglUpright();
+    if(need && !phRotateT0){ phRotateT0 = Date.now(); phRotateFor = phMissionId(state.screen); track("rotate_prompt_shown", {mission_id: phRotateFor}); }
+    else if(!need && phRotateT0){ track("rotate_prompt_cleared", {mission_id: phRotateFor, seconds_waited: phSecs(phRotateT0)}); phRotateT0 = 0; }
+  }catch(e){}
+}
+window.addEventListener("resize", function(){ phRotateCheck(); });
+window.addEventListener("orientationchange", function(){ setTimeout(phRotateCheck, 300); });
+document.addEventListener("visibilitychange", function(){
+  try{
+    if(document.hidden){ phHiddenAt = Date.now(); track("app_backgrounded", {in_game: !!phG}); }
+    else if(phHiddenAt){ track("app_returned", {seconds_away: phSecs(phHiddenAt)}); phHiddenAt = 0; }
+  }catch(e){}
+});
+function phError(msg){ if(++phErrN > 5) return; track("app_error", {message: String(msg).slice(0, 120)}); }
+window.addEventListener("error", function(e){ phError((e && e.message) || "error"); });
+window.addEventListener("unhandledrejection", function(e){ phError("promise: " + ((e && e.reason && (e.reason.message || e.reason)) || "")); });
 
 function shuffle(arr){
   var a = arr.slice();
@@ -2008,7 +2144,7 @@ function shuffle(arr){
 
 /* ---------- Language / Welcome ---------- */
 
-function selectLanguage(lang){ state.lang = lang; go("welcome"); }
+function selectLanguage(lang){ var had = !!state.lang; state.lang = lang; track("language_selected", {language: lang, via: had ? "changed" : "first_choice"}); go("welcome"); }
 
 // 8-bit button-press sound (2026-10-19, per Dan): a short two-step square-wave
 // blip made with Web Audio, so there is no sound file to load. It plays on the
@@ -2362,6 +2498,7 @@ function pixReviveOnTap(ev){
   pixAudioStale = false;
   var madeFresh = pixFreshAudio();
   dbgLog("audio: " + (ev ? ev.type : "?") + " on " + state.screen + " -> " + (madeFresh ? "new engine, state " + pixAudioCtx.state : "no new engine (state " + (pixAudioCtx ? pixAudioCtx.state : "none") + ")"));      // for the event log on the Options screen (2026-11-01, no sound after returning to the puzzle)
+  if(madeFresh) track("audio_engine_replaced", {screen: state.screen});
   if(!madeFresh) pixAudioStale = true;             // not made (a moment ago one was, or none could be): still not trusted, so the next touch tries again
   else if(pixReviveQueue.length){ var q = pixReviveQueue; pixReviveQueue = []; q.forEach(function(job){ job(); }); }      // the sounds that were waiting for the new engine
 }
@@ -2426,6 +2563,7 @@ function pixLoneTouch(e){
   for(k in pixFingers){ if(String(k) !== String(e.pointerId) && now - pixFingers[k] < 3000) return false; }
   if(!(e.target && e.target.closest && e.target.closest(".btn"))) return false;
   dbgLog("tap: a button was touched by a pointer that is not primary, with no other finger down: counted as a normal tap (" + state.screen + ")");
+  track("tap_recovered", {screen: state.screen});
   return true;
 }
 function tapOnTouch(e){
@@ -2531,11 +2669,13 @@ function goldenTicketUnlocked(){
 var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wordUnscramble","catchLight","fruitsSpirit",
   "jacobLadder","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","emmaus"];
 function openMission(id){
+  track("mission_icon_tapped", {mission_id: id, from: state.folderOpen ? "folder" : "menu", completed: !!(state.missions[id] && state.missions[id].done)});
   if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
   else startMission(id);
 }
 function startMission(id){
+  phMissionStart(id);
   state.introMission = null;
   if(id === "faithFlash"){ initFaithFlash(); go("faithFlash"); }
   else if(id === "faithMatch"){ preloadMatchTiles(); initFaithMatchLevel(0); go("faithMatch"); }   // always from Level 1
@@ -2617,10 +2757,11 @@ function toast(text, ms){            // ms = how long it stays up (2600 unless a
   toastTimer = setTimeout(function(){ el.classList.remove("show"); }, ms || 2600);   // 2600 is long enough to read the longer messages
 }
 function comingSoon(){ toast(t("comingSoonToast")); }
-function ticketLocked(){ toast(t("ticketLocked")(GOLDEN_TICKET_POINTS), 1560); }   // the "Earn 500 points..." message stays 40% less long than the 2600 ms it had (2026-10-22, per Dan)
+function ticketLocked(){ track("golden_ticket_tapped", {locked: true}); toast(t("ticketLocked")(GOLDEN_TICKET_POINTS), 1560); }   // the "Earn 500 points..." message stays 40% less long than the 2600 ms it had (2026-10-22, per Dan)
 
 // ---- the Missions folder ----
 function openFolder(icon){
+  track("missions_folder_opened");
   state.folderOpen = true; saveState(); render();
   // grow the panel out of the folder icon it came from
   var panel = document.querySelector(".folderPanel"), overlay = document.querySelector(".folderOverlay");
@@ -2872,6 +3013,7 @@ function pilgrimBusy(el, on){ var scr = el && el.closest(".screen"); if(scr) scr
 // The 5th stop is the church door, and there he goes in (2026-10-22, per Dan): he steps up into the doorway and is gone. From then on he stays inside
 // (state.pilgrimIn), and the icons can be tapped again once he is in.
 function pilgrimEnter(el){
+  track("church_reached", {seconds_since_open: phSecs(phT0)});
   pilgrimAward = null; pilgrimGreetPending = false; pilgrimHide();
   el.classList.remove("walking", "hop");
   void el.offsetWidth;
@@ -2957,6 +3099,7 @@ function cwFinish(){
   cwRunning = false; cancelAnimationFrame(cwRaf); clearTimeout(cwTimer); cwConfettiStop();
   if(state.screen !== "churchWalk") return;
   state.ticketUnlocked = true; saveState();
+  track("golden_ticket_unlocked", {seconds_since_open: phSecs(phT0)});
   go("mainMenu");                      // the ticket icon is unlocked now
 }
 function cwStart(){
@@ -2990,6 +3133,7 @@ function cwStart(){
   cwRaf = requestAnimationFrame(frame);
 }
 function pilgrimArrived(el, walkedForward){
+  if(walkedForward) track("pilgrim_walked", {games_done: pilgrimGamesDone()});
   state.pilgrimP = pilgrimPos; saveState();
   pilgrimAllowBack = false;
   if(pilgrimPos >= 0.9999 && !state.pilgrimIn){ pilgrimEnter(el); return; }
@@ -3105,7 +3249,7 @@ function howHtml(inFolderCount){
     '<div class="howBtn">' + pixBtnHtml(t("howGo"), "howClose()") + '</div></div></div>';
 }
 var howJustClosed = false;
-function howClose(){ state.howSeen = true; howJustClosed = true; saveState(); render(); }
+function howClose(){ track("how_it_works_closed", {seconds_open: phHowT0 ? phSecs(phHowT0) : null}); state.howSeen = true; howJustClosed = true; saveState(); render(); }
 
 // ---- Install the app (2026-11-02, per Dan): players scan the QR code, the game opens in the browser, and an INSTALL THE APP button (Welcome and Options screens) gets it onto the home screen ----
 // Android (Chrome) gives the page an install prompt that one tap opens (beforeinstallprompt); an iPhone has no such prompt, so a small window shows the two taps in Safari. The button is
@@ -3131,6 +3275,7 @@ function installTap(){
 function instRefresh(){ if(state.screen === "welcome" || state.screen === "options") render(); }
 function installShow(){
   if(document.getElementById("instOverlay")) return;
+  track("install_help_opened", {platform: instPlatform() || "other"});
   var plat = instPlatform(), share = '<svg class="instShare" viewBox="0 0 24 24" fill="none" stroke="#1E2F7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
   var steps = plat === "android" || plat === "" ? [t("install_and1"), t("install_and2"), t("install_and3")] : [t("install_ios1"), t("install_ios2"), t("install_ios3")];
   var lis = (plat === "iosOther" ? '<li>' + t("install_safari") + '</li>' : "") + steps.map(function(s, i){ return '<li><b>' + (i + 1) + '.</b> ' + s.replace("{share}", share) + '</li>'; }).join("");
@@ -3142,8 +3287,9 @@ function installShow(){
 }
 function installClose(){ var el = document.getElementById("instOverlay"); if(el && el.parentNode) el.parentNode.removeChild(el); }
 window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); instPrompt = e; instRefresh(); });
-window.addEventListener("appinstalled", function(){ instInstalled = true; instPrompt = null; installClose(); instRefresh(); });
+window.addEventListener("appinstalled", function(){ track("app_installed"); instInstalled = true; instPrompt = null; installClose(); instRefresh(); });
 function screenMainMenu(){
+  if(!state.howSeen && !phHowT0) phHowT0 = Date.now();
   if(state.pilgrimOwed && state.screen === "mainMenu"){ state.pilgrimOwed = false; pilgrimAward = state.pilgrimIn ? null : "great"; }      // a game was finished since the last Main Menu: he says "Great job!" and walks (2026-11-02, per Dan)
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
@@ -3211,6 +3357,7 @@ function grantMission(id, missionState){
   if(missionIsGame(id) && state.missions[id].done){      // the badge and the points came after round 1: all the rounds are played now, so back to the Main Menu (the pilgrim walks there if he has not yet)
     Object.assign(state.missions[id], missionState || {});
     state.awardMissionId = null; state.contFor = null; state.folderOpen = false;
+    phMissionDone(id);
     go("mainMenu");
     return;
   }
@@ -3220,6 +3367,8 @@ function grantMission(id, missionState){
   state.missions[id].badge = !(gm && gm.noBadge);
   if(missionIsGame(id)){ state.points += 100; state.pilgrimSteps = (state.pilgrimSteps || 0) + 1; }
   Object.assign(state.missions[id], missionState || {});
+  if(missionIsGame(id)) track("badge_awarded", {mission_id: id, points_total: state.points});
+  if(state.contFor !== id) phMissionDone(id);          // (after round 1 the mission is not over yet: it ends with the last round, above)
   state.awardMissionId = id;
   pixSfxPlay("missionDone", true);       // the Mission Complete sound: the screen appears together with it
   go("award");
@@ -3277,6 +3426,7 @@ function screenRoundCont(){
     buttons:pixBtnHtml(t("continuePlaying"), "roundContGo()") + pixBtnHtml(t("mainMenu"), "roundContMenu()", true)});
 }
 function roundContGo(){
+  track("keep_going_choice", {mission_id: state.contFor, choice: "continue"});
   var id = state.contFor, s = id === "emmaus" ? em : (id && state.session[id]);
   state.contFor = null;
   if(!s){ go("mainMenu"); return; }
@@ -3285,6 +3435,7 @@ function roundContGo(){
 }
 function roundContMenu(){
   var id = state.contFor;
+  track("keep_going_choice", {mission_id: id, choice: "main_menu"});
   state.contFor = null;
   state.folderOpen = false;          // the Missions window is closed, so the player sees the pilgrim walk, as after the last round of a game (2026-11-03, per Dan)
   if(id === "emmaus"){ emQuit(); return; }
@@ -8990,7 +9141,7 @@ document.addEventListener("pointerdown", function(e){
 }, true);
 
 // ---- screens ----
-function hgOpen(){ state.session.hopeGarden = null; hg = null; go("hopeGardenIntro"); }
+function hgOpen(){ track("mission_icon_tapped", {mission_id: "hopeGarden", from: "menu", completed: false}); state.session.hopeGarden = null; hg = null; go("hopeGardenIntro"); }
 function hgStart(){ state.introMission = "hopeGarden"; go("missionIntro"); }          // PLAY HOPE GARDEN opens the instruction screen first, like the games (2026-11-02, per Dan); START MISSION there calls hgPlay
 function hgPlay(){ state.introMission = null; state.session.hopeGarden = null; hg = null; hgl = null; go("hopeGardenL"); }          // (stage 1 of the landscape game; the upright one is still in this file, saved as Hope Garden v1)
 function hgTryAgain(){ initHopeGarden(); render(); }                                                   // PLAY AGAIN after winning: from round 1
@@ -11630,10 +11781,10 @@ function setVolume(kind, v){
   if(inp) inp.style.setProperty("--p", v / 100);
 }
 // letting go of the sound-effects slider plays a sound so the level can be heard
-function optionPreview(kind){ if(kind !== "music") pixSfxPlay("tap"); }
+function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-03 EH";
+var APP_BUILD = "2026-11-03 EL";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11647,6 +11798,7 @@ function screenOptions(){
       optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
+    '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
     '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
@@ -11741,6 +11893,7 @@ function exitMission(){
 function quitAskOpen(){
   if(quitAsk) return;
   quitAsk = true; quitAskScreen = state.screen;
+  track("quit_prompt_shown", {mission_id: phMissionId(state.screen), round: phG ? phG.round : null, seconds_played: phG ? phSecs(phG.t0) : null});
   document.body.classList.add("quitPaused");
   try { if(typeof emMoveSfxSet === "function") emMoveSfxSet(""); if(typeof hglDangerSfx === "function") hglDangerSfx(false); } catch(e){}      // (a looping sound would go on while the game stands still)
   var el = document.createElement("div");
@@ -11756,9 +11909,10 @@ function quitAskEnd(){          // takes the window away and lets what was held 
   rq.forEach(function(q){ requestAnimationFrame(q.cb); });
   tq.forEach(function(q){ setTimeout(function(){ q.fn.apply(window, q.args); }, 0); });
 }
-function quitAskStay(){ quitAskEnd(); }
+function quitAskStay(){ track("quit_prompt_answered", {mission_id: phMissionId(quitAskScreen || state.screen), answer: "stay"}); quitAskEnd(); }
 function quitAskLeave(){
   var scr = quitAskScreen;
+  track("quit_prompt_answered", {mission_id: phMissionId(scr || state.screen), answer: "leave"});
   quitAskEnd();
   if(state.screen !== scr) return;          // (the screen changed behind the window, e.g. the game ended: nothing to leave)
   if(scr.indexOf("hopeGarden") !== 0 && !isMenuIconMission(scr)) state.folderOpen = true;      // the Missions window is open when the Main Menu comes back (Hope Garden and Choose Joy are not in it)
@@ -12011,7 +12165,7 @@ function render(){
   if(need){          // something this screen needs is not here yet: what is showing stays up, and the new screen goes up in one go when it is (a render asked for meanwhile takes its place)
     var scr = state.screen, t0 = performance.now();
     dbgLog("assets: " + scr + " waits for " + need.urls.length + " picture(s)" + (need.fonts ? " and the fonts" : ""));
-    pixWhen(need, function(){ if(token === renderToken){ dbgLog("assets: " + scr + " shown after " + Math.round(performance.now() - t0) + " ms"); renderApply(html); } });
+    pixWhen(need, function(){ if(token === renderToken){ var waited = Math.round(performance.now() - t0); dbgLog("assets: " + scr + " shown after " + waited + " ms"); if(waited > 1500) track("slow_screen", {screen: scr, ms: waited}); renderApply(html); } });
     return;
   }
   renderApply(html);
@@ -12027,6 +12181,7 @@ function renderApply(html){
   lastRenderedScreen = state.screen;
   if(quitAsk && state.screen !== quitAskScreen) quitAskEnd();          // the screen changed behind the quit question (e.g. the game ended): the question goes
   rotateMsgUpdate();
+  phWatch(); phRotateCheck();
   var wasSky = !!app.querySelector(".screen.pixSky");     // the screen being replaced was a sky screen
   var oldSky = prevScreen === "award" && state.screen === "roundCont" && app.querySelector(".screen.pixSky");
   if(oldSky){
@@ -12162,6 +12317,7 @@ window.addEventListener("visibilitychange", saveState);
 dbgLog("page loaded " + APP_BUILD + " " + dbgView() + " nav:" + (function(){ try{ return performance.getEntriesByType("navigation")[0].type; }catch(e){ return "?"; } })() + " screen:" + state.screen);
 pixFontsLoad();
 pixGuardStart();
+phInit();
 render();
 // The service worker (sw.js) saves the game on the phone so it opens from the home screen and plays without a connection. It is registered with the build in its address, so every new build is a new worker with a fresh cache.
 if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
