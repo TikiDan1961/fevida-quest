@@ -2125,6 +2125,7 @@ function phWatch(){
     if(il && il !== phG.intl){
       phG.intl = il; phG.final = !!s.interlude.final;
       track("round_completed", {mission_id: id, round: il, seconds: phSecs(phG.t0), chances_left: typeof s.chances === "number" ? s.chances : null, final: phG.final});
+      pixConfettiParty();          // confetti on the ROUND X COMPLETED! screen (2026-11-05, per Dan)
     } else if(!il && phG.intl){
       var done = phG.intl; phG.intl = 0;
       if(!phG.final){ phG.round = done + 1; phG.t0 = Date.now(); track("round_started", {mission_id: id, round: phG.round}); }
@@ -3141,6 +3142,54 @@ function cwConfetti(tk){
   }
   cwConfettiRaf = requestAnimationFrame(frame);
 }
+// Confetti on the ROUND X COMPLETED! screens and on the badge screen (2026-11-05, per Dan): the same paper strips as the Golden Ticket's, a smaller burst from the middle of the screen and a rain from the top, for about 4 seconds.
+// It lies over the screen and never takes a touch. It stops by itself, and at once if another screen comes up. (Called from phWatch when a round is completed, and from renderApply when the badge screen comes up.)
+var pxConfettiRaf = 0, pxConfettiCv = null, pxConfettiFn = null;
+function pixConfettiStop(){
+  cancelAnimationFrame(pxConfettiRaf); pxConfettiRaf = 0; pxConfettiFn = null;
+  if(pxConfettiCv && pxConfettiCv.parentNode) pxConfettiCv.parentNode.removeChild(pxConfettiCv);
+  pxConfettiCv = null;
+}
+function pixConfettiParty(){
+  try {
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    pixConfettiStop();
+    var startScr = state.screen, dpr = Math.min(window.devicePixelRatio || 1, 1.5), vw = window.innerWidth, vh = window.innerHeight, k = Math.min(vw, 600) / 390;
+    var cv = document.createElement("canvas"); cv.className = "cwConfetti";
+    cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr);
+    document.body.appendChild(cv); pxConfettiCv = cv;
+    var g = cv.getContext("2d"); g.scale(dpr, dpr);
+    var colors = ["#FFC93A", "#FFE27A", "#E8433B", "#3B82E8", "#3FBF5F", "#F28AC0", "#FFFFFF", "#8A5CE0", "#FF8A2B"], bits = [], i, a, sp;
+    function add(x, y, vx, vy, delay){
+      bits.push({x: x, y: y, vx: vx, vy: vy, w: (6 + Math.random() * 8) * k, h: (3 + Math.random() * 5) * k, rot: Math.random() * 6.28, vr: (Math.random() - .5) * 14,
+        flip: Math.random() * 6.28, vf: 4 + Math.random() * 8, c: colors[Math.floor(Math.random() * colors.length)], delay: delay || 0});
+    }
+    for(i = 0; i < 70; i++){                                                                // the burst: a wide fan, mostly upwards, from the middle of the screen
+      a = -Math.PI / 2 + (Math.random() - .5) * Math.PI * 1.4; sp = (220 + Math.random() * 520) * k;
+      add(vw / 2 + (Math.random() - .5) * vw * .3, vh * .45, Math.cos(a) * sp, Math.sin(a) * sp, 0);
+    }
+    for(i = 0; i < 90; i++) add(Math.random() * vw, -20 - Math.random() * 60 * k, (Math.random() - .5) * 90 * k, (60 + Math.random() * 140) * k, .4 + Math.random() * 1.6);      // the rain
+    var last = performance.now(), t = 0;
+    function frame(now){
+      if(!pxConfettiCv || state.screen !== startScr){ pixConfettiStop(); return; }
+      var dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
+      g.clearRect(0, 0, vw, vh);
+      var alive = 0;
+      bits.forEach(function(b){
+        if(t < b.delay){ alive++; return; }
+        b.vy += 760 * k * dt; b.vx *= (1 - .9 * dt); b.vy *= (1 - .35 * dt);
+        b.x += b.vx * dt; b.y += b.vy * dt; b.rot += b.vr * dt; b.flip += b.vf * dt;
+        if(b.y > vh + 30) return;
+        alive++;
+        g.save(); g.translate(b.x, b.y); g.rotate(b.rot); g.scale(1, Math.cos(b.flip));
+        g.fillStyle = b.c; g.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); g.restore();
+      });
+      if(alive && t < 4.5) pxConfettiRaf = requestAnimationFrame(frame); else pixConfettiStop();
+    }
+    pxConfettiFn = frame;
+    pxConfettiRaf = requestAnimationFrame(frame);
+  } catch(e){}
+}
 function cwFinish(){
   cwRunning = false; cancelAnimationFrame(cwRaf); clearTimeout(cwTimer); cwConfettiStop();
   if(state.screen !== "churchWalk") return;
@@ -3336,7 +3385,9 @@ window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); 
 window.addEventListener("appinstalled", function(){ track("app_installed"); instInstalled = true; instPrompt = null; installClose(); instRefresh(); });
 function screenMainMenu(){
   if(!state.howSeen && !phHowT0) phHowT0 = Date.now();
-  if(state.pilgrimOwed && state.screen === "mainMenu"){ state.pilgrimOwed = false; pilgrimAward = state.pilgrimIn ? null : "great"; }      // a game was finished since the last Main Menu: he says "Great job!" and walks (2026-11-02, per Dan)
+  // (2026-11-05, per Dan: Faith Match, badge after round 1, CONTINUE PLAYING, lost in round 3: the Main Menu came back with the Missions window open while the pilgrim walked. Only some ways out of a game closed the window; now
+  // whenever the pilgrim is about to walk the window is closed, so the player sees him.)
+  if(state.pilgrimOwed && state.screen === "mainMenu"){ state.pilgrimOwed = false; state.folderOpen = false; pilgrimAward = state.pilgrimIn ? null : "great"; }      // a game was finished since the last Main Menu: he says "Great job!" and walks (2026-11-02, per Dan)
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
   var doneCount = inFolder.filter(function(m){ return state.missions[m.id].done; }).length;
@@ -11860,7 +11911,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 EW";
+var APP_BUILD = "2026-11-05 EX";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12294,6 +12345,7 @@ function renderApply(html){
   }
   if(!oldSky) app.innerHTML = exitBarHtml() + html;
   if(isNewScreen) pixHoldUntilLoaded(app);
+  if(isNewScreen && state.screen === "award") pixConfettiParty();          // confetti on the badge screen (2026-11-05, per Dan)
   if(isNewScreen){
     var el = app.querySelector(".screen");
     // No fade at all (2026-11-04, per Dan: "all screens should instantly appear and not fade in"). Before, only a sky screen after a sky screen came up at once (2026-10-22: the fade starts from see-through, which
