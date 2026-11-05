@@ -64,6 +64,10 @@
   }
   /* The screen shown while the first screen waits for its pictures and the fonts (2026-11-02, per Dan: the home-screen app showed plain purple): the Main Menu's sky blue and the app's church icon, built into the page so it is there at once. renderApply takes it away. */
   #boot{position:fixed;left:0;top:0;right:0;bottom:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#4FB0F2;transition:opacity .25s ease-out;}
+  /* The church icon and the words wait 0.4 s before they show (2026-11-05, per Dan: "when the app first runs I can see the image of the church appear for 1 frame in the middle of the screen"). The first screen is usually up in 0.1 s, and since the loading
+     screen no longer fades out the icon was seen for a few frames and then cut away. Now a quick start shows only the plain blue, and the icon only appears when the loading really takes a while (a cold start of the home-screen app). */
+  #boot > img,#boot > span{opacity:0;animation:bootShow .01s linear .4s forwards;}
+  @keyframes bootShow{to{opacity:1;}}
   #boot img{width:144px;height:144px;border-radius:32px;image-rendering:pixelated;box-shadow:0 0 0 4px #1B1F3B,0 8px 0 4px rgba(27,31,59,.35);}
   #boot span{font:700 15px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.06em;color:#fff;text-shadow:2px 0 #1B1F3B,-2px 0 #1B1F3B,0 2px #1B1F3B,0 -2px #1B1F3B,2px 2px #1B1F3B,-2px -2px #1B1F3B,2px -2px #1B1F3B,-2px 2px #1B1F3B;}
   .screen{
@@ -270,10 +274,17 @@
   @media (orientation:landscape){
     body.awardWide #app{max-width:none;overflow-x:hidden;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);}
     body.awardWide .screen.pixSky{padding-left:max(18px,calc((100% - 444px) / 2));padding-right:max(18px,calc((100% - 444px) / 2));background-size:100% 100%,auto;}
+    /* The clouds on the wide sky (2026-11-05, per Dan: on the Keep Going screen of the Road to Emmaus a cloud blinked off for one frame at the same place near the left edge on every pass). Each cloud layer was two screens wide
+       with its picture drawn a whole screen wide: 1688 x 1822 picture pixels a tile on an 844 point wide phone, more than a phone can keep as one piece (it is cut into tiles, and a tile is missing for a frame where two meet).
+       Now each tile is 360 points wide (a portrait phone's width), and the layer is the screen plus one tile, 4000 pixels or less on any phone; it drifts one tile and starts again, at the speed it has upright. */
+    body.awardWide .pixSkyClouds{width:calc(100% + 360px);background-size:360px auto;animation-name:pixCloudDriftW;}
   }
   /* the landscape Hope Garden held upright: the same message, and the little phone turns the other way (2026-10-27, per Dan) */
   @media (orientation:portrait){ body.hglMode .rotateMsg{display:flex;} }
   body.hglMode .rotatePhone{animation-name:rotateHintL;}
+  /* The Road to Emmaus Keep Going screen is shown on its side, and held upright it asks to be turned back (2026-11-05, per Dan): the same message and little phone as the games played on their side. */
+  @media (orientation:portrait){ body.needLandscape .rotateMsg{display:flex;} }
+  body.needLandscape .rotatePhone{animation-name:rotateHintL;}
   @keyframes rotateHintL{0%,25%{transform:rotate(0deg);}60%,100%{transform:rotate(90deg);}}
   body.hglMode .exitBar{position:absolute;left:calc(env(safe-area-inset-left,0px) + 30px);top:calc(env(safe-area-inset-top,0px) + 20px);margin:0;}
   .hglScreen{position:relative;flex:1;display:block;overflow:hidden;background:linear-gradient(#4FA9F0 0,#BFE3FF 100%);}
@@ -485,6 +496,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixSkyClouds.cl2{background-image:url("tiles/clouds_2.png");animation-duration:60s;}
   .pixSkyClouds.cl3{background-image:url("tiles/clouds_3.png");animation-duration:34s;}
   @keyframes pixCloudDrift{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @keyframes pixCloudDriftW{from{transform:translateX(0);}to{transform:translateX(-360px);}}
   @media (prefers-reduced-motion:reduce){ .pixSkyClouds{animation:none;} }
   .pixSky > *:not(.pixSkyClouds){position:relative;z-index:1;}
   .pixHome.pixSky > .backBtn{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:5;width:42px;height:42px;padding:0 0 3px;display:flex;align-items:center;justify-content:center;
@@ -1143,6 +1155,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pzOutline{fill:none;stroke:var(--gold);stroke-width:2.5;stroke-linejoin:round;pointer-events:none;}
   .pzPiece.dragging .pzOutline{stroke:#fff;}
   .pzSvg.solved .pzOutline{display:none;}
+  /* CONGRATULATIONS! in the blue tray area, where the pieces were, when a level is solved (2026-11-05, per Dan) */
+  .pzCongrats{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:34px;letter-spacing:.04em;fill:#FFC93A;stroke:#1B1F3B;stroke-width:5px;paint-order:stroke;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central;pointer-events:none;user-select:none;-webkit-user-select:none;}
   .pzFull{pointer-events:none;}      /* no fade any more (2026-11-01, per Dan): it was laid over an emptied board, which showed as a dark frame */
   .pzNoteBox{display:grid;}      /* the instruction and "Solved!" sit on top of each other: the box is as tall as the taller one, so nothing moves when it is solved (2026-11-01, per Dan) */
   .pzNoteBox > .pixNote{grid-area:1 / 1;align-self:center;margin:0;}
@@ -1156,6 +1170,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
 
   /* Passport in 8-bit style (2026-10-19, per Dan): pixel sky behind, a cream page with a gold inner edge, pixel badges at 4x. */
   .pixPassport{height:100dvh;min-height:0;}
+  .pixPassport > .pixResMid{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}      /* the Golden Ticket window: the cream card centred under the header */
   .passHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;}
   .passHeadSpace{width:44px;flex:none;}
   .passTitle{flex:1;margin:0;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
@@ -1455,7 +1470,7 @@ var T = {
     pz_intro:"Drag each piece into the frame to rebuild the picture. It snaps into place when it fits.",
     pz_round:function(n,total){return "Level "+n+" of "+total;},
     pz_pieces:function(n,total){return "Pieces placed: "+n+" / "+total;},
-    pz_solved:"Solved!", pz_next:"Next level in a moment...",
+    pz_solved:"Solved!", pz_congrats:"CONGRATULATIONS!", pz_next:"Next level in a moment...",
     pz_passTitle:"Puzzle Master!", pz_passBody:"You rebuilt all 4 stained-glass pictures!",
   },
   es: {
@@ -1624,7 +1639,7 @@ var T = {
     pz_intro:"Arrastra cada pieza al marco para armar la imagen. Encaja en su lugar cuando coincide.",
     pz_round:function(n,total){return "Nivel "+n+" de "+total;},
     pz_pieces:function(n,total){return "Piezas colocadas: "+n+" / "+total;},
-    pz_solved:"¡Resuelto!", pz_next:"Siguiente nivel en un momento...",
+    pz_solved:"¡Resuelto!", pz_congrats:"¡FELICIDADES!", pz_next:"Siguiente nivel en un momento...",
     pz_passTitle:"¡Maestro del Rompecabezas!", pz_passBody:"¡Armaste las 4 imágenes de vitral!",
   }
 };
@@ -2618,6 +2633,14 @@ function tapOnTouch(e){
   // The glow (2026-11-04, per Dan: "for all the buttons, add a glow around each button and icon when they are tapped"). A button used to do its work at once, so the screen it belonged to was gone before the glow could
   // be drawn. Now the button lights up (.tapGlow) and does its work TAP_GLOW_MS later (the timer that the quit window does not hold back: pixSt), so the glow is seen on every button and icon, whatever it does.
   // The click that the phone makes when the finger lifts is swallowed as before; a button that has left the page by then (another screen came up) does nothing.
+  // Only a real button or icon glows (2026-11-05, per Dan: tapping between the icons in the Missions window made the whole window frame glow). A window or a backdrop that merely has an onclick (the Missions window,
+  // which only stops the tap reaching the backdrop, and the backdrop, which closes it) holds other buttons, or does nothing: it does its work at once, with no glow.
+  var plain = (el.getAttribute("onclick") || "").indexOf("event.stopPropagation") === 0 || !!el.querySelector("[onclick]");
+  if(plain){
+    pixTapSynth = true;
+    try { el.click(); } finally { pixTapSynth = false; }
+    return;
+  }
   el.classList.add("tapGlow");
   (window.pixSt || window.setTimeout)(function(){
     el.classList.remove("tapGlow");
@@ -7345,7 +7368,7 @@ function dpStep(s, dt){
     if(since > .35){
       var nowMs = performance.now();
       dp.x += (.45 + 1.3 * (since - .35)) * dt;
-      if(nowMs - dp.flapAt > 200) dp.flapAt = nowMs;                    // flapping as it goes
+      if(nowMs - dp.flapAt > 200){ dp.flapAt = nowMs; pixSfxPlay("dpFlap", false); }                    // flapping as it goes, and bird_flap.wav with each flap (2026-11-05, per Dan: the sound repeats while the dove flies off the screen at the end of a round)
       if(dp.x > 1.14){
         if(s.round >= DP_ROUNDS.length - 1){ dp.scene = {t: 0, landed: false}; return; }       // the last round ends with the dove flying to Noah's Ark
         s.interlude = {n: s.round + 1, phase: "msg", award: false, final: false};     // ROUND X COMPLETED!
@@ -11178,15 +11201,46 @@ function hglDown(ev){
   if(pixAudioStale) pixReviveOnTap();
   try { document.getElementById("hglCanvas").setPointerCapture(ev.pointerId); } catch(e){}
   best.state = "hover";                                           // it waits where it is while its line is drawn
-  hgl.drag = {bee: best, id: ev.pointerId, pts: [{x: best.x, y: best.y}], len: 0};
+  hgl.drag = {bee: best, id: ev.pointerId, pts: [{x: best.x, y: best.y}], len: 0, done: false, pf: hglPathFlowers(best)};
   hgl.sel = {bee: best, until: 1e9};                              // it glows, and so do its flower and funnel
   pixSfxPlay("wgPick", false);                                    // sound_effect_4 (2026-10-27, per Dan; it was the Faith Match first-tile sound)
 }
+// A line stops where the bee or butterfly would land (2026-11-05, per Dan): once the drawn line has reached a place that lets it land on its flower (into the mouth of the funnel for a bee, onto the flower for a
+// butterfly: the same rules as hglCheck, which lands it when it flies), the line is not drawn any further, however the finger goes on moving. pf keeps, for each flower of the creature's colour, whether the
+// line is inside its funnel mouth and how far along the funnel it was, as hglCheck keeps inF and prevRa for the flying creature.
+function hglFunState(f, x, y){
+  var rx = x - f.x, ry = y - f.y;
+  if(f.fun){ var ra = rx * f.fun.ax + ry * f.fun.ay, rp = -rx * f.fun.ay + ry * f.fun.ax; return {ra: ra, inside: ra >= 0 && ra <= f.fun.len + 3 && Math.abs(rp) <= hglFunW(f, Math.min(ra, f.fun.len)) + 2}; }
+  return {ra: 0, inside: rx * rx + ry * ry <= f.r * f.r};
+}
+function hglPathFlowers(b){
+  var out = [];
+  hgl.flowers.forEach(function(f){ if(f.ci !== b.ci) return; var s = hglFunState(f, b.x, b.y); out.push({f: f, inF: s.inside, prevRa: s.ra}); });
+  return out;
+}
+// walks the new piece of line from a to b in steps of one picture pixel; answers the first point where it would land (and how far along the piece that is), or null
+function hglLandAlong(d0, a, b){
+  var dx = b.x - a.x, dy = b.y - a.y, L = Math.sqrt(dx * dx + dy * dy), n = Math.max(1, Math.ceil(L)), i, k;
+  for(i = 1; i <= n; i++){
+    var x = a.x + dx * i / n, y = a.y + dy * i / n;
+    for(k = 0; k < d0.pf.length; k++){
+      var st = d0.pf[k], f = st.f, s = hglFunState(f, x, y);
+      if(f.fun){
+        var lands = s.inside && !st.inF && st.prevRa > f.fun.len + 3;                // in through the mouth (in through the side, it just flies over)
+        st.inF = s.inside; st.prevRa = s.ra;
+        if(lands) return {x: x, y: y, d: L * i / n};
+      } else if(s.inside) return {x: x, y: y, d: L * i / n};
+    }
+  }
+  return null;
+}
 function hglMove(ev){
-  var d0 = hgl && hgl.drag; if(!d0 || ev.pointerId !== d0.id) return;
+  var d0 = hgl && hgl.drag; if(!d0 || ev.pointerId !== d0.id || d0.done) return;
   var p = hglPt(ev, true), last = d0.pts[d0.pts.length - 1], dx = p.x - last.x, dy = p.y - last.y, d = Math.sqrt(dx * dx + dy * dy), max = hglMax();
   if(d < 2.5 || d0.len >= max) return;
   if(d0.len + d > max){ var k = (max - d0.len) / d; p = {x: last.x + dx * k, y: last.y + dy * k}; d = max - d0.len; }
+  var hit = d0.pf ? hglLandAlong(d0, last, p) : null;
+  if(hit){ p = {x: hit.x, y: hit.y}; d = hit.d; d0.done = true; }                // the line ends where it would land, and goes no further
   d0.pts.push(p); d0.len += d;
 }
 function hglUp(ev){
@@ -11694,6 +11748,9 @@ function pzUp(ev){
 // up. Now the finished look is put on the screen that is already there: the piece lines go (class "solved"), the whole picture is laid over the pieces with no fade, the "Solved!" line shows in the
 // place of the instruction (both sit in one box, so the box is always as tall as the taller one) and the last square of the row of squares turns gold. Nothing moves. The advance to the next level is
 // scheduled here too, as screenStainedGlass does when it is drawn in the solved state (a reload during the hold).
+// the words in the middle of the tray area (the blue part under the picture, where the pieces were); SVG units, like everything else in the puzzle
+function pzCongratsY(H){ return (PZ_W + 12) + (H - PZ_W - 12) / 2; }
+function pzCongratsSvg(H){ return '<text class="pzCongrats" x="' + (PZ_W / 2) + '" y="' + pzCongratsY(H) + '">' + t("pz_congrats") + '</text>'; }
 function pzShowSolved(s){
   var svg = document.getElementById("pzSvg"); if(!svg || !s) return;
   var img = s.imgs[s.round];
@@ -11702,6 +11759,11 @@ function pzShowSolved(s){
   full.setAttribute("href", img); full.setAttribute("x", "0"); full.setAttribute("y", "0");
   full.setAttribute("width", PZ_W); full.setAttribute("height", PZ_W); full.setAttribute("preserveAspectRatio", "none");
   svg.appendChild(full);
+  if(pzCtx && !svg.querySelector(".pzCongrats")){
+    var cg = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    cg.setAttribute("class", "pzCongrats"); cg.setAttribute("x", PZ_W / 2); cg.setAttribute("y", pzCongratsY(pzCtx.H)); cg.textContent = t("pz_congrats");
+    svg.appendChild(cg);
+  }
   var gone = svg.querySelectorAll(".pzPiece"); for(var gi = 0; gi < gone.length; gi++) gone[gi].style.display = "none";      // the pieces are covered by the whole picture; the last one is still sliding into its place and must not show beyond the frame
   svg.classList.add("solved");
   var box = document.querySelector(".pzNoteBox"); if(box) box.classList.add("solved");
@@ -11807,7 +11869,7 @@ function screenStainedGlass(){
     '<defs>' + defs + '</defs>' +
     '<rect x="0" y="0" width="' + PZ_W + '" height="' + PZ_W + '" class="pzBoardRect"/>' +
     '<rect x="0" y="' + (PZ_W + 12) + '" width="' + PZ_W + '" height="' + (g.H - PZ_W - 12) + '" rx="10" class="pzTrayRect"/>' +
-    placedHtml + looseHtml + full +
+    placedHtml + looseHtml + full + (solved ? pzCongratsSvg(g.H) : '') +
   '</svg>';
 
   return pixShell('<h2 class="pixMTitle">' + t("stainedGlassName") + '</h2>' +
@@ -11911,7 +11973,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 EX";
+var APP_BUILD = "2026-11-05 FG";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11980,12 +12042,23 @@ function clearTicket(){
 
 // The Golden Ticket screen (2026-10-25, per Dan): the 8-bit look of the other screens (pixel sky, the name above a cream window, a pixel button), the smooth ticket picture in the window,
 // and no CLEAR TICKET button any more (clearTicket above is kept but nothing calls it). MAIN MENU is a plain, non-destructive go("mainMenu") (nothing about points / missions / badges changes).
+// (2026-11-05, per Dan) It is a window like the Passport and the Options now: the title in the header, a red X in the upper right corner (no MAIN MENU button), and the X shrinks the screen back into the Golden Ticket
+// icon, the third icon on the Main Menu, as it does for them (closeToHome).
 function screenGoldenTicket(){
-  return pixShell('<div class="pixResMid"><h2 class="pixMTitle pixIntroTitle">' + t("goldenTicketLabel") + '</h2><div class="pixPaper">' +
+  return '<div class="screen pixHome pixSky pixPassport">' +
+    cloudsHtml() +
+    '<div class="passHeader">' +
+      '<span class="passHeadSpace"></span>' +
+      '<h2 class="passTitle">' + t("goldenTicketLabel") + '</h2>' +
+      '<button class="passClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closeToHome(3)" aria-label="' + t("mainMenu") + '">X</button>' +
+    '</div>' +
+    '<div class="pixResMid"><div class="pixPaper">' +
       '<img class="pixTicketBig" src="tiles/golden_ticket.png" alt="" decoding="sync">' +
       '<div class="pixResTitle">' + t("ticketTitle") + '</div>' +
       '<p class="pixResBody">' + t("ticketBody") + '</p>' +
-    '</div></div>' + pixBtnHtml(t("mainMenu"), "go('mainMenu')", true), "pixLower");
+    '</div></div>' +
+    '<div class="spacer"></div>' +
+  '</div>';
 }
 
 /* ---------- Render ---------- */
@@ -12014,7 +12087,7 @@ function exitBarHtml(){
 // The red X (2026-11-03, per Dan): the game is paused, the screen is dimmed and a window asks "Are you sure you want to quit?", with KEEP PLAYING (back to the game as it was) and MAIN MENU
 // (leaves it, and the Main Menu comes back with the Missions window open). The instruction screens have no game to lose, and the Emmaus test play from the editor has its own way out: those leave at once.
 function exitMission(){
-  if(state.screen === "missionIntro" || (state.screen === "emmaus" && em && em.test)){ exitMissionNow(); return; }
+  if(state.screen === "missionIntro" || state.screen === "chooseJoy" || (state.screen === "emmaus" && em && em.test)){ exitMissionNow(); return; }      // (Choose Joy is not a game, so nothing can be lost: no question, 2026-11-05, per Dan)
   quitAskOpen();
 }
 function quitAskOpen(){
@@ -12080,6 +12153,7 @@ function rotateMsgUpdate(){
   var emSide = (state.screen === "award" && state.awardMissionId === "emmaus") || (state.screen === "roundCont" && state.contFor === "emmaus");
   document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || emSide);      // (the Mission Completed screen of The Road to Emmaus comes up with the phone still on its side)
   document.body.classList.toggle("hglMode", state.screen === "hopeGardenL" || state.screen === "emmaus");      // (the same full-width, no-bounce, rotate-me layout for both)
+  document.body.classList.toggle("needLandscape", state.screen === "roundCont" && state.contFor === "emmaus" && !roundContRotateWait);      // (held upright, the Keep Going screen of the Road to Emmaus asks for the phone to be turned back on its side; not while MAIN MENU waits for it to be turned upright)
   document.body.classList.toggle("awardWide", emSide);      // (those two screens on their side have a sky as wide as the phone: see body.awardWide in the style sheet)
   var back = (awardRotateWait && state.screen === "award") || (roundContRotateWait && state.screen === "roundCont");           // the Road to Emmaus badge screen has had its time, or MAIN MENU was tapped on the Keep Going screen: "turn the phone back to portrait" (2026-10-30, per Dan)
   document.body.classList.toggle("awardRotate", back);
