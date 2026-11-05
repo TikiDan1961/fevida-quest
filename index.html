@@ -139,11 +139,13 @@
   .btn.pixBtn.secondary{border-color:#1C4E9A;background:#3A93E8;}
   /* Pressed: the button sinks and lights up -- a hard light ring plus a soft glow in its own colour (2026-10-19, per Dan). */
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
-  .pixLang .btn.pixBtn:active,.pixChurch .btn.pixBtn:active{transform:none;}   /* the buttons on the first two screens (language, START YOUR QUEST) glow but do not move when pressed (2026-10-22, per Dan) */
-  .btn.pixBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 18px 8px rgba(120,255,120,.8);}
-  .pixMission.pixLower .btn.pixBtn:active{transform:none;}   /* Faith Match / Faith Flash buttons glow but never move when tapped (2026-10-20, per Dan) */
+  .pixLang .btn.pixBtn:active,.pixChurch .btn.pixBtn:active,.pixLang .btn.pixBtn.tapGlow,.pixChurch .btn.pixBtn.tapGlow{transform:none;}   /* the buttons on the first two screens (language, START YOUR QUEST) glow but do not move when pressed (2026-10-22, per Dan) */
+  /* The glow starts right at the button's edge (2026-11-05, per Dan: "a thin white band between the button edges and the start of the glow"): the pale 3px ring that used to sit between the button and its glow is gone. .tapGlow = the 0.1 s a tapped button keeps glowing before it does its work (see tapOnTouch). */
+  .btn.pixBtn:active,.btn.pixBtn.tapGlow{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 14px 7px rgba(120,255,120,.95);}
+  .btn.pixBtn.tapGlow{filter:none;}      /* (these buttons have their own glow: not the general one below) */
+  .pixMission.pixLower .btn.pixBtn:active,.pixMission.pixLower .btn.pixBtn.tapGlow{transform:none;}   /* Faith Match / Faith Flash buttons glow but never move when tapped (2026-10-20, per Dan) */
   .btn.pixBtn:disabled{opacity:.5;filter:grayscale(.4);pointer-events:none;}
-  .btn.pixBtn.secondary:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .btn.pixBtn.secondary:active,.btn.pixBtn.secondary.tapGlow{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 14px 7px rgba(110,190,255,.95);}
   /* Welcome screen: the church-interior picture (125x270 pixels, drawn at the full screen
      width and anchored to the bottom so the pews stay under the buttons; any extra height
      at the top is ceiling brown). */
@@ -3430,7 +3432,7 @@ function awardAutoReturn(){
     awardTimer = 0;
     if(state.screen !== "award" || state.awardMissionId !== awardTimerFor){ awardRotateWait = false; return; }
     // The Road to Emmaus is played on its side and the Main Menu is upright: once the badge screen has had its time, a message asks the player to turn the phone back to portrait (2026-10-30, per Dan), and the Main Menu comes when it is turned
-    if(state.awardMissionId === "emmaus" && !hglUpright()){
+    if(state.awardMissionId === "emmaus" && !hglUpright() && state.contFor !== "emmaus"){          // (after round 1 the Keep Going screen follows, and it is shown on its side too, 2026-11-05, per Dan)
       if(!awardRotateWait){ awardRotateWait = true; rotateMsgUpdate(); }
       awardTimer = setTimeout(leave, 300); return;
     }
@@ -3475,9 +3477,25 @@ function roundContGo(){
   if(s.interlude) s.interlude.resumed = true;           // the interlude of round 1 is still there: it ends at once and round 2 starts (see pixRoundRun)
   go(id);
 }
+var roundContRotateWait = false;
 function roundContMenu(){
   var id = state.contFor;
+  if(roundContRotateWait) return;          // (already waiting for the phone to be turned)
   track("keep_going_choice", {mission_id: id, choice: "main_menu"});
+  // The Road to Emmaus is played on its side and the Main Menu is upright: when MAIN MENU is tapped with the phone still on its side, a message asks the player to turn it back to portrait, and the Main Menu comes when it is
+  // (the pilgrim walks there, so it must not come up behind the message; 2026-11-05, per Dan)
+  if(id === "emmaus" && !hglUpright()){
+    roundContRotateWait = true; rotateMsgUpdate();
+    (function poll(){
+      if(state.screen !== "roundCont" || state.contFor !== "emmaus"){ roundContRotateWait = false; rotateMsgUpdate(); return; }
+      if(hglUpright()){ roundContRotateWait = false; rotateMsgUpdate(); roundContLeave(id); return; }
+      setTimeout(poll, 300);
+    })();
+    return;
+  }
+  roundContLeave(id);
+}
+function roundContLeave(id){
   state.contFor = null;
   state.folderOpen = false;          // the Missions window is closed, so the player sees the pilgrim walk, as after the last round of a game (2026-11-03, per Dan)
   if(id === "emmaus"){ emQuit(); return; }
@@ -11840,7 +11858,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-04 ET";
+var APP_BUILD = "2026-11-05 EV";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12005,10 +12023,12 @@ function exitMissionNow(){
 
 var LANDSCAPE_OK_SCREENS = ["hopeGardenL", "emmaus"];        // screens played on their side: the landscape Hope Garden (2026-10-27, per Dan) and The Road to Emmaus (2026-10-28)
 function rotateMsgUpdate(){
-  document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || (state.screen === "award" && state.awardMissionId === "emmaus"));      // (the Mission Completed screen of The Road to Emmaus comes up with the phone still on its side)
+  // The Road to Emmaus badge screen AND the Keep Going screen after it stay on their side (2026-11-05, per Dan: the player had to turn the phone upright to tap CONTINUE PLAYING and turn it back to play round 2)
+  var emSide = (state.screen === "award" && state.awardMissionId === "emmaus") || (state.screen === "roundCont" && state.contFor === "emmaus");
+  document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || emSide);      // (the Mission Completed screen of The Road to Emmaus comes up with the phone still on its side)
   document.body.classList.toggle("hglMode", state.screen === "hopeGardenL" || state.screen === "emmaus");      // (the same full-width, no-bounce, rotate-me layout for both)
-  document.body.classList.toggle("awardWide", state.screen === "award" && state.awardMissionId === "emmaus");      // (the badge screen on its side has a sky as wide as the phone: see body.awardWide in the style sheet)
-  var back = awardRotateWait && state.screen === "award";           // the Road to Emmaus badge screen has had its time: "turn the phone back to portrait" (2026-10-30, per Dan)
+  document.body.classList.toggle("awardWide", emSide);      // (those two screens on their side have a sky as wide as the phone: see body.awardWide in the style sheet)
+  var back = (awardRotateWait && state.screen === "award") || (roundContRotateWait && state.screen === "roundCont");           // the Road to Emmaus badge screen has had its time, or MAIN MENU was tapped on the Keep Going screen: "turn the phone back to portrait" (2026-10-30, per Dan)
   document.body.classList.toggle("awardRotate", back);
   var tx = document.getElementById("rotateText"), sub = document.getElementById("rotateSub");
   if(!tx || !sub) return;
