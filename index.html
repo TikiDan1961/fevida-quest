@@ -71,6 +71,8 @@
     flex-direction:column;
   }
   .screen.screen-enter{ animation:fadeIn .25s ease-out; }
+  /* A tapped button or icon glows for a moment before it does its work (2026-11-04, per Dan; see tapOnTouch). A filter, so it follows the shape of any button, icon or tile. */
+  .tapGlow{filter:drop-shadow(0 0 5px #FFF6C0) drop-shadow(0 0 12px rgba(255,236,120,.95)) brightness(1.12);}
   /* Fade only -- no slide (2026-10-24, per Dan): a slide moves the whole screen 6px and then snaps it into place, which looked like a 1px shift. */
   @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
   h1{font-size:1.5rem;margin:.2em 0 .1em;color:var(--gold);text-align:center;}
@@ -1254,6 +1256,7 @@ var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [];
     return id;
   };
   window.cancelAnimationFrame = function(id){ quitRafQ = quitRafQ.filter(function(q){ return q.id !== id; }); caf(id); };
+  window.pixSt = st;          // the real timer, which the quit window does not hold back (the glow of a tapped button in that window runs on it)
   window.setTimeout = function(fn, ms){
     if(typeof fn !== "function") return st.apply(window, arguments);
     var extra = [].slice.call(arguments, 2), id = st(function(){ if(quitAsk) quitTimerQ.push({id: id, fn: fn, args: extra}); else fn.apply(window, extra); }, ms);
@@ -2172,10 +2175,12 @@ function selectLanguage(lang){ var had = !!state.lang; state.lang = lang; track(
 // (mouse, or any later tap); pixClickSfx (release/click) starts the audio and
 // plays the blip if the press could not.
 var pixAudioCtx = null, pixBlipPlayed = false;
+var pixSessionSet = false;
 function pixCtx(){
   try {
-    // iOS: let Web Audio play even when the ring/silent switch is on (Safari 17+)
-    if(navigator.audioSession) navigator.audioSession.type = "playback";
+    // iOS: let Web Audio play even when the ring/silent switch is on (Safari 17+). Once only (2026-11-04): the Road to Emmaus asks for the engine on EVERY frame (emMoveSfxSet), and setting this on every frame
+    // makes the phone look at its audio session sixty times a second. (pixFreshAudio sets it again each time it makes a new engine.)
+    if(navigator.audioSession && !pixSessionSet){ pixSessionSet = true; navigator.audioSession.type = "playback"; }
     if(!pixAudioCtx) pixAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
     return pixAudioCtx;
   } catch(e){ return null; }
@@ -2349,7 +2354,7 @@ function pixMusicStart(){
   if(pixMusic.buf) pixMusicPlay(); else { pixMusicFetch(); pixMusicDecode(); }
 }
 function pixMusicRestart(){
-  try { if(pixMusic.src) pixMusic.src.stop(); } catch(e){}
+  try { if(pixMusic.src){ pixMusic.src.stop(); pixMusic.src.disconnect(); } } catch(e){}
   pixMusic.src = null; pixMusic.srcCtx = null;
   pixMusicPlay();
 }
@@ -2378,8 +2383,11 @@ function pixSfxPlayNow(name, exclusive){      // (pixSfxPlay, below the revive c
     var src = ctx.createBufferSource(), gain = ctx.createGain();
     src.buffer = buf; gain.gain.value = PIX_SFX[name].gain;
     src.connect(gain); gain.connect(pixBus(ctx, "sfx"));
+    // When the sound has ended its two nodes are taken out of the audio graph (2026-11-04, per Dan: the Road to Emmaus got slower with every jump). A finished sound's gain node stayed connected to the
+    // volume bus for good, so every jump added one more node that the phone had to keep mixing.
+    src.onended = function(){ try { src.disconnect(); gain.disconnect(); } catch(e){} };
     src.start();
-    pixSfxLast[name] = {t: performance.now(), ms: buf.duration * 1000};          // when it started and how long it lasts, so another sound can wait for it (pixAfterSfx)
+    pixSfxLast[name] ={t: performance.now(), ms: buf.duration * 1000};          // when it started and how long it lasts, so another sound can wait for it (pixAfterSfx)
     if(exclusive) pixSfxCurrent = src;
     return true;
   } catch(e){ return false; }
@@ -2590,6 +2598,7 @@ function pixLoneTouch(e){
   track("tap_recovered", {screen: state.screen});
   return true;
 }
+var TAP_GLOW_MS = 100;          // how long a tapped button glows before it does its work (milliseconds)
 function tapOnTouch(e){
   tapSwallow = false; tapHeldSound = undefined;
   if(e.pointerType === "mouse" && e.button !== 0) return;
@@ -2600,8 +2609,17 @@ function tapOnTouch(e){
   if(pd && !m) return;                       // it acts on the touch by itself
   if(pixAudioStale){ var nm = m && /^\s*['"](\w+)['"]\s*$/.exec(m[1]); tapHeldSound = nm ? nm[1] : "tap"; }
   tapSwallow = true;
-  pixTapSynth = true; pixDownT = e.timeStamp;
-  try { el.click(); } finally { pixTapSynth = false; }
+  pixDownT = e.timeStamp;
+  // The glow (2026-11-04, per Dan: "for all the buttons, add a glow around each button and icon when they are tapped"). A button used to do its work at once, so the screen it belonged to was gone before the glow could
+  // be drawn. Now the button lights up (.tapGlow) and does its work TAP_GLOW_MS later (the timer that the quit window does not hold back: pixSt), so the glow is seen on every button and icon, whatever it does.
+  // The click that the phone makes when the finger lifts is swallowed as before; a button that has left the page by then (another screen came up) does nothing.
+  el.classList.add("tapGlow");
+  (window.pixSt || window.setTimeout)(function(){
+    el.classList.remove("tapGlow");
+    if(!el.isConnected) return;
+    pixTapSynth = true;
+    try { el.click(); } finally { pixTapSynth = false; }
+  }, TAP_GLOW_MS);
 }
 document.addEventListener("click", function(e){
   if(pixTapSynth || !tapSwallow) return;
@@ -3739,7 +3757,7 @@ function screenFaithFlash(){
         '<div class="pixScore">' + t("scoreOf")(s.correct, s.index+1) + '</div>' +
       '</div></div>' +
       (pass ?'<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffCollectAward()">' + t("collectAward") + '</button>'
-            : '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ffPlayAgain()">' + t("playAgain") + '</button>') +
+            : '<button class="btn pixBtn pixBtnSm pixBtnBig"' + press + 'onclick="pixClickSfx();ffPlayAgain()">' + t("playAgain") + '</button>') +
       '<button class="btn pixBtn secondary pixBtnSm pixBtnBig"' + press + 'onclick="pixClickSfx();go(\'mainMenu\')">' + t("mainMenu") + '</button>' +
     '</div>';
   }
@@ -9966,7 +9984,7 @@ function emPaint(){
 }
 // The sound of the road (2026-10-31, per Dan): the cart's wheels while he rides on the street, his feet while he runs on the street (also as he runs off the screen at the end of a round); nothing while he is in the air (a jump, a basket)
 // or up on a cloud, while the game waits (the tap to start, the Leave question, the phone upright) and on every screen that is not the game. It loops: the sound is picked afresh every frame (emLoop) and only changes when it must.
-var emMoveSrc = null, emMoveName = "", emMoveCtx = null;
+var emMoveSrc = null, emMoveName = "", emMoveCtx = null, emMoveGain = null;
 function emMoveSfxWant(){
   var e = em;
   if(!e || !e.L || e.confirm || hglUpright()) return "";
@@ -9978,7 +9996,7 @@ function emMoveSfxWant(){
 function emMoveSfxSet(name){
   var ctx = pixCtx();
   if(name === emMoveName && emMoveCtx === ctx) return;              // (a new audio engine, made after the phone slept, starts it again)
-  if(emMoveSrc){ try { emMoveSrc.stop(); } catch(e){} emMoveSrc = null; }
+  if(emMoveSrc){ try { emMoveSrc.stop(); } catch(e){} try { emMoveSrc.disconnect(); if(emMoveGain) emMoveGain.disconnect(); } catch(e){} emMoveSrc = null; emMoveGain = null; }          // (taken out of the audio graph, not just stopped: every landing used to leave a node behind, 2026-11-04)
   emMoveName = ""; emMoveCtx = null;
   if(!name || !ctx) return;
   var buf = pixSfxBuf[name];
@@ -9988,7 +10006,7 @@ function emMoveSfxSet(name){
     var src = ctx.createBufferSource(), g = ctx.createGain();
     src.buffer = buf; src.loop = true; g.gain.value = PIX_SFX[name].gain;
     src.connect(g); g.connect(pixBus(ctx, "sfx"));
-    src.start(); emMoveSrc = src; emMoveName = name; emMoveCtx = ctx;
+    src.start(); emMoveSrc = src; emMoveGain = g; emMoveName = name; emMoveCtx = ctx;
   } catch(e){}
 }
 // The feet speed up with the pilgrim as he runs off the screen at the end of a round (2026-11-01, per Dan): he runs at 1.4 times the speed of the road and then faster every moment (see emStep), so the
@@ -11822,7 +11840,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-04 ES";
+var APP_BUILD = "2026-11-04 ET";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
