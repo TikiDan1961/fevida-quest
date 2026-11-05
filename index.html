@@ -25,6 +25,7 @@
     --glow: rgba(255,215,0,.85);
     --danger:#C43B3B;
     --good:#2E9E4F;
+    --gBlur:12px;--gSpread:6px;      /* the size of the glow around every tapped button and icon (2026-11-05, per Dan: the same size everywhere) */
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   /* This is a game, not a document: tapping or holding a button, tile or text must
@@ -72,7 +73,8 @@
   }
   .screen.screen-enter{ animation:fadeIn .25s ease-out; }
   /* A tapped button or icon glows for a moment before it does its work (2026-11-04, per Dan; see tapOnTouch). A filter, so it follows the shape of any button, icon or tile. */
-  .tapGlow{filter:drop-shadow(0 0 5px #FFF6C0) drop-shadow(0 0 12px rgba(255,236,120,.95)) brightness(1.12);}
+  .tapGlow{filter:drop-shadow(0 0 var(--gBlur) rgba(255,236,120,.95));}
+  .btn.tapGlow,.appIcon.tapGlow,.hgiBtn.tapGlow,.folderClose.tapGlow,.backBtn.tapGlow,.missionTile.tapGlow,.exitBtn.tapGlow,.pixAns.tapGlow,.sdHint.tapGlow,.tlCard.tapGlow,.lcIntent.tapGlow,.pixTile.tapGlow,.fsHintBtn.tapGlow,.passClose.tapGlow,.navArrow.tapGlow,.answerBtn.tapGlow,.wuTile.tapGlow{filter:none;}      /* (these have a glow of their own, the same size as all the others) */
   /* Fade only -- no slide (2026-10-24, per Dan): a slide moves the whole screen 6px and then snaps it into place, which looked like a 1px shift. */
   @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
   h1{font-size:1.5rem;margin:.2em 0 .1em;color:var(--gold);text-align:center;}
@@ -95,7 +97,7 @@
     cursor:pointer;
     transition:transform .08s ease;
   }
-  .btn:active{transform:scale(.97);box-shadow:0 0 14px 4px var(--glow);border-color:#fff;}
+  .btn:active,.btn.tapGlow {transform:scale(.97);box-shadow:0 0 var(--gBlur) var(--gSpread) var(--glow);border-color:#fff;}
   .btn.secondary{background:linear-gradient(180deg,var(--teal),#087572);}
   .btn.gold{background:linear-gradient(180deg,var(--gold),#b3822a);color:var(--ink);}
   .btn.outline{background:transparent;color:var(--gold);}
@@ -141,11 +143,11 @@
   /* Only transform and box-shadow change while pressed -- never a border width or size, which would resize the button and make the white card above it jump. */
   .pixLang .btn.pixBtn:active,.pixChurch .btn.pixBtn:active,.pixLang .btn.pixBtn.tapGlow,.pixChurch .btn.pixBtn.tapGlow{transform:none;}   /* the buttons on the first two screens (language, START YOUR QUEST) glow but do not move when pressed (2026-10-22, per Dan) */
   /* The glow starts right at the button's edge (2026-11-05, per Dan: "a thin white band between the button edges and the start of the glow"): the pale 3px ring that used to sit between the button and its glow is gone. .tapGlow = the 0.1 s a tapped button keeps glowing before it does its work (see tapOnTouch). */
-  .btn.pixBtn:active,.btn.pixBtn.tapGlow{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 14px 7px rgba(120,255,120,.95);}
+  .btn.pixBtn:active,.btn.pixBtn.tapGlow{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(120,255,120,.95);}
   .btn.pixBtn.tapGlow{filter:none;}      /* (these buttons have their own glow: not the general one below) */
   .pixMission.pixLower .btn.pixBtn:active,.pixMission.pixLower .btn.pixBtn.tapGlow{transform:none;}   /* Faith Match / Faith Flash buttons glow but never move when tapped (2026-10-20, per Dan) */
   .btn.pixBtn:disabled{opacity:.5;filter:grayscale(.4);pointer-events:none;}
-  .btn.pixBtn.secondary:active,.btn.pixBtn.secondary.tapGlow{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 14px 7px rgba(110,190,255,.95);}
+  .btn.pixBtn.secondary:active,.btn.pixBtn.secondary.tapGlow{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.95);}
   /* Welcome screen: the church-interior picture (125x270 pixels, drawn at the full screen
      width and anchored to the bottom so the pews stay under the buttons; any extra height
      at the top is ceiling brown). */
@@ -192,7 +194,7 @@
   .appTile{position:relative;width:72px;height:72px;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .appTile img.spr{width:48px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;pointer-events:none;}
-  .appIcon:active .appTile{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.9);}
+  .appIcon:active .appTile,.appIcon.tapGlow .appTile {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 var(--gBlur) var(--gSpread) rgba(255,236,120,.9);}
   .appName{margin-top:9px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.875rem;line-height:1.1;color:#fff;
     text-shadow:2px 0 #1b2a6b,-2px 0 #1b2a6b,0 2px #1b2a6b,0 -2px #1b2a6b,2px 2px #1b2a6b,-2px -2px #1b2a6b,2px -2px #1b2a6b,-2px 2px #1b2a6b;}
   .appTag{margin-top:3px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:600;font-size:.75rem;letter-spacing:.03em;color:#FFC93A;text-transform:lowercase;}
@@ -360,7 +362,7 @@
   .hgiBtn{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:42px;padding:3px 12px 5px 12px;font-family:inherit;font-weight:700;font-size:1.05rem;line-height:1.02;letter-spacing:.03em;text-align:left;text-transform:uppercase;color:#fff;
     text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1B1F3B;border-radius:10px;box-shadow:inset 0 0 0 2px #8CC4F6,inset 0 -4px 0 rgba(0,0,0,.18),0 4px 0 rgba(20,30,90,.4);cursor:pointer;}
   a.hgiBtn{text-decoration:none;-webkit-tap-highlight-color:transparent;}      /* WATCH ON YOUTUBE is a real link: a link opened by a script from a touch is blocked on iPhones, a tapped link is not (2026-10-28, per Dan) */
-  .hgiBtn:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #8CC4F6,0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .hgiBtn:active,.hgiBtn.tapGlow {transform:translateY(3px);box-shadow:inset 0 0 0 2px #8CC4F6,0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .hgiArrow{flex:none;width:0;height:0;border-left:10px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.35));}
   @media (max-height:700px){
     .pixMission.pixLower.hgiScreen{padding-top:calc(env(safe-area-inset-top,0px) + 6px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6px);}
@@ -400,7 +402,7 @@
   .folderClose{position:absolute;top:8px;right:10px;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
-  .folderClose:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
+  .folderClose:active,.folderClose.tapGlow {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 var(--gBlur) var(--gSpread) rgba(255,120,110,.9);}
   .expandClone{position:fixed;z-index:100;border-radius:16px;border:3px solid #1B1F3B;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;
     transition:left .28s ease-in,top .28s ease-in,width .28s ease-in,height .28s ease-in,border-radius .28s ease-in,opacity .25s ease-out;}
   .expandClone img.spr{width:48px;height:48px;image-rendering:pixelated;transition:transform .28s ease-in;}
@@ -488,7 +490,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixHome.pixSky > .backBtn{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:5;width:42px;height:42px;padding:0 0 3px;display:flex;align-items:center;justify-content:center;
     border:3px solid #1B1F3B;border-radius:12px;background:#3A93E8;cursor:pointer;box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
   .backBtn img{width:32px;height:32px;image-rendering:pixelated;pointer-events:none;}
-  .backBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #DCEEFF,0 0 16px 6px rgba(110,190,255,.85);}
+  .backBtn:active,.backBtn.tapGlow {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   @media (max-width:340px){   /* keeps the title clear of the back icon on the smallest phones */
     .pixMenu .pixMenuTitle{font-size:1.625rem;}
     .pixHome.pixSky > .backBtn{left:10px;width:38px;height:38px;}
@@ -534,7 +536,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     text-align:center;
     cursor:pointer;
   }
-  .missionTile:not(.done):active{box-shadow:0 0 14px 4px var(--glow);}
+  .missionTile:not(.done):active,.missionTile:not(.done).tapGlow {box-shadow:0 0 var(--gBlur) var(--gSpread) var(--glow);}
   .missionTile.done{border-color:var(--good);background:rgba(46,158,79,.18);opacity:.85;cursor:default;}
   .missionTile .ic{font-size:2rem;display:block;}
   .missionTile .lbl{font-size:.68rem;margin-top:4px;display:block;font-weight:600;}
@@ -557,7 +559,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .exitBtn{position:absolute;top:-14px;left:-6px;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
-  .exitBtn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
+  .exitBtn:active,.exitBtn.tapGlow {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 var(--gBlur) var(--gSpread) rgba(255,120,110,.9);}
 
   /* Pixel-style mission screens (2026-10-20, per Dan) -- Faith Flash first. Same sky and clouds as the Home Screen, a cream pixel card,
      and answer buttons built like the language buttons (glow + press sound). Everything is scoped to .pixMission so the other
@@ -578,7 +580,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixAnsList{display:flex;flex-direction:column;gap:10px;margin:18px 0 6px;}
   .pixAns{display:block;width:100%;box-sizing:border-box;min-height:52px;padding:8px 12px 10px;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.125rem;line-height:1.15;letter-spacing:.03em;
     text-align:center;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
-  .pixAns:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .pixAns:active,.pixAns.tapGlow {box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .pixAns.correct{background:#52C246;border-color:#1E6B2B;}
   .pixAns.wrong{background:#D6343A;border-color:#7E1B22;}
   .pixAns.disabled{pointer-events:none;}
@@ -617,7 +619,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     padding:5px 12px 8px;background:#52C246;border:3px solid #1E6B2B;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .sdHint{white-space:nowrap;}
   .sdHint:disabled{filter:saturate(.3) brightness(.85);cursor:default;}
-  .sdHint:not(:disabled):active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #E2FFD8,0 0 16px 6px rgba(120,255,120,.8);}
+  .sdHint:not(:disabled):active,.sdHint:not(:disabled).tapGlow {box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(120,255,120,.8);}
   .sdBoard{display:grid;gap:4px;width:min(100%,300px);box-sizing:border-box;margin:8px auto 6px;padding:4px;background:#1B1F3B;border-radius:6px;box-shadow:0 5px 0 rgba(20,30,90,.4);}
   .sdBox{display:grid;gap:2px;}
   .sdCell{aspect-ratio:1/1;position:relative;padding:0;border:0;border-radius:0;background:#FFFDED center / 82% 82% no-repeat;image-rendering:pixelated;cursor:pointer;   /* the picture sits a little inside the square, on the picture's own cream, so its edges never touch the lines */
@@ -641,7 +643,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .sdBig .sdCell{background-size:92% 92%;}
   .sdPick{width:42px;height:42px;padding:0;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:8px;background:#FFFDED center / 82% 82% no-repeat;image-rendering:pixelated;cursor:pointer;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
-  .sdPick:active{box-shadow:0 0 0 3px #DCEEFF,0 0 14px 5px rgba(110,190,255,.85);}
+  .sdPick:active,.sdPick.tapGlow {box-shadow:0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   /* Emoji Bible Stories */
   .pixEmoji{display:flex;justify-content:center;align-items:center;gap:6px;min-height:48px;}   /* the clues are pixel pictures (24 x 24, shown at 2x), the same on every phone */
   .pixEmoji img{width:48px;height:48px;image-rendering:pixelated;}
@@ -663,7 +665,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     line-height:1.1;letter-spacing:.02em;text-align:center;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;
     box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .tlCard .tlIcon{margin:0;font-size:1.1rem;}
-  .tlCard:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .tlCard:active,.tlCard.tapGlow {box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .tlCard.shake{background:#D6343A;border-color:#7E1B22;animation:tlShake .4s steps(4);}
   @keyframes tlShake{0%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-3px);}100%{transform:translateX(0);}}
   @media (prefers-reduced-motion:reduce){ .tlCard.shake{animation:none;} }
@@ -688,7 +690,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     font-size:1rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:12px;
     box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .lcIntent img{width:36px;height:36px;image-rendering:pixelated;}
-  .lcIntent:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .lcIntent:active,.lcIntent.tapGlow {box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .pixMission .pixResMid{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}
   .pixResBadge{display:block;width:144px;height:144px;margin:0 auto 10px;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
   .pixTicketBig{display:block;width:min(86%,290px);height:auto;margin:-4px auto 6px;image-rendering:auto;filter:drop-shadow(0 0 10px rgba(255,214,90,.9));animation:cwTicketGlow 1s ease-in-out infinite alternate;}      /* the smooth Golden Ticket picture on its screen, glowing softly */
@@ -759,7 +761,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;margin:20px 0 6px;}   /* one row, even for 6 letters: the tiles shrink a little to fit */
   .pixTile{flex:1 1 0;min-width:0;max-width:46px;width:auto;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
     color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
-  .pixTile:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .pixTile:active,.pixTile.tapGlow {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .pixTile.used{pointer-events:none;background:rgba(27,31,59,.22);border-color:rgba(27,31,59,.4);color:transparent;text-shadow:none;box-shadow:none;}
   @media (max-height:640px){
     .pixWuIntro{margin-bottom:10px;font-size:1rem;}
@@ -841,7 +843,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   @keyframes fsHint{from{opacity:.55;}to{opacity:1;}}
   .fsHintBtn{margin-left:6px;cursor:pointer;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1rem;letter-spacing:.04em;line-height:1;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     padding:6px 14px 5px;background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 2px 0 rgba(255,255,255,.4);}
-  .fsHintBtn:active{box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 0 3px #DCEEFF,0 0 14px 6px rgba(110,190,255,.85);}
+  .fsHintBtn:active,.fsHintBtn.tapGlow {box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .fsHintBtn:disabled{opacity:.5;filter:grayscale(.4);cursor:default;}
   .fsFruit.sel::before{content:"";position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:3px solid #fff;box-shadow:0 0 0 3px #3A8FE8;border-radius:6px;}
   .fsFruit.pop{animation:fsPop .3s ease-out forwards;z-index:2;}
@@ -974,7 +976,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .msStage{width:30px;height:30px;flex:none;}
   .msStage.isGoal .msTile{box-shadow:0 0 0 3px #fff,0 0 0 6px #FFC93A;}
   .msArrow{flex:none;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #FFC93A;filter:drop-shadow(1px 1px 0 #1B1F3B);}
-  .msBar:active{box-shadow:inset 0 0 0 3px #1C4E9A,0 0 0 3px #DCEEFF,0 0 18px 8px rgba(110,190,255,.85);}
+  .msBar:active,.msBar.tapGlow {box-shadow:inset 0 0 0 3px #1C4E9A,0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .msBar{display:flex;width:100%;cursor:pointer;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;height:54px;padding:0 22px;background:#3A8FE8;border:4px solid #1B1F3B;border-radius:18px;box-shadow:inset 0 0 0 3px #1C4E9A;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;letter-spacing:.06em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B,-2px -2px 0 #1B1F3B,2px -2px 0 #1B1F3B,-2px 2px 0 #1B1F3B;}
   @media (max-height:700px){ .msBar{height:44px;font-size:1.25rem;margin-top:6px;} }
@@ -1026,7 +1028,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixMission .matchGrid{margin:10px 0;}
   .pixMission .matchCard,.pixMission .flPad{aspect-ratio:1/1;border-radius:8px;border:3px solid #1B1F3B;background:#3A5BD0 url("tiles/card_back.png") center / 100% 100% no-repeat;image-rendering:pixelated;
     box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:none;}
-  .pixMission .matchCard:active,.pixMission .flPad:active{transform:none;box-shadow:inset 0 0 0 2px #FFC93A,0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.85);}
+  .pixMission .matchCard:active,.pixMission .flPad:active{transform:none;box-shadow:inset 0 0 0 2px #FFC93A,0 0 var(--gBlur) var(--gSpread) rgba(255,236,120,.85);}
   .pixMission .matchCard.flipped,.pixMission .matchCard.matched,.pixMission .flPad.lit{background:#fff;}
   .pixMission .matchCard.flipped{cursor:default;}
   .pixMission .matchCard.flipped:active{box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);}      /* a tile that is already turned over does not light up when touched again */
@@ -1104,14 +1106,14 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixRange::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:28px;margin-top:-9px;border:3px solid #1B1F3B;border-radius:8px;background:#D6343A;
     box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 3px 0 rgba(20,30,90,.4);}
   .pixRange::-moz-range-thumb{width:22px;height:22px;border:3px solid #1B1F3B;border-radius:8px;background:#D6343A;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 3px 0 rgba(20,30,90,.4);}
-  .pixRange:active::-webkit-slider-thumb{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 0 3px #FFE0DC,0 0 14px 5px rgba(255,120,110,.9);}
+  .pixRange:active::-webkit-slider-thumb{box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(255,120,110,.9);}
   .qaBox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:16px;margin:10px 0;}
   .answerBtn{
     display:block;width:100%;text-align:left;
     background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.35);
     color:#fff;padding:12px 14px;border-radius:12px;margin:8px 0;font-size:.95rem;cursor:pointer;
   }
-  .answerBtn:active{box-shadow:0 0 10px 3px var(--glow);}
+  .answerBtn:active,.answerBtn.tapGlow {box-shadow:0 0 var(--gBlur) var(--gSpread) var(--glow);}
   .answerBtn.correct{background:rgba(46,158,79,.5);border-color:var(--good);}
   .answerBtn.wrong{background:rgba(196,59,59,.5);border-color:var(--danger);}
   .answerBtn.disabled{pointer-events:none;}
@@ -1161,7 +1163,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .passClose{flex:none;width:44px;height:44px;padding:0 0 3px;border:3px solid #1B1F3B;border-radius:12px;background:#D6343A;color:#fff;cursor:pointer;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.35);
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.35);}
-  .passClose:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 0 3px #FFE0DC,0 0 16px 6px rgba(255,120,110,.9);}
+  .passClose:active,.passClose.tapGlow {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 var(--gBlur) var(--gSpread) rgba(255,120,110,.9);}
   .passportBook{background:#FFF3D6;color:#1E2F7A;border:4px solid #1B1F3B;border-radius:14px;box-shadow:inset 0 0 0 4px #FFC93A,0 6px 0 rgba(20,30,90,.4);flex:1;min-height:280px;overflow:hidden;position:relative;}
   /* Width no longer fixed here (was 1100% / 11 pages) -- the track carries
      2 extra "phantom" clone slides for the wrap animation (see screenPassport),
@@ -1184,7 +1186,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .navArrow{width:56px;height:48px;border:3px solid #1B1F3B;border-radius:12px;background:#FFC93A;color:#1B1F3B;cursor:pointer;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1;padding:0 0 3px;
     box-shadow:0 4px 0 rgba(20,30,90,.4),inset 0 3px 0 rgba(255,255,255,.45);}
-  .navArrow:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 0 0 3px #FFF6C0,0 0 16px 6px rgba(255,236,120,.9);}
+  .navArrow:active,.navArrow.tapGlow {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 0 var(--gBlur) var(--gSpread) rgba(255,236,120,.9);}
   .dots{display:flex;gap:6px;justify-content:center;margin:12px 0 2px;flex-wrap:wrap;}
   .dot{width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,.55);border:2px solid #1B1F3B;box-sizing:border-box;}
   .dot.active{background:#FFC93A;}
@@ -1213,7 +1215,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   @keyframes wuShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
   .wuTray{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
   .wuTile{width:42px;height:48px;border:2px solid var(--gold);border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;cursor:pointer;}
-  .wuTile:active{box-shadow:0 0 10px 3px var(--glow);}
+  .wuTile:active,.wuTile.tapGlow {box-shadow:0 0 var(--gBlur) var(--gSpread) var(--glow);}
   .wuTile.used{opacity:.2;pointer-events:none;}
 
   /* Catch the Light — Kaboom!-style: icons no longer take taps of their own
@@ -11858,7 +11860,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 EV";
+var APP_BUILD = "2026-11-05 EW";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
