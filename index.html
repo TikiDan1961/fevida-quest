@@ -278,7 +278,7 @@
     /* The clouds on the wide sky (2026-11-05, per Dan: on the Keep Going screen of the Road to Emmaus a cloud blinked off for one frame at the same place near the left edge on every pass). Each cloud layer was two screens wide
        with its picture drawn a whole screen wide: 1688 x 1822 picture pixels a tile on an 844 point wide phone, more than a phone can keep as one piece (it is cut into tiles, and a tile is missing for a frame where two meet).
        Now each tile is 360 points wide (a portrait phone's width), and the layer is the screen plus one tile, 4000 pixels or less on any phone; it drifts one tile and starts again, at the speed it has upright. */
-    body.awardWide .pixSkyClouds{width:calc(100% + 360px);background-size:360px auto;animation-name:pixCloudDriftW;}
+    body.awardWide .pixSkyClouds,body.hglMode .hglRound .pixSkyClouds{width:calc(100% + 360px);background-size:360px auto;animation-name:pixCloudDriftW;}      /* (the ROUND X COMPLETED! screens of Hope Garden and the Road to Emmaus, played on their side, have the same moving clouds: the same small tiles, 2026-11-05, per Dan) */
   }
   /* the landscape Hope Garden held upright: the same message, and the little phone turns the other way (2026-10-27, per Dan) */
   @media (orientation:portrait){ body.hglMode .rotateMsg{display:flex;} }
@@ -2305,7 +2305,11 @@ var PIX_SFX = {
   emCart:{url:"sounds/sfx_em_cart.wav", gain:0.9},                // peak 0.41
   emRun:{url:"sounds/sfx_em_thump.wav", gain:1.7},                // soft thump loop for the pilgrim's footsteps, peak 0.55, so 0.93 at this gain (2026-11-01, replaces running.wav, per Dan; louder the next day: the gain was 0.9)
   emCrash:{url:"sounds/sfx_em_crash.wav", gain:0.4},              // peak 0.56
-  dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35}                // peak 0.99
+  dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35},               // peak 0.99
+  // 2026-11-05, per Dan (8-Bit Sounds folder; made mono, the silence at both ends cut off, a 10 ms fade at each end): "bee _spawned.wav" when the arrow of a new bee or butterfly appears in Hope Garden (0.6 s, peak 0.35), and
+  // "tile_fall.wav" when a plant falls into a column in Mustard Seed (0.39 s, peak 0.14, so a gain of 2.5)
+  beeSpawn:{url:"sounds/sfx_hgl_spawn.wav", gain:1.0},
+  msFall:{url:"sounds/sfx_ms_fall.wav", gain:2.5}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -6567,6 +6571,7 @@ function msDropNow(){
 function msFall(c, landRow, v, done){
   var col = document.querySelectorAll(".msCol")[c], mover = document.getElementById("msMover");
   if(!col || !mover){ done(); return; }
+  pixSfxPlay("msFall", false);                                              // the plant starts to fall into the column (2026-11-05, per Dan: tile_fall.wav)
   var cells = col.querySelectorAll(".msCell"), rows = cells.length;
   var from = mover.getBoundingClientRect(), target = cells[rows - 1 - landRow].getBoundingClientRect();
   var dist = target.top - from.top, squares = Math.round(dist / (from.height + 5)), dur = Math.max(150, Math.min(520, 100 + squares * 60));
@@ -10736,6 +10741,7 @@ function hglPlan(ci){
   }
   if(!ok) return false;
   hgl.plans.push({ci: ci, ex: ex, ey: ey, ux: ux, uy: uy, ix: ex + nx * 10.5, iy: ey + ny * 10.5, t: 0});
+  pixSfxPlay("beeSpawn", false);                    // the arrow of a new bee or butterfly has appeared (2026-11-05, per Dan)
   return true;
 }
 // the next spawn in the round's fixed order (bee, and every second time a butterfly with it): it only comes when its colours are not on the board; true = it has been signalled
@@ -11976,7 +11982,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 FI";
+var APP_BUILD = "2026-11-05 FK";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
