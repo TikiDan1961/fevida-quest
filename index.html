@@ -68,6 +68,7 @@
      screen no longer fades out the icon was seen for a few frames and then cut away. Now a quick start shows only the plain blue, and the icon only appears when the loading really takes a while (a cold start of the home-screen app). */
   #boot > img,#boot > span{opacity:0;animation:bootShow .01s linear .4s forwards;}
   @keyframes bootShow{to{opacity:1;}}
+  .loadWait{opacity:0;animation:bootShow .01s linear .4s forwards;}      /* the "Loading tiles..." card of Faith Match and the Stained-Glass Puzzle shows only if loading takes more than 0.4 s (2026-11-05, per Dan: it flashed for one frame) */
   #boot img{width:144px;height:144px;border-radius:32px;image-rendering:pixelated;box-shadow:0 0 0 4px #1B1F3B,0 8px 0 4px rgba(27,31,59,.35);}
   #boot span{font:700 15px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.06em;color:#fff;text-shadow:2px 0 #1B1F3B,-2px 0 #1B1F3B,0 2px #1B1F3B,0 -2px #1B1F3B,2px 2px #1B1F3B,-2px -2px #1B1F3B,2px -2px #1B1F3B,-2px 2px #1B1F3B;}
   .screen{
@@ -4108,7 +4109,7 @@ function screenFaithMatch(){
     // Guaranteed brief in practice (preload starts at app boot), but this is
     // what actually prevents the blank-white-tile flash: no card can be
     // flipped until every tile image has genuinely finished loading.
-    return pixShell('<div class="spacer"></div><div class="pixPaper"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>', "pixLower");
+    return pixShell('<div class="spacer"></div><div class="pixPaper loadWait"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>', "pixLower");
   }
   var s = state.session.faithMatch;
   if(!s){ initFaithMatchLevel(0); s = state.session.faithMatch; }
@@ -11234,13 +11235,15 @@ function hglLandAlong(d0, a, b){
   }
   return null;
 }
+var HGL_LAND_EXTRA = 4;          // how many more nodes (points of the line) are drawn after the one where the creature would land (2026-11-05, per Dan)
 function hglMove(ev){
   var d0 = hgl && hgl.drag; if(!d0 || ev.pointerId !== d0.id || d0.done) return;
   var p = hglPt(ev, true), last = d0.pts[d0.pts.length - 1], dx = p.x - last.x, dy = p.y - last.y, d = Math.sqrt(dx * dx + dy * dy), max = hglMax();
   if(d < 2.5 || d0.len >= max) return;
   if(d0.len + d > max){ var k = (max - d0.len) / d; p = {x: last.x + dx * k, y: last.y + dy * k}; d = max - d0.len; }
-  var hit = d0.pf ? hglLandAlong(d0, last, p) : null;
-  if(hit){ p = {x: hit.x, y: hit.y}; d = hit.d; d0.done = true; }                // the line ends where it would land, and goes no further
+  var hit = (d0.pf && !d0.landed) ? hglLandAlong(d0, last, p) : null;
+  if(hit){ p = {x: hit.x, y: hit.y}; d = hit.d; d0.landed = true; d0.extra = HGL_LAND_EXTRA; }          // the line has reached the landing place (the creature lands there when it follows the line): 4 more nodes are drawn,
+  else if(d0.landed){ if(--d0.extra <= 0) d0.done = true; }                                            // and then it goes no further, however the finger goes on moving
   d0.pts.push(p); d0.len += d;
 }
 function hglUp(ev){
@@ -11638,7 +11641,8 @@ var PZ_POOL = PZ_PICS;       // only the smooth drawn pictures now (2026-11-01, 
 var pzPicsHeld = {};            // src -> the loaded Image, kept so the phone does not throw the decoded picture away
 var pzPicsLoading = false;
 function pzPicsReady(s){
-  return s.imgs.every(function(src){ return MATCH_SYMBOLS.indexOf(src) !== -1 || pzPicsHeld[src]; });
+  // (2026-11-05, per Dan: START MISSION showed "Loading tiles..." for one frame. A picture that the background preload has already fetched and decoded (pixImgs) counts as held at once, so the puzzle is drawn straight away.)
+  return s.imgs.every(function(src){ if(MATCH_SYMBOLS.indexOf(src) !== -1 || pzPicsHeld[src]) return true; var im = pixImgs[pixAbs(src)]; if(im){ pzPicsHeld[src] = im; return true; } return false; });
 }
 function pzLoadPics(s){
   if(pzPicsLoading) return;
@@ -11820,13 +11824,13 @@ function screenStainedGlass(){
   if(!matchTilesReady){
     // same guard as Faith Match: the pictures are the Faith Match tiles, and
     // they are preloaded at app boot, so this is a brief beat at most
-    return pixShell('<div class="spacer"></div><div class="pixPaper"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
+    return pixShell('<div class="spacer"></div><div class="pixPaper loadWait"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
   }
   var s = state.session.stainedGlass;
   if(!s){ initStainedGlass(); s = state.session.stainedGlass; }
   if(!pzPicsReady(s)){
     pzLoadPics(s);
-    return pixShell('<div class="spacer"></div><div class="pixPaper"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
+    return pixShell('<div class="spacer"></div><div class="pixPaper loadWait"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
   }
 
   if(s.status === "passed"){
@@ -11973,7 +11977,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 FG";
+var APP_BUILD = "2026-11-05 FH";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
