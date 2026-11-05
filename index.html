@@ -260,6 +260,11 @@
   body.hglMode #app{max-width:none;padding:0 env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px);overflow:hidden;}
   body.hglMode, body.hglMode #app, body.hglMode .hglScreen{overscroll-behavior:none;touch-action:none;}      /* no pull-down / bounce of the page while playing (the phone's own swipe-down from the top edge cannot be switched off by a web page) */
   body.hglMode #app{position:relative;}
+  /* The Road to Emmaus badge screen on its side (2026-11-04, per Dan): the sky fills the whole width instead of a 480 px strip with the purple page on both sides; the card keeps the column it has upright (444 px) */
+  @media (orientation:landscape){
+    body.awardWide #app{max-width:none;overflow-x:hidden;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);}
+    body.awardWide .screen.pixSky{padding-left:max(18px,calc((100% - 444px) / 2));padding-right:max(18px,calc((100% - 444px) / 2));background-size:100% 100%,auto;}
+  }
   /* the landscape Hope Garden held upright: the same message, and the little phone turns the other way (2026-10-27, per Dan) */
   @media (orientation:portrait){ body.hglMode .rotateMsg{display:flex;} }
   body.hglMode .rotatePhone{animation-name:rotateHintL;}
@@ -300,6 +305,7 @@
   .quitOverlay .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
   .quitOverlay .quitBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
   .quitOverlay .quitBtns .btn.pixBtn.pixBtnSm{width:auto;min-width:130px;margin:0;}
+  .quitOverlay,.instOverlay{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}      /* these windows are added to the page body, outside #app, so the no-selection rule above never reached them: a quick tap on MAIN MENU began a text selection (Copy / Look Up / Translate) instead of pressing the button (2026-11-04, per Dan) */
   body.quitPaused #app *{animation-play-state:paused !important;}
   .emConfirm .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
   .emConfirm .emConfirmBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
@@ -11784,7 +11790,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-03 EL";
+var APP_BUILD = "2026-11-04 EN";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11951,6 +11957,7 @@ var LANDSCAPE_OK_SCREENS = ["hopeGardenL", "emmaus"];        // screens played o
 function rotateMsgUpdate(){
   document.body.classList.toggle("landscapeOK", LANDSCAPE_OK_SCREENS.indexOf(state.screen) !== -1 || (state.screen === "award" && state.awardMissionId === "emmaus"));      // (the Mission Completed screen of The Road to Emmaus comes up with the phone still on its side)
   document.body.classList.toggle("hglMode", state.screen === "hopeGardenL" || state.screen === "emmaus");      // (the same full-width, no-bounce, rotate-me layout for both)
+  document.body.classList.toggle("awardWide", state.screen === "award" && state.awardMissionId === "emmaus");      // (the badge screen on its side has a sky as wide as the phone: see body.awardWide in the style sheet)
   var back = awardRotateWait && state.screen === "award";           // the Road to Emmaus badge screen has had its time: "turn the phone back to portrait" (2026-10-30, per Dan)
   document.body.classList.toggle("awardRotate", back);
   var tx = document.getElementById("rotateText"), sub = document.getElementById("rotateSub");
@@ -11968,11 +11975,14 @@ function rotateMsgUpdate(){
 // soon after the app starts (pixPreloadAll), so this wait is hardly ever seen. The wait is never longer than 1.5 seconds, and the sky behind the screen stays up (no dark flash).
 var holdToken = 0;
 function pixHoldUntilLoaded(app){
+  if(PIX_OFF) return;
   var mine = ++holdToken, pending = [].filter.call(app.querySelectorAll("img"), function(im){ return !im.complete; });
   if(!pending.length) return;
+  var t0 = performance.now(), scr = state.screen, shown = false;
+  dbgLog("assets: HIDDEN " + scr + " was drawn with " + pending.length + " picture(s) not complete: the screen stays hidden until they are");
   app.classList.add("assetsWait");
   var left = pending.length;
-  function reveal(){ if(mine === holdToken) app.classList.remove("assetsWait"); }
+  function reveal(){ if(mine === holdToken){ app.classList.remove("assetsWait"); if(!shown){ shown = true; dbgLog("assets: HIDDEN " + scr + " shown again after " + Math.round(performance.now() - t0) + " ms"); } } }
   function one(){ if(--left <= 0) reveal(); }
   pending.forEach(function(im){ im.addEventListener("load", one); im.addEventListener("error", one); });
   setTimeout(reveal, 1500);
@@ -11987,7 +11997,7 @@ function pixPreloadAll(){
       running++;
       pixLoad(pixAbs("tiles/" + PRELOAD_LIST[i++]), function(){ running--; next(); });
     }
-    if(!running && i >= PRELOAD_LIST.length && !pixPreloadDone){ pixPreloadDone = true; if(pixGuard) pixGuard.disconnect(); dbgLog("assets: every picture is loaded and decoded"); pixWarmSounds(); }
+    if(!running && i >= PRELOAD_LIST.length && !pixPreloadDone){ pixPreloadDone = true; if(pixGuard) pixGuard.disconnect(); dbgLog("assets: every picture is loaded" + (PIX_OFF ? "" : " and decoded") + ", " + Math.round(performance.now() / 1000) + " s after the page loaded"); pixWarmSounds(); }
   }
   next();
 }
@@ -12016,6 +12026,12 @@ function pixWarmSounds(){
 // The wait is never longer than PIX_WAIT_MAX, and a picture that cannot be fetched counts as arrived, so a missing file can never freeze the app. The pictures of the whole game are also fetched in the background
 // soon after the start (pixPreloadAll), so this wait is hardly ever seen. Anything that is put on a screen later and is not there yet (the first seconds only) stays invisible until it is (pixGuardScan).
 var PIX_WAIT_MAX = 6000;
+// A switch to find out whether the picture waiting causes the flashes (2026-11-04, per Dan): a link with ?noassets turns the waiting, the hiding of late pictures and the decoding of the preload OFF on that phone
+// (the screens are put up at once, as before build DQ); ?noassets=0 turns it back on. The Options event log says which mode the page is in.
+var PIX_OFF = false;
+(function(){ try{ var m = /[?&]noassets(?:=([^&]*))?/.exec(location.search || ""); if(m) phSet("fevidaNoAssets", m[1] === "0" ? null : "1"); PIX_OFF = phGet("fevidaNoAssets") === "1"; }catch(e){} })();
+dbgLog("assets: waiting for pictures is " + (PIX_OFF ? "OFF (?noassets)" : "on"));
+var pixGuardLogN = 0;
 var pixReady = {}, pixLoading = {}, pixImgs = {}, pixKeep = [], pixAbsCache = {}, pixAnchor = document.createElement("a");
 function pixAbs(u){ var a = pixAbsCache[u]; if(a) return a; pixAnchor.href = u; return (pixAbsCache[u] = pixAnchor.href); }
 function pixLoad(url, cb){
@@ -12029,7 +12045,7 @@ function pixLoad(url, cb){
     var q = pixLoading[url] || []; delete pixLoading[url];
     for(var i = 0; i < q.length; i++){ try { q[i](); } catch(e){} }
   }
-  im.onload = function(){ if(im.decode){ im.decode().then(fin, fin); setTimeout(fin, 2500); } else fin(); };       // (a decode that never settles, as in a tab that is not showing, must not hold anything up)
+  im.onload = function(){ if(im.decode && !PIX_OFF){ im.decode().then(fin, fin); setTimeout(fin, 2500); } else fin(); };       // (a decode that never settles, as in a tab that is not showing, must not hold anything up)
   im.onerror = fin;
   im.src = url;
   pixKeep.push(im);
@@ -12100,8 +12116,10 @@ function pixWhen(need, cb){
 // the first seconds only: a picture put on the screen after it was drawn (a game adding a sprite) stays invisible until it has arrived
 var pixGuard = null;
 function pixGuardHide(el, urls){
+  var t0 = performance.now(), lg = ++pixGuardLogN <= 20, nm = el.tagName + (typeof el.className === "string" && el.className ? "." + el.className.split(" ")[0] : "");
+  if(lg) dbgLog("assets: HIDDEN " + nm + " on " + state.screen + " until " + urls[0].split("/").pop() + " arrives" + (urls.length > 1 ? " (+" + (urls.length - 1) + ")" : ""));
   el.pixPendN = (el.pixPendN || 0) + urls.length; el.classList.add("pixPend");
-  function one(){ if(el.pixPendN > 0 && --el.pixPendN <= 0) el.classList.remove("pixPend"); }
+  function one(){ if(el.pixPendN > 0 && --el.pixPendN <= 0){ el.classList.remove("pixPend"); if(lg) dbgLog("assets: HIDDEN " + nm + " shown again after " + Math.round(performance.now() - t0) + " ms"); } }
   urls.forEach(function(u){ pixLoad(u, one); });
   setTimeout(function(){ el.pixPendN = 0; el.classList.remove("pixPend"); }, PIX_WAIT_MAX);
 }
@@ -12115,7 +12133,7 @@ function pixGuardScan(el){
   });
 }
 function pixGuardStart(){
-  if(!window.MutationObserver) return;
+  if(!window.MutationObserver || PIX_OFF) return;
   pixGuard = new MutationObserver(function(list){ for(var i = 0; i < list.length; i++) for(var j = 0; j < list[i].addedNodes.length; j++) pixGuardScan(list[i].addedNodes[j]); });
   pixGuard.observe(document.getElementById("app"), {childList: true, subtree: true});
 }
@@ -12161,7 +12179,7 @@ function render(){
     case "goldenTicket": html = screenGoldenTicket(); break;
     default: html = screenLanguage();
   }
-  var token = ++renderToken, need = pixMissing(html, state.screen !== lastRenderedScreen);
+  var token = ++renderToken, need = PIX_OFF ? null : pixMissing(html, state.screen !== lastRenderedScreen);
   if(need){          // something this screen needs is not here yet: what is showing stays up, and the new screen goes up in one go when it is (a render asked for meanwhile takes its place)
     var scr = state.screen, t0 = performance.now();
     dbgLog("assets: " + scr + " waits for " + need.urls.length + " picture(s)" + (need.fonts ? " and the fonts" : ""));
