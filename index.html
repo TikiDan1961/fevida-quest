@@ -1263,7 +1263,13 @@ var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [];
   ["pointerdown","pointermove","pointerup","pointercancel","touchstart","touchmove","touchend","touchcancel","mousedown","mousemove","mouseup"].forEach(function(type){
     window.addEventListener(type, function(e){
       if(!quitAsk) return;
-      if(type === "pointerdown" && e.target && e.target.closest && e.target.closest(".quitOverlay .pixBtn") && typeof pixPressSfx === "function") pixPressSfx();
+      if(type === "pointerdown" && e.target && e.target.closest && e.target.closest(".quitOverlay .pixBtn")){
+        if(typeof pixPressSfx === "function") pixPressSfx();
+        // (2026-11-04, per Dan's event log: Faith Match, red X, MAIN MENU made its sound and did nothing until the second tap, and the log had no "tap:" line at all.) This listener stops the event here, so the two
+        // buttons never reached tapOnTouch, the code that makes every other button work the moment the finger touches it, and they relied on the click the phone makes when the finger lifts. After a Faith Match
+        // tap the phone sometimes makes no click for the first touch. The touch itself now presses the button, and the click that may follow is swallowed, as for every other button.
+        if(typeof tapOnTouch === "function"){ try { tapOnTouch(e); } catch(err){} }
+      }
       e.stopImmediatePropagation();                // nothing reaches the game behind the window (a tap on it must not start a round or steer)
     }, true);
   });
@@ -11802,7 +11808,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-04 EP";
+var APP_BUILD = "2026-11-04 EQ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
