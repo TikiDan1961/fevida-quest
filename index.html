@@ -11790,7 +11790,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-04 EN";
+var APP_BUILD = "2026-11-04 EO";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -11976,7 +11976,14 @@ function rotateMsgUpdate(){
 var holdToken = 0;
 function pixHoldUntilLoaded(app){
   if(PIX_OFF) return;
-  var mine = ++holdToken, pending = [].filter.call(app.querySelectorAll("img"), function(im){ return !im.complete; });
+  // (2026-11-04, per Dan's event log: on his iPhone a picture that was drawn into the page counts as "not complete" for a few milliseconds even when it has long been fetched and decoded, so EVERY new screen
+  // was hidden for one frame, 1 to 26 ms, and the two flashes he saw (START MISSION to Faith Flash, and the round message to the badge screen, the two that have no fade-in) were exactly such frames.
+  // A picture the game has already fetched and decoded (pixReady) is not waited for here; only one that is really not here yet is.)
+  var mine = ++holdToken, pending = [].filter.call(app.querySelectorAll("img"), function(im){
+    if(im.complete) return false;
+    var s = im.getAttribute("src");
+    return !(s && pixReady[s.indexOf("data:") === 0 ? s : pixAbs(s)]);
+  });
   if(!pending.length) return;
   var t0 = performance.now(), scr = state.screen, shown = false;
   dbgLog("assets: HIDDEN " + scr + " was drawn with " + pending.length + " picture(s) not complete: the screen stays hidden until they are");
