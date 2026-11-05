@@ -304,7 +304,7 @@
   .quitOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(10,20,70,.6);touch-action:none;animation:folderFade .2s ease-out;}      /* "Are you sure you want to quit?" over the game, which is dimmed and stands still (2026-11-03, per Dan) */
   .quitOverlay .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
   .quitOverlay .quitBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
-  .quitOverlay .quitBtns .btn.pixBtn.pixBtnSm{width:auto;min-width:130px;margin:0;}
+  .quitOverlay .quitBtns .btn.pixBtn.pixBtnSm{width:100%;max-width:230px;min-width:130px;margin:0;}      /* KEEP PLAYING and MAIN MENU are the same size, one above the other (2026-11-04, per Dan) */
   .quitOverlay,.instOverlay{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}      /* these windows are added to the page body, outside #app, so the no-selection rule above never reached them: a quick tap on MAIN MENU began a text selection (Copy / Look Up / Translate) instead of pressing the button (2026-11-04, per Dan) */
   body.quitPaused #app *{animation-play-state:paused !important;}
   .emConfirm .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
@@ -425,7 +425,7 @@
   @keyframes sparkBlink{0%{opacity:0;}55%{opacity:1;}65%{opacity:.35;}75%{opacity:1;}85%{opacity:0;}100%{opacity:0;}}
   /* The dove flies across the whole screen, in front of the icons in the sky (2026-10-27, per Dan), and never takes a tap: the layer lets every touch through to the icons below it. */
   .pixHome.pixSky > .pixDoveLayer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none;z-index:8;}
-  .pixDove{position:absolute;left:-14%;top:225px;      /* (40 px lower than before, 2026-11-03, per Dan: it was 185px; every time the Main Menu is drawn the flight starts again at this height) */
+  .pixDove{position:absolute;left:-14%;top:265px;      /* (40 px lower than before, twice, per Dan: 185px, then 225px on 2026-11-03, then 265px on 2026-11-04; every time the Main Menu is drawn the flight starts again at this height) */
 width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-delay:-3s;pointer-events:none;}
   @keyframes doveFly{0%{left:-14%;}55%{left:112%;}100%{left:112%;}}
   .pixDoveBob{width:100%;height:100%;animation:doveBob 3.2s ease-in-out infinite alternate;}
@@ -3682,7 +3682,7 @@ function missionById(id){ return MISSIONS.filter(function(m){ return m.id === id
 function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission pixLower' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
 
 // a pixel button with the glow and the press sound; secondary = the blue one
-function pixBigLabel(label){ return label === t("hg_play") || label === t("tryAgain") || label === t("playAgain") || label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu") || label === t("continuePlaying"); }
+function pixBigLabel(label){ return label === t("hg_play") || label === t("tryAgain") || label === t("playAgain") || label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu") || label === t("continuePlaying") || label === t("em_keep"); }      // (KEEP PLAYING in the quit window has the same large type as MAIN MENU, 2026-11-04, per Dan)
 function pixBtnHtml(label, js, secondary){
   return '<button class="btn pixBtn pixBtnSm' + (pixBigLabel(label) ? ' pixBtnBig' : '') + (secondary ? ' secondary' : '') + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '">' + label + '</button>';
 }
@@ -10005,11 +10005,25 @@ function emMoveSfxRate(){
   try { if(Math.abs(emMoveSrc.playbackRate.value - r) > .001) emMoveSrc.playbackRate.value = r; } catch(e){}
 }
 document.addEventListener("visibilitychange", function(){ if(document.hidden) emMoveSfxSet(""); });
+// A frame-rate meter for the event log (2026-11-04, per Dan: "the Road to Emmaus is not running as smoothly as it was, the frame rate changes as it runs"). Every 10 seconds of play one line says how long the
+// frames took: average, the worst one, and how many took longer than 25 ms (a steady 60 per second is 16.7 ms; a steady 30 per second, as when the phone is in Low Power Mode, is 33.3 ms). Pauses are left out.
+var emFps = {t0: 0, prev: 0, n: 0, sum: 0, max: 0, slow: 0};
+function emFpsTick(now){
+  var f = emFps, d = f.prev ? now - f.prev : 0; f.prev = now;
+  if(d <= 0 || d > 250) return;          // the first frame, or the game stood still (the quit question, another app)
+  if(!f.t0) f.t0 = now;
+  f.n++; f.sum += d; if(d > f.max) f.max = d; if(d > 25) f.slow++;
+  if(now - f.t0 >= 10000){
+    dbgLog("emmaus frames (10 s): " + f.n + ", average " + (f.sum / f.n).toFixed(1) + " ms (" + Math.round(1000 * f.n / f.sum) + " per second), worst " + Math.round(f.max) + " ms, over 25 ms: " + f.slow +
+      " | pictures " + (pixPreloadDone ? "all loaded" : "still loading") + ", round " + (em && typeof em.round === "number" ? em.round + 1 : "?"));
+    f.t0 = now; f.n = 0; f.sum = 0; f.max = 0; f.slow = 0;
+  }
+}
 function emLoop(now){
-  if(state.screen !== "emmaus"){ emRaf = 0; emMoveSfxSet(""); return; }
+  if(state.screen !== "emmaus"){ emRaf = 0; emMoveSfxSet(""); emFps.prev = 0; emFps.t0 = 0; emFps.n = 0; emFps.sum = 0; emFps.max = 0; emFps.slow = 0; return; }
   if(em){
     var dt = Math.min(.05, (now - em.last) / 1000); em.last = now;
-    if(!hglUpright() && em.L){ if(!em.confirm) emStep(dt); emPaint(); }                    // (nothing moves while the phone is upright)
+    if(!hglUpright() && em.L){ if(!em.confirm) emStep(dt); emPaint(); emFpsTick(now); }                    // (nothing moves while the phone is upright)
   }
   emMoveSfxSet(emMoveSfxWant());
   emMoveSfxRate();
@@ -11808,7 +11822,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-04 EQ";
+var APP_BUILD = "2026-11-04 ES";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12216,8 +12230,8 @@ function render(){
 function renderApply(html){
   var app = document.getElementById("app");
   app.classList.remove("assetsWait");
-  var boot = document.getElementById("boot");          // the first screen is up: the loading screen fades out and goes
-  if(boot){ boot.style.opacity = "0"; setTimeout(function(){ if(boot.parentNode) boot.parentNode.removeChild(boot); }, 300); }
+  var boot = document.getElementById("boot");          // the first screen is up: the loading screen goes at once (it used to fade out over .25 s; 2026-11-04, per Dan: no screen fades)
+  if(boot && boot.parentNode) boot.parentNode.removeChild(boot);
   var isNewScreen = state.screen !== lastRenderedScreen;
   var enteringPassportFresh = state.screen === "passport" && isNewScreen;
   var prevScreen = lastRenderedScreen;
@@ -12242,9 +12256,9 @@ function renderApply(html){
   if(isNewScreen) pixHoldUntilLoaded(app);
   if(isNewScreen){
     var el = app.querySelector(".screen");
-    // No fade between two sky screens (2026-10-22, per Dan): the fade starts from see-through, which showed the dark purple page behind it as a
-    // black flash between START MISSION and the game. Screens with other backgrounds still fade in.
-    if(el && !(wasSky && el.classList.contains("pixSky"))) el.classList.add("screen-enter");
+    // No fade at all (2026-11-04, per Dan: "all screens should instantly appear and not fade in"). Before, only a sky screen after a sky screen came up at once (2026-10-22: the fade starts from see-through, which
+    // showed the dark purple page behind it as a black flash between START MISSION and the game); every other screen faded in over .25 s, e.g. the Emmaus badge screen after the game on its side.
+    // (The .screen-enter style is still in the style sheet, but nothing adds it any more.)
   }
   if(state.screen === "mainMenu"){
     // the pilgrim and the pets wait until the How It Works window has been closed (2026-11-01, per Dan); closing it starts them as on a fresh Main Menu
