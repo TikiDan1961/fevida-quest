@@ -32,6 +32,10 @@
      never highlight it as if it were being copied, and a long press must not open
      the iOS copy/save-image bubble (2026-10-19, per Dan). */
   #app{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+  /* Nothing on any screen can be selected, wherever it sits (2026-11-05, per Dan: tapping fast in Pray the Beads brought up the iOS "Copy | Translate" bubble over the Keep Trying screen; the quit window did the same on 2026-11-04).
+     The rule above covers what is inside #app; this covers the whole page, and the script (see selectstart below) refuses a selection whatever the style says. Text fields and the developer-only level editor are left alone. */
+  html,body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+  input,textarea,select,[contenteditable],#edRoot,#edRoot *{-webkit-user-select:text;user-select:text;}
   #app img{-webkit-user-drag:none;user-drag:none;}
   button{touch-action:manipulation;}
   html,body{margin:0;padding:0;height:100%;overflow:hidden;}
@@ -1295,6 +1299,16 @@ var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [];
       }
       e.stopImmediatePropagation();                // nothing reaches the game behind the window (a tap on it must not start a round or steer)
     }, true);
+  });
+})();
+
+// No text is ever selected (2026-11-05, per Dan: the "Copy | Translate" bubble over Pray the Beads). Besides the style (user-select: none), a selection that is started is refused, and one that gets made anyway is cleared
+// at once, so the bubble goes. Text fields and the level editor (a developer tool on a computer) are left alone.
+(function(){
+  function free(n){ try { var el = n && (n.nodeType === 1 ? n : n.parentElement); return !!(el && el.closest && el.closest("input,textarea,select,[contenteditable],#edRoot")); } catch(e){ return false; } }
+  document.addEventListener("selectstart", function(e){ if(!free(e.target)) e.preventDefault(); }, true);
+  document.addEventListener("selectionchange", function(){
+    try { var sel = window.getSelection && window.getSelection(); if(sel && !sel.isCollapsed && !free(sel.anchorNode)) sel.removeAllRanges(); } catch(e){}
   });
 })();
 
@@ -11997,7 +12011,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 FQ";
+var APP_BUILD = "2026-11-05 FR";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
