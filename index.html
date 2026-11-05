@@ -2306,9 +2306,9 @@ var PIX_SFX = {
   emRun:{url:"sounds/sfx_em_thump.wav", gain:1.7},                // soft thump loop for the pilgrim's footsteps, peak 0.55, so 0.93 at this gain (2026-11-01, replaces running.wav, per Dan; louder the next day: the gain was 0.9)
   emCrash:{url:"sounds/sfx_em_crash.wav", gain:0.4},              // peak 0.56
   dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35},               // peak 0.99
-  // 2026-11-05, per Dan (8-Bit Sounds folder; made mono, the silence at both ends cut off, a 10 ms fade at each end): "tile_fall.wav" when a plant falls into a column in Mustard Seed (0.39 s, peak 0.14; a gain of 2.5 first, then 20% quieter at Dan's word: 2.0).
+  // 2026-11-05, per Dan (8-Bit Sounds folder; made mono, the silence at both ends cut off, a 10 ms fade at each end): "tile_fall.wav" when a plant falls into a column in Mustard Seed (0.39 s, peak 0.14; a gain of 2.5 first, then 20% quieter at Dan's word: 2.0, then 30% quieter again: 1.4).
   // (Hope Garden's spawn arrow first had "bee _spawned.wav" here; the same day Dan changed it to Heart Pickup.wav, which is emHeart above.)
-  msFall:{url:"sounds/sfx_ms_fall.wav", gain:2.0}
+  msFall:{url:"sounds/sfx_ms_fall.wav", gain:1.4}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -11981,7 +11981,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 FN";
+var APP_BUILD = "2026-11-05 FO";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
