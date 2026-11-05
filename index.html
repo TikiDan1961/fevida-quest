@@ -2306,9 +2306,9 @@ var PIX_SFX = {
   emRun:{url:"sounds/sfx_em_thump.wav", gain:1.7},                // soft thump loop for the pilgrim's footsteps, peak 0.55, so 0.93 at this gain (2026-11-01, replaces running.wav, per Dan; louder the next day: the gain was 0.9)
   emCrash:{url:"sounds/sfx_em_crash.wav", gain:0.4},              // peak 0.56
   dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35},               // peak 0.99
-  // 2026-11-05, per Dan (8-Bit Sounds folder; made mono, the silence at both ends cut off, a 10 ms fade at each end): "tile_fall.wav" when a plant falls into a column in Mustard Seed (0.39 s, peak 0.14, so a gain of 2.5).
+  // 2026-11-05, per Dan (8-Bit Sounds folder; made mono, the silence at both ends cut off, a 10 ms fade at each end): "tile_fall.wav" when a plant falls into a column in Mustard Seed (0.39 s, peak 0.14; a gain of 2.5 first, then 20% quieter at Dan's word: 2.0).
   // (Hope Garden's spawn arrow first had "bee _spawned.wav" here; the same day Dan changed it to Heart Pickup.wav, which is emHeart above.)
-  msFall:{url:"sounds/sfx_ms_fall.wav", gain:2.5}
+  msFall:{url:"sounds/sfx_ms_fall.wav", gain:2.0}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -3170,7 +3170,7 @@ function cwConfetti(tk){
 }
 // Confetti on the ROUND X COMPLETED! screens and on the badge screen (2026-11-05, per Dan): the same paper strips as the Golden Ticket's, a smaller burst from the middle of the screen and a rain from the top, for about 4 seconds.
 // It lies over the screen and never takes a touch. It stops by itself, and at once if another screen comes up. (Called from phWatch when a round is completed, and from renderApply when the badge screen comes up.)
-var pxConfettiRaf = 0, pxConfettiCv = null, pxConfettiFn = null, pxRoundKey = "";
+var pxConfettiRaf = 0, pxConfettiCv = null, pxConfettiFn = null, pxRoundKey = "", pxBadgeShown = false;
 function pixConfettiStop(){
   cancelAnimationFrame(pxConfettiRaf); pxConfettiRaf = 0; pxConfettiFn = null;
   if(pxConfettiCv && pxConfettiCv.parentNode) pxConfettiCv.parentNode.removeChild(pxConfettiCv);
@@ -11981,7 +11981,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 FL";
+var APP_BUILD = "2026-11-05 FN";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12427,12 +12427,16 @@ function renderApply(html){
   }
   if(!oldSky) app.innerHTML = exitBarHtml() + html;
   if(isNewScreen) pixHoldUntilLoaded(app);
-  if(isNewScreen && state.screen === "award") pixConfettiParty();          // confetti on the badge screen (2026-11-05, per Dan)
   // Confetti whenever a ROUND X COMPLETED! card comes up, in every mission (2026-11-05, per Dan: in Hope Garden it only came with the extra chance heart). The card is looked for on the screen itself (pixRoundDoneHtml marks it with
   // data-rd = the round number), not in the analytics, which does not see every game. It starts once for each card (the extra heart that comes up on the same card does not start it again) and stops when the card goes.
   var rdCard = app.querySelector(".pixRoundDone[data-rd]");
   if(rdCard){ var rdKey = state.screen + ":" + rdCard.getAttribute("data-rd"); if(rdKey !== pxRoundKey){ pxRoundKey = rdKey; pixConfettiParty(); } }
   else if(pxRoundKey){ pxRoundKey = ""; pixConfettiStop(); }
+  // Confetti on EVERY badge screen (2026-11-05, per Dan: it was missing on some): the badge screen after round 1 and the result screens of the games that show their badge (a .pixResBadge picture), and the award screen of a mission
+  // with no badge (Choose Joy). It starts when a badge comes up, once, and this comes AFTER the round card above: before, the ROUND X COMPLETED! card going away stopped the confetti that the badge screen had just started.
+  var badgeNow = !!app.querySelector(".pixResBadge") || state.screen === "award";
+  if(badgeNow && !pxBadgeShown) pixConfettiParty();
+  pxBadgeShown = badgeNow;
   if(isNewScreen){
     var el = app.querySelector(".screen");
     // No fade at all (2026-11-04, per Dan: "all screens should instantly appear and not fade in"). Before, only a sky screen after a sky screen came up at once (2026-10-22: the fade starts from see-through, which
