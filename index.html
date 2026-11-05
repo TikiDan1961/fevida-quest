@@ -2520,7 +2520,18 @@ function pixSfxPlayHeld(name, exclusive){
 // letters, a flap of the dove...). While the engine is not trusted, a sound made with a finger on the screen is therefore kept until the finger lifts and the new engine is made (0.7 s at the most), then
 // played. A sound made with no finger down (a timer, an animation) plays at once, as before. pixHeldRun stops a held sound from being held again when it is let go after the 0.7 s.
 var pixFingers = {}, pixHeldRun = false;
-document.addEventListener("pointerdown", function(e){ pixFingers[e.pointerId] = performance.now(); }, true);
+document.addEventListener("pointerdown", function(e){
+  pixFingers[e.pointerId] = performance.now();
+  // The end of this touch is also listened for on the touched element itself (2026-11-04, per Dan: Faith Match, two tiles, the red X, then MAIN MENU in the quit window made its sound but did nothing until
+  // the second tap). A Faith Match tile is thrown away when the finger goes down, so the lift is sent to an element that is no longer on the page and never reaches `document`: the finger stayed "down" in
+  // pixFingers for 3 seconds, and a lone touch on a button (pixLoneTouch) was refused for those 3 seconds. The element itself still gets the lift (see pixArmRevive), so the finger is forgotten at once.
+  var el = e.target, id = e.pointerId;
+  if(el && el.addEventListener){
+    var evs = ["pointerup", "pointercancel", "touchend", "touchcancel"], end = function(){ evs.forEach(function(n){ el.removeEventListener(n, end, true); }); delete pixFingers[id]; };
+    evs.forEach(function(n){ el.addEventListener(n, end, true); });
+    setTimeout(function(){ evs.forEach(function(n){ el.removeEventListener(n, end, true); }); }, 15000);
+  }
+}, true);
 function pixFingerUp(e){ delete pixFingers[e.pointerId]; }
 document.addEventListener("pointerup", pixFingerUp, true);
 document.addEventListener("pointercancel", pixFingerUp, true);
@@ -2566,8 +2577,9 @@ var TAP_SOUND_ONLY = /^\s*(?:if\s*\(\s*!\s*this\.disabled\s*\)\s*)?(?:pixPressSf
 // being a second finger, gets neither this tap nor a click. Such a touch on a button now counts as a normal tap when no other finger has been down in the last 3 seconds (the pixFingers rule above).
 function pixLoneTouch(e){
   var now = performance.now(), k;
-  for(k in pixFingers){ if(String(k) !== String(e.pointerId) && now - pixFingers[k] < 3000) return false; }
-  if(!(e.target && e.target.closest && e.target.closest(".btn"))) return false;
+  var isBtn = !!(e.target && e.target.closest && e.target.closest(".btn"));
+  for(k in pixFingers){ if(String(k) !== String(e.pointerId) && now - pixFingers[k] < 3000){ if(isBtn) dbgLog("tap: a button touched by a pointer that is not primary was NOT counted: another pointer was down " + Math.round(now - pixFingers[k]) + " ms ago (" + state.screen + ")"); return false; } }
+  if(!isBtn) return false;
   dbgLog("tap: a button was touched by a pointer that is not primary, with no other finger down: counted as a normal tap (" + state.screen + ")");
   track("tap_recovered", {screen: state.screen});
   return true;
@@ -11790,7 +11802,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-04 EO";
+var APP_BUILD = "2026-11-04 EP";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
