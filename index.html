@@ -214,8 +214,8 @@
   .appTile .miniGrid img.spr{width:32px;height:32px;image-rendering:pixelated;}
   .countBadge{position:absolute;top:-9px;right:-12px;min-width:34px;padding:2px 6px;border-radius:12px;background:#D6343A;border:3px solid #fff;color:#fff;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
-  .fullBadge{position:absolute;top:-9px;left:-9px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#FFC93A;border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}      /* the heart: every round of the mission done; like the check mark, a coloured circle with a thick white border and the picture in the middle (2026-11-05, per Dan) */
-  .fullBadge img{width:22px;height:20px;image-rendering:pixelated;display:block;}
+  .fullBadge{position:absolute;top:-8px;left:-8px;width:24px;height:24px;box-sizing:border-box;border-radius:50%;background:#FFC93A;border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}      /* the heart: every round of the mission done; like the check mark, a coloured circle with a thick white border and the picture in the middle (2026-11-05, per Dan) */
+  .fullBadge img{width:14.667px;height:13.333px;image-rendering:pixelated;display:block;margin:0;flex:none;}      /* the heart picture, a little larger (2026-11-06, per Dan): each of its 11 x 10 squares is 4 / 3 px, which is exactly 4 device pixels on a 3x phone screen, so it stays crisp; in the middle of the 24 px circle (18 px inside the border): 1.667 px at the sides, 2.333 px above and below. The circle is exactly the check mark's size. */
   .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
     display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}
   /* (2026-10-25, per Dan) an icon that cannot be opened is grey: the locked Golden Ticket, the coming-soon missions, and all the icons while the pilgrim is talking and walking */
@@ -12272,7 +12272,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 GP";
+var APP_BUILD = "2026-11-06 GR";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
