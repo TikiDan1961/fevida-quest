@@ -3075,11 +3075,16 @@ function pilgrimResize(){
   if(pilgrimWaitFit){ pilgrimWaitFit = false; pilgrimInit(false); return; }          // the Main Menu was drawn while the phone was on its side: it is upright now, so he can be placed
   var rows = box.clientHeight / (box.clientWidth / SCENE_W);
   if(Math.abs(rows - pilgrimRows) < 1) return;
-  pilgrimFitPath(); pilgrimHide();
+  pilgrimFitPath();
   if(state.pilgrimIn && !pilgrimAllowBack) return;
   if(pilgrimPos !== null && !el.classList.contains("walking")) pilgrimPlace(el, pilgrimPos, 0);      // (one that is walking places himself again at every step)
 }
-function pilgrimResizeSoon(){ clearTimeout(pilgrimResizeTimer); pilgrimResizeTimer = setTimeout(function(){ pilgrimResize(); pilgrimResizeTimer = setTimeout(pilgrimResize, 600); }, 150); }
+function pilgrimResizeAll(){
+  pilgrimResize();
+  var b = document.getElementById("pilgrimBubble");
+  if(b && b.classList.contains("show")) pilgrimBubblePlace();          // a bubble that is showing is put above whoever is talking again
+}
+function pilgrimResizeSoon(){ clearTimeout(pilgrimResizeTimer); pilgrimResizeTimer = setTimeout(function(){ pilgrimResizeAll(); pilgrimResizeTimer = setTimeout(function(){ pilgrimResizeAll(); pilgrimResizeTimer = setTimeout(pilgrimResizeAll, 900); }, 500); }, 150); }
 window.addEventListener("resize", pilgrimResizeSoon);
 window.addEventListener("orientationchange", pilgrimResizeSoon);
 var pilgrimFaceLeft = null;
@@ -3197,17 +3202,25 @@ function pilgrimMessages(){
   return list;
 }
 
-function pilgrimSay(text, anchor, ms){   // anchor = who is talking (the pilgrim unless told otherwise), ms = how long the bubble stays
-  var scene = document.getElementById("pixSceneBox"), pil = anchor || document.getElementById("pilgrim"), b = document.getElementById("pilgrimBubble");
-  if(!scene || !pil || !b) return;
-  b.classList.remove("show"); b.textContent = text;
-  b.style.visibility = "hidden"; b.style.display = "block";   // measure it before showing
+// The bubble sits above whoever is talking, in pixels measured from the scene as it is now. (2026-11-06, per Dan: the phone was turned sideways while the pilgrim walked and turned upright again, and the bubble he
+// said on arriving was where the sideways screen had put it. Now a turn of the phone puts it above him again: see pilgrimResizeSoon.)
+var pilgrimBubbleAnchor = null;
+function pilgrimBubblePlace(){
+  var scene = document.getElementById("pixSceneBox"), b = document.getElementById("pilgrimBubble"), pil = pilgrimBubbleAnchor;
+  if(!scene || !b || !pil || !pil.isConnected) return;
   var sr = scene.getBoundingClientRect(), pr = pil.getBoundingClientRect(), bw = b.offsetWidth, bh = b.offsetHeight;
   var cx = pr.left + pr.width / 2 - sr.left;
   var left = Math.max(6, Math.min(sr.width - bw - 6, cx - bw / 2));
   b.style.left = left + "px";
   b.style.top = (pr.top - sr.top - bh - 12) + "px";
   b.style.setProperty("--tail", Math.max(16, Math.min(bw - 16, cx - left)) + "px");
+}
+function pilgrimSay(text, anchor, ms){   // anchor = who is talking (the pilgrim unless told otherwise), ms = how long the bubble stays
+  var scene = document.getElementById("pixSceneBox"), pil = anchor || document.getElementById("pilgrim"), b = document.getElementById("pilgrimBubble");
+  if(!scene || !pil || !b) return;
+  b.classList.remove("show"); b.textContent = text;
+  b.style.visibility = "hidden"; b.style.display = "block";   // measure it before showing
+  pilgrimBubbleAnchor = pil; pilgrimBubblePlace();
   b.style.display = ""; b.style.visibility = "";
   void b.offsetWidth;
   b.classList.add("show");
@@ -12187,6 +12200,19 @@ function pzFit(){
   pzFitTries = 0;
   if(pzCtx.H > availUnits) svg.style.height = Math.floor(availPx) + "px";
 }
+// (2026-11-06, per Dan's question about turning the phone during a game) The fit above runs after every draw, so a draw made while the phone was on its side (the next round coming up, say) fitted the picture and
+// the tray to the short, wide screen, and nothing fitted them again when the phone was turned upright: the tray stayed tiny. A turn of the phone (or any change of the screen's height) now fits them again.
+var pzResizeTimer = 0;
+function pzResizeSoon(){
+  clearTimeout(pzResizeTimer);
+  pzResizeTimer = setTimeout(function(){
+    if(state.screen !== "stainedGlass") return;
+    pzFitTries = 0; pzFit();
+    pzResizeTimer = setTimeout(function(){ if(state.screen === "stainedGlass"){ pzFitTries = 0; pzFit(); } }, 600);        // (a phone that has only just finished turning)
+  }, 150);
+}
+window.addEventListener("resize", pzResizeSoon);
+window.addEventListener("orientationchange", pzResizeSoon);
 
 function pzAdvance(){
   pzAdvancing = false;
@@ -12369,7 +12395,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 HA";
+var APP_BUILD = "2026-11-06 HC";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
