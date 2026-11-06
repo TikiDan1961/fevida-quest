@@ -214,7 +214,7 @@
   .appTile .miniGrid img.spr{width:32px;height:32px;image-rendering:pixelated;}
   .countBadge{position:absolute;top:-9px;right:-12px;min-width:34px;padding:2px 6px;border-radius:12px;background:#D6343A;border:3px solid #fff;color:#fff;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
-  .fullBadge{position:absolute;top:-9px;left:-9px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#fff;border:2px solid #1B1F3B;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}      /* the heart: every round of the mission done (2026-11-05, per Dan) */
+  .fullBadge{position:absolute;top:-9px;left:-9px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#FFC93A;border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}      /* the heart: every round of the mission done; like the check mark, a coloured circle with a thick white border and the picture in the middle (2026-11-05, per Dan) */
   .fullBadge img{width:22px;height:20px;image-rendering:pixelated;display:block;}
   .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
     display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}
@@ -678,6 +678,11 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .tlNum{position:absolute;left:8px;top:50%;margin-top:-10px;width:20px;height:20px;border-radius:4px;background:#1B1F3B;color:#fff;display:grid;place-items:center;font-size:.8rem;}
   .tlTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;}
   .tlSlots.seven{gap:7px;}
+  .tlSlots.dense{gap:4px;margin:4px 0 6px;}  .tlSlots.dense .tlSlot{height:var(--tlSlot,30px);font-size:.875rem;}      /* rounds of 8 to 11 events (2026-11-06, per Dan); tlFit sets --tlSlot and --tlCard from the room there is */
+  .tlSlots.denser{gap:3px;}
+  .tlSlots.tight .tlSlot{font-size:.75rem;padding:0 22px;}  .tlSlots.tight .tlNum{width:15px;height:15px;margin-top:-7.5px;left:5px;font-size:.625rem;}
+  .tlCards.dense{gap:5px;}  .tlCards.dense .tlCard{min-height:var(--tlCard,38px);padding:2px 6px 5px;}
+  .tlCards.denser{gap:4px;}  .tlCards.tight .tlCard{font-size:.75rem;line-height:1.05;padding:1px 5px 3px;}
   .tlSlots.seven .tlSlot{height:36px;}
   .tlIcon{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;margin-right:6px;}
   .tlCards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
@@ -802,7 +807,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixNote.good{color:#FFE680;font-size:1.25rem;}
   /* Word Trail (2026-10-23): the letter grid. Every cell is exactly 1/8 of the grid wide, so a touch can be turned into a square by simple division. */
   /* minmax(0,1fr) and min-width:0: a wide letter can never stretch its column, so the grid is always exactly as wide as the screen allows and the right-hand column is never pushed off it */
-  .wtGrid{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));width:min(100%,max(220px,calc(100vh - 360px)),380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;
+  .wtGrid{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));width:min(100%,max(220px,calc(100vh - 392px)),380px);max-width:100%;box-sizing:border-box;margin:4px auto;touch-action:none;
     container-type:inline-size;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer;}
   .wtCell{aspect-ratio:1/1;padding:2px 2px 4px;box-sizing:border-box;pointer-events:none;min-width:0;}     /* no overflow:hidden: it cut off the tile's bottom edge (2026-10-23, per Dan's phone picture) */
   .wtCell i{display:flex;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;font-style:normal;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;
@@ -822,6 +827,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .prTile.g1{background-image:radial-gradient(circle at 70% 20%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 24% 78%,#FF9FC0 0 1.5px,transparent 2px);}
   .prTile.g2{background-image:radial-gradient(circle at 30% 70%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 80% 30%,#FFD84A 0 1.5px,transparent 2px);}
   .prTile.g3{background-image:radial-gradient(circle at 84% 80%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 20% 30%,#FF9FC0 0 1.5px,transparent 2px);}
+  .prBoard.prDone .prTile{pointer-events:none;}      /* once the road is complete the tiles take no touch at all (2026-11-05, per Dan) */
   .prTile:active{filter:brightness(1.12);}
   .prTile.tapGlow,.prTile.tapHold{filter:brightness(1.12);}      /* a tapped tile's edges no longer glow (2026-11-05, per Dan): the page-wide tap glow is a drop shadow around the element; here a touch just brightens the tile, as :active does */
   .prWalker{position:absolute;z-index:3;pointer-events:none;}
@@ -1035,9 +1041,10 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .wgFound{min-height:1.6rem;margin:0 0 4px;font-size:1rem;}
   @media (max-width:340px){ .wgGroup{padding:1px 3px 4px;border-width:2px;} .wgRow{gap:4px;} .wgCell{font-size:clamp(6.5px,calc(((100cqw - 14px) / var(--n) - 6px) / (var(--m) * .82)),19px);} }
   @media (max-height:700px){ .wgCell{aspect-ratio:1.6/1;} .wgGroup{margin-bottom:4px;padding-bottom:4px;} .wgLabel{height:1.25rem;line-height:1.25rem;} }      /* shorter screens: the biggest board still fits */
+  .wtHearts{margin:0 0 2px;}
   .wtWords{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 8px;margin:2px 4px 8px;}
   .wtWord{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.9375rem;letter-spacing:.06em;color:#1B1F3B;background:#FFF3D6;border:2px solid #1B1F3B;border-radius:8px;padding:2px 9px 4px;box-shadow:0 2px 0 rgba(20,30,90,.35);}
-  @media (max-height:640px){ .wtTrace{height:1.5rem;line-height:1.5rem;font-size:1.125rem;} .wtGrid{width:min(100%,max(200px,calc(100vh - 330px)),380px);} }
+  @media (max-height:640px){ .wtTrace{height:1.5rem;line-height:1.5rem;font-size:1.125rem;} .wtGrid{width:min(100%,max(200px,calc(100vh - 360px)),380px);} }
   .pixChances{display:flex;align-items:center;justify-content:center;gap:4px 10px;flex-wrap:wrap;margin:0 0 10px;}
   .pixChances .pixNote{margin:0;}
   .pixChancesGap{margin-top:12px;}
@@ -1378,9 +1385,9 @@ var T = {
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
       lightCandle:{d:"Take a quiet moment to pray.", h:["Choose who or what you are praying for.", "Press and hold the candle to light it.", "Let go too soon and the light fades, so keep holding."]},
       emojiStories:{d:"Guess the Bible story from the emojis.", h:["Look at the emojis and tap the Bible story they show.", "Answer 8 stories in each of 3 rounds. You have 5 chances."]},
-      jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
+      jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 8 rounds. Each round has one more event than the last, from 4 events up to 11. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
-      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
+      wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "You have 3 chance hearts. Letters that don't spell a word on the list cost you one, and finishing a round wins one back.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
       jacobLadder:{d:"Bounce Jacob up the rungs to the gate of heaven.", h:["Jacob bounces by himself. Hold LEFT or RIGHT to steer him. He bounces off the sky's edges. The bar on the right shows how high you are.", "He lands on a rung only when coming down. Some rungs slide, some break after one bounce, and winged rungs throw him very high.", "Avoid the storm clouds and don't fall off the bottom, or you lose a chance and the climb starts again. You have 3 chances. Reach the gate in all 3 rounds to win."]},
       fruitsSpirit:{d:"Match fruit to collect all 8 fruits of the Spirit.", h:["Swipe a fruit toward a neighbor to swap them. Make a row or column of 3 or more of the same fruit, or they slide back.", "The words below the board count each fruit you collect, like 3/5. Fill all 8 to finish a level.", "Match 4 or more to make a flame. The flame is wild: put it next to 2 matching fruit and the whole row or column clears.", "Stuck? Tap HINT (3 in the whole game) to light up a match."]},
       dovePeace:{d:"Tap to flap and fly the dove through the storm clouds.", h:["Tap anywhere on the screen to make the dove flap upward. Between taps it sinks.", "Fly through the gap in each pair of storm clouds to carry the olive branch. Hit a cloud and you lose a chance. You have 3 chances.", "Fly past 10 clouds to finish a round. The gaps get tighter each round. In rounds 2 and 3 a vulture now and then flies in from the right: keep out of its way. Finish all 3 rounds to win."]},
@@ -1439,6 +1446,7 @@ var T = {
 
     wu_intro:"Tap the letters in order to unscramble each word. Finish all 3 levels to win!",
     wu_word:function(n,total){return "Word "+n+" of "+total;},
+    wt_failTitle:"So Close!", wt_failBody:"You ran out of chances — give it another try from Level 1.",
     wu_failTitle:"So Close!", wu_failBody:"You ran out of chances — give it another try from Level 1.",
     wu_passTitle:"Word Master!", wu_passBody:"You made it through all 3 levels of words!", wu_skip:function(n){return "SKIP ("+n+")";},
     clearWord:"CLEAR",
@@ -1549,9 +1557,9 @@ var T = {
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
       lightCandle:{d:"Tómate un momento de tranquilidad para orar.", h:["Elige por quién o por qué estás orando.", "Mantén presionada la vela para encenderla.", "Si la sueltas muy pronto, la luz se apaga, así que sigue presionando."]},
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias en cada una de las 3 rondas. Tienes 5 oportunidades."]},
-      jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
+      jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 8 rondas. Cada ronda tiene un evento más que la anterior, de 4 eventos hasta 11. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen debe aparecer una sola vez en cada fila, en cada columna y en cada bloque.", "Si una imagen rompe la regla, se pondrá roja y desaparecerá. Toca PISTA si necesitas ayuda. Resuelve los 4 rompecabezas para ganar."]},
-      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
+      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Tienes 3 corazones de oportunidad. Unir letras que no forman una palabra de la lista te cuesta uno, y al terminar una ronda recuperas uno.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
       jacobLadder:{d:"Haz rebotar a Jacob de un peldaño a otro hasta llegar a la puerta del cielo.", h:["Jacob rebota por sí solo. Mantén presionada IZQUIERDA o DERECHA para moverlo. Rebotará al llegar a los bordes del cielo. La barra de la derecha muestra tu altura.", "Solo cae sobre un peldaño al bajar. Algunos se deslizan, otros se rompen tras un rebote, y los peldaños con alas lo lanzan muy alto.", "Evita las nubes de tormenta y no caigas por abajo, o pierdes una oportunidad y tendrás que comenzar a subir de nuevo. Tienes 3 oportunidades. Llega a la puerta en las 3 rondas para ganar."]},
       fruitsSpirit:{d:"Combina las frutas para recolectar los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que recolectas, como 3/5. Llena las 8 para terminar un nivel.", "Combina 4 frutas o más para crear una llama. La llama es comodín: colócala junto a 2 frutas iguales y eliminará toda la fila o columna.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para hacer que la paloma aletee y suba. Entre cada toque, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
@@ -1609,6 +1617,7 @@ var T = {
 
     wu_intro:"Toca las letras en orden para descifrar cada palabra. ¡Termina los 3 niveles para ganar!",
     wu_word:function(n,total){return "Palabra "+n+" de "+total;},
+    wt_failTitle:"¡Casi lo logras!", wt_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
     wu_failTitle:"¡Casi lo logras!", wu_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
     wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Superaste los 3 niveles de palabras!", wu_skip:function(n){return "SALTAR ("+n+")";},
     clearWord:"BORRAR",
@@ -3755,8 +3764,17 @@ var pixRoundRunning = {};
 // ONE time for every game (2026-10-25, per Dan: the message must stay up exactly as long in each game): the ROUND X COMPLETED! message is up for ROUND_MSG_MS (the fanfare, which is 3.3 s, and a
 // beat), the message before the badge screen (the last round) for ROUND_MSG_FINAL_MS (just the fanfare). They no longer follow the length of the sound file, so they are the same whether or not it
 // had been decoded yet. A heart that is given back appears 2 s in (FF_INTERLUDE_AWARD_MS) and does not change the total. The badge screen has its own single time, AWARD_SHOW_MS.
-var ROUND_MSG_MS = 4100, ROUND_MSG_FINAL_MS = 3350;
+// (2026-11-06, per Dan: every Round Completed screen, with or without a heart given back, stays up exactly as long.) The last round's message used to be shorter (3.35 s) than the others (4.1 s); it is 4.1 s too now.
+var ROUND_MSG_MS = 4100, ROUND_MSG_FINAL_MS = ROUND_MSG_MS;
 var ROUND_SHOW_EXTRA_MS = 500;     // the ROUND COMPLETED message, with or without the heart, stays up this much longer than the sound (2026-10-22, per Dan)
+// The time of a Round Completed screen counts from the moment the screen is really on the glass (2026-11-06, per Dan), not from when it was built: after two painted frames, or after 0.8 s if no frame comes (a hidden
+// page). A game that is slow to paint it (a busy canvas, a lot to take down) used to lose that time off the front. The sound starts together with the count. The event log (Options) says how long the paint took.
+function pixAfterPaint(label, cb){
+  var t0 = performance.now(), fired = false, tm = 0;
+  function go(){ if(fired) return; fired = true; clearTimeout(tm); try { dbgLog("round screen " + label + ": painted " + Math.round(performance.now() - t0) + " ms after it was built"); } catch(e0){} cb(); }
+  tm = setTimeout(go, 800);
+  try { requestAnimationFrame(function(){ requestAnimationFrame(go); }); } catch(e1){ go(); }
+}
 function pixRoundRun(key, getSession, giveAward, finish){
   if(pixRoundRunning[key]) return;
   var s = getSession();
@@ -3773,20 +3791,22 @@ function pixRoundRun(key, getSession, giveAward, finish){
   if(s.interlude.resumed){ setTimeout(done, 0); return; }      // back from the "keep playing" screen: straight on to the next round, with no second ROUND 1 COMPLETED!
   if(s.interlude.phase === "award"){ setTimeout(done, 1200 + ROUND_SHOW_EXTRA_MS); return; }   // reloaded after the heart was given: just let it be seen, then go on
   var buf = pixSfxBuf.ffRound;
-  // the very last ROUND COMPLETED goes to the Mission Completed screen as soon as its sound is over: no extra wait (2026-10-23, per Dan, shorter)
-  var soundMs = s.interlude.final ? ROUND_MSG_FINAL_MS : ROUND_MSG_MS;
-  pixSfxPlay("ffRound", false);
-  setTimeout(function(){
+  var soundMs = s.interlude.final ? ROUND_MSG_FINAL_MS : ROUND_MSG_MS;      // the same for every round, the last included (2026-11-06, per Dan)
+  pixAfterPaint(key, function(){
     if(!alive()){ pixRoundRunning[key] = false; return; }
-    // never on the last round (2026-10-22, per Dan): that one shows the message alone, since the mission is won
-    var award = (giveAward && !s.interlude.final) ? giveAward(s) : false;
-    if(award){
-      s.interlude.phase = "award"; s.interlude.award = true;
-      saveState(); render();
-      pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
-    }
-    setTimeout(done, Math.max(soundMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
-  }, FF_INTERLUDE_AWARD_MS);
+    pixSfxPlay("ffRound", false);
+    setTimeout(function(){
+      if(!alive()){ pixRoundRunning[key] = false; return; }
+      // never on the last round (2026-10-22, per Dan): that one shows the message alone, since the mission is won
+      var award = (giveAward && !s.interlude.final) ? giveAward(s) : false;
+      if(award){
+        s.interlude.phase = "award"; s.interlude.award = true;
+        saveState(); render();
+        pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
+      }
+      setTimeout(done, Math.max(soundMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
+    }, FF_INTERLUDE_AWARD_MS);
+  });
 }
 function pixRoundDoneHtml(il){
   if(il.resumed) return '<div class="pixRoundMid"></div>';      // (the moment between CONTINUE PLAYING and the next round: nothing is said twice)
@@ -3818,18 +3838,21 @@ function ffInterlude(){
   var buf = pixSfxBuf.ffRound;
   var lastRound = s.index >= s.order.length - 1;       // the last one goes to the Mission Completed screen as soon as its sound is over (2026-10-23, per Dan)
   var fanfareMs = lastRound ? ROUND_MSG_FINAL_MS : ROUND_MSG_MS;       // the same times as every other game (see ROUND_MSG_MS)
-  pixSfxPlay("ffRound", false);
-  setTimeout(function(){
+  pixAfterPaint("faithFlash", function(){
     if(!alive()){ ffInterludeRunning = false; return; }
-    var award = ffChancesLeft(s) < FF_CHANCES && s.index < s.order.length - 1;     // never after the last round (2026-10-22, per Dan)
-    if(award){
-      s.chances = ffChancesLeft(s) + 1;
-      s.interlude.phase = "award"; s.interlude.award = true;
-      saveState(); render();
-      pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
-    }
-    setTimeout(finish, Math.max(fanfareMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
-  }, FF_INTERLUDE_AWARD_MS);
+    pixSfxPlay("ffRound", false);
+    setTimeout(function(){
+      if(!alive()){ ffInterludeRunning = false; return; }
+      var award = ffChancesLeft(s) < FF_CHANCES && s.index < s.order.length - 1;     // never after the last round (2026-10-22, per Dan)
+      if(award){
+        s.chances = ffChancesLeft(s) + 1;
+        s.interlude.phase = "award"; s.interlude.award = true;
+        saveState(); render();
+        pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
+      }
+      setTimeout(finish, Math.max(fanfareMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
+    }, FF_INTERLUDE_AWARD_MS);
+  });
 }
 
 function ffNext(){
@@ -5531,6 +5554,9 @@ function screenLightCandle(){
 // The stories, clues, references and Spanish titles are drafts for the client to approve. The clues are pixel-art pictures (tiles/emoji/e_<name>.png,
 // 24 x 24: 2026-10-22, per Dan), made from the emoji and pixelized, so they look the same on every phone; pics lists them in order.
 var EB_CHANCES = 5;
+// The clue pictures are built into the page (2026-11-05, per Dan: in Zacchaeus and then in Adam, Eve and the Serpent, one or two of the three pictures came in about a second after the story). They are 24 x 24 and
+// under 800 bytes each, so a picture is never fetched, looked up in the phone's cache or the service worker when a story comes up: it is in the page already. (tiles/emoji/*.png are still the source files.)
+var EB_PIC_DATA = {"angel":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACvUlEQVR4nNVVXUiTURh+vm9TzJw/Y/6XFwopOcFpYVASKQYR0U0RiYEREggZNchkdREF5cWIjIyQIKiQqC4iogvJGwuStIKcuoESplkytnQSg7kt3jPP6TvbPr2oGx/YvnPO+77P+3d+gI0OZR159F95FD3SlBQjKurr4KvYg/mtO5MaF377APPkW0wODSMUWknKGe8gWtWwG66mc0jZVikWD28ZRn/2LUTTPsWMgjYc/3UWL2brhE7I40JuTxt+zvslXq2DaHF7J7yNrbC8ecAiO2b14qLdjbVww1mOJ2MWERTZzvV2C25Vq8xLQeQLE+PrkhNIhwKpHLjJ5vHllDKguue12VkWvDQcra7HKKvPFPPLvkNizEtF0S/0OXk/FN0mX+sox9Ez1qQkHFrnV80v8fT2GC71uBM4jdBBWepz9GdP/21stk1qMh9z1FQ3AUgsaVIHNdUlUILpUP0ZiOTY2Jr+eDP77m8c0G5zkYWarDyVxUZGEg6ouH7nNxbfZwli+hFmvxYwmd9NMSqAZy/IlvqoheSAhI7mXJRkLbO5cyTC6to7Op+Q5cNX05LMYIrA0ZwHs8XEs0h0sCr8rzBqJz5vAOGAgUVDsO9QEeooR3ttIYCwZHjiYKnmu6x7dUnngP7yC3NwvsOKC/tkxXBAxdL3mHpmUVQEwfF6PA0nHSP8qhDcUgZ0D7U0qajKTwMQlAgMpggyi2IVjSfnoMAInV1D0NtFGG04FTuxqWYper/bIOY0pjWBVDOzIdtHA7JzrQPly+A7THT1sRPsMRmFE8NqxFQiXiYtOemSTe3gfRCH3m0q+kClenavgC1MDS3hwHa5XBwzixkIlqaz8ZHTPzj5mg6YEzoPfMv6vAH28HS3pGOXIYRAwSa45lbw8fMMrtydYjok1zw6az448dko2sySQCtf7/ndoPgDAa4ELWM/nBEAAAAASUVORK5CYII=","apple":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB80lEQVR4nNWVTUvcQBjH/5PdVbKpGHQVWkRPhWKhIguCNw/twXsvfgbx3mvv6qH4Cbz4EUp7UenBUxEXFFEU1Epbu67ikg3RdaY8M07YJJNN2Js/GJKZzPP+zAR47rDYXPQol9/AhFNAa6UcLrw6LclnbfUGH2ZH5fv3H39Nskas+MJ5wMFtFo5fb9tyVNZeoBeKsTkTbSEsX0jlncTnE04hTOeZ9xjKxw2YwpRpchcHpeedjO0XsbRpwWm2MT/UL9c4gG+NAJ8umtoQy6zBxmsXk+UifC7QcFQNiJ27QD4/lgoxMeCg1cb7WgMtLiJ6EwY23rjKO9uBeDmuNv0+B3xPGuy3WLJwT3xtBFg4vI3ojdSgbDHMuX3KEikfcNX7gAt2VIPte+iGlu0k4syIbcG2mPReK9foaLpBsuRkqoF/PpdF6xWfC10DswH6SB1B+UZT5jJE1iGDrdv7xJqxi3anKsqy7ajVjNwTFPn0Xj3RqvGGYLRBRqEV+9nKCZIxnQNjx2170QOWhzQZ44VVtpioVSuolNI6Pkr9gePdzzrVMKHPqIGKvfzHR15ob7x7NKlXLkVxMjOizkWP3hOpOSCPPl+2En1OI6/3XSPQUXypDmMODFcPHAvH6mzQZUisXwdYv/RSvc808ETWbzT37/N58h+mtdBm8y5RcgAAAABJRU5ErkJggg==","baby":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACRklEQVR4nGNgGOqAkQS1/8nRy0Ss4fzczAwzypQYcoNEGEBsLBaSbcF/ZiZGhjh3QQZPmW8MJQ4sDJ3Z8jDnE7SEkZCr49wFGcriFRhkxDkZfv/8y/D84j2wJIuEFEPHikcMi3a+Z/j49S9OsxjxufrwLH0GSx1eDMlHp24zyBirMDAxMzJsOfKOIaDsGsPff/8ZiQ4ikOEburRQDP/98y/Ds0dfwYaDXA8yHAR8bIQYppYoglyKNbiw2fpfW4mL4coyYwyJ3z/BQcHAyg6OZBSgE3WW4eq9bxhmYvVBbogENmEGkMHYDMenhwmb6/XU+MCcf3//Mxy/8hlMowN0OZAekF70lIViASjVnJ9vAA/72RufMVilXADT6AAmt/DAdzAfpAekF5pHsFsgI86OMwjQwdU7n8D0r4/v4WIgvSAziM5o0mKcYG+DaHTgZiXOgBycMPDk5U8UPkqMg5JaTpAIPGMhA1BY//3zD8xmZmGCJ1OEwd8ZuhY+YJi87g2KuSg+AMUOSMGF25BwRQevX/4AY2xg95X/MMNRAAsaH2Tz/13HXoIzEAzc/SXMMJE1kYFBFqEw/9d8BmW2t3D++bMPkc1AMRAD8HMz/7+yzBAcTF8YuBjkf63E6uqHbOEMPAzfwMGjEHgWa3GBNZJBhZdH4TWwRkIApAak9u+//6SXpqBUsqtDg+G7hBwkiJBA/u/5DK9uPWBIbbuFtYggxgKwJcxMjAxZAcLgZGmgCklZoEQAiqdpG97CXM5IaZX5n0L9QxgAAPiG1ujyTMnWAAAAAElFTkSuQmCC","boy":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACOklEQVR4nGNgGOqAkUh1/8k1j5EYg9UkeBgMlXkZxHk5MBScvP+O4eTNjzjNZcFnOMjgUCtJBmEWTqwK3v75DqbN1fkZLj/4wvDt518GYn0ANjzDTomBGHDy6WuGzWdewSxAMRObD/5zsTPDDWckEIj/obGDzXBcFjD4moiBaQtXRgYjVV6chn/49odh8773DOYMogyb2eE+QAFM2DSqiPOADbfU5WNg52DEicWFWBliXcQZeOV+Mugq8IA9RMgCsAItA2aw4cQAdoH/YEsURLiwyjOhR+yx2foMkS6iYIFlu14zRBTfYXj57jeGxjlrXsHlQJZMrJZn6ExRwfAFig88DETBLmeEip489pNh5dHnDPeefse0YPMLFDlQcMW5QeIOpwW0ACzoufLFI0kGCTlmML8qT5whIpiPwUKbj+H/P4Q6kA83NGsz7LvxDiwHAj9//GfYcuothgXo6RYcfj8O2IBTCTL4+YGR4flViJi85T94MCLHSWrPTQxz0fMBSOL/+1f/4L74/w/iYlBESmozMLDx/ccwHAQe3IN7kZFgHMC8CjL84XEmsOtBAGQJNsNB6vZcfYUtRLBb0L3kKdzlktr/wUEDsgSEkeMCBpbveY2tRMVpAeOtF18YCpqegCOOHRw0/xnef/oDtujXJ1RHHr/8iSG19TZWw7F6CQn8D7eWZFjYqowR4WDJfxCXgwzHVdARsgBeshZ6KzF4e3IxKPJzgwVByXPS0ufIwcJIqyqTkUj9QxgAAGXS0z8+Z/J0AAAAAElFTkSuQmCC","bread":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABEUlEQVR4nGNgGAUDDRixiP2nppmM6IbrKTAw9CQyM7DxSmHoZP75GKep338xM5TM/8tw6QGquYzohu9qFWYQ04tnYGRmxzDk/9+fDO+uzmb4//szVkv+/mVgcGtgQLGECVmBtwkTTsNBACTOp+jHgAswM0N8jwxYkDmOutiiBBO8fMlANEDxwf7L/xn+fMOv++vbm3jlQWbgsoBxxo5/BAz4z/D3000GEREGnHjrmX+4g4hYwIwazMQHES0A0/C04P/fn7S14A84qf6nvgXvvzAwPHnyDMz+/fkxhk/+//2Fs5iAFRWP3+Aui+DlUWu6KgMv+w8MA359hliOL5O1r/mH1wKwJQyUAUYK9Y8CBuoCAHYPXgccT5pWAAAAAElFTkSuQmCC","cross":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAqElEQVR4nGNgoDFgJFahtLz1f2T+04dHidZLlOH/Py+A45tTpf6jW4gLsJBk07VZJDuOiWQdg80CFmyCxIavNBERz4hN05MrqYTDXysNhXtrURWDU5cihiUsZEfotVmDOA5uLarCEFMzUUBVc+YBURYwEhvJT0DxAg0WkOGg8EYH2CIZqw/QFUrjSFXEFBdDP6MxjVpACIwGEfVqtFtYig9iwOCo9CkBAF2SRZFMUP98AAAAAElFTkSuQmCC","crown":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA90lEQVR4nGNgGAXUBNLy1v9pZoC0vPV/ECCkhoEcA6ShcjCATw1WSyg1QJoI/QSDQBok/3kBfnks+plQVH1ZyEAR+IJDP8x1/09aYXWlNAXyqD5gYGC4tagKryNvkSiPYQE23z25ksrAcG0WmK9mosAA4hObJ5jIMeAWkisJ6WfCZwC6Zhgg5AhkB7DABc88AGtENgAM0AyHg2uzGJ5cScOvhoGBgRHmUhANc+3NbFawpPrU3yiKrY+tA9NHrYJQxJHVgxzq1KXI8PThUUZ4EME4tABMDDQGLNgE0YMGBtCDhpB6rBaAwpCagJGqFQoU0DJOGYYfAABgK+jzzDJD4wAAAABJRU5ErkJggg==","cup":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABAUlEQVR4nGNgGOqAEV1AWt76PyUGPn14FMVMRnTD94qywPnqYd4MN1dtRTGAkJjz6z8oljCh2w5SQC3DsQYRNp+QazheC55cSWVguDaLgRhw68wDBqcuRawWoAQRDIAUyujMZmDQSqPIcJwWUBMw4ZIgxhe3CLgerwV0A9Ly1v//f17w/+ZUqf//T1qBMYgNwpRmShRLpJEsgvGJ0UtUED3FEsb4wh0ZEKVIWt76/76y+yhihCKXZCCNFkTE6iMqiKSxGEisJXi9CDMEXGyAAKzogOYNcD4hEB84JeDlEQjgKpOQLMJlCWqRiQXcWlSFW/IMTE6RsiAiBKiamhhGHAAA8cuj2JLN18QAAAAASUVORK5CYII=","dove":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABJUlEQVR4nGNgGOqAkRTF0vLW/5H5Tx8eJaifkRRDDx7ejCJnb+tL0BIWUg3FpxabZYzYNBAyFAaUZQUZkIGMgg2GJUzkGo4NPHlwBCOeUCwgBShjcT02S5ioYTjMYBBYsfEow62c93BLmKhhOAyADPe7ncZAMJJBNLa4UMZhOMhgECjJL4eL4Uy+IAtg4M6jd3CMCyzfcOQ/SA965BI0nFQgjcMCslMRtiDCawFRXiQDMMEMhyUzqgNpeWuUyCQUqbgiGZf54KSETQHIR6CwjfC3Jpg08ZWoOCVglj6BWoQOYGmeUHFNUn2ADoipcIhKpgV77VH4Kp0CYExMyiOqypSWt/4Ps2SC80G4JSBwp/wDeXGAzRIQDTMMxgdZRMgSigChYAIA1XEndqSLnpEAAAAASUVORK5CYII=","earth":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACWElEQVR4nNVVz2sTURD+Zl2b2EZd2oii0kPjb0LBSxHxptBgRWMPXsSToJ48FK8VxKsnT/4DXlMpplQ8Ch56KZRQsMYeShQqW4lNU7Zlu0/mbfZX3ksbCh46sOyved988828ecBBN+rST+x3/V4OAsYhUL4AnMkBqZPRn+WvEJVZwNvZFcfszJhAw7dBxUl428dh9PxFJv9G/txeuYreJzWY1hH8Hk0BjbUgQyWQLrLA0QHQzQmIy0X05t7DWbkrwTcqL5AenEbmytvEAreew587FW02hopPPvilcT/FY0sYuHUP7voFWNeeKuDSx/qB/o95rRTtAQTLEoAbhxswM9/RXHosA7kb5+HUChBunzYIZ97eEMkAXNDiZOKT82sM6dNlpE59kVnw1Zh7rlX3RNmUGInACfb5gixoYCyJZNaySJ4InDNKn/0kiZPZBPqsoOikZjB0PXxMZ0swrWWFZYsLnNqoLC5nZM9+DqWjGw87ZqAF6mQsGUvlrBUBYcjW5QspdBeAFxqLTVlctkCGwFiOnsF5OLbfEMGdUNolwNZq9CwMbFYfha8sRbxFWZ71+VcqsziGUoOfUUHbzasnW5Nblkko1oYR9yCeLTwS9jbyd3W2BJAXfbar/nyKtVmSgrcD8eE1IIS2Jm4957OvD4XtzJtRmhCguXfBuNBm4GexMAP6NqWSFoaUhVtxc/GBH9QeDwPxGrFQTrBXXpRhd/E+QDGXQI649sycwadfaoddpzkuNaLhMYiRZ0D2nN7LrkpZWsy1ePs7cLZWZbd0c+D89yMTB97+ATPn8LHKZeTBAAAAAElFTkSuQmCC","elephant":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACDklEQVR4nO1VsctxYRQ/PiQDEQYlJRmkbGSQSAazP0ImKwODnUUmsRpISt1JMRgNYrhKDLJwmSxK8vacvufpPt+9Xl7r+/1KnnvueX7nd55zznMB/uMFNK8cAODx4T5VR45Mr9dDPB7nHCaTCdxut7eDyJ0ehDCfz4PX60WDwWAAj8cD1+uVOc1mM+j3+xyJJEmw3+9VRXMBisUiZDIZZlgsFiCKInvW6XSYkc1mUyglvuVymQZivH/kTm63m613u52CPBQKqZITBINBaDab4HK5UKxqAKqEkB8OB87u8/k4AWpwOByQzWY5myKAxWIBo9HI2cxmM/j9fngHgUDgeYDtdsuUkAJT8mg0ih31Dv4VxwW43+9sLQgCdDodXJtMJvgUOvmD1WoFp9MJ7XYber0e2iqVCv6n0+mPAihqMJ/PsRsI/nYEBrlcLsyHDNr5fGY/+btvM7Db7XA6neikQqvVgkKhgHZ6TIRsOBxCrVZj+4iQwWDwOoP1eg3hcBg3pFIpLLAkSZDL5Zjy6XTKTTYZKjJcz7KQZ6Cp1+sPUodut4sk1WoVIpEI9j9VrtVqOXK6WK1WOIjfZkAUlkoliMVikEgksNDJZBLfNRoNGI/H8AzL5fJlBkwRrQEZeToPm80Gj+sZyPG+E0ABQRDwBqU35mg0UnPTiKL4IO19PB6Vin/4sXl6G3/6UYLfjS/85tN27UJ8CAAAAABJRU5ErkJggg==","feet":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACeElEQVR4nNVVS2sTURT+5pXJTPNqGmu02GbRGsRuinQhiCLqQhGX3SluiguVgoIbLV2I4MqF4EL8A67cCAZfKxcFLbhQqAujKWIVqnm3TTKPK/emM5mZZBJT3fSDWcydc79zznceA+x0cH3Yku3c43sQEonn2DObVHEnFe4rom6RkD0BARGRw+2xEJaqGo5HZUyHJYy/W0NRN//aj+g9oNEmRB5X9qrYJfGMvKA51fm3DMipQRmzSQXzK1WMygKmQs0Y3pQ0hAQOLwv1Xhy+H0labZKVdYLzu4O4lFQxJDXLtFjWcOZjHg8nouz9xtcKDqgiFsuNro5cEl0YVlAyTMwkFIwrgstwOiwhKvI4EQts2QYxNzKAa18qGJN53F/dIJ0cubroZq6C91W9jZwiVzNQ0k0UdMKe58UG7n5bR1oVcCQaAM2eNoannV0ZUM+karQX9POmgavZMrt58kOeSXN9ZAD7ZAGZfA1z2QrOxmXk6gZ+NAzX3TbdOIA8m4zjcESyz1JvWWva7xnPdyuAvG7iaCSARz83bO62QaNR3vu+7jo7Fm3qbmG/R0Iq6dODg4w8FRR6TjL3qlDHC0c7zo+GEBNbpq+LdufYEDlA4Zt1dCrTcVXQLKiuOmlFSLvGwuVsGQ9WmQwuLG+69fd1QCOgxXryq2YfnI63HGgmwa1chWlvgc4Jzbxrm3qxsFJlJDQThzNGcG4o6GpnWrdOC6XX0iLUQOQ5FrVlT/fVp0MJe8ppvWaWix352padNwCyJYnT6cVhxSb/rZmsXn7oKpEfnK34eK1mDVe/vwpfkLQqkqWpBMlMxklM5NmPyc94u17Jf+LZAfgDrcHjnoUInBUAAAAASUVORK5CYII=","fire":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABtElEQVR4nGNgGOqAkUh1/8nUx8BErOE+mkwMy505wDQLE1jsP8UWgAyyFGcGs6UYmBkCFFgYVltxMezz4WLgZwN74j8lFvxPUmdl6DRnB3McpSAWgYCpKBPDZg9OkAMo8wEILLn9G+xaNxkWFHGQJSAHEPIFXgvm3fwNxjNs2Rm4UM3H8BUugEUbHDD++cfwv9uCHRz22IA0N+EwwhsHaZqsDDna4GAgBHCmKlwW/FfhY2JoN4NEMD4ASmWg5AtSjw3gyjD/QZpwBQ0MfPsDoUHx47TlO8Pxl38xzMNqAijVEDIcBLBFPDrA6i8tQUzhb0a/wJhUgM0N/4WF0OKLk4GB3wdquM8vht/dPAwM34mzAKsP3r5DCkpOBgbW0i8o8t80MX3y+vt/on3AeO39v/+gCASFMcgwfjQFIN98hLK5zrGBI/vBl3/E++Djr//gHAwzDAa+v7dAsQQmV3nqJ8Mf7ObjBvxsjP8P+XH9//OQAYz//zwJxmD+Ix64OEgNtPgmGYAy2/+3U9lQLEC2CCQHcgixdQNWS1iYGP77aDKhGH5tiwNYjJiKh9wqk4FE/UMYAABV87ZOmw9UugAAAABJRU5ErkJggg==","fish":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACEElEQVR4nGNgGAUEACMD6eA/KWaQYsF/sHIxGQZmHn6wwN+XjxgYvn7Caw4L0YaLyTIw+KUxMHALMPwFiXz9wMCwaRbMAgZyLfgPoRjhhoMA25XDDL/2rsYSWsRbANEpJsvApmvJ8EtRl4FBzxou+evrBwY2ZwaGv/evwYLpP65gYsQZHDULGRi0TOCC3MwMDF//Imi42NdvDMx5Lgx/712BCvKhxAsTXsOvnQFjL0EmhhUyEAWnTbnBfBAGsRk4uBj+FkyCmJfSzMCw8hZOH0CCJX8yA4NvPEQkShviqJVXwTSyD0A0Mvi6YSFE349vDAw+Ejh9wMCwvAuiCFnzX0SwgA26dgYuVinGCPGdaygRkQxyPUghBxeE75eGqhoUZCBwF+IjUDDWPP8P8Q1MDxpACSI25zCGX5VzsCrkZmZgiP/2EEVMSkEBQ92zBw8Ypnnrws1G9gHjr72r/zP4Z6CkHhiw52Ni8JSRZ0AFmPmAn5cdhY8WB/8ZmCfkYcQBCFhx4M9UD56/wCqOHsmMoPTM1o+whJuZAZwk9dn+4zW8uLEGqxyuQuo/KMOwWXgwpHm4ggX+aVkwaEK9f/3zTzj75smDDNOnTwRnNGYlHYbMzHyGKaWpcLMJlab/YQyQ5r++6eBCjnnfSggbBCbmIjv2PyVVwX8GMdn/zEo6/6E+RLDxAFJt+U8lc0YBAxwAAPNisSEQDoKkAAAAAElFTkSuQmCC","heart":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA3ElEQVR4nGNgGEggLW/9H4TJlQcBFlwaQfSTbH8wX2YqA5j/9OFRRmLk8VoA0gzTeHPVVgZsBuGTR7eEEZvhMI3oQD3MG8VgbPIyUzei+ISRWMOJBeiWMDFQGcyfugSFT9AC9dMHKLKQiZaGE+WDm6YODDSzgFLDCVpADQC3AJSsQMkLltbJAcdev2eoZeBFyQf08wGlvjiGxfVYfUCOJcdwGI7VAlItOYbHcJwWEGvJMQKG47UA3ZJjr9+jGEyM4SCAVxIGkCsYUGEGMhjmAAZqAmkiqshRwEAqAAB4HpRiWyflnwAAAABJRU5ErkJggg==","herb":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACJUlEQVR4nOVVv2/TYBB95zix3bpNww9V5UcGYGBBYmGAf6GIoawgQApTJSrBUDFRQMx0gaEqCBASC1IlJCakLqAiwUAlFqYOpQMLtKgNsWs3h+5z4tiJXTvdEE+yE38+v3ffuzsb+NdBfcZzyrPR9di9fgTY3EfQJ0z4H7bhfNsJCIqE0hkd1rmiunaeNuD84pBXz01+sgD75gDYICWgyAkoT1konEqn0fKmb543FHkUpbPFGDm5DHed+xZgda50Qkt/giVr3IgFOp98cFc1tAzPWayJYuerj83vTQxXNegHqZP5ew/1Jw11mddzPjA3xCMPbMlJ/bdrFlOReLiq8cKXAb72yFRxspbQSek7kM5oF7SN2RM+Rlc8GAZw/2EJqytNvJp2VTexF3L3CCWVn43jWk9BBaerwI3JwPfpK676tWsW9BEKa/R7ph4VzG7TxtuASHBpKshcyF0XKM8MonBEi9UnSp4pIA9sf/Zh2p3dVI9pmH9j4uc6495WhHytqYasG4kChw8R7h71cLnmYGiMlOdCuPDCC2OWV4EtJ5hmgSTSyp5y7WCwQor88TNDkbdtkddCFO5SKJrYnrtaFJJfF2agfLvX85ZAau/vOsmyi+UfwPiFAsxbcXIZriTPu9GjTASefW1if4VU9m3c+dgh9zcY9edOoudZ4ItXdX65aKnXRGRw0o7+INkLuYjsiSCrBkbLlneLzb187RJBOT+J+H/xF4zI49FCRKECAAAAAElFTkSuQmCC","house":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABiElEQVR4nGNgGGngPxQTDZhIMZyFkYEBhEm1hFjD/6/SEgRjEJualvyHGf6xrej/i7n9VLXkP7Lhnz59AmOYJRxcjBRZAjZgFdzwj3ALQGxKLYG7/MXcfiSDUTG5wYU1WD6RaQkjFsMZlmkKMrjHJDIw5tQz1LxihUu2iP0B0zWvWJDEfjN8Wz2P4VBvE0PU9fcMf/6jmouRD1g4GRmWq9gwMOY0wNU9/HQJw5sgMYg4IwNXaDLDrZhMsF4M89AFfnzDDEp5Pj0Uvi/PZ4bNDDAxiK/OnriMVS+6BSAnoKhqgQYLMjDn4mQw58IURzKDrKKCLIARROjg/5QGhu8P7zBwyqtA4wU9kv9QZsH3h3cYfl09B2ZzIYnDI15MizILsAFskUxVC8zxRzJeC0BlC8Oh+H0Mk17PYTDnjmbQRZI8+e07w8mvS7EaBNLDsYcRlFT/I6ckjJzMHcXGwBEMyb2FN/MZUsRF4ZJzXr5m6FefiNO1P9b+Zvi67BcDXgsYqAMYqWTOIAAA8cMBoXo3cqQAAAAASUVORK5CYII=","jar":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABXElEQVR4nGNgoDFgJFahtLz1f2T+04dHidLLSKzhfTuPoIgVudsQZQkjMYbLF6zFKvdwQjBBS1gYiACbJesYHl25hiJ2+sYLhkYGcYJ6mRhoDJgIKXj68CijXvlVBjkdLVTXnxYnKg6YcIU7eqrBB/Cpx4gDkMJ605dgdiMDfktghiKrR/cVzkgGBQEIXOrUBtPIkWyqIcFwKQQSZKDgA6mFWULQB8gAZDh66oEBmDhIDcgSkiMZn+HIAKQG5kuCPgCFKUjx2jUvwRoD7pcwSJtYMDw9cwIvPfVKCJJvGFDiAWcQgZLiBo0eBoa3DAwMigx4aZBaEFi7Zh8DA1rmY0R3PTHBgg+A8gsoTmC+oHpOXgv2BQIw4cuxpAJsOZy+ZdFTJF/AIo4YAFKLq3xixFcEQJLsPnDOxWUwcq7HVvjhLQ2RLcJaH+AxmCgLkC2C+QYGiC2uaV7p0xwAANXcys/TvX8/AAAAAElFTkSuQmCC","ladder":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAcElEQVR4nGNgwAKk5a3/gzA2OVLVMmHTsK5AmKHe9SuYzUDAcEJqMSygNmAhpECayKAiywKQ9wmBi1cfkW8BIc3EALwWNO7mJmgAyJf4HDKwkbxuNA4YRuOACDCaDxhGyyKKwWhZxECoPsAKqNlsAQAEq1FKQlE/bgAAAABJRU5ErkJggg==","lion":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACs0lEQVR4nNWV30tTURzAv8vhXW7Olu3SNtNyFEIsHGtRM7B6qN4kH3wr9CH78Qf0A4IEwd4qipJ6MYiCeukliJVgkVlEw6HURDGQzOW2XNkE79w48f1u9+6e7d65Vz9wON9z7vfH+fH9nguw0TFozLEKdCrWLzZmHrcdHnQbYGreAreG/8H3+SSsx93uRmhpSMFgsBYej85yfg3Fzr/cjisTT142K/KfpIVzusWWgl01azCR2Aznu6Zprroa4Ey/mwvCBRjrF8HXGoNQWKQd4KoOHYjRx4+fRfg0uZ1krysJgWM/yOHCnBWCoW2ki7aJqBVcvcuK703qVaFTRFoSOOcIygc9v8j5kZM554izaRlO+BKK7dyiCdRwOzALRnhzbSsF8HcUjgcxS+9AzYrQzo0n3keoP/eIweRsXDs5zIKRXTq1n6XetjMks7ZKTfp2nbEgcI3m8joI2tzs2oeLZOrMUh8Ra26wgctC50f0HN1LTY/LnX7wtuyAbEZSLr7T38TpGNWDVocVamsyyjgcLQTTIhpPysdB4L1NxRr1AyCYeuqA5XDYbYCpXY6SAPKFSrExGBr5SuPszA1N44HnozAAAJmlUD4JxBIdLk0RLBxECLeRYZVR0F0dfkMd1EXkVC0bICuZqHgQw+/X1LP64zSnbjKyTjpdWu2aAZDpSJ3iGBHEANTt8YKaqt1XuR6rXwvNAOM/bfQ0qDG1BRW5vuMVd3S4I/kZqeiSETTw4fbFQG6lRgGcZ/9Szqud4x08G96p56Z0B+MLKzAUipJ8r+8FpCN9JGNWYWFh4aEszz29c0Wxw4a1ofsWyQLmdo/PUQg4kkvX+4MPqb94oZd6DOZ1mknGRamLruyPSn6TPG47vSunD7vZ6uIHruH3/D+E0y32pReFFekwHT2tb+v9YjcY/wHd4EOc8cT/aAAAAABJRU5ErkJggg==","moneybag":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACDklEQVR4nNVVTUsbURQ9GeNMZiSodFEwi4KQboqKG0UQGyHQLvoD2iKCFGoX7cJFFoW60ODOpS4EtVC66A8QScGNpSC4EVJaaCOCiwS6ED9iEicf8+TOmMnEefMSzSoHhry5795z7pt77wvQ7vA12Get8kgi8qeDwMacD49D1i+982yiREQnYDNRBZsxHSUD6LyVSgVAB4BIDNhNenP5BQK+zzs6Gx/w4flwgOuQOLjCbpIJExUJmPj5S8ZFJszdS578BaAL4xsKEN6++gMe3q/QRxJDWAMq5MGqH5paNg1nOWujpwv2++gH4F/am8uri5gqA1tx2OSE2aKGZaNWDxIiH/L16iSuAAVsLwHhUM32W5dwXJGwo/vNdRXkQ743Ik0JsJcTCiJWf9tYzAfwqMMwH1o7Qb4UwzsF9wRjIyWX7bgiIew38LU7jzU579ofHyjyqPgC4V7DZdsI5s3Ps5AL2EV2or+P3fmqqMMTxUBUKZsin7L8wWt6DlKnEiKoP0XJABaCVwACSJXdeR1lqEtZcyfY2+902abONbw+1bjk1YnngTscqgx2uK6i72HBtlFrvslq5jqhXtbVIZUGht4BhaKbj5tOoQhMfizYk+usAT1O8sx/FS/mrZh7XRVb8fqBc4IyJ3LRVdHwH02VrSGafqYj9MAypk+AL98VfPuhVzP35GkkgKpQi/FtjGtueaLwqMqCJQAAAABJRU5ErkJggg==","moon":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB/0lEQVR4nGNgGOqAkUL9/wmZxUSJ6awsjAwL69QYxARZ0S2jDmBhZvz/da/R/6PT1f+LCbL+x2YJRT748/c/w84zPxisDMUYZlSogixkoKoFIHD70VeGr58/MbgZsTJkBkkyoPuCYgtA4MOLe2DckSEBiw/qWSAhzM4gqaTDIC6vxsDFzc0Q7iKK4guKLVCRZGR4+/otw8uHtxj+/PrG4GgigCJPiQX/QcFhoSfE8Ovzc7DAz59/GIzkf6AoYqHAAgZQymFiZgEH0fdv3xi4efkYvn39ThUf/Lc35GEItBeGGMLMAjYcBG4/Z6TYgv8gw7f1qGGVvPP8P9lB9B9EwAwHpRhsYN7mZzgt+A8qW0Dg9x/MYkVMkBUc5gF2ggyMjNg9/vDBU4Zjl7+CmIxYfTCnSpUhxJ4HnP1BORQEQOkclBQtDURwGgwC//7+YYjvfIXhOBQLSiffZ1CRVGIItBdjYGCARCAIgNL3/3//GBiZUS0AiYMACxsXQ8+yZwwHz38BcVFimRFb2gYFBSyF/P//j+HZnUtgtrSqAVzh09sX4OylJ4QYqmc8AhV+GKUdtkriP6hUBBVcoLIFFJmgwoydnQXsUlhwPL93BcyO7vuP1eX4LEDxTbiLKDj7g3IoFwcLw7cffxgOXmMBpxZQhELDnJGSKvM/HjlKq9whAAABlatu6rcj3wAAAABJRU5ErkJggg==","mountain":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA0UlEQVR4nGNgGAXUBtLy1v9pajgI0MQSaajhIHDn0TvqWiKNZDjMAmItYSLFohUbj8LZvZPmM1DV9cs3HIH7ILOkl2hfsBBjyd3H78n2AUYQgVwEcxWIPnh4M8Ppc9dwGtAzsRNv0kWxAKTQLzSIAYSJMRwEDh05idcSkiIZnyW4ABO662GAGNcjA1y+YMJmuJ2NOUmG4wsqqgQRvqBiwuZ6SkAPmi+YkA2nhS+YkDmUuh6bL5iobTh6hLMQk5bJATDzGGlZQz19eJSRVmbTDwAAGa+kAq/TN5QAAAAASUVORK5CYII=","ogre":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAC4ElEQVR4nN1UX0hTYRT/3bvpNldKy1luGjRNaiIkhQ+JpQ9BpPQWJGQMasTowaCXpQ89FOFbrD+MsB7SoCh6iXwMAtGXAh8ioaH2UE2mpNjYn+vmd+Ocedd2vUuLXurAud/3nXO+c87vnPNd4H8kdZ3/yj1Zb+T1uBFuc0OW5cILKjHJCuR5JlnA14PTjW7NtmQArMQVdFz0463vECoqbByIVrezGvX19cy0X9cxk+2ljsOGsCQjqJTJtat+KBNj6HsTRWLNzIrgriy2LykYzNj5bDdlMdrpgqW9G/fvjuDO1NwGnxsQkMHzma+4N/6OL452ulh41p5BrzmLnhoTByI6drSVbSgRI+clERBsKsUph4kFvUjBaxNFRtMpGWOKhO8WK14urWFxcQHJZGqDT8MA1OgHVQINFTKsZglqJmNgBkhlZUhnVcwmBW7FZbyYm4cQosinWe+cmtcsA82VJtiGh/KKpO8KFClnblGz+HI+gKaORtjoPBTC7qlvsFothIKmSDLqAZfG6azhw+dzF9B/8yn2tl/m8+z+PZieFcwUiJzvOz7INi3Bfrahu5Rg4agWIajd6SiCExo4k9/XfYxien1PJaGhPNnVwuMZGZ/J2+2w27VeGJbop8OHYUQQ4CDvh0Ko0+lJFhrIZZ7yBwGUG/qR9CUiFEeqLBiuyY0iEZWESlNI3gaZe6GRf8GMyRUFy4lE0TQV9kASQrDBh2JfWya981IPjV8uzTmRNjmUsUbaXtPRWiopfQ+kdFpRs8kEnjgqcR0JdM3nXixReOIVr4ETPbw+evYa0YOVuL2sYiW+inRa2RLS/B8y3OZWHzdWa39LZq/HzSvJBr0udbK1Vv+H/SUCRkEfIYR645MCn7McIx4HDsgxVvZVCVjkGNo9DsS3SeiNlZFt/p6hs1JIaKrodRJ1uxxoKs8lGFmVMBZd4j2V5U8DaOVi0kZYNy2b+tksAApIX9/fufsP0w+rhSSsCOBq7AAAAABJRU5ErkJggg==","oldman":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACRklEQVR4nGNgGOqAkUh1/8nVz0iMwWpynAxJIUYMpmoQwdO3GBjmrTnHcOvRd4Lm4LPgP8jg6VVGDE76jAwMjGhK//9n2HfxP4NvwQmGbz/+4jSLEZ+rd3QqMygqCuL14v377xk8yu/i9A26Bf9dLGUZPILzGcLUNzPIiv5jeP/yBV4LBMUlGB6/ZmJYddOXYdakWphFcHOZ0DWADDf0CmWQUPNgIBaA1IL0pOU1Y8ixENLMxYc/iAgBDB/sWDsRhc/OyY4X49OLYQEXBzNDSqACnL/vwj8G18IHYBodwORAkQwDyHqxWiAjxsYQbsfAYMu8jIH1/TZwet9z/DGYhhkKswwmt+o0P1gtSA9ILyj14UxFanKc/2+uMgGnitvKizBcw3AoCkLbLcOQUr0bB0516mFnQCkJeyp68uoX3IXnt61GMeD8ttUMqtIsYIxNDuZDkBk4fQDLZHtnWIMNuv30D8NLNkewhI3oYYZ/16Gu0mRgOPLaFswW/7UfrtY54yiGuejJFCTx//UnJgYng38MsqIgDx5EyIpAyzxGRoZIUZg4SM0/hmPXmbA6GiOZgsCc9Q9Q+D+//0TJ0SA2SAyfHlw+ALvg2Pln/x+/VgJHGgh8+/Se4eHznwwPnz9igAF5hvcM7JwSYDYoqR47/wxr2caIryTdM9UMbgnIxSCLYLkblslAKc4l+xRGGUTIArglO/CUqGglKdHFNYolXBzMDFaGUgyV8XIMivwfIQZ/5GdoX/gIHCz46gJiLGCAWUSh/iEMAKDL7FxoAq9PAAAAAElFTkSuQmCC","people":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB4ElEQVR4nO1VXasBURTdM4aSQfIRUijx6Af4DfKzefEqn3ngQYMmIULObe2caT7O4OXep7tqcs7s3dpnr3X2IPrHB2gf4uJN7rvYVwVEMpmkeDxOl8uFzuczPZ9PJ2gYBseA4/EYymeomHVdF/V6nfL5vPPucDjQbDbjIuVymdLptCe22Wzo8XjQNwVELpfzkJdKJX6A/X7vIY/FYpx7u93Isizh70LZQTabJU3TWIZWq0WZTMZ53+/3eR2JRJgcOQCKWJYVVMN/+kKhQJ1Oh4rFIqETkNu2TYPBgNfNZpOu1yvd73cmhzzb7Zb9gGc+8wMF+JQgWq1WNJ1OHVmWy6UTh6kgBrDGyVHsVcCDoOuGIbrdLlWrVd5Ho1E+7el0ItM0aTgc8q165TrGwoPRaCT3WmgHSBiPx0yMRxZBVyBfLBZMLLWX691uFyBXFkDCZDKh+XzueWnbNhuM6wjN3ZDXVKVI2KCxUTAcmksCOWi6rlMikXCG8N2gKce/UqnwLfIDOkMKFVBEVcirl66LXq9HjUYjpDFiw+EFfv2Q0+72wu2BaLfbb8ml4Rg+FTDh8vYpTa7VavQNTNMMjaVSqfACvwHDvcHkhpnoBvRfr9ekgvuT7jfZ8w35gz+zfxDjB1gt4lKzvIWiAAAAAElFTkSuQmCC","pig":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABrklEQVR4nGNgGAXDHjDikfuPpu4/OebitWBZVgJD7IxFDELcnAxqkhI4FX7585fhyoNHDHE2ZgyHrt1iuPvmHdxsFnzO0JGRZDjfUs4gwc/LwMLMjNfJT959YPjx+jnDuScvGBggFjBgswAcDMxMTAx1gZ4MMkICDMQCsFohAQYFvtMMF5HEmZANF+XlZrBQlGVYnBEHFvjz9y8DqSDcyhSFj+KDNjdrhmBXZwjnEgNZQEdGEoWP7AOGF1++gcMSBDz0NAmGOzZw5clzFD4jevgriwgx2GmpMbjqaDC4aKuhWiIoysDAw4dq4pdPDAzvX8ODNHDiXIajt+7CzUZPpihpHWRZnL0lQ6CxHiQSZZUZGPiFMZ398S0Dw+O7YN87t09ieP35K9xs9FSEYiEoPdev3fr/weu3DL1RgQyT581nWHf+Kob5i1MiwUlURV2TQUpUFGYBA8F8gA52Xb7BcPHeAwZ0X4IML9x6mGGzuiaGHqItuHPzOkrYQsH/BGMthouPnjHcev4Cqz6UVEQqYGZiYnDXUmGYe+46TjX4yiIY+I9DD6HCjxizR8FwAADn54MC4Ao1lQAAAABJRU5ErkJggg==","pray":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABsElEQVR4nGNgGOqAkQS1/8nRy0Ss4aba/AwCgrwMLCyMDCA2Fgsp8sH/U/MMGET+3GO49EqQwdRIlkHa6whR+on1ARiwcXIy6Im9ZyAFEGUBCyhYtHjhfCkh4oOJGAv+G6rzYQj62whQzwf+WAzTkWWgngU6WAwDRTRVLGABhT8Ww0DxAEq2lFrwHxT+IMOwAVUpJoIRTdAH/ngik5iIxmfBf1DwuJkL4lSQ6C8LC6b/pFjwH1Y0HJulj5L+0QEo6Hb1KiPnif/4LAArALlIzqeQQaVoK4OGmjgDIQBSA1Krnb8Y2Tdwi5Bj7z/IYEmnBAZmDh6wgDz7c4aZ6s0MvCzfwPyNex6BaX8XOTD9+Q8XQ/rNWoaHPyXhhny8eYzh6sRYuNkoQcSrbAQ3HARAGkEGgAwCGR5Q8xCMW+c/wmo4CPDI66HwWQgFwcOfkgw6HVoMz3bsgruqZubD/7OeBjHIeKEaTlYyfbJtCsOjLf0Mf/78Rw5ORpDY3WXVBC1A8cGbs1sZPt89B+f//PCc4eWRFbj0Mr48sgIcmewCkih6UBQhsXGlZUYCjiRX3xABAEfPfTs9UNLhAAAAAElFTkSuQmCC","rain":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABcUlEQVR4nGNgGAUEACMD8eA/OfqJteA/Bw8fQ0Z+AYOatATDk49fGabOnMXw8cFtchyKaXhsXNz/Dx8+/EcGf//+/T9t2jSQxf9x+A6/oTAcFhYGNgwXAFlCigVgxfwKqmCDza1tMFyODkDypPjif0F1HV4XYwMghzAwMsF9jdNwkKvJAX///gX7BBRXeC3Yvn07WRYgWwRyJLIlTAxUBExMTAwODg6oYsicZcuXM9AWMDL9r2rvJphycAUPKIhBKRA5iNBzIFiCX0GVITs9jeHO+dMokqdtYhhMjyxBEZNS1QDTxw/sYzh57BgDw/9/2MxFWABO0xsf/+dJb0RKdoz/FSdtAosjZ0IGGx+IGIjGkXowIpldRBxL0DGCKcWH51GEebRNwTT/k5u4HIzdF2AMyjg2Pmg+geRysBhqxiKjLIJ6nwfZApChoCABYYQFZAFwXIAMR0sV/xUD4/GGOTrAV47/x6IO3VCK6oFRwAACANPV1tvUrfRXAAAAAElFTkSuQmCC","rainbow":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABvUlEQVR4nN2Uv0oDQRDG5+4WYiCXEJELB4JYCNrYWdrY2Gkh2EkewD+1L+AbaGPnE9jbBqwEIRKusRBJpQEJEbwEk8jsZS6ze3ebGG30a3ZJdn/z3be7A/DXZf0CY2hii59CHbDgbGFJ+fO09RTPxSxgh0GrAwEwGC+4sj9njmhI4J2+DWXLjn71w3iBu/YOnaAAfqMZs8V34A/lZSgP7GirH0qgU1Id6xLTuq5iFJAEd72CHIubi3LMe02AxpQROWANOdzdailghFrzeWXPXbsNG9v1mG36gkx4bm8V5hgYoQfus5y/hRUFIkzR6HDuGqEoCXazXQrTgerw0u5K0vFrBTq1Qzn/qB9Bfv0cAE7MX4DRyNvih3EsdIg6/OUiUPZiEVMB6R7vOR4R3hbKnGJBOLmOYJGOc9dyvH+8gZopIt191yvIA+XOOZzAWUoU0N0XR9GQ0H0aHJ3fBpfGAjIeagHcPYqiocx5JAjuj/uf8rZGDSVS3BVZf0HRlaTbwsXgVtrDVQroongoexJ3z+CpSi1A+evit4bcT2o3iUPGfl4NogbW3O8BtHuJ54/OUSz3TPHqk1fDRMY/1BeEnsq0CtgUbAAAAABJRU5ErkJggg==","sailboat":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABhklEQVR4nGNgGOqAkUh1/8nQAwZMxCqMiTInxVzSLfB2dGXgZGdF9w11LOBgY2YQ+faaodVfk4EW4H9piN7/j4c8/v/bwfBfTor3Pym+IOSD/6BgKQu/DuYwMjIwFNopkxTLBIOo1V+TQYTvN5yfn3CBQVaKF2w5xRaAXF+QdAlFDOSLAhtFYswmaMF/kOtBBqKD2NDrDHJE+oIJX8oBGYQNgIKMWF/gsuB/rp82StijA1DQEeMLbBaAkiI45fz/zwDHYAk0PihFsbEy47WEBd1wEGHnoMUw8zg/ioSypgnD3ev/UFVLMTBIiHIxPHr2GZslGLH3n42VGZTuseLls2twyiFjDjZmlIyIbMv/liI3BnN54pMgLuCaPxNuNooFoPAMCzVhMP73k4Fc0H/oLizIGDEimZmJiWHt2nMMZ5nYGf7/g4T3/3//UNjEiCEDFB+oTVnL8FLOEMwRf3QezBZ/dB7Mh7EJid0R0WL4F6GJPYhAFoAUUAr+4bKAgbqAkcrmDRAAAKXupRIHyo15AAAAAElFTkSuQmCC","seedling":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB60lEQVR4nNVVv0tCURT+vKlIQqEYhTQEhhUZVtiSFEEETSI0Rn+AW9EWbYFLi006NPRjcIhIHNqKllqKIPpBNTk4FIYGYZg/7o37xJfX98r33PqWd++5597vnvOdcx/w32GoGzMdvq0RhNbM6B8igsP9iQnJZB5vWdrorwnGRsPIBMFnoQ35rypRjxsILFuxs1FC4rDA9JIIETjsBNunVjy9dApOvbYPODpKiK5TTqIrkkZH5hsyYT1uQbulonBmDFj0F2rpkkDEjEqg9OdstZtIkQQCVji9X7LR5iDw+AgS+2UcxMrS+vBsCb19ZmFzOlXE6tJPlH+FKlQVIcDmrkWeu0ZMilSO9WVxtFdGNFyUz1aIXAeBnFKw3BvF1LwRBgPwKV1S1IkXx0FMXPiLQJ3VUP1yjfiNa7i9pIiHK4py1k2QyxgRj0gpkJF+qOD6qSSI2zJBOlWslWojVPXUTVAHTb2gUsWqYLw/RnvMcHUR8LGGt0szAeN9seLqlg18zG1aSDRFsDXphN/rFmxXoRnVLtZN4LATBGc86LKZYbRVy6Q2Hx9onqqmImffKTK5onTg3N20sJZ6rTQVu2kElALLjxcKe+LsTnj0foPWZ5cFFyyIDE5Kk/ObZywdp1Ubq1UCqOS6pV/o/8M3aD6YVX4YHXgAAAAASUVORK5CYII=","sheep":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABqklEQVR4nO1Vu6rCQBA9ibcxhYhgZaEgtjaKhT8gFtaS1s7awkLyB/6ChXaCP2BhJfgBtiIGK4kg0SJaqHOZxUgiRhMfzeUeWJbMzs7jzMwG+McboMt6C5KX8VgshnA4jP1+j81m80g3MCiRSJBlWXQ8HsWuqqqdjXO97qBYLFK9Xqd2u026rl8d8eJvPvPrxJW2LMtUKpWQzWYxHo+RTCaRy+XQaDRcl06nEyqVCqbT6VXmoNJl1+mA2FihUEAkEhGC5XIJ0zTR7XYRj8cfRspOB4MBarUaLMu62pWdSqvVSuy73Q7RaFREn0ql0Ov1nlIRCoVQrVahaZoI1kuP7Bq8Cl3XXfVxZXChTFqv1/gU5HvC+XyOfr+Pb4IURSHDMAJTxK3tpOjHw4F0OBy47+EFptE+VxRF7J1OB61WS9z3lUWz2bwbJWfG0243RSaTEbrcHLcd9NATD146nUY+nxctOxqNYBgGFovF7ftE5XIZ2+0Wk8nEZdeLIoHz+SzNZjOyB284HLLMNwUiSL+KjKDG/SqTXcRLUaUgOn6joSdB3T4NH/t34O/jF3a4TzdKNgKXAAAAAElFTkSuQmCC","ship":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABy0lEQVR4nGNgGAUEACMDeeA/seYxkWM6NxcXw5JZMxmUFRUZMsKCwBgXYCLBxf+RMIMrx2986uCAhRjDubm4GCTExVEEH6ibMriaGjJ8U9JncFOSYNh9+jzDi5cvGb5++0ZyHPwHWTBzQj+Dqr4BXoVOjo4wCxhx+QBr5H399o3hubYtw1cxKTA/QpiJYcXbfww+bF8Zvv3+w7DvPz+DE+NHDNdjswAcgdgsWPTkC4O0IDvEAobfDOu/s4MNBRmOD7CgGx7r4wEOT1D4wgCIP0fhP4OGDCJiV4LZggwRUP6rd9gtQIkDbi6u/08NeBnIBcbPuRju3r+PYi5GEP3MqCXbAtct+2AWMGC1ABTWoOQnIyODoujJkycMQuISDO9evgDzQfIwMRAAiYPEvl17y8DAsA6WWBixZrSp63eg8L/9/sNw++IFOB/ERhYDGQ5jg/IDeq5mRE+ioIjet38/hi+IASBfgSyLSUuHm40aB4WTGL6qGzGkPGBkyBHjBgut/87OEMj5E06jizm/v8/AJyUFYf/5yND4QQy3D3i61jN8MXJmoAjcucTAkGEDN5us0pQUgBJEX54/hriAAsDz6TXDF3yRPAgqs5EGAFQas1GGbiH7AAAAAElFTkSuQmCC","snake":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACZklEQVR4nNVVS2gTURQ9b5LXJJNMatupNVHaahTbXRUk6rYuulCLoItK7aLgB8QiiEvFjRtF1G6kYMWdG0EaBD8I3RSF+llkoyMW2mJDqAlN87NJxnkyL020mckkRFz0wsCbue+ec+95974BNrsRk2/sH2LrIzhxUsLzqTRuPnQanOGvLnyYzuHL24wVRtkEK2fPfhv6goQ/jyaKW0fOrOH+JMPIJQpKSc2KKwnY9m0CJN8ajg568H3RVnb0+gV45KZiygQYvkgxdttrhV21vHJGOtndkIhmSTMGrkeOjZKSXKSRg2K6DFvbjNuuPWnFLl8Wr15S3Lm8WhXLXoOAFAoMS1GDzGzmjYadw0BgjzWA5SFbWUYpIKcK2NH56/8QlMxOrMfGSqJ6B64hAt6u/adsODggQm43k4HBYde4TPrepajGzA7atE17Drtxa4LASTUkkgLiP92GTW2uDLZ4i35luRWJb6sYv5qE3hR/45pWMHpeg5MSqCpBaKoJGSW7we/eS3F6iIExcHBZyiE4UADgLbWstUT6fdPdm+cZHh/MI/bDhnQsz336NHd35fh6dk7Gp8crOHRMBToI+o+oGKekVEV1gunJBKSuTvj9Gs+OeADJ8+fi+zjvQCQiIPo6jmdPU5B8FH1BinSW1D3JfIIDB0R+B+mSVM7A7EwGy3HG76yzNzSojODFOxkPzs1vwCVmwEMX7GgPiFW4gY6W/LpUKn9fiHsQVlwIXV/Uu8ma4Mq9ZuzeZ/wPVFos5SivdbnMwA1noGefFVsQVlDTUgtJLtXniIa591lDe1atAI0ZaTBuE9hv7x7RKCsZ0DEAAAAASUVORK5CYII=","star":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABt0lEQVR4nGNgGAXUBBzsTP9BmBQ9TCSo/R/qJMIAwiA2LSxgCHcRBWNSAAuxCpWkORi8rYUY/v79z8DHzczw6etfqvrgv7UeH5jBzMzI4G8nDBajlgX/QYSbuSBcAIn9n5Qg+s/MxMjAyIhFEQsjg4+1EJzvaCzAwMbKyPDvH6Yl//8zMPz9BxYCm4Rs3H9XMwGG7lwlBnkJdhQLmJkYGXi5mVHEPn/9CzMIDh6++MlQOvkew+5TH7BaALYEFIHLmjTAEUoK2Hr0HUNU3Q1Y5MPNxRIgDKDMxNCRpciQEyIJjlR8AJSqupY8YWiY85Dh129E0OCzAG5RgL0ww5QSFQZpUTasCp6+/sWQ2HwTJUhISUWMGw6+Zbhw6wtOBfvPfsBrOCELwBnKwwKRPNGBv60wqHzCZwReC/47mQigxMHF21/BGAZAKctWnw9vfsBrfbAjuGADg4krnzGYJJwH4yU7XsHFva3BuZp0wMbK+P/JZnMwDrAX/o/mSrAYTJ6ZiZGkIhxsgKuZwP/FDeqgfIFuOFwNSG5Lr/Z/JWkOXGpwWwDSxMLMSEjjf5BPybEArJlGaocYAADMk5YRVM5G9wAAAABJRU5ErkJggg==","sun":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACHElEQVR4nOWVT0hUQRzHP7NsCh0ykkQ7iGEe9LAYeDEPbiS0IBF06VIqXvQQHrwFgicRPCtd6lDgoTp1EimoLiEUISJEgpUeLIwF+3NpXXfiNzP73r71vefTm/iFYXdmfr/v7/88OCnQbkXtI5FKQt7eDA1nPWJq0pDN+PujGAgoDvTB3D1Q7u7BGNzti9cpIx1GXvZ2e8cedLZCrgsejoOcDV+Hrz+sQe3Ly50YUQcZMHqb8/B6GV68g6udoOtg6I7zoAAtKRjph2uX4UY35O5b42FkYdALU9ZrXQelc0BtiHIeUj9tNK2DJhp1UA287hDPDXlTOLkRrofSeXj61ivAvu5S1d0iBZWcS1rSbdHklSiu2nQur8PiB3iz4nMHapD/DZcuVKSmlkQ41QQ5x/TkVfCuOmdaDqRbpKCSgkT4By+fw81JKBSDvNU1UJLA9585NLbysGvJA6g0oGvS6OlhkEFSheTk6q+djWcTwYnfF8GVDisgbcefQxjIOx3gVk+8bLnN9Gg/urSELm7Er72PJmqpnacbGYErjimQTKj6Zb2L81zW7V6PsawfWWQDSZOMv4Q9M2v7PPXdJzQTvGbvvm3BxUaQGUoKebx0NuOHvTCF1ov299G4/f/lsb2X1d5sV9iLGvrYyavoHi4lSjKhAulzacUzp50nTv7TpreNetviI8pmAh6aCKUJknxwklrUVfKVxEfy+vjgP5MY3zAnUUbyAAAAAElFTkSuQmCC","sunrise":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABCElEQVR4nGNgGAVDCkjLW/+nmYHS8tb//5+0+o9uCSFLmfAZ/mTVf7wGEKMGpwU0AdJYvP8fKVjICTJGdO/KhEGEnj48ykhMGKOrg5kBE4dbgGwJCMAsAoEn2U8YsAGZqTJwNrI+mOEYFqC7GMVge2lUhQefYrUI2XAQYEE2FCSJETT2aAajWwi1CNlgZPMY0YMFJAgWg7neHmqQVhqqBddmoVgA8gVcL5J5WCMIHjz2OAzHYgksmNATChOy95Ajllwgg5YK4T6QL1nLQE3wsCcYbAk4kkHg0e5NDJtnpYLZvmmzwTSlfPr7gBaABcaQc/WjqsEPLy5EtYBWPmCEMahdW6EXGTQDAN8TtsnEGnwMAAAAAElFTkSuQmCC","tablets":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAoElEQVR4nGNgGOqAEV1AWt76P7rY04dHyVaHoQkbkEYzjFh1KD4AST55cITh7uP3GBYrywoyyCjYgF1IrDoUC/BpQtdMrDqYJUwMRIIVG4+SpY5oC8gFNLeABV2gd9J8DEXFeYkM5KpjIUYRNkCsuoENomI8riRW3TAPIhgYTUVDOxWxIHNOn7tGlKbTRKrDqHAIKX4KrXCIUUe0CwY9AADBMY0HkILPgAAAAABJRU5ErkJggg==","target":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACnUlEQVR4nNVVTWgTQRT+pkmq+bO2JCYhhXhpBGsqSEqhh2BsQQ/iDwh6ECyCUA8tBGwVPJR6EVHx4MGCICq9CGLBHqQHDR6VoocWwVIQQanSmKb56Z9tRt5sZ7Pb3aSLtz4Ydmfmzffe++a9N8BOF2ZRj/8vpn07YK+NId7kQdLFEWtwisWpxWWklxgms0U4bn9UlbOD7QaAWgZ40u/FyP7dCDjqdBtJjxuB6DHkUk9069lB5Zw2ElOKvDbGB5rd6Au7NQoMtughdZZIjRvOfZ+Y1kZS1QC/FfGgP+xWZr4gnD0pOLrPgHkbxNL49DcMlUM64MjxivHPh50qtt2Mlr6wS0zsHUm4hkcEMC8sYm3smaLVkjB4XW3OtlIzecSncO4LYs/oewFOwMv3bqj0Xrn6ErNtcRVM6/3e7n1IzxdUbO3tccoWeaFESwX8uiFTzcB7H1wW2aYVHUWVTSY4J1oUzwFbNIb6Uxcx0ZLA2zd/0BVaEeuzAIbr5jB3/ybOz7xDWqRy0dyAzHPKFuk9Nj2X4D2b4I8fnVMivXYH9WcvodTIsQ7g4C5dADqKLElXaAUvTscs6+sMUIWSbGTnxZdoknmw9noUJyNNAnxpqNcAxBcy4vtltYYBKn8hmV+CHqLJ3nFUMTozhfyJA2Ksf0iraUz00F3RvtZJMwOMesvvv2XVYxKqAwLaWpOyRkhkRHRbd3+UalJGVcxznQExiqkLXEo5n+Orr56qQwr9S306a6Xz8rE2v85IOZ9TAbUGaS/XGRR6X9v91HkNBli1Fv281Yekp8Ig1QFr9CkKCxmVcxKiNf4pg8IGN2BWe3CEJjU9fUc1Kj38WRK8m4HXMqCLZqDZLYpQFhGlImWLBrgqlpUnk2+zb/XZ3aHyD3IiPcqHbb1NAAAAAElFTkSuQmCC","tower":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABRUlEQVR4nGNgGGpAWt76P9EKkRUT4sPEQABZnAWX4U+y/cFsmakMYMX4+E8fHmUE63lwBCwGomUUbMDiTAw0BizUMujpw6OMIFcj80E0mCAUTCBwc9VWMK0e5o3Bl5m6EW4gyT64CTUIBI69fs/AgMQHgflTlzAwMPDi1D+wcTAf7DpUAPYFCQCvDxKzYxisRAXBbBCNjGFiZFkAi2Dk8McFQJaA1OLKwVhjHqS4meEzAymgloEXa0piwRc8oDhADwZQHGATG3ypaD40BR2Dug4UBMGqTxkYBBgYam/zMhAbhCy4wh89GIIFHiLYqk8ZrD7IowTXE3COhhR8NAmi+VjyDFYf4Iw4AezyhDIeC64UBMsDx6DBcIHhE4oaYlMSE7kZDBvAluEYic1gF1RRfWBwmw+rOvQMh5HziK60cQBc9QLNAABfmKiEF94+KQAAAABJRU5ErkJggg==","tree":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB30lEQVR4nNVVy0rsQBA91UlGZ5yI4FVE70pBXF515S/4AYIbV3crKPgf+gV+joJwUXAjgq68oqLgW5xMd0k/MpNMHhN1ZW3Srzqn6lR3BfjpRp84y1/xrUrAwayHweUBM3nfi9A6iCr5+1XAvUmBcGsIZPFR++Pj8V4hOpXcj0SUAcfgjZXBDrgxAhqrdei9+FwRSBE7wwPC9QZq8+VJts8VnrZfoB45F68wgxQ4A+qKwO8AIjuGtFv+tEC4OQQdUJ7lEujUk5HzM5lqGZkCWzl+7QarSYIZw5CRKjd/0UxnSiGDwsT+r6zkNKJjldUyiM4k+MmRRPFi3sFuidsnbcNThYBriwGoyVC3BHVnffRXz5OmHgjqmgysP2fE4P4EHtBca3RiEWPWR4zqMNMQZs2J3PxbhximDEkvAetiac07WntuJwDEBKdFoG499AVwWZRnYIuVNXZXVNfRjCtaBk1eaISexQiQ/1XHQ4+rkvQSkLxUaB2ZG5Eyb0rYN0BunPOiW/+yDTBXj5fdN7QOEySBe2RxFAPpedwucp5BSS9yL9r7bas83iZsLNXNeGf/DTe+1ZFtVy3EK+pk5qCWS14qi7RQgzzuZuX+B2VB9m3XSQAqC6Sfc1Xjb/r/UPsAd2ef4dQ46W0AAAAASUVORK5CYII=","walk":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABjUlEQVR4nGNgGOqAkQS1/8nRx0SMImZGhv+OJmoMsb52DDLCrOiW4QXEuOS/rTwHg5elCFygZuUThr//ifMFCzGKkoJFGOyMVcDsQ2fvMEgKsTI8efubgWoWvHjGwKAU8gfKU2F4PfMjAwMD9SxgrFn5BBzmElIMDPPWvmH4+fUHA1Uj+e9/BoZtx98w8B36wVAgysMAihNiI5rYVMQwV0GAQZebhUHV6x/YEmIBURYgA10PLQZSAEkW/LD/RZLhJFug66HFcO8+C9Ut+M/CxcuQaVEHNjztUhjDBknig4ko5/z0n8Kw958hg/JWbgYGaUMGBl5uUJajig/+M0hoQwx9ep6BYV8XUYaSYgECgAx/exfBZyUuLxBvwdu7DAy/fzCwT7OG+Ch0JlGWkJoPGH9+/czAsDiSwVn2K8P8XBGCxTcToRzc7vCR4RKnAwPzH3j5w8jw4iqDy8M2BmOebwzP34ELPUZyLPhvJcfB4K32DUMC5GqQePbCb+ByCh/AV2n8x6EeXZyUancIAgD+/WslljDqtwAAAABJRU5ErkJggg==","wave":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACX0lEQVR4nNVVTWgTQRT+JmQDrYsIItSSQ/3BlnqpgqFKPfiDXqQ3K4ao1YOHIj2UHnoWDx568YccNWpZ0GMvosQetGiIhyYgwRaKCmEV6k8TlhbT0pE3yYy7m/1petIPJm8yb/Z735v3dhb438Fa2Mu3wsE2Sxzv7sXJ/gSODQwox9vZWRiGgfW1Wqti/5LHu3v5VPY1r1QqvFqtNg3y0Z6GEDlCM+BRLYb76TQuDp0HY8HirN81TIyPi/njRxkHb8SPPPM8q8g5577ExtNn2BbTcHty0nF8QQGE8sFEH8IwUyzhxsgIDiaOijnVhGplPyZ3AH75yjCSF4Yci6xxRKR4Ol8QlkAiOvbuF8V/+eSBPB4Hou6FM5euNRFLvFjRcHWxhq5yEbfiGqxPC3CjPF8i41k00Q2yW8g+/FIfh4srolvMpe+8K/NK7ItqMWFdHRScAaVKqukIzpnt+La6AbOYE74U/SwWoL+ZhlVXKdX6Km6qgewCOgpBvqAIFHa8z9pJ5cCmAuh7Dgj195Y1fLU2PB9YPnI67OrwD0BFI/VBsI4PQk+Ngt4VOn89NSrqQVbWxh6cuVv0xM07IoO5pXXw1SpgfkQrEDWauqu4HRnM5PI4276m/rO27UBnD0DWY872JerzANi7iJXnS1zcKWNp7NYjog5MEkq4CFlnTz3TXyZA1gX3m8zo+r2eN9DRFhFBvEDrh3ZFlZ9EsEZGO/v6HXuZ32WXTCbxYSytFqltKagXyEcg/8+5d/g8fEpxB/UwdQWoLaWqH4Vc09y9RrAXOewrxEP8QdjSF+7fwx8x8xyOgMeySQAAAABJRU5ErkJggg==","whale":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACV0lEQVR4nNVVTWgTURD+dtOQJksoYi72YPxpCdaUVkQR1J4CKh48tQexIB6E3or1IogeFDxYoXgUCQWlByUHtW2k9KSmleJBIShiiU2RKjQQYkmTpU1G3qTZ7NvdVNN60IHh7TLzvm/nezNvgf/dlAbzqdH9aoMEcAVD0K6O8OpAuG0jT/dxwvRPQixFqtcnCKruaE2NMqxnM5WHlgBw+wm07/PA0gKKiTiV0p9tsjlp+PuyY6kKgdlyGXhu9UN/n5BwrQTE2u7vdMSl2Um4Q4egD8f5Xf3wCuU9HTWyXAauK2dgrkSSSPX64Bl9ZwNeLZEBiEd3DDBc7+MuKT9OVkhaAmjuHUB+eLCGaZXm4UHV5ue8K5xQ7urhM9CiN6BeCKNcWGXXYvcNkMKutvpt2jp0F2m9JLmwY7v9MFt+bISBqzIUf3wzYixZPYK9bUEsevySvyYvx7SXUZZFSGCtms5erAEufNxam65PP4Umvv70JV7FOwNEepHv6qm7TyL4Op9G2CHp7eIK1vqvQd8oX5BAOADdkqtMjNaXaHl8DCB5DEhR8Kzg5wO29b7VchluZXP7mwkUMSTJOCdI5nP92Z2ozT6vHn4N1GnQLs99ApRaiAAkM2tS4pulIq8nWpsrQHNTSAz0Sd1lrYADYgqjp05KUikAOgNuw8MBt7RpZ3YZMzeHbOBOBIZUD44eQHJywnYmVpuJT+FFpF26HiSwTfZS9foQ909TxxHs2NfOgWzqCwqHI3zwYqrF4G3h52UjI7O7giFS742Tdn5w0//BdljpL2L9w/YLwyjqCquiHsEAAAAASUVORK5CYII="};
 var EB_ROUND_SIZE = 8;
 var EB_ROUNDS = 3;      // three rounds of 8 stories (2026-11-05, per Dan); the 5 chances carry on from round to round, and ROUND X COMPLETED! gives one back if at least one was lost
 var EMOJI_STORIES = [
@@ -5676,7 +5702,7 @@ function screenEmojiStories(){
     '<div class="pixNote">' + t("eb_story")(s.index + 1, s.order.length) + '</div>' +
     pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now"), null, s.past) +
     '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ebChancesLeft(s)), EB_CHANCES) + '</div>' +
-    '<div class="pixPaper"><div class="pixEmoji">' + story.pics.map(function(n){ return '<img src="tiles/emoji/e_' + n + '.png" alt="" decoding="sync">'; }).join('') + '</div><div class="pixRef' + (answered ? ' shown' : '') + '">' + hint + '</div></div>' +
+    '<div class="pixPaper"><div class="pixEmoji">' + story.pics.map(function(n){ return '<img src="' + (EB_PIC_DATA[n] || ('tiles/emoji/e_' + n + '.png')) + '" alt="" decoding="sync">'; }).join('') + '</div><div class="pixRef' + (answered ? ' shown' : '') + '">' + hint + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
     (answered && ebChancesLeft(s) > 0 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ebNext()">' + t("eb_next") + '</button>' : '') +
@@ -5686,8 +5712,8 @@ function screenEmojiStories(){
 
 /* ---------- Life of Jesus Timeline ---------- */
 
-// Life of Jesus Timeline (2026-10-21, per Dan; spec = Five New Missions Design, mission 14). Tap five events in the order they happened, for two
-// rounds, each from a different set. A wrong tap costs a chance (5 shared across both rounds, to match the other missions -- the spec said 3;
+// Life of Jesus Timeline (2026-10-21, per Dan; spec = Five New Missions Design, mission 14). Tap the events in the order they happened, in eight rounds of 4 to 11 events (2026-11-06; it was
+// five events for two rounds), each from a different set. A wrong tap costs a chance (5 shared across both rounds, to match the other missions -- the spec said 3;
 // change TL_CHANCES to go back). The events, the order inside each set and the Spanish names are drafts for the client to approve.
 var TL_CHANCES = 5;
 var TL_EVENTS = {
@@ -5704,7 +5730,15 @@ var TL_EVENTS = {
   cross:{icon:"✝️", en:"The Crucifixion", es:"La Crucifixión"},
   ascension:{icon:"☁️", en:"The Ascension", es:"La Ascensión"},
   sermon:{icon:"⛰️", en:"Sermon on the Mount", es:"El Sermón de la montaña"},
-  transfig:{icon:"✨", en:"The Transfiguration", es:"La Transfiguración"}
+  transfig:{icon:"✨", en:"The Transfiguration", es:"La Transfiguración"},
+  // 7 more events for the eight rounds (2026-11-06, per Dan); drafts for the client to approve, like the others (the cards show words only, so the icons are not drawn)
+  wisemen:{icon:"⭐", en:"Visit of the Wise Men", es:"La Visita de los Reyes Magos"},
+  egypt:{icon:"🐫", en:"Flight to Egypt", es:"La Huida a Egipto"},
+  temptation:{icon:"🏜️", en:"Temptation in the Desert", es:"Tentación en el Desierto"},
+  disciples:{icon:"🎣", en:"Calling of the Disciples", es:"El Llamado de los Discípulos"},
+  water:{icon:"🌊", en:"Jesus Walks on Water", es:"Jesús Camina sobre el Agua"},
+  gethsemane:{icon:"🙏", en:"Prayer in Gethsemane", es:"Oración en Getsemaní"},
+  emmaus:{icon:"🚶", en:"The Road to Emmaus", es:"El Camino a Emaús"}
 };
 // every set is listed in the correct order, first to last
 // Three rounds (2026-10-23, per Dan): round 1 puts 5 events in order, round 2 puts 7, round 3 puts 5 again. A game takes a 5-event set for round 1, a 7-event
@@ -5722,15 +5756,46 @@ var TL_SETS7 = [
   ["baptism", "cana", "sermon", "feeding", "lazarus", "palm", "supper"],
   ["birth", "baptism", "feeding", "palm", "supper", "cross", "resurrection"]
 ];
-var TL_ROUNDS = 3;
+// Eight rounds (2026-11-06, per Dan): round 1 puts 4 events in order, and every round adds one, up to 11 in round 8. A game takes one set at random for each size (the 5- and 7-event sets above are the ones the
+// game already had; the others are new). Every set is in the order the events happened: annunciation, birth, wise men, flight to Egypt, found in the Temple, baptism, temptation, calling of the disciples,
+// Cana, Sermon on the Mount, feeding of the 5,000, walking on water, Transfiguration, Lazarus, Palm Sunday, Last Supper, Gethsemane, Crucifixion, Resurrection, Emmaus, Ascension.
+var TL_SETS4 = [
+  ["birth", "baptism", "cross", "resurrection"],
+  ["annunciation", "birth", "temple", "baptism"],
+  ["baptism", "feeding", "cross", "ascension"]
+];
+var TL_SETS6 = [
+  ["annunciation", "birth", "wisemen", "temple", "baptism", "cana"],
+  ["baptism", "temptation", "disciples", "cana", "sermon", "feeding"],
+  ["palm", "supper", "gethsemane", "cross", "resurrection", "ascension"]
+];
+var TL_SETS8 = [
+  ["annunciation", "birth", "wisemen", "egypt", "temple", "baptism", "cana", "sermon"],
+  ["sermon", "feeding", "water", "transfig", "lazarus", "palm", "supper", "cross"]
+];
+var TL_SETS9 = [
+  ["birth", "temple", "baptism", "temptation", "disciples", "cana", "sermon", "feeding", "transfig"],
+  ["feeding", "water", "transfig", "lazarus", "palm", "supper", "gethsemane", "cross", "resurrection"]
+];
+var TL_SETS10 = [
+  ["annunciation", "birth", "wisemen", "egypt", "temple", "baptism", "temptation", "disciples", "cana", "sermon"],
+  ["baptism", "cana", "sermon", "feeding", "water", "transfig", "lazarus", "palm", "supper", "cross"],
+  ["sermon", "feeding", "transfig", "lazarus", "palm", "supper", "gethsemane", "cross", "resurrection", "ascension"]
+];
+var TL_SETS11 = [
+  ["annunciation", "birth", "wisemen", "egypt", "temple", "baptism", "temptation", "disciples", "cana", "sermon", "feeding"],
+  ["baptism", "disciples", "sermon", "feeding", "transfig", "lazarus", "palm", "supper", "gethsemane", "cross", "resurrection"],
+  ["feeding", "water", "transfig", "lazarus", "palm", "supper", "gethsemane", "cross", "resurrection", "emmaus", "ascension"]
+];
+var TL_POOLS = [TL_SETS4, TL_SETS5, TL_SETS6, TL_SETS7, TL_SETS8, TL_SETS9, TL_SETS10, TL_SETS11];
+var TL_ROUNDS = TL_POOLS.length;
 
 function tlStartRound(s){
   s.deck = shuffle(s.rounds[s.round]);
   s.placed = []; s.shake = null; s.busy = false; s.interlude = null;
 }
 function initJesusTimeline(){
-  var five = shuffle(TL_SETS5);
-  var s = {rounds:[five[0], shuffle(TL_SETS7)[0], five[1]], round:0, deck:[], placed:[], chances:TL_CHANCES, shake:null, busy:false, status:"playing", interlude:null};
+  var s = {rounds:TL_POOLS.map(function(pool){ return shuffle(pool)[0]; }), round:0, deck:[], placed:[], chances:TL_CHANCES, shake:null, busy:false, status:"playing", interlude:null};
   tlStartRound(s);
   state.session.jesusTimeline = s;
   saveState();
@@ -5748,6 +5813,31 @@ function tlInterlude(){
     saveState(); render();
   });
 }
+// The long rounds (8 to 11 events) have to fit on one screen without scrolling, whatever the height of the phone (2026-11-06, per Dan): the slots and the cards are sized from the room that is really there
+// (the same way as Mustard Seed and Catch the Light). On a short screen the one-line instruction goes first, then the rows get thinner; the cards keep at least 30 px for a finger.
+function tlFit(){
+  var s = state.session.jesusTimeline;
+  var slots = document.querySelector(".tlSlots"), cards = document.querySelector(".tlCards");
+  if(!s || !s.rounds || !slots || !cards || s.interlude || s.status !== "playing") return;
+  var n = s.rounds[s.round].length, scr = slots.closest(".screen"), intro = scr && scr.querySelector(".tlIntroNote");
+  [slots, cards].forEach(function(el){ el.style.removeProperty("--tlSlot"); el.style.removeProperty("--tlCard"); el.classList.remove("tight"); });
+  if(intro) intro.style.display = "";
+  if(n < 8) return;
+  var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  var pad = scr ? parseFloat(getComputedStyle(scr).paddingBottom) || 0 : 0;
+  var rows = Math.ceil(n / 2), sg = n > 9 ? 3 : 4, cg = n > 9 ? 4 : 5;
+  function solve(){
+    var avail = vh - slots.getBoundingClientRect().top - pad - 14;
+    return (avail - (n - 1) * sg - rows * 8 - (rows - 1) * cg) / (n + rows);
+  }
+  var sh = solve();
+  if(sh < 27 && intro){ intro.style.display = "none"; sh = solve(); }
+  sh = Math.max(20, Math.min(34, Math.floor(sh)));
+  var ch = Math.max(30, Math.min(40, sh + 8));
+  slots.style.setProperty("--tlSlot", sh + "px"); cards.style.setProperty("--tlCard", ch + "px");
+  if(sh < 26){ slots.classList.add("tight"); cards.classList.add("tight"); }
+}
+window.addEventListener("resize", function(){ if(state.screen === "jesusTimeline") tlFit(); });
 function tlChancesLeft(s){ return typeof s.chances === "number" ? s.chances : TL_CHANCES; }
 function tlPress(){ pixPressSfx("none"); }
 function tlTap(id){
@@ -5821,10 +5911,10 @@ function screenJesusTimeline(){
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
     '<h2 class="pixMTitle">' + t("jesusTimelineName") + '</h2>' +
-    '<div class="pixNote">' + t("tl_intro") + '</div>' +
+    '<div class="pixNote tlIntroNote">' + t("tl_intro") + '</div>' +
     '<div class="pixChances"><span class="pixNote">' + t("tl_round")(s.round + 1, s.rounds.length) + '</span>' + chancesHeartsHtml(Math.max(0, tlChancesLeft(s)), TL_CHANCES) + '</div>' +
-    '<div class="tlSlots' + (n > 5 ? ' seven' : '') + '">' + slotsHtml + '</div>' +
-    '<div class="tlCards">' + cardsHtml + '</div>' +
+    '<div class="tlSlots' + (n > 7 ? ' dense' : (n > 5 ? ' seven' : '')) + (n > 9 ? ' denser' : '') + '">' + slotsHtml + '</div>' +
+    '<div class="tlCards' + (n > 7 ? ' dense' : '') + (n > 9 ? ' denser' : '') + '">' + cardsHtml + '</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -6119,6 +6209,9 @@ function screenSacredSudoku(){
 // 6-letter words, the words coming from the Word Scramble pool of that level. Between rounds the same ROUND COMPLETED! message as the other games.
 var WT_ROUNDS = [{size: 6, level: 0}, {size: 7, level: 1}, {size: 8, level: 2}];
 var WT_WORDS = 5;                 // words hidden in a round
+// 3 chance hearts (2026-11-06, per Dan): 3 or more letters joined that do not spell a word on the list cost one. The hearts carry on from round to round; ROUND X COMPLETED! gives one back if one was lost.
+// With no hearts left the Keep Trying screen comes, and TRY AGAIN starts the game over from Level 1.
+var WT_CHANCES = 3;
 var WT_SIZE = 8;                  // the size of the round on screen (set by wtUse, which every function that needs it is given after)
 function wtUse(s){ if(s && s.size) WT_SIZE = s.size; }
 var WT_FILLER = {
@@ -6181,7 +6274,7 @@ function wtFindPath(grid, word){
   return false;
 }
 // one round: a fresh grid of that round's size, with WT_WORDS words from the Word Scramble pool of that level hidden in it
-function wtNewRound(round){
+function wtNewRound(round, chances){
   var cfg = WT_ROUNDS[round];
   WT_SIZE = cfg.size;
   var pool = WORD_UNSCRAMBLE_WORDS[state.lang || "en"][cfg.level], hidden = null;
@@ -6189,17 +6282,25 @@ function wtNewRound(round){
   var grid = [];
   for(var i = 0; i < WT_SIZE * WT_SIZE; i++) grid.push(wtLetter());
   hidden.forEach(function(h){ h.cells.forEach(function(c, k){ grid[c] = h.w.charAt(k); }); });
-  return {v: 3, round: round, size: cfg.size, grid: grid, hidden: hidden, remaining: hidden.map(function(h){ return h.w; }), busy: false, status: "playing", interlude: null};     // v 3 = three rounds
+  return {v: 3, round: round, size: cfg.size, grid: grid, hidden: hidden, remaining: hidden.map(function(h){ return h.w; }), chances: typeof chances === "number" ? chances : WT_CHANCES, busy: false, status: "playing", interlude: null};     // v 3 = three rounds
 }
+function wtEnsureChances(s){ if(typeof s.chances !== "number") s.chances = WT_CHANCES; }       // (a game saved before the hearts existed gets all 3)
+function wtHeartsPaint(){
+  var s = state.session.wordTrail, el = document.getElementById("wtHearts");
+  if(s && el) el.innerHTML = chancesHeartsHtml(Math.max(0, s.chances), WT_CHANCES);
+}
+function wtTryAgain(){ wtDrag = null; initWordTrail(); render(); }
 function initWordTrail(){
   state.session.wordTrail = wtNewRound(0);
   saveState();
 }
 // ROUND X COMPLETED! between the rounds, and after the last one before the Mission Completed screen (the same as the other games)
 function wtInterlude(){
-  pixRoundRun("wordTrail", function(){ return state.session.wordTrail; }, null, function(s2){
+  pixRoundRun("wordTrail", function(){ return state.session.wordTrail; },
+    function(s2){ wtEnsureChances(s2); if(s2.chances >= WT_CHANCES) return false; s2.chances++; return true; },       // a heart comes back if one was lost (2026-11-06, per Dan)
+    function(s2){
     if(s2.interlude.final){ s2.interlude = null; wtCollectAward(); return; }
-    state.session.wordTrail = wtNewRound(s2.round + 1);
+    state.session.wordTrail = wtNewRound(s2.round + 1, s2.chances);
     saveState(); render();
   });
 }
@@ -6333,8 +6434,20 @@ function wtUp(){
       } else { saveState(); render(); }
     }, 450);
   } else if(path.length >= 3){
-    pixSfxPlay("fmMiss", true);
+    wtEnsureChances(s);
+    s.chances = Math.max(0, s.chances - 1);                                // letters that spell nothing on the list: a heart is lost
+    var lastOne = s.chances <= 0;
+    pixSfxPlay(lastOne ? "fmLast" : "fmMiss", true);
     wtPaint("bad");
+    wtHeartsPaint(); saveState();
+    if(lastOne){
+      s.busy = true;                                                       // the last heart: nothing more can be traced, and the Keep Trying screen follows
+      setTimeout(function(){
+        var s2 = state.session.wordTrail;
+        if(!s2 || s2 !== s || s2.status !== "playing") return;
+        wtDrag = null; s2.busy = false; s2.status = "failed"; saveState(); render();
+      }, 1100);
+    }
     setTimeout(function(){ if(wtDrag && wtDrag.path.join() === path.join()) wtCancel(); }, 260);
     wtDrag.path = path; wtDrag.done = true;
     return;
@@ -6346,13 +6459,20 @@ function wtQuit(){ state.session.wordTrail = null; wtDrag = null; go("mainMenu")
 function screenWordTrail(){
   var s = state.session.wordTrail;
   if(!s || s.v !== 3){ initWordTrail(); s = state.session.wordTrail; }          // a game saved by an earlier build (one grid, no rounds) starts over
-  wtUse(s);
-  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("wordTrailName") + '</h2>' + pixRoundDoneHtml(s.interlude), "pixLower");
+  wtUse(s); wtEnsureChances(s);
+  if(s.status === "failed"){
+    return pixResultHtml("wordTrailName", {cls:"pixLower", title:t("wt_failTitle"), body:t("wt_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "wtTryAgain()") + pixBtnHtml(t("mainMenu"), "wtQuit()", true)});
+  }
+  if(s.interlude) return pixShell('<h2 class="pixMTitle">' + t("wordTrailName") + '</h2>' +
+    '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, s.chances), WT_CHANCES) + '</div>' +
+    pixRoundDoneHtml(s.interlude), "pixLower");
   var cells = s.grid.map(function(ch, i){ return '<div class="wtCell" id="wtC' + i + '"><i>' + ch + '</i></div>'; }).join("");
   var words = s.remaining.map(function(w){ return '<span class="wtWord">' + w + '</span>'; }).join("");
   return pixShell('<h2 class="pixMTitle">' + t("wordTrailName") + '</h2>' +
     '<div class="pixNote">' + t("wt_intro") + '</div>' +
     '<div class="pixNote">' + t("fm_level")(s.round + 1, WT_ROUNDS.length) + '</div>' +
+    '<div class="pixChances wtHearts" id="wtHearts">' + chancesHeartsHtml(Math.max(0, s.chances), WT_CHANCES) + '</div>' +      // the 3 hearts, above the word grid (2026-11-06, per Dan)
     '<div class="wtTrace" id="wtTrace">&nbsp;</div>' +
     '<div class="wtGrid" id="wtGrid" style="--n:' + s.size + ';grid-template-columns:repeat(' + s.size + ',minmax(0,1fr))" onpointerdown="wtDown(event)" onpointermove="wtMove(event)" onpointerup="wtUp(event)" onpointercancel="wtCancel(event)" oncontextmenu="return false">' + cells +
       '<svg class="wtLine" id="wtSvg"><polyline id="wtPoly" points=""/></svg></div>' +
@@ -7306,6 +7426,7 @@ function prTurn(r, c){
   var reach = prPaint(s);
   if(reach.won){
     s.busy = true;                                                         // the road is done: the pilgrim walks it, then ROUND X COMPLETED!
+    var bd = document.getElementById("prBoard"); if(bd) bd.classList.add("prDone");      // the finished board reads no taps at all: no turn, no button sound, no glow (2026-11-05, per Dan)
     pixSfxPlay("clCatch", false);                                          // the road is finished: sound_effect_1 (2026-10-25, per Dan)
     saveState();
     prWalk(s, function(){
@@ -7334,7 +7455,7 @@ function screenPilgrimRoad(){
   return pixShell('<h2 class="pixMTitle">' + t("pilgrimRoadName") + '</h2>' +
     '<div class="pixNote">' + t("pr_intro") + '</div>' +
     '<div class="pixNote">' + t("fm_level")(s.round + 1, PR_ROUNDS.length) + '</div>' +
-    '<div class="prBoard" id="prBoard" style="--n:' + s.n + '">' + cells + '</div>' +
+    '<div class="prBoard' + (s.busy ? ' prDone' : '') + '" id="prBoard" style="--n:' + s.n + '">' + cells + '</div>' +
     '<div class="prLegend"><span>' + t("pr_start") + '</span><span>' + t("pr_church") + '</span></div>' +
     '<div class="prTurns" id="prTurns">' + prStatus(s, reach) + '</div>' +
     '<div class="spacer"></div>', "pixLower msScreen");
@@ -12151,7 +12272,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 GJ";
+var APP_BUILD = "2026-11-06 GP";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12711,6 +12832,7 @@ function renderApply(html){
   if(state.screen === "hopeGardenIntro") hgiHorizon();
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
+  if(state.screen === "jesusTimeline") tlFit();
   if(state.screen === "lightCandle") lcPaint();
   awardAutoReturn();
   if(state.screen === "sacredSudoku" && state.session.sacredSudoku && state.session.sacredSudoku.done && !sdCelebrating) sdCelebrate();
