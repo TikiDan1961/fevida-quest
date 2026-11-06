@@ -3497,7 +3497,7 @@ function screenMainMenu(){
     '<div class="homeGrid">' + icons + '</div>' +
     pilgrimSceneHtml() +
     '<div class="pixDoveLayer"><div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div></div>' +
-    '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeMenuName")}) + '</div>' +
+    '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeMenuName"), badge:missionMarksHtml("hopeGarden")}) + '</div>' +
     '<div class="hgMenuIcon" id="cjMenuIcon">' + appIconHtml({onclick:"openMission('" + MENU_ICON_MISSION + "')", bg:ICON_BG[MENU_ICON_MISSION], cls:state.missions[MENU_ICON_MISSION].done ? "done" : "", inner:iconSpr(MENU_ICON_MISSION),
       label:t(missionById(MENU_ICON_MISSION).nameKey), badge:missionMarksHtml(MENU_ICON_MISSION)}) + '</div>' +
     folderHtml() + howHtml(inFolder.length) +
@@ -11051,7 +11051,12 @@ function hglPlayAgain(){ hglDangerSfx(false); hgl = null; render(); }           
 // the end of a ROUND X COMPLETED! screen: the lost chance is given back (after rounds 1 and 2), then the next round starts; after the last round the end message comes up
 function hglInterlude(){
   pixRoundRun("hopeGardenL", function(){ return hgl; }, function(s){ if(hgl.chances >= HG_CHANCES) return false; hgl.chances++; return true; }, function(s){
-    if(s.interlude.final){ hgl.interlude = null; hgl.mode = "complete"; render(); return; }          // all three rounds done: the end message and PLAY AGAIN (no badge, points or step for the pilgrim: Hope Garden is a separate activity, 2026-10-28, per Dan)
+    if(s.interlude.final){
+      hgl.interlude = null; hgl.mode = "complete";
+      if(!state.missions.hopeGarden) state.missions.hopeGarden = {done:false, badge:false};
+      state.missions.hopeGarden.full = true; saveState();           // all three rounds done: the heart on the Unfinished icon (2026-11-05, per Dan)
+      render(); return;
+    }          // all three rounds done: the end message and PLAY AGAIN (no badge, points or step for the pilgrim: Hope Garden is a separate activity, 2026-10-28, per Dan)
     hglSetRound(hgl.round + 1);
     render();
   });
@@ -12146,7 +12151,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 GI";
+var APP_BUILD = "2026-11-05 GJ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
