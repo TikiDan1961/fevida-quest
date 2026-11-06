@@ -2531,15 +2531,18 @@ var pixAudioBorn = 0;      // when the current engine was made
 // (2026-11-06, per Dan's event log after an alarm in Mustard Seed) Every new engine was given up on after HALF a second ("state running, clock NOT moving") and replaced again at the next tap: about 40 times in 8
 // minutes, and none of them was ever given the time to start (a phone that has just had its audio interrupted can take a second or more to start the clock). Now a new engine has PIX_PROVE_MS to start its clock, no
 // other engine is made meanwhile (a tap only wakes it), and it is judged at 0.5, 1.5 and 3 s. Three engines in a row that never start are the last straw: the other sample rates are tried, and then the page is
-// reloaded, on the Main Menu only (everything is saved), at most once in ten minutes.
+// reloaded (everything is saved; see GW below).
 // (2026-11-06 GV, per Dan's log after a phone call: 3 engines and about 9 s, 7 taps, because each dead engine was kept 3 s. The dead ones were already "NOT moving" at 0.5 s and the one that worked was moving
 // at 0.5 s, so PIX_PROVE_MS is now 1.5 s (judged at 0.5, 1 and 1.5 s); and the second engine asks for 44100 Hz, the rate of the one that finally worked, before 48000.)
+// (2026-11-06 GW, per Dan's log after tapping a notification and coming back to Mustard Seed: 13 engines in a row, every rate, "running" but the clock never moved, for 10+ taps; the sound came back only
+// when the page was reloaded at the Main Menu. A reload keeps the game (the screen and the whole board are saved in this tab, and every game picks its round-complete screen up again), so the page is now
+// reloaded at once, wherever the player is, after the 3rd dead engine; and a second reload is allowed after 2 minutes (it was 10) so that a second interruption does not leave the sound dead.)
 var pixAudioProving = false, pixAudioFails = 0, PIX_PROVE_MS = 1500, pixAudioReloadWanted = false;
 function pixAudioReloadCheck(){
-  if(!pixAudioReloadWanted || state.screen !== "mainMenu") return;
+  if(!pixAudioReloadWanted) return;
   try {
     var last = parseInt(sessionStorage.getItem("fevidaAudioReload") || "0", 10);
-    if(Date.now() - last < 10 * 60 * 1000){ pixAudioReloadWanted = false; dbgLog("audio: not reloading the page again (it was reloaded less than 10 minutes ago)"); return; }
+    if(Date.now() - last < 2 * 60 * 1000){ pixAudioReloadWanted = false; dbgLog("audio: not reloading the page again (it was reloaded less than 2 minutes ago)"); return; }
     sessionStorage.setItem("fevidaAudioReload", String(Date.now()));
   } catch(e){}
   pixAudioReloadWanted = false;
@@ -2548,7 +2551,7 @@ function pixAudioReloadCheck(){
 }
 try { var pixRl = parseInt(sessionStorage.getItem("fevidaAudioReload") || "0", 10); if(pixRl && Date.now() - pixRl < 60000) dbgLog("audio: this page was reloaded " + Math.round((Date.now() - pixRl) / 1000) + " s ago because no sound engine would start"); } catch(e){}
 function pixAudioGiveUp(){
-  dbgLog("audio: " + pixAudioFails + " new engines in a row never started their clock (" + pixAudioDiag() + "); the page will be reloaded on the Main Menu");
+  dbgLog("audio: " + pixAudioFails + " new engines in a row never started their clock (" + pixAudioDiag() + "); the page is reloaded now");
   pixAudioReloadWanted = true; pixAudioReloadCheck();
 }
 function pixFreshAudio(){
@@ -12341,7 +12344,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 GV";
+var APP_BUILD = "2026-11-06 GW";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
