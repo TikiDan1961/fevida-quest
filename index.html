@@ -2241,7 +2241,7 @@ function pixCtx(){
     // iOS: let Web Audio play even when the ring/silent switch is on (Safari 17+). Once only (2026-11-04): the Road to Emmaus asks for the engine on EVERY frame (emMoveSfxSet), and setting this on every frame
     // makes the phone look at its audio session sixty times a second. (pixFreshAudio sets it again each time it makes a new engine.)
     if(navigator.audioSession && !pixSessionSet){ pixSessionSet = true; navigator.audioSession.type = "playback"; }
-    if(!pixAudioCtx) pixAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(!pixAudioCtx){ pixAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); pixWatchEngine(pixAudioCtx); }
     return pixAudioCtx;
   } catch(e){ return null; }
 }
@@ -2489,6 +2489,30 @@ function pixClickSfx(name){
 // context is kept (closing one can silence its replacement) and only the oldest are closed.
 var pixAudioStale = false, pixAudioOld = [], pixSilentWavUrl = null;
 function pixMarkAudioStale(){ if(pixAudioCtx){ if(!pixAudioStale) dbgLog("audio: engine no longer trusted (state " + pixAudioCtx.state + ", screen " + state.screen + ")"); pixAudioStale = true; } }
+// An alarm, a call or a timer interrupts the page's audio session (2026-11-06, per Dan: Mustard Seed, an alarm went off, and after it was turned off no sound came back, not in round 2 and not on the Main Menu). The phone says so
+// through navigator.audioSession (iOS 17+): "interrupted" while it lasts, "active" when it is over. The engine is marked as not trusted at both changes, and when the session is active again the engine is woken at once.
+// Every change is written to the event log (Options) together with the state of the engine, so that what the phone really did can be read.
+function pixSessionState(){ try { return navigator.audioSession ? String(navigator.audioSession.state) : "n/a"; } catch(e){ return "n/a"; } }
+function pixAudioDiag(){ var c = pixAudioCtx; return c ? ("engine " + c.state + ", the phone's audio session " + pixSessionState()) : "no engine"; }
+try {
+  if(navigator.audioSession && navigator.audioSession.addEventListener){
+    navigator.audioSession.addEventListener("statechange", function(){
+      dbgLog("audio: the phone's audio session is now " + pixSessionState() + " (screen " + state.screen + ", " + pixAudioDiag() + ")");
+      pixMarkAudioStale();
+      var c = pixAudioCtx;
+      if(c && c.resume && pixSessionState() === "active"){ try { var rp = c.resume(); if(rp && rp.catch) rp.catch(function(){}); } catch(e){} }
+    });
+  }
+} catch(e){}
+// an engine that leaves "running" while the page is showing (an interruption) is not trusted any more, and the change is logged
+function pixWatchEngine(c){
+  try {
+    c.addEventListener("statechange", function(){
+      dbgLog("audio: engine " + (c === pixAudioCtx ? "(current)" : "(an old one)") + " is now " + c.state + " (screen " + state.screen + ", " + pixAudioDiag() + ")");
+      if(c === pixAudioCtx && c.state !== "running" && !document.hidden) pixMarkAudioStale();
+    });
+  } catch(e){}
+}
 function pixPlaySilentClip(){
   try {
     if(!pixSilentWavUrl){
@@ -2504,6 +2528,27 @@ function pixPlaySilentClip(){
   } catch(e){}
 }
 var pixAudioBorn = 0;      // when the current engine was made
+// (2026-11-06, per Dan's event log after an alarm in Mustard Seed) Every new engine was given up on after HALF a second ("state running, clock NOT moving") and replaced again at the next tap: about 40 times in 8
+// minutes, and none of them was ever given the time to start (a phone that has just had its audio interrupted can take a second or more to start the clock). Now a new engine has PIX_PROVE_MS to start its clock, no
+// other engine is made meanwhile (a tap only wakes it), and it is judged at 0.5, 1.5 and 3 s. Three engines in a row that never start are the last straw: the other sample rates are tried, and then the page is
+// reloaded, on the Main Menu only (everything is saved), at most once in ten minutes.
+var pixAudioProving = false, pixAudioFails = 0, PIX_PROVE_MS = 3000, pixAudioReloadWanted = false;
+function pixAudioReloadCheck(){
+  if(!pixAudioReloadWanted || state.screen !== "mainMenu") return;
+  try {
+    var last = parseInt(sessionStorage.getItem("fevidaAudioReload") || "0", 10);
+    if(Date.now() - last < 10 * 60 * 1000){ pixAudioReloadWanted = false; dbgLog("audio: not reloading the page again (it was reloaded less than 10 minutes ago)"); return; }
+    sessionStorage.setItem("fevidaAudioReload", String(Date.now()));
+  } catch(e){}
+  pixAudioReloadWanted = false;
+  try { saveState(); } catch(e2){}
+  location.reload();
+}
+try { var pixRl = parseInt(sessionStorage.getItem("fevidaAudioReload") || "0", 10); if(pixRl && Date.now() - pixRl < 60000) dbgLog("audio: this page was reloaded " + Math.round((Date.now() - pixRl) / 1000) + " s ago because no sound engine would start"); } catch(e){}
+function pixAudioGiveUp(){
+  dbgLog("audio: " + pixAudioFails + " new engines in a row never started their clock (" + pixAudioDiag() + "); the page will be reloaded on the Main Menu");
+  pixAudioReloadWanted = true; pixAudioReloadCheck();
+}
 function pixFreshAudio(){
   try {
     var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
@@ -2513,28 +2558,41 @@ function pixFreshAudio(){
     // And an engine made a moment ago is not thrown away again by the other events of the same tap (pointerup, touchend and click come together): it is only
     // woken. That answers false, so the caller leaves the engine marked as not yet trusted. (The wait was 1.2 s at first, which let a second tap after waking
     // be skipped over a dead engine and left the sound dead for good: 2026-10-23, per Dan, no sound after the phone woke from sleep.)
-    if(old && performance.now() - pixAudioBorn < 300){
+    if(old && performance.now() - pixAudioBorn < (pixAudioProving ? PIX_PROVE_MS : 300)){
       try { var rp = old.resume(); if(rp && rp.catch) rp.catch(function(){}); } catch(e){}
       return false;
     }
     // iOS 16.4+: ask the phone to re-evaluate the page's audio session ("playback" = plays even with the silent switch on, as before)
     try { if(navigator.audioSession){ navigator.audioSession.type = "auto"; navigator.audioSession.type = "playback"; } } catch(e){}
-    var fresh = null;
-    try { fresh = new AC(); } catch(e1){
+    var fresh = null, wantRate = pixAudioFails >= 1 ? [0, 48000, 44100][pixAudioFails % 3] : 0;       // after a dead engine, the next ones ask for the phone's other usual sample rates
+    try { fresh = wantRate ? new AC({sampleRate: wantRate}) : new AC(); } catch(e1){
       try { if(pixAudioOld.length) pixAudioOld.shift().close(); } catch(e2){}
       try { fresh = new AC(); } catch(e3){ fresh = null; }
     }
     if(!fresh) return false;                                         // still no engine: try again at the next tap
     pixAudioBorn = performance.now();
-    pixAudioCtx = fresh;
+    pixAudioCtx = fresh; pixWatchEngine(fresh);
     var p = pixAudioCtx.resume(); if(p && p.catch) p.catch(function(){});
     var silent = pixAudioCtx.createBufferSource(); silent.buffer = pixAudioCtx.createBuffer(1, 1, 22050);
     silent.connect(pixAudioCtx.destination); silent.start(0);
     pixPlaySilentClip();
     pixMusicRestart();
     if(old){ pixAudioOld.push(old); while(pixAudioOld.length > 2){ try { pixAudioOld.shift().close(); } catch(e){} } }
-    var c = pixAudioCtx, t0 = c.currentTime;
-    setTimeout(function(){ if(c === pixAudioCtx){ var moving = c.currentTime > t0 + 0.05; dbgLog("audio: half a second after the new engine: state " + c.state + ", clock " + (moving ? "moving" : "NOT moving")); if(!moving) pixAudioStale = true; } }, 500);   // clock not moving: a dead engine, replace it again on the next tap
+    var c = pixAudioCtx, t0 = c.currentTime, born = performance.now(), proved = false;
+    pixAudioProving = true;
+    dbgLog("audio: new engine made: sample rate " + c.sampleRate + ", base latency " + c.baseLatency + ", state " + c.state + " (dead ones before it: " + pixAudioFails + ")");
+    [500, 1500, PIX_PROVE_MS].forEach(function(ms, k){
+      setTimeout(function(){
+        if(c !== pixAudioCtx || proved) return;
+        var el = performance.now() - born, moving = (c.currentTime - t0) * 1000 > Math.max(50, el * .25);
+        dbgLog("audio: " + Math.round(el) + " ms after the new engine: state " + c.state + ", clock " + (moving ? "moving" : "NOT moving") + ", the phone's audio session " + pixSessionState());
+        if(moving){ proved = true; pixAudioProving = false; pixAudioFails = 0; pixAudioStale = false; return; }
+        if(k === 2){                                                // 3 s and the clock still has not started: a dead engine, the next tap makes another
+          pixAudioProving = false; pixAudioFails++; pixAudioStale = true;
+          if(pixAudioFails >= 3) pixAudioGiveUp();
+        }
+      }, ms);
+    });
     return true;
   } catch(e){ return false; }
 }
@@ -2560,7 +2618,7 @@ setInterval(function(){ var now = Date.now(), gap = now - pixAudioBeat; pixAudio
 // 2026-10-23, per Dan, no sound after the phone woke from sleep.)
 // A dead engine that still says "running" (2026-11-01, per Dan: the sounds took a few moves to come back after another app): at the end of a touch, an engine that reports running but whose clock has barely
 // moved since the end of the last touch is dead, and is marked as not trusted so that this very touch replaces it. (The events that mark it after sleep or switching apps can be missed.)
-var pixClockChk = null;
+var pixClockChk = null, pixNotRunningSince = 0;
 function pixClockStuck(){
   var c = pixAudioCtx; if(!c) return false;
   var now = performance.now(), ct = c.currentTime, prev = pixClockChk, stuck = false;
@@ -2572,6 +2630,15 @@ function pixReviveOnTap(ev){
   if(!pixAudioCtx) return;
   var endOfTouch = !!(ev && !pixTapSynth && (ev.type === "touchend" || ev.type === "pointerup" || ev.type === "click"));     // a click made by the tap-on-touch code below is not the end of a touch
   if(endOfTouch && !pixAudioStale && pixClockStuck()){ dbgLog("audio: engine says " + pixAudioCtx.state + " but its clock is stuck, replacing it (screen " + state.screen + ")"); pixAudioStale = true; }
+  // (2026-11-06, per Dan, no sound after an alarm) An engine that is still not "running" at the end of a touch that came 0.9 s or more after the touch before it has not been woken by resume(): it is replaced
+  // with a new one instead of being asked again for ever.
+  if(endOfTouch && !pixAudioStale){
+    if(pixAudioCtx.state !== "running"){
+      var ntNow = performance.now();
+      if(!pixNotRunningSince) pixNotRunningSince = ntNow;
+      else if(ntNow - pixNotRunningSince > 900){ pixNotRunningSince = 0; pixAudioStale = true; dbgLog("audio: engine still " + pixAudioCtx.state + " after being woken, replacing it (screen " + state.screen + ", " + pixAudioDiag() + ")"); }
+    } else pixNotRunningSince = 0;
+  }
   var interrupted = pixAudioCtx.state === "interrupted";
   if(!endOfTouch || (!pixAudioStale && !interrupted)){
     // a healthy engine that has been put to sleep (suspended) is woken by any tap, including taps on things that make their own sound
@@ -2580,7 +2647,7 @@ function pixReviveOnTap(ev){
   }
   pixAudioStale = false;
   var madeFresh = pixFreshAudio();
-  dbgLog("audio: " + (ev ? ev.type : "?") + " on " + state.screen + " -> " + (madeFresh ? "new engine, state " + pixAudioCtx.state : "no new engine (state " + (pixAudioCtx ? pixAudioCtx.state : "none") + ")"));      // for the event log on the Options screen (2026-11-01, no sound after returning to the puzzle)
+  dbgLog("audio: " + (ev ? ev.type : "?") + " on " + state.screen + " -> " + (madeFresh ? "new engine, state " + pixAudioCtx.state : "no new engine (state " + (pixAudioCtx ? pixAudioCtx.state : "none") + ")") + " [the phone's audio session " + pixSessionState() + "]");      // for the event log on the Options screen (2026-11-01, no sound after returning to the puzzle)
   if(madeFresh) track("audio_engine_replaced", {screen: state.screen});
   if(!madeFresh) pixAudioStale = true;             // not made (a moment ago one was, or none could be): still not trusted, so the next touch tries again
   else if(pixReviveQueue.length){ var q = pixReviveQueue; pixReviveQueue = []; q.forEach(function(job){ job(); }); }      // the sounds that were waiting for the new engine
@@ -12272,7 +12339,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 GR";
+var APP_BUILD = "2026-11-06 GT";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12833,6 +12900,7 @@ function renderApply(html){
   if(state.screen === "churchWalk") cwStart();
   if(state.screen === "stainedGlass" && state.session.stainedGlass) pzFit();
   if(state.screen === "jesusTimeline") tlFit();
+  pixAudioReloadCheck();
   if(state.screen === "lightCandle") lcPaint();
   awardAutoReturn();
   if(state.screen === "sacredSudoku" && state.session.sacredSudoku && state.session.sacredSudoku.done && !sdCelebrating) sdCelebrate();
