@@ -2346,9 +2346,9 @@ var PIX_SFX = {
   emRun:{url:"sounds/sfx_em_thump.wav", gain:1.7},                // soft thump loop for the pilgrim's footsteps, peak 0.55, so 0.93 at this gain (2026-11-01, replaces running.wav, per Dan; louder the next day: the gain was 0.9)
   emCrash:{url:"sounds/sfx_em_crash.wav", gain:0.4},              // peak 0.56
   dpFlap:{url:"sounds/sfx_dp_flap.wav", gain:0.35},               // peak 0.99
-  // 2026-11-05, per Dan (8-Bit Sounds folder; made mono, the silence at both ends cut off, a 10 ms fade at each end): "tile_fall.wav" when a plant falls into a column in Mustard Seed (0.39 s, peak 0.14; a gain of 2.5 first, then 20% quieter at Dan's word: 2.0, then 30% quieter again: 1.4).
+  // 2026-11-05, per Dan (8-Bit Sounds folder; made mono, the silence at both ends cut off, a 10 ms fade at each end): "tile_fall.wav" when a plant falls into a column in Mustard Seed (0.39 s, peak 0.14; a gain of 2.5 first, then 20% quieter at Dan's word: 2.0, then 30% quieter again: 1.4, then 40% quieter on 2026-11-06: 0.84).
   // (Hope Garden's spawn arrow first had "bee _spawned.wav" here; the same day Dan changed it to Heart Pickup.wav, which is emHeart above.)
-  msFall:{url:"sounds/sfx_ms_fall.wav", gain:1.4}
+  msFall:{url:"sounds/sfx_ms_fall.wav", gain:0.84}
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
@@ -2532,7 +2532,9 @@ var pixAudioBorn = 0;      // when the current engine was made
 // minutes, and none of them was ever given the time to start (a phone that has just had its audio interrupted can take a second or more to start the clock). Now a new engine has PIX_PROVE_MS to start its clock, no
 // other engine is made meanwhile (a tap only wakes it), and it is judged at 0.5, 1.5 and 3 s. Three engines in a row that never start are the last straw: the other sample rates are tried, and then the page is
 // reloaded, on the Main Menu only (everything is saved), at most once in ten minutes.
-var pixAudioProving = false, pixAudioFails = 0, PIX_PROVE_MS = 3000, pixAudioReloadWanted = false;
+// (2026-11-06 GV, per Dan's log after a phone call: 3 engines and about 9 s, 7 taps, because each dead engine was kept 3 s. The dead ones were already "NOT moving" at 0.5 s and the one that worked was moving
+// at 0.5 s, so PIX_PROVE_MS is now 1.5 s (judged at 0.5, 1 and 1.5 s); and the second engine asks for 44100 Hz, the rate of the one that finally worked, before 48000.)
+var pixAudioProving = false, pixAudioFails = 0, PIX_PROVE_MS = 1500, pixAudioReloadWanted = false;
 function pixAudioReloadCheck(){
   if(!pixAudioReloadWanted || state.screen !== "mainMenu") return;
   try {
@@ -2564,7 +2566,7 @@ function pixFreshAudio(){
     }
     // iOS 16.4+: ask the phone to re-evaluate the page's audio session ("playback" = plays even with the silent switch on, as before)
     try { if(navigator.audioSession){ navigator.audioSession.type = "auto"; navigator.audioSession.type = "playback"; } } catch(e){}
-    var fresh = null, wantRate = pixAudioFails >= 1 ? [0, 48000, 44100][pixAudioFails % 3] : 0;       // after a dead engine, the next ones ask for the phone's other usual sample rates
+    var fresh = null, wantRate = pixAudioFails >= 1 ? [0, 44100, 48000][pixAudioFails % 3] : 0;       // after a dead engine, the next ones ask for the phone's other usual sample rates
     try { fresh = wantRate ? new AC({sampleRate: wantRate}) : new AC(); } catch(e1){
       try { if(pixAudioOld.length) pixAudioOld.shift().close(); } catch(e2){}
       try { fresh = new AC(); } catch(e3){ fresh = null; }
@@ -2581,13 +2583,13 @@ function pixFreshAudio(){
     var c = pixAudioCtx, t0 = c.currentTime, born = performance.now(), proved = false;
     pixAudioProving = true;
     dbgLog("audio: new engine made: sample rate " + c.sampleRate + ", base latency " + c.baseLatency + ", state " + c.state + " (dead ones before it: " + pixAudioFails + ")");
-    [500, 1500, PIX_PROVE_MS].forEach(function(ms, k){
+    [500, 1000, PIX_PROVE_MS].forEach(function(ms, k){
       setTimeout(function(){
         if(c !== pixAudioCtx || proved) return;
         var el = performance.now() - born, moving = (c.currentTime - t0) * 1000 > Math.max(50, el * .25);
         dbgLog("audio: " + Math.round(el) + " ms after the new engine: state " + c.state + ", clock " + (moving ? "moving" : "NOT moving") + ", the phone's audio session " + pixSessionState());
         if(moving){ proved = true; pixAudioProving = false; pixAudioFails = 0; pixAudioStale = false; return; }
-        if(k === 2){                                                // 3 s and the clock still has not started: a dead engine, the next tap makes another
+        if(k === 2){                                                // 1.5 s and the clock still has not started: a dead engine, the next tap makes another
           pixAudioProving = false; pixAudioFails++; pixAudioStale = true;
           if(pixAudioFails >= 3) pixAudioGiveUp();
         }
@@ -12339,7 +12341,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 GT";
+var APP_BUILD = "2026-11-06 GV";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
