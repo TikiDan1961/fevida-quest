@@ -214,6 +214,8 @@
   .appTile .miniGrid img.spr{width:32px;height:32px;image-rendering:pixelated;}
   .countBadge{position:absolute;top:-9px;right:-12px;min-width:34px;padding:2px 6px;border-radius:12px;background:#D6343A;border:3px solid #fff;color:#fff;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.75rem;line-height:1.1;text-shadow:none;box-shadow:0 2px 0 rgba(0,0,0,.3);}
+  .fullBadge{position:absolute;top:-9px;left:-9px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:#fff;border:2px solid #1B1F3B;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}      /* the heart: every round of the mission done (2026-11-05, per Dan) */
+  .fullBadge img{width:22px;height:20px;image-rendering:pixelated;display:block;}
   .doneBadge{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#2E9E4F;border:3px solid #fff;color:#fff;font-size:.8rem;font-weight:700;
     display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.3);}
   /* (2026-10-25, per Dan) an icon that cannot be opened is grey: the locked Golden Ticket, the coming-soon missions, and all the icons while the pilgrim is talking and walking */
@@ -662,6 +664,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.25rem;color:#D6343A;line-height:1;}
   .sdPick:active,.sdPick.tapGlow,.sdPick.tapHold {box-shadow:0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   /* Emoji Bible Stories */
+  /* decoding="sync" on the clue pictures (2026-11-05, per Dan: in the Zacchaeus story the middle picture came in about a second after the other two): each is decoded in the frame in which it is drawn, so the three appear together (the same remedy as the Faith Match tiles). Not reproduced on the desktop; a phone decodes a freshly drawn picture a little later. */
   .pixEmoji{display:flex;justify-content:center;align-items:center;gap:6px;min-height:48px;}   /* the clues are pixel pictures (24 x 24, shown at 2x), the same on every phone */
   .pixEmoji img{width:48px;height:48px;image-rendering:pixelated;}
   .pixRef{margin-top:6px;min-height:2.6em;font-weight:600;font-size:.9375rem;line-height:1.3;color:#3d4d96;display:flex;align-items:center;justify-content:center;}
@@ -1369,7 +1372,7 @@ var T = {
       faithMatch:{d:"Flip the tiles and find all the matching pairs.", h:["Tap two tiles to turn them over.", "A match stays face up. If they do not match, they flip back and you lose a chance.", "Match every pair to clear a level. Clear all 3 levels to win."]},
       stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "Finish all 4 puzzles to win."]},
       followLight:{d:"Watch the tiles light up, then play the same notes back.", h:["Listen to the hymn notes and watch the tiles that light up.", "Tap the same tiles in the same order. Tap REPEAT to see the pattern again.", "A wrong tap costs a chance. You have 3 in all. Finish all 8 levels to win."]},
-      wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "Finish 3 levels of 5 words to win."]},
+      wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "You have 5 chance hearts. A wrong word costs one, and finishing a level wins one back.", "Finish 3 levels of 5 words to win."]},
       catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 8 rounds to win."]},
       kindnessSort:{d:"Decide if each situation is kind or not kind.", h:["Read each situation.", "Tap KIND or NOT KIND.", "A wrong answer costs a chance. You have 3."]},
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
@@ -1540,7 +1543,7 @@ var T = {
       faithMatch:{d:"Voltea las fichas y encuentra todos los pares.", h:["Toca dos fichas para voltearlas.", "Si coinciden, permanecen boca arriba. Si no coinciden, se voltean de nuevo y pierdes una oportunidad.", "Empareja todos los pares para pasar de nivel. Supera los 3 niveles para ganar."]},
       stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
-      wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Termina 3 niveles de 5 palabras para ganar."]},
+      wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Tienes 5 corazones de oportunidad. Una palabra incorrecta te cuesta uno, y al terminar un nivel recuperas uno.", "Termina 3 niveles de 5 palabras para ganar."]},
       catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo hacia la izquierda y hacia la derecha sobre la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que caiga. Si dejas escapar una, perderás una oportunidad. Tienes 5 oportunidades en total.", "Supera las 8 rondas para ganar."]},
       kindnessSort:{d:"Decide si cada situación es un acto de bondad o no.", h:["Lee cada situación.", "Toca BONDAD o NO ES BONDAD.", "Una respuesta incorrecta cuesta una oportunidad. Tienes 3."]},
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
@@ -2792,7 +2795,8 @@ var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wo
   "jacobLadder","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","emmaus"];
 function openMission(id){
   track("mission_icon_tapped", {mission_id: id, from: state.folderOpen ? "folder" : "menu", completed: !!(state.missions[id] && state.missions[id].done)});
-  if(state.missions[id].done){ resetMission(id); return; }      // TEMPORARY, for testing: tapping a completed mission clears it, and the next tap plays it (2026-10-22, per Dan)
+  // Every mission can always be played again (2026-11-05, per Dan; the temporary "tapping a finished mission clears it" is gone). A game that is already done gives no second badge, points or step for the pilgrim:
+  // round 1 of a replay goes straight on to round 2 (see roundOneGrant), and finishing all the rounds goes back to the Main Menu (see grantMission).
   if(GUIDE_MISSIONS.indexOf(id) !== -1){ state.introMission = id; go("missionIntro"); }
   else startMission(id);
 }
@@ -2897,12 +2901,17 @@ function closeFolder(){ state.folderOpen = false; saveState(); render(); }
 
 function isMenuIconMission(id){ return id === MENU_ICON_MISSION || id === "hopeGarden"; }      // the missions whose icons hang in the sky on the Main Menu instead of being in the Missions window
 var MENU_ICON_MISSION = "chooseJoy";      // the mission whose icon is in the sky on the Main Menu, right of the church (2026-10-27, per Dan), not in the Missions window
+// the marks on a mission's icon (2026-11-05, per Dan): the check mark in the upper right corner once round 1 is done (it has the badge, the 100 points and the pilgrim's step), the heart in the upper left corner once ALL the rounds are done
+function missionMarksHtml(id){
+  var ms = state.missions[id] || {};
+  return (ms.done ? '<span class="doneBadge">&#10003;</span>' : '') + (ms.full ? '<span class="fullBadge"><img src="tiles/heart_full.png" alt=""></span>' : '');
+}
 function folderHtml(){
   if(!state.folderOpen) return "";
   var items = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); }).map(function(m){
     var done = state.missions[m.id].done;
     return appIconHtml({onclick:"openMission('" + m.id + "')", bg:ICON_BG[m.id], cls:done ? "done" : "", inner:iconSpr(m.id),
-      label:t(m.nameKey), badge:done ? '<span class="doneBadge">&#10003;</span>' : ""});
+      label:t(m.nameKey), badge:missionMarksHtml(m.id)});
   }).join("");
   items += COMING_SOON_MISSIONS.map(function(m){
     return appIconHtml({onclick:"comingSoon()", bg:ICON_BG[m.art || m.id], cls:"soon", inner:iconSpr(m.art || m.id), label:t(m.nameKey), tag:t("comingSoon")});
@@ -3490,24 +3499,9 @@ function screenMainMenu(){
     '<div class="pixDoveLayer"><div class="pixDove"><div class="pixDoveBob"><div class="pixDoveSprite"></div></div></div></div>' +
     '<div class="hgMenuIcon" id="hgMenuIcon">' + appIconHtml({onclick:"hgOpen()", bg:ICON_BG.hopeGarden, inner:iconSpr("hopeGarden"), label:t("hopeMenuName")}) + '</div>' +
     '<div class="hgMenuIcon" id="cjMenuIcon">' + appIconHtml({onclick:"openMission('" + MENU_ICON_MISSION + "')", bg:ICON_BG[MENU_ICON_MISSION], cls:state.missions[MENU_ICON_MISSION].done ? "done" : "", inner:iconSpr(MENU_ICON_MISSION),
-      label:t(missionById(MENU_ICON_MISSION).nameKey), badge:state.missions[MENU_ICON_MISSION].done ? '<span class="doneBadge">&#10003;</span>' : ""}) + '</div>' +
+      label:t(missionById(MENU_ICON_MISSION).nameKey), badge:missionMarksHtml(MENU_ICON_MISSION)}) + '</div>' +
     folderHtml() + howHtml(inFolder.length) +
   '</div>';
-}
-
-// TEMPORARY test aid (2026-10-22, per Dan; it replaces the TEMP RESET box that sat on the church): tapping a completed mission in the Missions folder
-// just clears it (see openMission), and the next tap plays it. Take that line out of openMission before the event.
-// Makes a completed mission playable again: clears its done flag and its saved
-// game, and takes back its 100 points so earning it again isn't double
-// counted. The Passport badge is kept, as with CLEAR TICKET.
-function resetMission(id){
-  var ms = state.missions[id];
-  if(!ms || !ms.done) return;
-  ms.done = false;
-  if(id === "faithMatch") ms.level = 0;
-  if(missionIsGame(id)) state.points = Math.max(0, state.points - 100);       // (a non-game gave no points, so none are taken back)
-  if(state.session[id] !== undefined) state.session[id] = null;
-  go("mainMenu");
 }
 
 function openPassport(){ go("passport"); }
@@ -3530,6 +3524,7 @@ function roundOneGrant(key){
 function grantMission(id, missionState){
   if(missionIsGame(id) && state.missions[id].done){      // the badge and the points came after round 1: all the rounds are played now, so back to the Main Menu (the pilgrim walks there if he has not yet)
     Object.assign(state.missions[id], missionState || {});
+    state.missions[id].full = true;                      // every round done: the heart on the mission's icon (2026-11-05, per Dan)
     state.awardMissionId = null; state.contFor = null; state.folderOpen = false;
     phMissionDone(id);
     go("mainMenu");
@@ -3539,6 +3534,7 @@ function grantMission(id, missionState){
   if(missionIsGame(id)) state.pilgrimOwed = true;
   var gm = missionById(id);
   state.missions[id].badge = !(gm && gm.noBadge);
+  if(state.contFor !== id) state.missions[id].full = true;          // a mission with no later rounds (or all of them played in one go) is finished entirely; after round 1 it is not (2026-11-05, per Dan)
   if(missionIsGame(id)){ state.points += 100; state.pilgrimSteps = (state.pilgrimSteps || 0) + 1; }
   Object.assign(state.missions[id], missionState || {});
   if(missionIsGame(id)) track("badge_awarded", {mission_id: id, points_total: state.points});
@@ -5680,7 +5676,7 @@ function screenEmojiStories(){
     '<div class="pixNote">' + t("eb_story")(s.index + 1, s.order.length) + '</div>' +
     pixPipsHtml(s.order.length, s.index, isCorrect ? "done" : (answered ? "bad" : "now"), null, s.past) +
     '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ebChancesLeft(s)), EB_CHANCES) + '</div>' +
-    '<div class="pixPaper"><div class="pixEmoji">' + story.pics.map(function(n){ return '<img src="tiles/emoji/e_' + n + '.png" alt="">'; }).join('') + '</div><div class="pixRef' + (answered ? ' shown' : '') + '">' + hint + '</div></div>' +
+    '<div class="pixPaper"><div class="pixEmoji">' + story.pics.map(function(n){ return '<img src="tiles/emoji/e_' + n + '.png" alt="" decoding="sync">'; }).join('') + '</div><div class="pixRef' + (answered ? ' shown' : '') + '">' + hint + '</div></div>' +
     '<div class="pixAnsList">' + answersHtml + '</div>' +
     '<div class="spacer"></div>' +
     (answered && ebChancesLeft(s) > 0 && s.index < s.order.length - 1 ? '<button class="btn pixBtn pixBtnSm"' + press + 'onclick="pixClickSfx();ebNext()">' + t("eb_next") + '</button>' : '') +
@@ -12150,7 +12146,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 GG";
+var APP_BUILD = "2026-11-05 GI";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
