@@ -633,7 +633,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .sdBar{display:flex;align-items:center;justify-content:space-between;margin:2px 6px 0;}
   .sdBar .pixNote{margin:0;}
   .sdHint{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:.875rem;letter-spacing:.03em;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);
-    padding:5px 12px 8px;background:#52C246;border:3px solid #1E6B2B;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
+    padding:6.5px 12px 6.5px;background:#52C246;border:3px solid #1E6B2B;border-bottom-width:5px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .sdHint{white-space:nowrap;}
   .sdHint:disabled{filter:saturate(.3) brightness(.85);cursor:default;}
   .sdHint:not(:disabled):active,.sdHint:not(:disabled).tapGlow,.sdHint:not(:disabled).tapHold {box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(120,255,120,.8);}
@@ -709,6 +709,10 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .lcIntent img{width:36px;height:36px;image-rendering:pixelated;}
   .lcIntent:active,.lcIntent.tapGlow,.lcIntent.tapHold {box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .pixMission .pixResMid{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}
+  /* The badge screen and the Keep Going screen (2026-11-05, per Dan: the heading was slightly off between them, on Mustard Seed, and was not in the same place for every game): the mission's name is pinned at ONE height, the
+     place the badge screen's centred name and card had on a normal phone (the card is 331 px with the name; 279 px on a short screen), whatever the card under it holds and however many lines the name takes. */
+  .pixTitlePin .pixResMid{justify-content:flex-start;padding-top:max(0px,calc((100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 80px - 331px) / 2));}
+  @media (max-height:640px){ .pixTitlePin .pixResMid{padding-top:max(0px,calc((100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 80px - 279px) / 2));} }
   .pixResBadge{display:block;width:144px;height:144px;margin:0 auto 10px;image-rendering:pixelated;filter:drop-shadow(0 5px 0 rgba(27,31,59,.35));}
   .pixTicketBig{display:block;width:min(86%,290px);height:auto;margin:-4px auto 6px;image-rendering:auto;filter:drop-shadow(0 0 10px rgba(255,214,90,.9));animation:cwTicketGlow 1s ease-in-out infinite alternate;}      /* the smooth Golden Ticket picture on its screen, glowing softly */
   .pixResTitle{font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:.02em;}
@@ -769,6 +773,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   /* Word Unscramble's bar: SKIP | Level X of X (centred) | HINT */
   .wuBar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:2px 4px 0;}
   .wuBar .pixNote{margin:0;text-align:center;}
+  .wuHearts{margin:6px 0 0;}
+  /* (.sdHint, the small green buttons of Word Scramble and Sacred Sudoku, has its words in the middle of the green face since 2026-11-05, per Dan: the text was 1 px high with 5px above and 8px below; the padding is 6.5px both ways, the same button height.) */
   .wuBar .sdHint.skip{justify-self:start;}
   .wuBar .sdHint:not(.skip){justify-self:end;}
   .pixSlot[role=button]{cursor:pointer;}
@@ -814,6 +820,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .prTile.g2{background-image:radial-gradient(circle at 30% 70%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 80% 30%,#FFD84A 0 1.5px,transparent 2px);}
   .prTile.g3{background-image:radial-gradient(circle at 84% 80%,#fff 0 1.5px,transparent 2px),radial-gradient(circle at 20% 30%,#FF9FC0 0 1.5px,transparent 2px);}
   .prTile:active{filter:brightness(1.12);}
+  .prTile.tapGlow,.prTile.tapHold{filter:brightness(1.12);}      /* a tapped tile's edges no longer glow (2026-11-05, per Dan): the page-wide tap glow is a drop shadow around the element; here a touch just brightens the tile, as :active does */
   .prWalker{position:absolute;z-index:3;pointer-events:none;}
   .prFixed{cursor:default;} .prFixed:active{filter:none;}
   .prRoad{position:absolute;left:0;top:0;width:100%;height:100%;display:block;transition:transform .16s ease-out;}
@@ -1177,6 +1184,10 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   /* Passport in 8-bit style (2026-10-19, per Dan): pixel sky behind, a cream page with a gold inner edge, pixel badges at 4x. */
   .pixPassport{height:100dvh;min-height:0;}
   .pixPassport > .pixResMid{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}      /* the Golden Ticket window: the cream card centred under the header */
+  .pixTicketScreen .gtCenter{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}      /* Golden Ticket: the heading and the window, centred together */
+  .pixTicketScreen .gtCenter .passTitle{flex:none;margin:0 0 14px;}
+  .pixTicketScreen .gtCenter > .pixResMid{flex:none;}
+  .pixTicketScreen .gtClose{position:absolute;top:18px;right:18px;z-index:5;}
   .passHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;}
   .passHeadSpace{width:44px;flex:none;}
   .passTitle{flex:1;margin:0;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;line-height:1.1;letter-spacing:.02em;color:#FFC93A;
@@ -1363,7 +1374,7 @@ var T = {
       kindnessSort:{d:"Decide if each situation is kind or not kind.", h:["Read each situation.", "Tap KIND or NOT KIND.", "A wrong answer costs a chance. You have 3."]},
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
       lightCandle:{d:"Take a quiet moment to pray.", h:["Choose who or what you are praying for.", "Press and hold the candle to light it.", "Let go too soon and the light fades, so keep holding."]},
-      emojiStories:{d:"Guess the Bible story from the emojis.", h:["Look at the emojis and tap the Bible story they show.", "Answer 8 stories. You have 5 chances."]},
+      emojiStories:{d:"Guess the Bible story from the emojis.", h:["Look at the emojis and tap the Bible story they show.", "Answer 8 stories in each of 3 rounds. You have 5 chances."]},
       jesusTimeline:{d:"Put events from the life of Jesus in order.", h:["Tap the events in the order they happened, from first to last.", "Finish 3 rounds: 5 events, then 7, then 5. You have 5 chances."]},
       sacredSudoku:{d:"A picture puzzle with sacred symbols.", h:["Tap a square, then tap a picture to place it.", "Each picture goes once in every row and column, and once in every box.", "A picture that breaks the rule turns red and clears. Tap HINT if you get stuck. Solve all 4 puzzles to win."]},
       wordTrail:{d:"Find the hidden words in a grid of letters.", h:["Touch a letter, then drag your finger to the next letter: up, down, left or right.", "Spell a word from the list at the bottom. Lift your finger to check it.", "A word you find leaves the list and its letters are replaced with new ones. Find every word to finish the round. Finish all 3 rounds to win."]},
@@ -1425,6 +1436,7 @@ var T = {
 
     wu_intro:"Tap the letters in order to unscramble each word. Finish all 3 levels to win!",
     wu_word:function(n,total){return "Word "+n+" of "+total;},
+    wu_failTitle:"So Close!", wu_failBody:"You ran out of chances — give it another try from Level 1.",
     wu_passTitle:"Word Master!", wu_passBody:"You made it through all 3 levels of words!", wu_skip:function(n){return "SKIP ("+n+")";},
     clearWord:"CLEAR",
 
@@ -1533,7 +1545,7 @@ var T = {
       kindnessSort:{d:"Decide si cada situación es un acto de bondad o no.", h:["Lee cada situación.", "Toca BONDAD o NO ES BONDAD.", "Una respuesta incorrecta cuesta una oportunidad. Tienes 3."]},
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
       lightCandle:{d:"Tómate un momento de tranquilidad para orar.", h:["Elige por quién o por qué estás orando.", "Mantén presionada la vela para encenderla.", "Si la sueltas muy pronto, la luz se apaga, así que sigue presionando."]},
-      emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias. Tienes 5 oportunidades."]},
+      emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias en cada una de las 3 rondas. Tienes 5 oportunidades."]},
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen debe aparecer una sola vez en cada fila, en cada columna y en cada bloque.", "Si una imagen rompe la regla, se pondrá roja y desaparecerá. Toca PISTA si necesitas ayuda. Resuelve los 4 rompecabezas para ganar."]},
       wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
@@ -1594,6 +1606,7 @@ var T = {
 
     wu_intro:"Toca las letras en orden para descifrar cada palabra. ¡Termina los 3 niveles para ganar!",
     wu_word:function(n,total){return "Palabra "+n+" de "+total;},
+    wu_failTitle:"¡Casi lo logras!", wu_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
     wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Superaste los 3 niveles de palabras!", wu_skip:function(n){return "SALTAR ("+n+")";},
     clearWord:"BORRAR",
 
@@ -3148,11 +3161,13 @@ function pilgrimEnter(el){
 // (2026-11-01, per Dan) The ticket stays up for 5.5 seconds instead of 2, with a big burst of confetti, and it is a new, smoother picture with the name on it (1100 x 700, so ticketW is its width in
 // picture pixels and ticketAspect its height over its width).
 var CW = {W: 125, H: 270, x: 62.5, yStart: 274, yEnd: 206, dur: 4400, ticketAt: .75, ticketMs: 5500, scaleNear: 2.3, scaleFar: .55, ticketW: 92, ticketAspect: 700 / 1100, ticketY: 90};
-function cwPreload(){ ["tiles/pilgrim_back.png", "tiles/golden_ticket.png", "tiles/church_interior2.png"].forEach(function(src){ var im = new Image(); im.src = src; }); }
+// The Golden Ticket picture has the words on it, so Spanish has its own (BOLETO DORADO, 2026-11-05, per Dan).
+function ticketPic(){ return state.lang === "es" ? "tiles/golden_ticket_es.png" : "tiles/golden_ticket.png"; }
+function cwPreload(){ ["tiles/pilgrim_back.png", ticketPic(), "tiles/church_interior2.png"].forEach(function(src){ var im = new Image(); im.src = src; }); }
 function screenChurchWalk(){
   var tw = CW.ticketW, th = tw * CW.ticketAspect;
   return '<div class="screen pixHome pixChurch cwScreen"><div class="cwScene" id="cwScene">' +
-    '<img class="cwTicket" id="cwTicket" src="tiles/golden_ticket.png" alt="" style="left:' + ((CW.x - tw / 2) / CW.W * 100) + '%;top:' + ((CW.ticketY - th / 2) / CW.H * 100) + '%;width:' + (tw / CW.W * 100) + '%">' +
+    '<img class="cwTicket" id="cwTicket" src="' + ticketPic() + '" alt="" style="left:' + ((CW.x - tw / 2) / CW.W * 100) + '%;top:' + ((CW.ticketY - th / 2) / CW.H * 100) + '%;width:' + (tw / CW.W * 100) + '%">' +
     '<div class="cwPilgrim walking" id="cwPilgrim"><div class="cwSprite"></div></div>' +
   '</div></div>';
 }
@@ -3554,12 +3569,29 @@ function awardAutoReturn(){
     awardRotateWait = false;
     afterAward();
   }
-  awardTimer = setTimeout(leave, AWARD_SHOW_MS);
+  // The 2.5 seconds count from the moment the badge screen is really on the glass (2026-11-05, per Dan: Faith Flash's is the right length and some other games' badge screens were gone sooner).
+  // The old count began when the screen was built; a game that is slow to paint it (the ones with a busy canvas or a lot to take down) lost that time off the front. Now the count begins after the
+  // badge picture is decoded and two frames have been painted. If no frame comes (a hidden page), it begins after 1 s anyway. The event log (Options) says how long the paint took.
+  var armedAt = performance.now(), began = false, mission = awardTimerFor;
+  function begin(){
+    if(began) return; began = true;
+    if(mission !== awardTimerFor) return;           // a different badge has taken over since: it has its own count
+    clearTimeout(awardTimer); awardTimer = 0;
+    if(state.screen !== "award" || state.awardMissionId !== mission) return;
+    try { dbgLog("badge screen " + mission + ": painted " + Math.round(performance.now() - armedAt) + " ms after it was built, shown for " + AWARD_SHOW_MS + " ms"); } catch(e0){}
+    awardTimer = setTimeout(leave, AWARD_SHOW_MS);
+  }
+  awardTimer = setTimeout(begin, 1000);          // (also what stops a redraw of the same screen from starting a second count)
+  try {
+    var bimg = document.querySelector(".pixResBadge");
+    var decoded = (bimg && bimg.decode) ? bimg.decode().catch(function(){}) : Promise.resolve();
+    decoded.then(function(){ requestAnimationFrame(function(){ requestAnimationFrame(begin); }); });
+  } catch(e1){ begin(); }
 }
 function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
-  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("awardTitle"), body:m.noBadge ? t("awardBodyJoy") : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
+  return pixResultHtml(m.nameKey, {cls:"pixLower pixTitlePin", title:t("awardTitle"), body:m.noBadge ? t("awardBodyJoy") : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
     buttons:""});
 }
 
@@ -3581,7 +3613,7 @@ function roundContAlive(id){ return id === "emmaus" ? !!em : !!(id && state.sess
 function screenRoundCont(){
   var id = state.contFor, m = id && missionById(id);
   if(!m || !roundContAlive(id)){ state.contFor = null; state.screen = "mainMenu"; return screenMainMenu(); }      // (the game was lost, e.g. the page was reloaded: just the Main Menu)
-  return pixResultHtml(m.nameKey, {cls:"pixLower", title:t("cont_title"), body:t("cont_body"),
+  return pixResultHtml(m.nameKey, {cls:"pixLower pixTitlePin", title:t("cont_title"), body:t("cont_body"),
     buttons:pixBtnHtml(t("continuePlaying"), "roundContGo()") + pixBtnHtml(t("mainMenu"), "roundContMenu()", true)});
 }
 function roundContGo(){
@@ -4567,11 +4599,14 @@ function wuSetupWord(s){
 var WU_HINTS = 3;
 // 3 skips in the whole game (2026-10-21, per Dan): SKIP moves on to the next word without solving this one. A skipped word shows as a red square.
 var WU_SKIPS = 3;
+// 5 chance hearts (2026-11-05, per Dan): a wrong word (all the squares full and not the word) costs one; SKIP and HINT never do. Out of hearts, the Keep Trying screen comes
+// and TRY AGAIN starts the game over from Level 1. The hearts carry on from level to level; ROUND X COMPLETED! gives one back if at least one was lost (see wuInterlude).
+var WU_CHANCES = 5;
 
 function initWordUnscramble(){
   var lang = state.lang || "en";
   var order = wuPickOrder(lang, 0);
-  var s = {level:0, order:order, index:0, hints:WU_HINTS, skips:WU_SKIPS, past:[], status:"playing"};
+  var s = {level:0, order:order, index:0, hints:WU_HINTS, skips:WU_SKIPS, chances:WU_CHANCES, past:[], status:"playing"};
   wuSetupWord(s);
   state.session.wordUnscramble = s;
   saveState();
@@ -4587,6 +4622,7 @@ function wuEnsure(s){
 // a game saved before skips existed gets its 3 skips
 function wuEnsureSkips(s){
   if(typeof s.skips !== "number") s.skips = WU_SKIPS;
+  if(typeof s.chances !== "number") s.chances = WU_CHANCES;         // a game saved before the hearts existed gets all 5
   if(!Array.isArray(s.past)) s.past = [];
 }
 function wuFirstEmpty(s){
@@ -4594,8 +4630,7 @@ function wuFirstEmpty(s){
   return -1;
 }
 
-// No fail state, per spec — this is a puzzle, not a knowledge/reflex test.
-// A wrong full attempt just shakes and clears for another try (letters placed by a hint stay).
+// A wrong full attempt shakes, costs a heart, and clears for another try (letters placed by a hint stay). With no hearts left the game is lost (2026-11-05, per Dan).
 function wuPick(letterPos){
   var s = state.session.wordUnscramble;
   if(!s || s.feedback) return;
@@ -4649,7 +4684,9 @@ function wuAdvance(s2){
   }
 }
 function wuInterlude(){
-  pixRoundRun("wordUnscramble", function(){ return state.session.wordUnscramble; }, null, function(s2){
+  pixRoundRun("wordUnscramble", function(){ return state.session.wordUnscramble; },
+    function(s2){ wuEnsureSkips(s2); if(s2.chances >= WU_CHANCES) return false; s2.chances++; return true; },       // a heart comes back if one was lost (2026-11-05, per Dan)
+    function(s2){
     var lang2 = state.lang || "en";                // the next level: longer words, and 3 fresh hints
     if(s2.interlude.final){ s2.interlude = null; wuCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
     s2.interlude = null;
@@ -4673,6 +4710,7 @@ function wuSkip(){
 var WU_SFX_EARLY_MS = 200;
 // every square is full: right, and on to the next word; wrong, and the squares clear for another try
 function wuCheck(s){
+  wuEnsureSkips(s);
   var guess = s.slots.map(function(pos){ return s.letters[pos]; }).join("");
   // The word's sound (right = sound_effect_6, wrong = the SKIP sound) waits until the last letter's own sound has finished (2026-10-23, per Dan).
   // The letter sound's last 0.2 s is only a faint tail, so the word sound comes in a little early (the gap was too long, 2026-10-23, per Dan).
@@ -4689,11 +4727,13 @@ function wuCheck(s){
     }, 900 + wait);
   } else {
     s.feedback = "wrong";
+    s.chances = Math.max(0, s.chances - 1);                         // the heart goes as the squares turn red
     pixAfterSfx("fmFirst", function(){ pixSfxPlay("clFade", true); }, WU_SFX_EARLY_MS);
     saveState(); render();
     setTimeout(function(){
       var s2 = state.session.wordUnscramble;
       if(!s2) return;
+      if(s2.chances <= 0){ s2.feedback = null; s2.status = "failed"; saveState(); render(); return; }       // the last heart: the Keep Trying screen
       for(var i = 0; i < s2.slots.length; i++) if(s2.hinted.indexOf(i) === -1) s2.slots[i] = null;
       s2.feedback = null;
       saveState(); render();
@@ -4709,6 +4749,7 @@ function wuClear(){
   saveState(); render();
 }
 
+function wuTryAgain(){ initWordUnscramble(); go("wordUnscramble"); }
 function wuCollectAward(){ state.session.wordUnscramble = null; grantMission("wordUnscramble"); }
 function wuQuit(){ state.session.wordUnscramble = null; go("mainMenu"); }
 
@@ -4716,6 +4757,11 @@ function screenWordUnscramble(){
   var s = state.session.wordUnscramble;
   if(!s){ initWordUnscramble(); s = state.session.wordUnscramble; }
   var press = ' onpointerdown="pixPressSfx()" ';
+
+  if(s.status === "failed"){
+    return pixResultHtml("wordUnscrambleName", {cls:"pixLower", title:t("wu_failTitle"), body:t("wu_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "wuTryAgain()") + pixBtnHtml(t("mainMenu"), "wuQuit()", true)});
+  }
 
   if(s.status === "results"){
     var wm = MISSIONS.filter(function(m){ return m.id === "wordUnscramble"; })[0];
@@ -4730,8 +4776,10 @@ function screenWordUnscramble(){
   }
 
   if(s.interlude){
+    wuEnsureSkips(s);
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<h2 class="pixMTitle">' + t("wordUnscrambleName") + '</h2>' +
+      '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, s.chances), WU_CHANCES) + '</div>' +
       pixRoundDoneHtml(s.interlude) +
     '</div>';
   }
@@ -4758,6 +4806,7 @@ function screenWordUnscramble(){
       '<span class="pixNote">' + t("fm_level")((s.level || 0) + 1, WU_LEVELS) + '</span>' +
       '<button class="sdHint" data-sfx="own"' + (s.hints > 0 && !s.feedback ? '' : ' disabled') + ' onpointerdown="if(!this.disabled)pixPressSfx(\'clCatch\')" onclick="if(!this.disabled){pixClickSfx(\'clCatch\');wuHint()}">' + t("sd_hint")(s.hints) + '</button></div>' +
     pixPipsHtml(s.order.length, s.index, s.feedback === "correct" ? "done" : "now", null, s.past) +
+    '<div class="pixChances wuHearts">' + chancesHeartsHtml(Math.max(0, s.chances), WU_CHANCES) + '</div>' +      // the 5 hearts, just above the word window (2026-11-05, per Dan)
     '<div class="pixPaper">' +
       '<p class="pixWuIntro">' + t("wu_intro") + '</p>' +
       '<div class="' + rowCls + '">' + slotsHtml + '</div>' +
@@ -4996,7 +5045,7 @@ function clResolveIcon(record, caught){
 }
 
 // A miss: everything freezes where it is, each light on the screen fades away one at a time from the lowest (the one that was missed) to the highest,
-// with sound_effect_2 for each. Only when the last has gone is the chance heart taken; after a beat the level starts over.
+// with sound_effect_2 for each. Only when the last has gone is the chance heart taken; after a beat the level starts over, waiting for a tap (clRestartLevel).
 function clStartMiss(){
   var s = state.session.catchLight;
   if(!s || s.status !== "playing" || clFading) return;
@@ -5035,7 +5084,9 @@ function clRestartLevel(){
   if(field) [].slice.call(field.querySelectorAll(".clIcon")).forEach(function(e){ if(e.parentNode) e.parentNode.removeChild(e); });
   s.spawnedInLevel = 0; s.resolvedInLevel = 0; s.caughtInLevel = 0;
   saveState();
-  clStart();
+  // After a miss the round does not begin by itself (2026-11-05, per Dan): "Tap anywhere to start!" shows, and the first tap starts it (see clGo), as before each new round.
+  clWaiting = true;
+  render();                                     // the render()-hook starts the lights once the screen has been tapped
 }
 
 // Runs every CL_TICK_MS while a round is live — the only way to detect a
@@ -5480,11 +5531,12 @@ function screenLightCandle(){
 /* ---------- Emoji Bible Stories ---------- */
 
 // Emoji Bible Stories (2026-10-21, per Dan; spec = Five New Missions Design, mission 12, but with 5 chances, not 3, to match Faith Flash). A
-// string of emojis stands for a Bible story: pick its title out of three. 8 stories a round, drawn from 24; every wrong pick costs a chance.
+// string of emojis stands for a Bible story: pick its title out of three. 3 rounds of 8 stories (2026-11-05, per Dan), drawn from 32; every wrong pick costs a chance.
 // The stories, clues, references and Spanish titles are drafts for the client to approve. The clues are pixel-art pictures (tiles/emoji/e_<name>.png,
 // 24 x 24: 2026-10-22, per Dan), made from the emoji and pixelized, so they look the same on every phone; pics lists them in order.
 var EB_CHANCES = 5;
 var EB_ROUND_SIZE = 8;
+var EB_ROUNDS = 3;      // three rounds of 8 stories (2026-11-05, per Dan); the 5 chances carry on from round to round, and ROUND X COMPLETED! gives one back if at least one was lost
 var EMOJI_STORIES = [
   {pics:["rain","ship","elephant","rainbow"], en:{t:"Noah's Ark", r:"Genesis 6 to 9"}, es:{t:"El Arca de Noé", r:"Génesis 6 a 9"}},
   {pics:["whale","wave","pray"], en:{t:"Jonah and the Whale", r:"Jonah 1 to 2"}, es:{t:"Jonás y la Ballena", r:"Jonás 1 a 2"}},
@@ -5511,18 +5563,31 @@ var EMOJI_STORIES = [
   {pics:["bread","cup","people"], en:{t:"The Last Supper", r:"Luke 22"}, es:{t:"La Última Cena", r:"Lucas 22"}},
   {pics:["fire","dove","people"], en:{t:"Pentecost", r:"Acts 2"}, es:{t:"Pentecostés", r:"Hechos 2"}},
   {pics:["star","crown","walk"], en:{t:"The Visit of the Wise Men", r:"Matthew 2"}, es:{t:"La Visita de los Reyes Magos", r:"Mateo 2"}},
-  {pics:["sailboat","fish","people"], en:{t:"The Miraculous Catch of Fish", r:"Luke 5"}, es:{t:"La Pesca Milagrosa", r:"Lucas 5"}}
+  {pics:["sailboat","fish","people"], en:{t:"The Miraculous Catch of Fish", r:"Luke 5"}, es:{t:"La Pesca Milagrosa", r:"Lucas 5"}},
+  // 8 more stories (2026-11-05, per Dan), 32 in all, for the three rounds (a game asks 8 in each round, none twice). Drafts for the client to approve, like the others; every clue picture already existed.
+  {pics:["oldman","boy","mountain","fire"], en:{t:"Abraham and Isaac", r:"Genesis 22"}, es:{t:"Abraham e Isaac", r:"Génesis 22"}},
+  {pics:["people","wave","walk","fire"], en:{t:"Crossing the Red Sea", r:"Exodus 14"}, es:{t:"El Cruce del Mar Rojo", r:"Éxodo 14"}},
+  {pics:["walk","moneybag","heart","house"], en:{t:"The Good Samaritan", r:"Luke 10"}, es:{t:"El Buen Samaritano", r:"Lucas 10"}},
+  {pics:["seedling","tree","dove"], en:{t:"The Mustard Seed", r:"Matthew 13"}, es:{t:"La Semilla de Mostaza", r:"Mateo 13"}},
+  {pics:["wave","dove","people"], en:{t:"The Baptism of Jesus", r:"Matthew 3"}, es:{t:"El Bautismo de Jesús", r:"Mateo 3"}},
+  {pics:["people","boy","baby","heart"], en:{t:"Jesus Blesses the Children", r:"Mark 10"}, es:{t:"Jesús Bendice a los Niños", r:"Marcos 10"}},
+  {pics:["walk","house","bread"], en:{t:"The Road to Emmaus", r:"Luke 24"}, es:{t:"El Camino a Emaús", r:"Lucas 24"}},
+  {pics:["jar","feet","people"], en:{t:"Jesus Washes the Disciples' Feet", r:"John 13"}, es:{t:"Jesús Lava los Pies a los Discípulos", r:"Juan 13"}}
 ];
 
-function initEmojiStories(){
+// the 8 stories of a round, none that this game has already asked, each with the right title and two others in a random order -- a fresh draw every game
+function ebDrawRound(used){
   var all = EMOJI_STORIES.map(function(_, i){ return i; });
-  var order = shuffle(all).slice(0, EB_ROUND_SIZE);
-  // each question: the right story plus two others, in a random order -- a fresh draw every game
+  var order = shuffle(all.filter(function(i){ return used.indexOf(i) === -1; })).slice(0, EB_ROUND_SIZE);
   var choices = order.map(function(story){
     var others = shuffle(all.filter(function(i){ return i !== story; })).slice(0, 2);
     return shuffle([story].concat(others));
   });
-  state.session.emojiStories = {order:order, choices:choices, index:0, answered:null, chances:EB_CHANCES, correct:0, past:[], status:"playing"};
+  return {order: order, choices: choices};
+}
+function initEmojiStories(){
+  var d = ebDrawRound([]);
+  state.session.emojiStories = {order:d.order, choices:d.choices, used:d.order.slice(), round:0, index:0, answered:null, chances:EB_CHANCES, correct:0, past:[], status:"playing"};
   saveState();
 }
 function ebChancesLeft(s){ return typeof s.chances === "number" ? s.chances : EB_CHANCES; }
@@ -5546,7 +5611,10 @@ function ebAnswer(i){
       var s2 = state.session.emojiStories;
       if(!s2 || s2 !== s || s2.status !== "playing" || s2.index !== at) return;
       if(lastChance){ s2.status = "failed"; saveState(); render(); }
-      else ebCollectAward();            // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
+      else {                             // the round is over: ROUND X COMPLETED! (2026-11-05, per Dan); the last round goes on to the Mission Complete screen (see ebInterlude)
+        s2.interlude = {n: (s2.round || 0) + 1, phase: "msg", award: false, final: (s2.round || 0) >= EB_ROUNDS - 1};
+        saveState(); render();
+      }
     }, 1300);
   }
 }
@@ -5554,6 +5622,19 @@ function ebNext(){
   var s = state.session.emojiStories;
   if(!s || s.status !== "playing" || s.answered === null || ebChancesLeft(s) <= 0 || s.index >= s.order.length - 1) return;
   s.index++; s.answered = null; saveState(); render();
+}
+function ebInterlude(){
+  pixRoundRun("emojiStories", function(){ return state.session.emojiStories; },
+    function(s2){ if(ebChancesLeft(s2) >= EB_CHANCES) return false; s2.chances = ebChancesLeft(s2) + 1; return true; },       // a heart comes back if one was lost
+    function(s2){
+      if(s2.interlude.final){ s2.interlude = null; ebCollectAward(); return; }       // a win goes straight to the Mission Complete screen (2026-10-22, per Dan)
+      s2.interlude = null;
+      if(!s2.used) s2.used = s2.order.slice();                                        // (a game saved before there were rounds)
+      var d = ebDrawRound(s2.used);
+      s2.round = (s2.round || 0) + 1; s2.order = d.order; s2.choices = d.choices; s2.used = s2.used.concat(d.order);
+      s2.index = 0; s2.answered = null; s2.past = [];
+      saveState(); render();
+    });
 }
 function ebTryAgain(){ initEmojiStories(); render(); }
 function ebCollectAward(){ state.session.emojiStories = null; grantMission("emojiStories"); }
@@ -5572,6 +5653,12 @@ function screenEmojiStories(){
   if(s.status === "passed"){
     return pixResultHtml("emojiStoriesName", {cls:"pixLower", title:t("eb_passTitle"), body:t("eb_passBody"), badge:"emojiStories",
       buttons:pixBtnHtml(t("collectAward"), "ebCollectAward()") + pixBtnHtml(t("mainMenu"), "ebQuit()", true)});
+  }
+
+  if(s.interlude){
+    return pixShell('<h2 class="pixMTitle">' + t("emojiStoriesName") + '</h2>' +
+      '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, ebChancesLeft(s)), EB_CHANCES) + '</div>' +
+      pixRoundDoneHtml(s.interlude), "pixLower");
   }
 
   var storyIdx = s.order[s.index], story = EMOJI_STORIES[storyIdx];
@@ -5842,6 +5929,28 @@ function sdClashes(cells, lv){
   }
   return bad;
 }
+// Touching a square that can be picked, empty or already filled by the player, plays sound_effect_4 (wgPick) the moment the finger lands, together with the square lighting up (2026-11-05, per Dan).
+// A square that does not light up (a starting or hinted picture, nothing allowed right now) stays silent, as before. Same arrangement as the Faith Match tiles: the sound is chosen at the touch,
+// and the click that follows only plays it late if the sound engine could not start on the touch itself.
+var sdPendingSfx;
+function sdSquareSfx(i){
+  var s = state.session.sacredSudoku;
+  if(!s || s.status !== "playing" || s.busy) return "none";
+  var lv = s.levels[s.level];
+  return (lv.puz[i] === 0 && s.hinted.indexOf(i) === -1) ? "wgPick" : "none";
+}
+function sdSquareDown(i){
+  var name = sdSquareSfx(i);
+  sdPendingSfx = name;
+  if(pixAudioStale) pixReviveOnTap();
+  pixPressSfx(name);
+}
+function sdSquareClick(i, ev){
+  var name = (ev && ev.detail !== 0 && sdPendingSfx !== undefined) ? sdPendingSfx : sdSquareSfx(i);
+  sdPendingSfx = undefined;
+  pixClickSfx(name);
+  sdSelect(i);
+}
 function sdSelect(i){
   var s = state.session.sacredSudoku;
   if(!s || s.status !== "playing" || s.busy) return;
@@ -5983,7 +6092,7 @@ function screenSacredSudoku(){
       if(bad[i]) cls += " clash";
       if(s.sel === i) cls += " sel";
       var fixed = lv.puz[i] !== 0 || s.hinted.indexOf(i) !== -1;
-      inner += '<button class="' + cls + '" data-sfx="own"' + (v ? ' style="background-image:url(' + sdPicUrl(lv, v) + ')"' : '') + (fixed ? '' : ' onclick="sdSelect(' + i + ')"') + '></button>';
+      inner += '<button class="' + cls + '" data-sfx="own"' + (v ? ' style="background-image:url(' + sdPicUrl(lv, v) + ')"' : '') + (fixed ? '' : ' onpointerdown="sdSquareDown(' + i + ')" onclick="sdSquareClick(' + i + ', event)"') + '></button>';
     }
     boxesHtml += '<div class="sdBox" style="grid-template-columns:repeat(' + lc + ',1fr)">' + inner + '</div>';
   }
@@ -6628,13 +6737,14 @@ function msShow(s, res, landed){
   s.goalKey = res.goalAt ? res.goalAt[0] + "," + res.goalAt[1] : "";
   pixSfxPlay(over ? "fmLast" : (res.goalAt ? "clCatch" : (res.merges ? "fmMatch" : "fmFirst")), true);          // a goal plant: sound_effect_1 (2026-10-26, per Dan)
   if(!res.goalAt && !over) s.busy = false;
+  if(res.goalAt) s.got++;                                                  // the goal number goes up at once, as the reward sound plays (2026-11-05, per Dan: it went up only after the plant was picked, and for the last one of a round never)
   saveState(); render();
   if(res.goalAt){
     var gt = document.querySelector(".msTile.goal");                      // the finished plant sparkles (2026-10-26, per Dan: the same burst as a word in Fruits of the Spirit)
     if(gt){ var gr = gt.getBoundingClientRect(); pixBurst(Math.round(gr.left + gr.width / 2), Math.round(gr.top + gr.height / 2), .8, 22); }
     setTimeout(function(){                                                 // the goal plant is picked
       if(state.session.mustardSeed !== s || state.screen !== "mustardSeed") return;
-      s.cols[res.goalAt[0]].splice(res.goalAt[1], 1); s.got++; s.goalKey = "";
+      s.cols[res.goalAt[0]].splice(res.goalAt[1], 1); s.goalKey = "";
       if(s.got >= s.need){
         s.busy = false; s.interlude = {n: s.round + 1, phase: "msg", award: false, final: s.round >= MS_ROUNDS.length - 1};     // ROUND X COMPLETED!
         saveState(); render();
@@ -12040,7 +12150,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 FW";
+var APP_BUILD = "2026-11-05 GG";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12112,19 +12222,18 @@ function clearTicket(){
 // (2026-11-05, per Dan) It is a window like the Passport and the Options now: the title in the header, a red X in the upper right corner (no MAIN MENU button), and the X shrinks the screen back into the Golden Ticket
 // icon, the third icon on the Main Menu, as it does for them (closeToHome).
 function screenGoldenTicket(){
-  return '<div class="screen pixHome pixSky pixPassport">' +
+  // (2026-11-05, per Dan) the heading and the ticket window are one group, centred top to bottom on the screen; the red X stays in the upper right corner.
+  return '<div class="screen pixHome pixSky pixPassport pixTicketScreen">' +
     cloudsHtml() +
-    '<div class="passHeader">' +
-      '<span class="passHeadSpace"></span>' +
+    '<button class="passClose gtClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closeToHome(3)" aria-label="' + t("mainMenu") + '">X</button>' +
+    '<div class="gtCenter">' +
       '<h2 class="passTitle">' + t("goldenTicketLabel") + '</h2>' +
-      '<button class="passClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closeToHome(3)" aria-label="' + t("mainMenu") + '">X</button>' +
+      '<div class="pixResMid"><div class="pixPaper">' +
+        '<img class="pixTicketBig" src="' + ticketPic() + '" alt="" decoding="sync">' +
+        '<div class="pixResTitle">' + t("ticketTitle") + '</div>' +
+        '<p class="pixResBody">' + t("ticketBody") + '</p>' +
+      '</div></div>' +
     '</div>' +
-    '<div class="pixResMid"><div class="pixPaper">' +
-      '<img class="pixTicketBig" src="tiles/golden_ticket.png" alt="" decoding="sync">' +
-      '<div class="pixResTitle">' + t("ticketTitle") + '</div>' +
-      '<p class="pixResBody">' + t("ticketBody") + '</p>' +
-    '</div></div>' +
-    '<div class="spacer"></div>' +
   '</div>';
 }
 
@@ -12259,7 +12368,7 @@ function pixHoldUntilLoaded(app){
   setTimeout(reveal, 1500);
 }
 // Every picture of the game (tiles/, all the .png and .jpg: 299 of them, about 5.6 MB), fetched a few at a time in the background after the first screen is up. New pictures put in tiles/ must be added to this list.
-var PRELOAD_LIST = "anamaria.png|anamaria_placeholder.png|badge_beads.png|badge_discipleship.png|badge_faith.png|badge_forgiveness.png|badge_friendship.png|badge_grace.png|badge_growth.png|badge_holiness.png|badge_hope.png|badge_light.png|badge_love.png|badge_mercy.png|badge_perseverance.png|badge_salvation.png|badge_scripture.png|badge_spirit.png|badge_truth.png|badge_wisdom.png|badges8/b8_faith.png|badges8/b8_forgiveness.png|badges8/b8_friendship.png|badges8/b8_grace.png|badges8/b8_holiness.png|badges8/b8_hope.png|badges8/b8_light.png|badges8/b8_love.png|badges8/b8_mercy.png|badges8/b8_salvation.png|badges96/b96_beads.png|badges96/b96_discipleship.png|badges96/b96_faith.png|badges96/b96_forgiveness.png|badges96/b96_friendship.png|badges96/b96_grace.png|badges96/b96_growth.png|badges96/b96_holiness.png|badges96/b96_hope.png|badges96/b96_light.png|badges96/b96_love.png|badges96/b96_mercy.png|badges96/b96_perseverance.png|badges96/b96_salvation.png|badges96/b96_scripture.png|badges96/b96_spirit.png|badges96/b96_truth.png|badges96/b96_wisdom.png|blessings.png|candle.png|card_back.png|cat.png|church_interior.png|church_interior2.png|clouds_1.png|clouds_2.png|clouds_3.png|clouds_menu.png|dog.png|dove.png|dove2.png|dove3.png|emoji/e_angel.png|emoji/e_apple.png|emoji/e_baby.png|emoji/e_boy.png|emoji/e_bread.png|emoji/e_cross.png|emoji/e_crown.png|emoji/e_cup.png|emoji/e_dove.png|emoji/e_earth.png|emoji/e_elephant.png|emoji/e_feet.png|emoji/e_fire.png|emoji/e_fish.png|emoji/e_heart.png|emoji/e_herb.png|emoji/e_house.png|emoji/e_jar.png|emoji/e_ladder.png|emoji/e_lion.png|emoji/e_moneybag.png|emoji/e_moon.png|emoji/e_mountain.png|emoji/e_ogre.png|emoji/e_oldman.png|emoji/e_people.png|emoji/e_pig.png|emoji/e_pray.png|emoji/e_rain.png|emoji/e_rainbow.png|emoji/e_sailboat.png|emoji/e_seedling.png|emoji/e_sheep.png|emoji/e_ship.png|emoji/e_snake.png|emoji/e_star.png|emoji/e_sun.png|emoji/e_sunrise.png|emoji/e_tablets.png|emoji/e_target.png|emoji/e_tower.png|emoji/e_tree.png|emoji/e_walk.png|emoji/e_wave.png|emoji/e_whale.png|faith_tile2_00.jpg|faith_tile2_01.jpg|faith_tile2_02.jpg|faith_tile2_03.jpg|faith_tile2_04.jpg|faith_tile2_05.jpg|faith_tile2_06.jpg|faith_tile2_07.jpg|faith_tile2_08.jpg|faith_tile2_09.jpg|faith_tile2_10.jpg|faith_tile2_11.jpg|faith_tile2_12.jpg|faith_tile2_13.jpg|faith_tile2_14.jpg|faith_tile2_15.jpg|faith_tile8_00.png|faith_tile8_01.png|faith_tile8_02.png|faith_tile8_03.png|faith_tile8_04.png|faith_tile8_05.png|faith_tile8_06.png|faith_tile8_07.png|faith_tile8_08.png|faith_tile8_09.png|faith_tile8_10.png|faith_tile8_11.png|faith_tile8_12.png|faith_tile8_13.png|faith_tile8_14.png|faith_tile8_15.png|fence_front.png|fence_front2.png|fence_front3.png|flame.png|fruits/fs_1.png|fruits/fs_2.png|fruits/fs_3.png|fruits/fs_4.png|fruits/fs_5.png|fruits/fs_6.png|fruits/fs_7.png|fruits/fs_8.png|fruits/fs_9.png|fruits/fs_9b.png|fruits/fs_9c.png|fruits/fs_9d.png|golden_ticket.png|hands.png|hands2.png|hands3.png|hb_scene.png|heart_empty.png|heart_full.png|hg_intro_scene.png|hg_qr.png|icons/ic_back.png|icons/ic_beTheLight.png|icons/ic_catchLight.png|icons/ic_chooseJoy.png|icons/ic_emojiStories.png|icons/ic_faithFlash.png|icons/ic_faithMatch.png|icons/ic_followLight.png|icons/ic_goldenTicket.png|icons/ic_hiddenBlessings.png|icons/ic_jesusTimeline.png|icons/ic_kindnessSort.png|icons/ic_lightCandle.png|icons/ic_lock.png|icons/ic_music.png|icons/ic_options.png|icons/ic_passport.png|icons/ic_pathOfLight.png|icons/ic_sacredSudoku.png|icons/ic_sound.png|icons/ic_stainedGlass.png|icons/ic_tbd.png|icons/ic_wordUnscramble.png|icons/lc_courage.png|icons/lc_family.png|icons/lc_friends.png|icons/lc_healing.png|icons/lc_peace.png|icons/lc_thanks.png|icons48/ic_back.png|icons48/ic_beTheLight.png|icons48/ic_catchLight.png|icons48/ic_chooseJoy.png|icons48/ic_dovePeace.png|icons48/ic_emojiStories.png|icons48/ic_faithFlash.png|icons48/ic_faithMatch.png|icons48/ic_followLight.png|icons48/ic_fruitsSpirit.png|icons48/ic_goldenTicket.png|icons48/ic_hiddenBlessings.png|icons48/ic_hopeGarden.png|icons48/ic_jacobLadder.png|icons48/ic_jesusTimeline.png|icons48/ic_kindnessSort.png|icons48/ic_lightCandle.png|icons48/ic_lock.png|icons48/ic_music.png|icons48/ic_mustardSeed.png|icons48/ic_options.png|icons48/ic_passport.png|icons48/ic_pathOfLight.png|icons48/ic_pilgrimRoad.png|icons48/ic_prayBeads.png|icons48/ic_sacredSudoku.png|icons48/ic_sound.png|icons48/ic_stainedGlass.png|icons48/ic_tbd.png|icons48/ic_wordGroups.png|icons48/ic_wordTrail.png|icons48/ic_wordUnscramble.png|icons48p/ic_back.png|icons48p/ic_beTheLight.png|icons48p/ic_catchLight.png|icons48p/ic_chooseJoy.png|icons48p/ic_dovePeace.png|icons48p/ic_emojiStories.png|icons48p/ic_faithFlash.png|icons48p/ic_faithMatch.png|icons48p/ic_followLight.png|icons48p/ic_fruitsSpirit.png|icons48p/ic_goldenTicket.png|icons48p/ic_hiddenBlessings.png|icons48p/ic_hopeGarden.png|icons48p/ic_jacobLadder.png|icons48p/ic_jesusTimeline.png|icons48p/ic_kindnessSort.png|icons48p/ic_lightCandle.png|icons48p/ic_lock.png|icons48p/ic_music.png|icons48p/ic_mustardSeed.png|icons48p/ic_options.png|icons48p/ic_passport.png|icons48p/ic_pathOfLight.png|icons48p/ic_pilgrimRoad.png|icons48p/ic_prayBeads.png|icons48p/ic_sacredSudoku.png|icons48p/ic_sound.png|icons48p/ic_stainedGlass.png|icons48p/ic_tbd.png|icons48p/ic_wordGroups.png|icons48p/ic_wordTrail.png|icons48p/ic_wordUnscramble.png|lawn.png|logo_8bit.png|logo_small.png|ms/ms_1.png|ms/ms_2.png|ms/ms_3.png|ms/ms_4.png|ms/ms_5.png|ms/ms_6.png|passport_bg.png|pilgrim.png|pilgrim_back.png|pr/church.png|puzzle/pz_01.jpg|puzzle/pz_02.jpg|puzzle/pz_03.jpg|puzzle/pz_04.jpg|puzzle/pz_05.jpg|puzzle/pz_06.jpg|puzzle/pz_07.jpg|puzzle/pz_08.jpg|puzzle/pz_09.jpg|puzzle/pz_10.jpg|puzzle/pz_11.jpg|puzzle/pz_12.jpg|qr_feyvida.png|scene_church.png|scene_home.png|scene_world.png|scene_world2.png|scene_world3.png|sheep.png|sheep_far.png|sheep_far2.png|sheep_near.png|sheep_near2.png|sky_menu.png|spark.png|stars_tile.png|icons/ic_emmaus.png|icons48/ic_emmaus.png|icons48p/ic_emmaus.png".split("|");
+var PRELOAD_LIST = "anamaria.png|anamaria_placeholder.png|badge_beads.png|badge_discipleship.png|badge_faith.png|badge_forgiveness.png|badge_friendship.png|badge_grace.png|badge_growth.png|badge_holiness.png|badge_hope.png|badge_light.png|badge_love.png|badge_mercy.png|badge_perseverance.png|badge_salvation.png|badge_scripture.png|badge_spirit.png|badge_truth.png|badge_wisdom.png|badges8/b8_faith.png|badges8/b8_forgiveness.png|badges8/b8_friendship.png|badges8/b8_grace.png|badges8/b8_holiness.png|badges8/b8_hope.png|badges8/b8_light.png|badges8/b8_love.png|badges8/b8_mercy.png|badges8/b8_salvation.png|badges96/b96_beads.png|badges96/b96_discipleship.png|badges96/b96_faith.png|badges96/b96_forgiveness.png|badges96/b96_friendship.png|badges96/b96_grace.png|badges96/b96_growth.png|badges96/b96_holiness.png|badges96/b96_hope.png|badges96/b96_light.png|badges96/b96_love.png|badges96/b96_mercy.png|badges96/b96_perseverance.png|badges96/b96_salvation.png|badges96/b96_scripture.png|badges96/b96_spirit.png|badges96/b96_truth.png|badges96/b96_wisdom.png|blessings.png|candle.png|card_back.png|cat.png|church_interior.png|church_interior2.png|clouds_1.png|clouds_2.png|clouds_3.png|clouds_menu.png|dog.png|dove.png|dove2.png|dove3.png|emoji/e_angel.png|emoji/e_apple.png|emoji/e_baby.png|emoji/e_boy.png|emoji/e_bread.png|emoji/e_cross.png|emoji/e_crown.png|emoji/e_cup.png|emoji/e_dove.png|emoji/e_earth.png|emoji/e_elephant.png|emoji/e_feet.png|emoji/e_fire.png|emoji/e_fish.png|emoji/e_heart.png|emoji/e_herb.png|emoji/e_house.png|emoji/e_jar.png|emoji/e_ladder.png|emoji/e_lion.png|emoji/e_moneybag.png|emoji/e_moon.png|emoji/e_mountain.png|emoji/e_ogre.png|emoji/e_oldman.png|emoji/e_people.png|emoji/e_pig.png|emoji/e_pray.png|emoji/e_rain.png|emoji/e_rainbow.png|emoji/e_sailboat.png|emoji/e_seedling.png|emoji/e_sheep.png|emoji/e_ship.png|emoji/e_snake.png|emoji/e_star.png|emoji/e_sun.png|emoji/e_sunrise.png|emoji/e_tablets.png|emoji/e_target.png|emoji/e_tower.png|emoji/e_tree.png|emoji/e_walk.png|emoji/e_wave.png|emoji/e_whale.png|faith_tile2_00.jpg|faith_tile2_01.jpg|faith_tile2_02.jpg|faith_tile2_03.jpg|faith_tile2_04.jpg|faith_tile2_05.jpg|faith_tile2_06.jpg|faith_tile2_07.jpg|faith_tile2_08.jpg|faith_tile2_09.jpg|faith_tile2_10.jpg|faith_tile2_11.jpg|faith_tile2_12.jpg|faith_tile2_13.jpg|faith_tile2_14.jpg|faith_tile2_15.jpg|faith_tile8_00.png|faith_tile8_01.png|faith_tile8_02.png|faith_tile8_03.png|faith_tile8_04.png|faith_tile8_05.png|faith_tile8_06.png|faith_tile8_07.png|faith_tile8_08.png|faith_tile8_09.png|faith_tile8_10.png|faith_tile8_11.png|faith_tile8_12.png|faith_tile8_13.png|faith_tile8_14.png|faith_tile8_15.png|fence_front.png|fence_front2.png|fence_front3.png|flame.png|fruits/fs_1.png|fruits/fs_2.png|fruits/fs_3.png|fruits/fs_4.png|fruits/fs_5.png|fruits/fs_6.png|fruits/fs_7.png|fruits/fs_8.png|fruits/fs_9.png|fruits/fs_9b.png|fruits/fs_9c.png|fruits/fs_9d.png|golden_ticket.png|golden_ticket_es.png|hands.png|hands2.png|hands3.png|hb_scene.png|heart_empty.png|heart_full.png|hg_intro_scene.png|hg_qr.png|icons/ic_back.png|icons/ic_beTheLight.png|icons/ic_catchLight.png|icons/ic_chooseJoy.png|icons/ic_emojiStories.png|icons/ic_faithFlash.png|icons/ic_faithMatch.png|icons/ic_followLight.png|icons/ic_goldenTicket.png|icons/ic_hiddenBlessings.png|icons/ic_jesusTimeline.png|icons/ic_kindnessSort.png|icons/ic_lightCandle.png|icons/ic_lock.png|icons/ic_music.png|icons/ic_options.png|icons/ic_passport.png|icons/ic_pathOfLight.png|icons/ic_sacredSudoku.png|icons/ic_sound.png|icons/ic_stainedGlass.png|icons/ic_tbd.png|icons/ic_wordUnscramble.png|icons/lc_courage.png|icons/lc_family.png|icons/lc_friends.png|icons/lc_healing.png|icons/lc_peace.png|icons/lc_thanks.png|icons48/ic_back.png|icons48/ic_beTheLight.png|icons48/ic_catchLight.png|icons48/ic_chooseJoy.png|icons48/ic_dovePeace.png|icons48/ic_emojiStories.png|icons48/ic_faithFlash.png|icons48/ic_faithMatch.png|icons48/ic_followLight.png|icons48/ic_fruitsSpirit.png|icons48/ic_goldenTicket.png|icons48/ic_hiddenBlessings.png|icons48/ic_hopeGarden.png|icons48/ic_jacobLadder.png|icons48/ic_jesusTimeline.png|icons48/ic_kindnessSort.png|icons48/ic_lightCandle.png|icons48/ic_lock.png|icons48/ic_music.png|icons48/ic_mustardSeed.png|icons48/ic_options.png|icons48/ic_passport.png|icons48/ic_pathOfLight.png|icons48/ic_pilgrimRoad.png|icons48/ic_prayBeads.png|icons48/ic_sacredSudoku.png|icons48/ic_sound.png|icons48/ic_stainedGlass.png|icons48/ic_tbd.png|icons48/ic_wordGroups.png|icons48/ic_wordTrail.png|icons48/ic_wordUnscramble.png|icons48p/ic_back.png|icons48p/ic_beTheLight.png|icons48p/ic_catchLight.png|icons48p/ic_chooseJoy.png|icons48p/ic_dovePeace.png|icons48p/ic_emojiStories.png|icons48p/ic_faithFlash.png|icons48p/ic_faithMatch.png|icons48p/ic_followLight.png|icons48p/ic_fruitsSpirit.png|icons48p/ic_goldenTicket.png|icons48p/ic_hiddenBlessings.png|icons48p/ic_hopeGarden.png|icons48p/ic_jacobLadder.png|icons48p/ic_jesusTimeline.png|icons48p/ic_kindnessSort.png|icons48p/ic_lightCandle.png|icons48p/ic_lock.png|icons48p/ic_music.png|icons48p/ic_mustardSeed.png|icons48p/ic_options.png|icons48p/ic_passport.png|icons48p/ic_pathOfLight.png|icons48p/ic_pilgrimRoad.png|icons48p/ic_prayBeads.png|icons48p/ic_sacredSudoku.png|icons48p/ic_sound.png|icons48p/ic_stainedGlass.png|icons48p/ic_tbd.png|icons48p/ic_wordGroups.png|icons48p/ic_wordTrail.png|icons48p/ic_wordUnscramble.png|lawn.png|logo_8bit.png|logo_small.png|ms/ms_1.png|ms/ms_2.png|ms/ms_3.png|ms/ms_4.png|ms/ms_5.png|ms/ms_6.png|passport_bg.png|pilgrim.png|pilgrim_back.png|pr/church.png|puzzle/pz_01.jpg|puzzle/pz_02.jpg|puzzle/pz_03.jpg|puzzle/pz_04.jpg|puzzle/pz_05.jpg|puzzle/pz_06.jpg|puzzle/pz_07.jpg|puzzle/pz_08.jpg|puzzle/pz_09.jpg|puzzle/pz_10.jpg|puzzle/pz_11.jpg|puzzle/pz_12.jpg|qr_feyvida.png|scene_church.png|scene_home.png|scene_world.png|scene_world2.png|scene_world3.png|sheep.png|sheep_far.png|sheep_far2.png|sheep_near.png|sheep_near2.png|sky_menu.png|spark.png|stars_tile.png|icons/ic_emmaus.png|icons48/ic_emmaus.png|icons48p/ic_emmaus.png".split("|");
 var pixPreloadDone = false;
 function pixPreloadAll(){
   var i = 0, running = 0;
@@ -12351,7 +12460,7 @@ function pixBuildRules(){
 var PIX_EXTRA = {                                    // pictures that a screen uses without having them in its markup
   emmaus: ["tiles/sheep_near.png", "tiles/dog.png"],                                   // drawn on the canvas
   fruitsSpirit: ["tiles/fruits/fs_1.png", "tiles/fruits/fs_2.png", "tiles/fruits/fs_3.png", "tiles/fruits/fs_4.png", "tiles/fruits/fs_5.png", "tiles/fruits/fs_6.png", "tiles/fruits/fs_7.png", "tiles/fruits/fs_8.png", "tiles/fruits/fs_9.png", "tiles/fruits/fs_9b.png", "tiles/fruits/fs_9c.png", "tiles/fruits/fs_9d.png"],      // the fruits and the flame the Spirit fruit swaps through
-  churchWalk: ["tiles/pilgrim_back.png", "tiles/golden_ticket.png", "tiles/church_interior2.png"]
+  churchWalk: ["tiles/pilgrim_back.png", "tiles/golden_ticket.png", "tiles/golden_ticket_es.png", "tiles/church_interior2.png"]
 };
 // what the markup of the next screen needs and has not got yet: {urls: [...], fonts: bool}, or null when everything is in
 function pixMissing(html, isNew){
@@ -12572,6 +12681,7 @@ function renderApply(html){
   if(state.screen === "followLight" && state.session.followLight && state.session.followLight.interlude && !pixRoundRunning.followLight) flInterlude();
   if(state.screen === "stainedGlass" && state.session.stainedGlass && state.session.stainedGlass.interlude && !pixRoundRunning.stainedGlass) pzInterlude();
   if(state.screen === "wordUnscramble" && state.session.wordUnscramble && state.session.wordUnscramble.interlude && !pixRoundRunning.wordUnscramble) wuInterlude();
+  if(state.screen === "emojiStories" && state.session.emojiStories && state.session.emojiStories.interlude && !pixRoundRunning.emojiStories) ebInterlude();
   if(state.screen === "catchLight" && state.session.catchLight && state.session.catchLight.interlude && !pixRoundRunning.catchLight) clInterlude();
   if(state.screen === "wordTrail" && state.session.wordTrail && state.session.wordTrail.interlude && !pixRoundRunning.wordTrail) wtInterlude();
   if(state.screen === "wordGroups" && state.session.wordGroups && state.session.wordGroups.interlude && !pixRoundRunning.wordGroups) wgInterlude();
