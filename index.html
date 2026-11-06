@@ -330,7 +330,7 @@
   .quitOverlay .quitBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
   .quitOverlay .quitBtns .btn.pixBtn.pixBtnSm{width:100%;max-width:230px;min-width:130px;margin:0;}      /* KEEP PLAYING and MAIN MENU are the same size, one above the other (2026-11-04, per Dan) */
   .quitOverlay,.instOverlay{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}      /* these windows are added to the page body, outside #app, so the no-selection rule above never reached them: a quick tap on MAIN MENU began a text selection (Copy / Look Up / Translate) instead of pressing the button (2026-11-04, per Dan) */
-  body.quitPaused #app *{animation-play-state:paused !important;}
+  body.quitPaused #app *,body.rotPaused #app *{animation-play-state:paused !important;}
   .emConfirm .pixRoundDone{min-width:280px;max-width:92%;text-align:center;}
   .emConfirm .emConfirmBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
   .emConfirm .emConfirmBtns .btn.pixBtn.pixBtnSm{width:auto;min-width:130px;margin:0;}
@@ -1294,18 +1294,21 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
 
 // "Are you sure you want to quit?" (2026-11-03, per Dan): while that window is up the game stands still. Every animation frame and every timer that comes due in the meantime is held back (and the CSS motion
 // is stopped, see body.quitPaused), then released when the player goes back to the game, so no game needs its own pause. The functions that open and close the window are quitAskOpen / quitAskClose, next to exitMission.
-var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [];
+// (2026-11-06, per Dan: "pause all the games while the phone is rotated the wrong way") The same hold now works while the PLEASE ROTATE YOUR PHONE message covers a game that is played upright (rotHold, see
+// rotHoldUpdate): the frames and timers that come due are held back, the motion of the lights, plants and beads that is made with the Web Animations API (el.animate) is stopped where it is, and all of it goes on
+// when the phone is upright again. The games played on their side (the Road to Emmaus, Hope Garden) stand still upright by their own code, and are left out.
+var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [], rotHold = false;
 (function(){
   var raf = window.requestAnimationFrame.bind(window), caf = window.cancelAnimationFrame.bind(window), st = window.setTimeout.bind(window), ct = window.clearTimeout.bind(window);
   window.requestAnimationFrame = function(cb){
-    var id = raf(function(ts){ if(quitAsk) quitRafQ.push({id: id, cb: cb}); else cb(ts); });
+    var id = raf(function(ts){ if(quitAsk || rotHold) quitRafQ.push({id: id, cb: cb}); else cb(ts); });
     return id;
   };
   window.cancelAnimationFrame = function(id){ quitRafQ = quitRafQ.filter(function(q){ return q.id !== id; }); caf(id); };
   window.pixSt = st;          // the real timer, which the quit window does not hold back (the glow of a tapped button in that window runs on it)
   window.setTimeout = function(fn, ms){
     if(typeof fn !== "function") return st.apply(window, arguments);
-    var extra = [].slice.call(arguments, 2), id = st(function(){ if(quitAsk) quitTimerQ.push({id: id, fn: fn, args: extra}); else fn.apply(window, extra); }, ms);
+    var extra = [].slice.call(arguments, 2), id = st(function(){ if(quitAsk || rotHold) quitTimerQ.push({id: id, fn: fn, args: extra}); else fn.apply(window, extra); }, ms);
     return id;
   };
   window.clearTimeout = function(id){ quitTimerQ = quitTimerQ.filter(function(q){ return q.id !== id; }); ct(id); };
@@ -1323,6 +1326,45 @@ var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [];
     }, true);
   });
 })();
+
+function pixPaused(){ return quitAsk || rotHold; }
+var PAUSE_ON_ROTATE = ["faithFlash","faithMatch","beTheLight","followLight","wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder"];
+var pixPausedAnims = [];
+function pixPauseAnims(){          // the lights, plants and beads that move on el.animate() (not the CSS ones: body.quitPaused / body.rotPaused stop those)
+  try {
+    var app = document.getElementById("app");
+    document.getAnimations().forEach(function(a){
+      var tg = a.effect && a.effect.target;
+      if(a.constructor === window.Animation && a.playState === "running" && tg && app && app.contains(tg)){ a.pause(); pixPausedAnims.push(a); }
+    });
+  } catch(e){}
+}
+function pixPauseRelease(){        // lets what was held back go on, once nothing holds the game any more
+  if(quitAsk || rotHold) return;
+  pixPausedAnims.forEach(function(a){ try { a.play(); } catch(e){} }); pixPausedAnims = [];
+  var rq = quitRafQ, tq = quitTimerQ; quitRafQ = []; quitTimerQ = [];
+  rq.forEach(function(q){ requestAnimationFrame(q.cb); });
+  tq.forEach(function(q){ setTimeout(function(){ q.fn.apply(window, q.args); }, 0); });
+}
+function rotHoldUpdate(){
+  var want = false;
+  try { want = PAUSE_ON_ROTATE.indexOf(state.screen) !== -1 && rotateMsgShowing(); } catch(e){}
+  if(want === rotHold) return;
+  rotHold = want;
+  if(want){ pixPauseAnims(); document.body.classList.add("rotPaused"); dbgLog("pause: " + state.screen + " stands still while the phone is on its side"); }
+  else { document.body.classList.remove("rotPaused"); dbgLog("pause: " + state.screen + " goes on, the phone is upright"); pixPauseRelease(); }
+}
+// a turn of the phone (the size is settled a moment later on a phone), and a check twice a second while held, so that nothing can stay held
+["resize", "orientationchange"].forEach(function(ev){ window.addEventListener(ev, function(){ rotHoldUpdate(); window.pixSt(rotHoldUpdate, 150); window.pixSt(rotHoldUpdate, 700); }); });
+window.setInterval(function(){ if(rotHold) rotHoldUpdate(); }, 500);
+// the screen's own fit again after a turn of the phone: at once, and three times more (a phone reports the new size late), never while the Rotate message covers the screen (2026-11-06, per Dan: Catch the Light came back
+// with a shrunken play area, because the fit made on its side, or at the moment of the turn, was left)
+function pixFitSoon(screen, fn){
+  var tm = 0;
+  function run(){ if(state.screen === screen && !rotateMsgShowing()) fn(); }
+  function soon(){ run(); window.clearTimeout(tm); tm = window.pixSt(function(){ run(); tm = window.pixSt(function(){ run(); tm = window.pixSt(run, 900); }, 450); }, 120); }
+  window.addEventListener("resize", soon); window.addEventListener("orientationchange", soon);
+}
 
 // No text is ever selected (2026-11-05, per Dan: the "Copy | Translate" bubble over Pray the Beads). Besides the style (user-select: none), a selection that is started is refused, and one that gets made anyway is cleared
 // at once, so the bubble goes. Text fields and the level editor (a developer tool on a computer) are left alone.
@@ -5033,7 +5075,7 @@ function clClearTimers(){
 var CL_SLIDE_GAP = 24;      // px above the band, and so also below it
 function clFit(){
   var stage = document.getElementById("clStage"), zone = document.getElementById("clSlide"), band = zone && zone.querySelector(".clSlide");
-  if(!stage || !band) return;
+  if(!stage || !band || rotateMsgShowing()) return;          // (not on its side: the play area keeps the size it has, 2026-11-06, per Dan)
   var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
   zone.style.marginTop = (CL_SLIDE_GAP - 18) + "px"; zone.style.marginBottom = "";            // (the stage's 8 px margin and the zone's 10 px padding make the 18)
   var mb = parseFloat(getComputedStyle(zone).marginBottom) || 0;
@@ -5043,7 +5085,7 @@ function clFit(){
     mb += diff; zone.style.marginBottom = mb + "px";
   }
 }
-window.addEventListener("resize", function(){ if(state.screen === "catchLight") clFit(); });
+pixFitSoon("catchLight", clFit);
 function clUpdateHud(){
   var s = state.session.catchLight;
   if(!s) return;
@@ -5151,10 +5193,20 @@ function clSpawnIcon(){
   record.anim = el.animate([{transform:"translateY(-36px)"}, {transform:"translateY(" + endTop + "px)"}], {duration:fallTime, easing:"linear", fill:"forwards"});
   clActiveIcons.push(record);
   // If it's never caught by clCollisionTick, its own fall timer calls it a miss the moment it has reached the bottom.
-  var fallId = setTimeout(function(){ clResolveIcon(record, false); }, fallTime + 10);
+  var fallId = setTimeout(function(){ clFallDue(record); }, fallTime + 10);
   clTimers.falls.push(fallId);
 }
 
+// the light's own fall timer: a light whose fall was stood still (the Rotate message, the quit window) has not reached the bottom yet, so it is looked at again when it will have (2026-11-06, per Dan)
+function clFallDue(record){
+  if(record.resolved) return;
+  var a = record.anim, tm = (a && a.effect && a.effect.getTiming) ? a.effect.getTiming() : null;
+  if(a && tm && typeof a.currentTime === "number" && a.currentTime < tm.duration - 15){
+    clTimers.falls.push(setTimeout(function(){ clFallDue(record); }, Math.round(tm.duration - a.currentTime) + 10));
+    return;
+  }
+  clResolveIcon(record, false);
+}
 function clResolveIcon(record, caught){
   if(record.resolved || clFading) return;
   var s = state.session.catchLight;
@@ -5331,8 +5383,8 @@ function clStart(){
   clUpdateHandPosition();
   if(clDragging) clMoveHandTo(clPtrX);          // the finger is still down from the round before: the hands go straight to it
   clUpdateHud();
-  clTimers.spawn = setInterval(function(){ if(!quitAsk) clSpawnIcon(); }, s ? CL_LEVELS[s.level].spawnMs : CL_LEVELS[0].spawnMs);      // (nothing happens while the quit question is up)
-  clTimers.tick = setInterval(function(){ if(!quitAsk) clCollisionTick(); }, CL_TICK_MS);
+  clTimers.spawn = setInterval(function(){ if(!pixPaused()) clSpawnIcon(); }, s ? CL_LEVELS[s.level].spawnMs : CL_LEVELS[0].spawnMs);      // (nothing happens while the quit question is up)
+  clTimers.tick = setInterval(function(){ if(!pixPaused()) clCollisionTick(); }, CL_TICK_MS);
 }
 
 function clEndRound(reason){
@@ -5926,6 +5978,7 @@ function tlInterlude(){
 // The long rounds (8 to 11 events) have to fit on one screen without scrolling, whatever the height of the phone (2026-11-06, per Dan): the slots and the cards are sized from the room that is really there
 // (the same way as Mustard Seed and Catch the Light). On a short screen the one-line instruction goes first, then the rows get thinner; the cards keep at least 30 px for a finger.
 function tlFit(){
+  if(rotateMsgShowing()) return;
   var s = state.session.jesusTimeline;
   var slots = document.querySelector(".tlSlots"), cards = document.querySelector(".tlCards");
   if(!s || !s.rounds || !slots || !cards || s.interlude || s.status !== "playing") return;
@@ -5947,7 +6000,7 @@ function tlFit(){
   slots.style.setProperty("--tlSlot", sh + "px"); cards.style.setProperty("--tlCard", ch + "px");
   if(sh < 26){ slots.classList.add("tight"); cards.classList.add("tight"); }
 }
-window.addEventListener("resize", function(){ if(state.screen === "jesusTimeline") tlFit(); });
+pixFitSoon("jesusTimeline", tlFit);
 function tlChancesLeft(s){ return typeof s.chances === "number" ? s.chances : TL_CHANCES; }
 function tlPress(){ pixPressSfx("none"); }
 function tlTap(id){
@@ -6904,7 +6957,7 @@ function msLoopStart(){
 // see how much room is left under the button, and give that room to the (rows + 1) squares that stack up (the grid and the plant above it). The width also limits it.
 function msFit(){
   var area = document.getElementById("msArea"), s = state.session.mustardSeed;
-  if(!area || !s || s.interlude) return;
+  if(!area || !s || s.interlude || rotateMsgShowing()) return;
   var n = s.cols.length, rows = s.rows, TINY = 16;
   var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
   var scr = area.closest(".screen"), pad = scr ? parseFloat(getComputedStyle(scr).paddingBottom) || 0 : 0;
@@ -6931,7 +6984,7 @@ function msFit(){
   }
   msPlace();
 }
-window.addEventListener("resize", function(){ if(state.screen === "mustardSeed") msFit(); });
+pixFitSoon("mustardSeed", msFit);
 // DROP TILE: the plant falls into the column it is over right now
 // (2026-10-23, per Dan: sometimes it fell into the next column. The tap reaches the game a moment after the finger touched, and by then the plant may have jumped on, so the column
 // is the one it was over when the finger touched (the event's own time, pixDownT) less the little the screen is behind the game.)
@@ -7143,7 +7196,7 @@ function pbChime(s, i){
 // (2026-10-24, per Dan: the TAP button sits halfway between the bottom of the play area and the bottom of the screen.) The button's margin is set by measuring where it is.
 function pbFit(){
   var stage = document.getElementById("pbStage"), bar = document.querySelector(".pbBar");
-  if(!stage || !bar) return;
+  if(!stage || !bar || rotateMsgShowing()) return;
   var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
   bar.style.marginTop = "";
   var sb = stage.getBoundingClientRect().bottom, goal = sb + (vh - sb) / 2, mt = parseFloat(getComputedStyle(bar).marginTop) || 0;
@@ -7153,7 +7206,7 @@ function pbFit(){
     mt = Math.max(0, mt + extra); bar.style.marginTop = mt + "px";
   }
 }
-window.addEventListener("resize", function(){ if(state.screen === "prayBeads") pbFit(); });
+pixFitSoon("prayBeads", pbFit);
 // the music is OFF while the beads are moving (2026-10-25, per Dan), and comes back to its own volume when the last bead of the round has been dealt with (tapped, or missed), and at every
 // other time too (waiting for the first tap, between rounds, game over, any other screen)
 function pbDuckSync(){
@@ -7941,11 +7994,13 @@ function dpSceneStep(s, dt){
     saveState(); render();
   }
 }
+// true while the Rotate message covers the screen (a phone that is on its side during a game that is played upright)
+function rotateMsgShowing(){ var m = document.getElementById("rotateMsg"); try { return !!m && getComputedStyle(m).display !== "none"; } catch(e){ return false; } }
 function dpLoop(now){
   var s = state.session.dovePeace;
   if(state.screen !== "dovePeace" || !s){ dpRaf = 0; return; }
   var dt = Math.min(.05, (now - dp.last) / 1000); dp.last = now;
-  if(s.status === "playing" && !s.interlude && !s.busy) dpStep(s, dt);
+  if(s.status === "playing" && !s.interlude && !s.busy && !rotateMsgShowing()) dpStep(s, dt);          // (nothing moves while the PLEASE ROTATE YOUR PHONE message is up: 2026-11-06, per Dan, as in the Road to Emmaus)
   dpDraw();
   dpRaf = requestAnimationFrame(dpLoop);
 }
@@ -8009,6 +8064,7 @@ var fsEls = [], fsDrag = null;
 var FS_FLAME = ["fs_9", "fs_9b", "fs_9c", "fs_9d"], FS_FLAME_SEQ = [0, 1, 2, 3, 2, 1], FS_FLAME_MS = 130, fsFlameIv = 0, fsFlameK = 0;
 function fsFlameTick(){
   if(state.screen !== "fruitsSpirit"){ clearInterval(fsFlameIv); fsFlameIv = 0; return; }
+  if(pixPaused()) return;
   var name = "tiles/fruits/" + FS_FLAME[FS_FLAME_SEQ[fsFlameK++ % FS_FLAME_SEQ.length]] + ".png";
   var list = document.querySelectorAll("#fsLayer .fsFruit.spirit img");
   for(var i = 0; i < list.length; i++) if(list[i].getAttribute("src") !== name) list[i].setAttribute("src", name);
@@ -8241,7 +8297,7 @@ function fsIntro(s){
 }
 function fsFit(){                                                            // the board in whole pixels: every square, and every fruit in it, is a whole number of pixels
   var inner = document.getElementById("fsInner"), board = inner && inner.parentNode;
-  if(!inner || !board) return;
+  if(!inner || !board || rotateMsgShowing()) return;
   var cell = Math.max(24, Math.floor((board.clientWidth - 8) / FS_N)), pad = Math.max(2, Math.round(cell * .11));
   inner.classList.add("fit");                                                // (no sliding while the sizes are being set)
   inner.style.setProperty("--cell", cell + "px"); inner.style.setProperty("--pad", pad + "px"); inner.style.setProperty("--img", (cell - 2 * pad) + "px");
@@ -8249,7 +8305,7 @@ function fsFit(){                                                            // 
   inner.style.setProperty("--n1", nudge + "px"); inner.style.setProperty("--n2", (2 * nudge) + "px");
   void inner.offsetWidth; inner.classList.remove("fit");
 }
-window.addEventListener("resize", function(){ if(state.screen === "fruitsSpirit") fsFit(); });
+pixFitSoon("fruitsSpirit", fsFit);
 function fsBind(){
   fsFlameStart();
   fsFit();                                                           // after the screen is drawn: which picture is at which square
@@ -8885,7 +8941,7 @@ function jlPaintMeter(s){
 // the buttons sit halfway between the bottom of the sky and the bottom of the screen: measured, as in Pray the Beads
 function jlFit(){
   var stage = document.getElementById("jlStage"), bar = document.querySelector(".jlBar");
-  if(!stage || !bar) return;
+  if(!stage || !bar || rotateMsgShowing()) return;
   var vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
   bar.style.marginTop = "";
   var sb = stage.getBoundingClientRect().bottom, goal = sb + (vh - sb) / 2, mt = parseFloat(getComputedStyle(bar).marginTop) || 0;
@@ -8895,7 +8951,7 @@ function jlFit(){
     mt = Math.max(0, mt + extra); bar.style.marginTop = mt + "px";
   }
 }
-window.addEventListener("resize", function(){ if(state.screen === "jacobLadder") jlFit(); });
+pixFitSoon("jacobLadder", jlFit);
 function jlRelease(e){ delete jlHold[e.pointerId]; jlPaintHeld(); }
 document.addEventListener("pointerup", function(e){ if(jlHold[e.pointerId] !== undefined){ delete jlHold[e.pointerId]; jlPaintHeld(); } }, true);        // wherever the finger lifts
 document.addEventListener("pointercancel", function(e){ if(jlHold[e.pointerId] !== undefined){ delete jlHold[e.pointerId]; jlPaintHeld(); } }, true);
@@ -12187,6 +12243,7 @@ function pzShowSolved(s){
 function pzFit(){
   var svg = document.getElementById("pzSvg"), screen = svg && svg.closest(".screen");
   if(!svg || !screen || pzDrag || !pzCtx) return;
+  if(rotateMsgShowing()) return;       // on its side (2026-11-06, per Dan): the picture and the tray keep the size they have, so the first frames after the phone is turned upright are not the small ones (the Rotate message covers the game meanwhile)
   var spacer = screen.querySelector(".spacer");
   svg.style.height = "";
   var overhead = screen.offsetHeight - svg.getBoundingClientRect().height - (spacer ? spacer.offsetHeight : 0);
@@ -12202,17 +12259,7 @@ function pzFit(){
 }
 // (2026-11-06, per Dan's question about turning the phone during a game) The fit above runs after every draw, so a draw made while the phone was on its side (the next round coming up, say) fitted the picture and
 // the tray to the short, wide screen, and nothing fitted them again when the phone was turned upright: the tray stayed tiny. A turn of the phone (or any change of the screen's height) now fits them again.
-var pzResizeTimer = 0;
-function pzResizeSoon(){
-  clearTimeout(pzResizeTimer);
-  pzResizeTimer = setTimeout(function(){
-    if(state.screen !== "stainedGlass") return;
-    pzFitTries = 0; pzFit();
-    pzResizeTimer = setTimeout(function(){ if(state.screen === "stainedGlass"){ pzFitTries = 0; pzFit(); } }, 600);        // (a phone that has only just finished turning)
-  }, 150);
-}
-window.addEventListener("resize", pzResizeSoon);
-window.addEventListener("orientationchange", pzResizeSoon);
+pixFitSoon("stainedGlass", function(){ pzFitTries = 0; pzFit(); });
 
 function pzAdvance(){
   pzAdvancing = false;
@@ -12395,7 +12442,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 HC";
+var APP_BUILD = "2026-11-06 HF";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12516,6 +12563,7 @@ function quitAskOpen(){
   quitAsk = true; quitAskScreen = state.screen;
   track("quit_prompt_shown", {mission_id: phMissionId(state.screen), round: phG ? phG.round : null, seconds_played: phG ? phSecs(phG.t0) : null});
   document.body.classList.add("quitPaused");
+  pixPauseAnims();
   try { if(typeof emMoveSfxSet === "function") emMoveSfxSet(""); if(typeof hglDangerSfx === "function") hglDangerSfx(false); } catch(e){}      // (a looping sound would go on while the game stands still)
   var el = document.createElement("div");
   el.className = "quitOverlay";
@@ -12526,9 +12574,7 @@ function quitAskEnd(){          // takes the window away and lets what was held 
   quitAsk = false; quitAskScreen = null;
   document.body.classList.remove("quitPaused");
   var el = document.querySelector(".quitOverlay"); if(el && el.parentNode) el.parentNode.removeChild(el);
-  var rq = quitRafQ, tq = quitTimerQ; quitRafQ = []; quitTimerQ = [];
-  rq.forEach(function(q){ requestAnimationFrame(q.cb); });
-  tq.forEach(function(q){ setTimeout(function(){ q.fn.apply(window, q.args); }, 0); });
+  pixPauseRelease();
 }
 function quitAskStay(){ track("quit_prompt_answered", {mission_id: phMissionId(quitAskScreen || state.screen), answer: "stay"}); quitAskEnd(); }
 function quitAskLeave(){
@@ -12578,6 +12624,7 @@ function rotateMsgUpdate(){
   document.body.classList.toggle("awardWide", emSide);      // (those two screens on their side have a sky as wide as the phone: see body.awardWide in the style sheet)
   var back = (awardRotateWait && state.screen === "award") || (roundContRotateWait && state.screen === "roundCont");           // the Road to Emmaus badge screen has had its time, or MAIN MENU was tapped on the Keep Going screen: "turn the phone back to portrait" (2026-10-30, per Dan)
   document.body.classList.toggle("awardRotate", back);
+  rotHoldUpdate();
   var tx = document.getElementById("rotateText"), sub = document.getElementById("rotateSub");
   if(!tx || !sub) return;
   var es = state.lang === "es", unset = !state.lang;
