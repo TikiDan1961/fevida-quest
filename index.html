@@ -1047,7 +1047,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:none;}
   .pixMission .matchCard:active,.pixMission .flPad:active{transform:none;box-shadow:inset 0 0 0 2px #FFC93A,0 0 var(--gBlur) var(--gSpread) rgba(255,236,120,.85);}
   .pixMission .matchCard.flipped,.pixMission .matchCard.matched,.pixMission .flPad.lit{background:#fff;}
-  .pixMission .matchCard.flipped{cursor:default;}
+  .pixMission .matchCard.flipped,.pixMission .matchCard.locked{cursor:default;}
+  .pixMission .matchCard.locked:active{box-shadow:none;}      /* a tile that cannot be turned over right now does not light up when touched */
   .pixMission .matchCard.flipped:active{box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);}      /* a tile that is already turned over does not light up when touched again */
   .pixMission .matchCard.matched{opacity:.5;filter:brightness(.7);box-shadow:none;pointer-events:none;}
   .pixMission .matchGrid.celebrate .matchCard.matched{opacity:1;filter:none;border-color:#1B1F3B;box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);}
@@ -1492,13 +1493,13 @@ var T = {
     chooseLanguage:"Elige Tu Idioma",
     english:"INGLÉS", spanish:"ESPAÑOL",
     welcomeTitle:"¡Bienvenido a Fe y Vida Quest!",
-    welcomeBody:"Completa misiones llenas de fe en el stand para ganar insignias digitales. Termina cinco de ellas para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
+    welcomeBody:"Completa misiones llenas de fe en el stand para ganar sellos digitales. Termina cinco de ellas para desbloquear tu Boleto Dorado y ganar premios. ¿Listo?",
     startQuest:"COMIENZA TU AVENTURA", changeLanguage:"CAMBIAR IDIOMA",
     howTitle:"¿Cómo se juega?", howIntro:"¡Ay, no! Un peregrino quiere llegar a la iglesia y no puede lograrlo sin ti. ¿Te animas a ser su héroe?",
     howMissions:function(need, n){ return "Abre la carpeta de Misiones y conquista " + need + " de las " + n + " misiones. Escoge tus favoritas, juégalas en el orden que quieras y ¡diviértete!"; },
-    howPoints:"¡Cada misión que termines te da 100 puntos y una insignia brillante para tu Pasaporte! Mira cómo se llena la barra de arriba.",
-    howTicket:function(pts){ return "¡Llega a " + pts + " puntos y ganas un Boleto Dorado! Tócalo y muestra tu pantalla al equipo del stand de Fe y Vida (#301) para ganar un premio especial."; },
-    howHope:"¡Diversión extra: juega el Jardín de la Esperanza de Anamaria y ven a conocerla en persona al stand de Unfinished (#400)!", howGo:"¡VAMOS!",
+    howPoints:"¡Cada misión que termines te da 100 puntos y un sello brillante para tu Pasaporte! Observa cómo se llena la barra de progreso en la parte superior.",
+    howTicket:function(pts){ return "¡Alcanza " + pts + " puntos y ganarás un Boleto Dorado! ¡Tócalo y muestra tu pantalla al equipo del stand de Fe y Vida (#301) para recibir un premio especial!"; },
+    howHope:"¡Diversión extra: juega el Jardín de Esperanza de Anamaria y luego ve a conocer a Anamaria en persona en el stand de Unfinished (#400)!", howGo:"¡VAMOS!",
     install_btn:"INSTALAR LA APP", install_title:"Añadir a la pantalla de inicio", install_why:"Fe y Vida Quest se abre en pantalla completa como cualquier otra app y funciona incluso sin internet.",
     install_safari:"Primero abre esta página en Safari: toca el botón ••• o Compartir y elige «Abrir en Safari». Luego:",
     install_ios1:"Toca el botón Compartir {share} en la parte inferior de Safari.", install_ios2:"Desplázate hacia abajo y toca «Añadir a pantalla de inicio».", install_ios3:"Toca «Añadir». ¡Listo! Fe y Vida Quest ya está en tu teléfono.",
@@ -1511,10 +1512,10 @@ var T = {
     faithFlashName:"Destello de Fe", faithMatchName:"Memoria de Fe", beTheLightName:"Sé la Luz",
     stainedGlassName:"Rompecabezas de Vitral", chooseJoyName:"Elige la Alegría",
     done:"COMPLETADO",
-    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu insignia! Tienes 3 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
+    ff_intro:"¡Supera 3 rondas de 10 preguntas para ganar tu sello! Tienes 3 oportunidades.", ff_round:function(n,total){return "Ronda "+n+" de "+total;}, ff_roundDone:function(n){return "¡RONDA "+n+" COMPLETADA!";}, ff_awarded:"¡OTORGADA!",
     nextQuestion:"SIGUIENTE PREGUNTA", collectAward:"RECOGER PREMIO", playAgain:"JUGAR DE NUEVO", tryAgain:"INTENTAR DE NUEVO",
-    ff_resultsTitlePass:"¡Puntaje Perfecto!", ff_resultsTitlePass2:"¡Bien Hecho!", ff_resultsTitleFail:"¡Tan Cerca!",
-    ff_resultsBodyPass:"¡Respondiste las 30 preguntas correctamente!", ff_resultsBodyPass2:"¡Superaste las 30 preguntas!",
+    ff_resultsTitlePass:"¡Puntuación perfecta!", ff_resultsTitlePass2:"¡Bien Hecho!", ff_resultsTitleFail:"¡Por muy poco!",
+    ff_resultsBodyPass:"¡Respondiste correctamente las 30 preguntas!", ff_resultsBodyPass2:"¡Superaste las 30 preguntas!",
     ff_resultsBodyFail:"No te preocupes, ¡inténtalo de nuevo!",
     scoreOf:function(c,t){return "Obtuviste "+c+" de "+t+" correctas.";},
     fm_intro:"¡Empareja todos los pares en cada nivel!",
@@ -1523,32 +1524,32 @@ var T = {
     chancesLeft:"Oportunidades restantes:",
     startMission:"COMENZAR MISIÓN",
     guides:{
-      faithFlash:{d:"Responde preguntas sobre la fe católica para ganar tu insignia.", h:["Toca la respuesta correcta de cada pregunta.", "Termina 3 rondas de 10 preguntas.", "Tienes 3 oportunidades. Una respuesta incorrecta cuesta una, y al terminar cada ronda se te devuelve la que perdiste."]},
-      faithMatch:{d:"Voltea las fichas y encuentra todos los pares.", h:["Toca dos fichas para voltearlas.", "Si hacen pareja, se quedan descubiertas. Si no, se voltean de nuevo y pierdes una oportunidad.", "Empareja todos los pares para pasar de nivel. Supera los 3 niveles para ganar."]},
+      faithFlash:{d:"Responde preguntas sobre la fe católica para ganar tu sello.", h:["Toca la respuesta correcta para cada pregunta.", "Termina 3 rondas de 10 preguntas.", "Tienes 3 oportunidades. Una respuesta incorrecta cuesta una, y al terminar cada ronda se te devuelve la que perdiste."]},
+      faithMatch:{d:"Voltea las fichas y encuentra todos los pares.", h:["Toca dos fichas para voltearlas.", "Si coinciden, permanecen boca arriba. Si no coinciden, se voltean de nuevo y pierdes una oportunidad.", "Empareja todos los pares para pasar de nivel. Supera los 3 niveles para ganar."]},
       stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
       wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Termina 3 niveles de 5 palabras para ganar."]},
-      catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo a la izquierda y a la derecha en la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que pase. Si se te escapa una, pierdes una oportunidad. Tienes 5 en total.", "Supera las 8 rondas para ganar."]},
+      catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo hacia la izquierda y hacia la derecha sobre la barra de DESLIZAMIENTO para mover las manos.","Atrapa cada luz antes de que caiga. Si dejas escapar una, perderás una oportunidad. Tienes 5 oportunidades en total.", "Supera las 8 rondas para ganar."]},
       kindnessSort:{d:"Decide si cada situación es un acto de bondad o no.", h:["Lee cada situación.", "Toca BONDAD o NO ES BONDAD.", "Una respuesta incorrecta cuesta una oportunidad. Tienes 3."]},
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
-      lightCandle:{d:"Tómate un momento de calma para orar.", h:["Elige por quién o por qué estás orando.", "Mantén presionada la vela para encenderla.", "Si la sueltas muy pronto, la luz se apaga, así que sigue presionando."]},
+      lightCandle:{d:"Tómate un momento de tranquilidad para orar.", h:["Elige por quién o por qué estás orando.", "Mantén presionada la vela para encenderla.", "Si la sueltas muy pronto, la luz se apaga, así que sigue presionando."]},
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias. Tienes 5 oportunidades."]},
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 3 rondas: 5 eventos, luego 7 y luego 5. Tienes 5 oportunidades."]},
-      sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen va una vez en cada fila y columna, y una vez en cada recuadro.", "Una imagen que rompe la regla se pone roja y se borra. Toca PISTA si te atoras. Resuelve los 4 rompecabezas para ganar."]},
-      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "La palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
-      jacobLadder:{d:"Haz rebotar a Jacob por los peldaños hasta la puerta del cielo.", h:["Jacob rebota solo. Mantén pulsado IZQUIERDA o DERECHA para moverlo. Rebota en los bordes del cielo. La barra de la derecha muestra tu altura.", "Solo cae sobre un peldaño al bajar. Algunos se deslizan, otros se rompen tras un rebote, y los peldaños con alas lo lanzan muy alto.", "Evita las nubes de tormenta y no caigas por abajo, o pierdes una oportunidad y la subida empieza de nuevo. Tienes 3 oportunidades. Llega a la puerta en las 3 rondas para ganar."]},
-      fruitsSpirit:{d:"Combina frutas para reunir los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que reúnes, como 3/5. Llena las 8 para terminar un nivel.", "Junta 4 o más para crear una llama. La llama es un comodín: ponla junto a 2 frutas iguales y toda la fila o columna desaparece.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
-      dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para que la paloma aletee hacia arriba. Entre toques, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
-      pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Une el camino desde el peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: da todos los giros que necesites. Termina las 3 rondas, con tableros cada vez más grandes, para ganar."]},
-      hopeGarden:{d:"Guía a las abejas y a las mariposas hasta las flores de su mismo color.", h:["Gira tu teléfono de lado para jugar.", "Arrastra desde una abeja o mariposa hasta la flor de su color. Las abejas entran por el extremo ancho de una flor de embudo.", "Los choques, las libélulas y salir de la pantalla cuestan una oportunidad. Tienes 3.", "Haz que todas aterricen para terminar una ronda. Termina 3 rondas para ganar."]},
-      emmaus:{d:"Corre por el camino a Ema\u00fas y salta lo que se cruce en tu camino.", h:["Toca en cualquier parte para saltar costales, piedras, vasijas, ovejas, perros y baches. Si chocas con uno, pierdes una oportunidad. Tienes 3.", "Cae sobre un carro para viajar en \u00e9l. Toca, y el carro y t\u00fa saltan juntos.", "Recoge monedas y corazones (un coraz\u00f3n recupera una oportunidad). Las cestas te lanzan muy alto; en las rondas 2 y 3 la morada te lleva hasta las nubes.", "Llega al final del camino para terminar cada ronda. \u00a1Gana las 3 rondas!"]},
+      sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen debe aparecer una sola vez en cada fila, en cada columna y en cada bloque.", "Si una imagen rompe la regla, se pondrá roja y desaparecerá. Toca PISTA si necesitas ayuda. Resuelve los 4 rompecabezas para ganar."]},
+      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
+      jacobLadder:{d:"Haz rebotar a Jacob de un peldaño a otro hasta llegar a la puerta del cielo.", h:["Jacob rebota por sí solo. Mantén presionada IZQUIERDA o DERECHA para moverlo. Rebotará al llegar a los bordes del cielo. La barra de la derecha muestra tu altura.", "Solo cae sobre un peldaño al bajar. Algunos se deslizan, otros se rompen tras un rebote, y los peldaños con alas lo lanzan muy alto.", "Evita las nubes de tormenta y no caigas por abajo, o pierdes una oportunidad y tendrás que comenzar a subir de nuevo. Tienes 3 oportunidades. Llega a la puerta en las 3 rondas para ganar."]},
+      fruitsSpirit:{d:"Combina las frutas para recolectar los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que recolectas, como 3/5. Llena las 8 para terminar un nivel.", "Combina 4 frutas o más para crear una llama. La llama es comodín: colócala junto a 2 frutas iguales y eliminará toda la fila o columna.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
+      dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para hacer que la paloma aletee y suba. Entre cada toque, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
+      pilgrimRoad:{d:"Gira las casillas del camino para llevar al peregrino a la iglesia.", h:["Toca una casilla del camino para girarla un cuarto de vuelta.", "Sigue el camino del peregrino, a la izquierda, hasta la iglesia. El camino debe pasar por todas las casillas del tablero, sin dejar ninguna fuera. La parte que ya has unido se vuelve dorada, y \"Camino\" cuenta las casillas que lleva. Cuando está terminado, el peregrino lo recorre.", "No hay oportunidades: tómate todos los turnos que necesites. Completa las 3 rondas. En cada una, el tablero será más grande, ¡para ganar!"]},
+      hopeGarden:{d:"Guía a las abejas y a las mariposas hasta las flores de su mismo color.", h:["Gira tu teléfono de lado para jugar.", "Arrastra desde una abeja o mariposa hasta la flor de su color. Las abejas entran por el extremo ancho de una flor de embudo.", "Los choques, las libélulas y las criaturas que salen volando de la pantalla te harán perder una oportunidad. Tienes 3.", "Haz que todas aterricen para terminar una ronda. Termina 3 rondas para ganar."]},
+      emmaus:{d:"Corre por el camino a Ema\u00fas y salta sobre lo que se cruce en tu camino.", h:["Toca en cualquier parte para saltar sobre costales, piedras, jarras, ovejas, perros y hoyos. Si chocas con uno, pierdes una oportunidad. Tienes 3.", "Cae sobre un carro para viajar en \u00e9l. Toca y tú y el carro saltarán juntos.", "Recolecta monedas y corazones (cada corazón te devuelve una oportunidad). Las canastas te lanzan muy alto; en las rondas 2 y 3 la morada te lleva hasta las nubes.", "Llega al final del camino para terminar cada ronda. \u00a1Gana las 3 rondas!"]},
       prayBeads:{d:"Toca cada cuenta del rosario cuando esté dentro del aro.", h:["Las cuentas del rosario se deslizan por el cordón hacia el aro dorado.", "Toca en cualquier parte de la pantalla, o el botón TOCAR, cuando una cuenta esté dentro del aro (el botón TOCAR se ilumina; el resto de la pantalla no). Algunas cuentas vienen juntas: toca rápido, una vez por cada cuenta.", "Un toque demasiado pronto, o una cuenta que se te pasa, cuesta una oportunidad. Tienes 3 oportunidades. Cada ronda es un rosario completo de 60 cuentas, 7 grandes y 53 pequeñas, en el orden de uno de verdad, y las cuentas van más rápido en cada ronda. Termina las 3 rondas para ganar."]},
-      mustardSeed:{d:"Deja caer plantas en columnas y haz crecer una semilla pequeña hasta un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta de la meta (se ve arriba) tantas veces como diga el contador, y cada una se recoge. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
-      wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Junta las palabras de un grupo en la misma fila. Cuando una fila está bien, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
+      mustardSeed:{d:"Deja caer las plantas en las columnas y haz crecer una pequeña semilla hasta convertirla en un gran árbol.", h:["Una planta salta de columna en columna sobre la cuadrícula. Toca SOLTAR PLANTA para que caiga en la columna donde está.", "Cuando una planta cae sobre otra del mismo tipo, las dos crecen a la siguiente etapa: semilla, brote, planta, arbusto, árbol, gran árbol. ¡Puede encadenarse!", "Haz crecer la planta objetivo (se ve arriba) tantas veces como indique el contador. Cada vez que lo hagas, se recogerá una. Si una columna se llena hasta arriba, el jardín está lleno. La planta salta más rápido en cada ronda. Termina las 3 rondas para ganar."]},
+      wordGroups:{d:"Ordena las palabras en grupos que van juntos.", h:["Toca una palabra y arrástrala sobre otra para intercambiar sus lugares.", "Agrupa las palabras de un grupo en la misma fila. Cuando una fila es correcta, cambia de color y se bloquea.", "Ordena todas las filas para terminar la ronda. Termina las 3 rondas para ganar."]}
     },
     fm_failTitle:"¡Sin Oportunidades!",
     fm_failBody:"¡Esta vez no! Empiezas de nuevo desde el Nivel 1.",
-    fm_passTitle:"¡Los 3 Niveles Completos!",
+    fm_passTitle:"¡Completaste los tres niveles!",
     fm_passBody:"¡Emparejaste todos los pares! Excelente trabajo.",
     bl_title:"Sé la Luz",
     bl_body:"Ve al Muro de la Esperanza de Fe y Vida y escribe un mensaje de aliento para alguien más. Cuando termines, toca el botón de abajo.",
@@ -1557,105 +1558,105 @@ var T = {
     cont_title:"¿Seguir jugando?",
     cont_body:"Puedes seguir jugando este juego o volver al Menú Principal y probar otro.",
     cj_title:"Elige la Alegría",
-    cj_body:"¡Ve al stand de Fe y Vida (#301) para hacerte una foto instantánea alegre con un amigo! Cuando termines, toca el botón de abajo.",
-    awardTitle:"¡Misión Completada!",
-    awardBody:function(pts,badge){return "¡Ganaste "+pts+" Puntos de Aventura y desbloqueaste la insignia "+badge+"!";},
-    awardBodyNoPts:function(badge){return "¡Desbloqueaste la insignia "+badge+"!";}, awardBodyPtsOnly:function(pts){return "¡Ganaste "+pts+" Puntos de Aventura!";}, awardBodyJoy:"¡Gracias por elegir la alegría!",
+    cj_body:"¡Visita el stand de Fe y Vida (#301) para tomarte una divertida foto instantánea con un amigo! Cuando hayas terminado, toca el botón de abajo.",
+    awardTitle:"¡Misión Cumplida!",
+    awardBody:function(pts,badge){return "¡Ganaste "+pts+" Puntos de Aventura y desbloqueaste el sello "+badge+"!";},
+    awardBodyNoPts:function(badge){return "¡Desbloqueaste el sello "+badge+"!";}, awardBodyPtsOnly:function(pts){return "¡Ganaste "+pts+" Puntos de Aventura!";}, awardBodyJoy:"¡Gracias por elegir alegría!",
     passportTitle:"Pasaporte Fe y Vida",
-    missionBadge:function(n){return "INSIGNIA MISIÓN "+n;},
+    missionBadge:function(n){return "SELLO MISIÓN "+n;},
     badgeLocked:"???",
     ticketTitle:"¡Boleto Dorado Desbloqueado!",
     ticketBody:"¡Muestra esta pantalla a un miembro del personal de Fe y Vida para reclamar un premio!",
     clearTicket:"BORRAR BOLETO",
-    themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé Luz para el Mundo",
+    themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé una luz para el mundo",
     themeUnity:"Unidad", themeHope:"Esperanza",
     themeHoliness:"Santidad", themeGrace:"Gracia", themeSalvation:"Salvación",
     themeForgiveness:"Perdón", themeMercy:"Misericordia", themePrayer:"Oración", themeScripture:"Escrituras", themeDiscipleship:"Discipulado", themePerseverance:"Perseverancia", themePeace:"Paz", themeSpirit:"El Espíritu", themeHeaven:"El Cielo",
 
-    followLightName:"Sigue la Luz", wordUnscrambleName:"Desordena Palabras",
+    followLightName:"Sigue la Luz", wordUnscrambleName:"Palabras Desordenadas",
     catchLightName:"Atrapa la Luz", kindnessSortName:"Actos de Bondad",
     hiddenBlessingsName:"Bendiciones Escondidas",
-    emojiStoriesName:"Historias Bíblicas en Emojis", lightCandleName:"Enciende una Vela", jesusTimelineName:"Línea de Tiempo de la Vida de Jesús",
+    emojiStoriesName:"Historias Bíblicas en Emojis", lightCandleName:"Enciende una Vela", jesusTimelineName:"Cronología de la vida de Jesús",
     pathOfLightName:"Camino de Luz", tbdName:"Por definir",
     comingSoon:"PRÓXIMAMENTE", comingSoonToast:"¡Próximamente!",
     missionsFolder:"Misiones", goldenTicketLabel:"Boleto Dorado",
     sheepSays:"beeee", backLabel:"Volver a la pantalla de bienvenida",
-    optionsLabel:"Opciones", optionsTitle:"Opciones", privacyNote:"Este juego cuenta el uso de forma anónima, por ejemplo qué juegos se juegan, para ayudarnos a mejorarlo. No recopila tu nombre ni información personal.", sfxVolume:"Efectos de sonido", musicVolume:"Música",
-    pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.", pilgrimGreat:"¡Buen trabajo!", pilgrimTryAnother:function(n){return "¡Prueba otra misión: "+n+"!";},
-    pilgrimTry:function(n){return "¡Prueba "+n+"!";}, pilgrimToGo:function(n){return n === 1 ? "¡Falta 1 juego para llegar a la iglesia!" : "¡Faltan "+n+" juegos para llegar a la iglesia!";},
+    optionsLabel:"Opciones", optionsTitle:"Opciones", privacyNote:"Este juego recopila datos anónimos de uso, como los juegos que se juegan, para ayudarnos a mejorarlo. No recopila tu nombre ni ningún dato personal.", sfxVolume:"Efectos de sonido", musicVolume:"Música",
+    pilgrimStart:"¡Hola, soy Peregrino! Abre Misiones para empezar nuestro viaje.", pilgrimNice:"¡Buen trabajo! Sigamos caminando con fe.", pilgrimGreat:"¡Buen trabajo!", pilgrimTryAnother:function(n){return "¡Intenta otra misión: "+n+"!";},
+    pilgrimTry:function(n){return "¡Intenta "+n+"!";}, pilgrimToGo:function(n){return n === 1 ? "¡Falta 1 juego para llegar a la iglesia!" : "¡Faltan "+n+" juegos para llegar a la iglesia!";},
     pilgrimTicket:"¡Tu Boleto Dorado está listo! Tócalo para verlo.",
-    pilgrimCheer1:"¡Deja brillar tu luz!", pilgrimCheer2:"¡Camina con fe!", pilgrimCheer3:"¡Sigue adelante, amigo!",
+    pilgrimCheer1:"¡Deja que tu luz brille!", pilgrimCheer2:"¡Camina con fe!", pilgrimCheer3:"¡Sigue adelante, amigo!",
     ticketLocked:function(p){return "¡Gana "+p+" puntos para desbloquear el Boleto Dorado!";},
 
     fl_repeat:"REPITE EL MISMO PATRÓN TOCANDO LAS FICHAS EN EL MISMO ORDEN", fl_replay:"REPETIR",fl_incorrect:"¡FICHA INCORRECTA!", fl_tryAgainMsg:"INTÉNTALO DE NUEVO",
-    fl_failTitle:"¡Tan Cerca!", fl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
-    fl_passTitle:"¡Memoria Increíble!", fl_passBody:"¡Repetiste cada patrón en los 8 niveles!",
+    fl_failTitle:"¡Casi lo logras!", fl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
+    fl_passTitle:"¡Memoria Increíble!", fl_passBody:"¡Repetiste todos los patrones a lo largo de los 8 niveles!",
 
     wu_intro:"Toca las letras en orden para descifrar cada palabra. ¡Termina los 3 niveles para ganar!",
     wu_word:function(n,total){return "Palabra "+n+" de "+total;},
     wu_passTitle:"¡Maestro de Palabras!", wu_passBody:"¡Superaste los 3 niveles de palabras!", wu_skip:function(n){return "SALTAR ("+n+")";},
     clearWord:"BORRAR",
 
-    cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 5 oportunidades en los 8 niveles.",
+    cl_intro:"¡Desliza las manos a la izquierda y derecha para atrapar las luces que caen! Si fallas demasiadas, empezarás de nuevo — tienes 5 oportunidades para completar los 8 niveles.",
     cl_slide:"DESLIZA",
     cl_level:function(n,total){return "Nivel "+n+" de "+total;},
     cl_getReady:function(n){return "¡Prepárate para el Nivel "+n+"!";},
     cl_caught:function(n,total){return "Atrapadas: "+n+" / "+total;},
     cl_passTitle:"¡Excelentes Reflejos!", cl_passBody:"¡Atrapaste todas las luces en los 8 niveles!",
-    cl_failTitle:"¡Tan Cerca!", cl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
+    cl_failTitle:"¡Casi lo logras!", cl_failBody:"Te quedaste sin oportunidades — inténtalo de nuevo desde el Nivel 1.",
 
     ks_intro:"Lee cada escenario y decide: ¿es un acto de bondad o no?",
     ks_kind:"BONDAD", ks_notKind:"NO ES BONDAD",
     ks_passTitle:"¡Campeón de la Bondad!", ks_passBody:"¡Clasificaste todos los escenarios correctamente!",
-    ks_failTitle:"¡Sin Oportunidades!", ks_failBody:"Inténtalo de nuevo en esta misión.",
+    ks_failTitle:"¡Sin Oportunidades!", ks_failBody:"Vuelve a intentar esta misión.",
 
-    hb_intro:"Mira con atención: ¡encuentra las 6 bendiciones escondidas en la escena!",
-    hb_found:function(n,total){return "Encontradas: "+n+" / "+total;},
+    hb_intro:"Mira con atención: ¡encuentra 6 bendiciones escondidas en la escena!",
+    hb_found:function(n,total){return "Encontraste: "+n+" / "+total;},
     hb_passTitle:"¡Buscador de Bendiciones!", hb_passBody:"¡Encontraste todas las bendiciones escondidas!",
     sudokuName:"Sudoku Sagrado", themeWisdom:"Sabiduría",
     mustardSeedName:"Semilla de Mostaza", themeGrowth:"Crecimiento", ms_intro:"Toca SOLTAR cuando la planta esté sobre la columna que quieres.", ms_goal:"Meta:", ms_dropBtn:"SOLTAR PLANTA",
-    ms_failTitle:"Jardín Lleno", ms_failBody:"Una columna se llenó hasta arriba. Une plantas iguales para mantener las columnas bajas. ¡Inténtalo de nuevo!",
-    prayBeadsName:"Reza el Rosario", pb_intro:"Toca en cualquier parte cuando una cuenta esté dentro del aro. Algunas vienen juntas: ¡toca rápido!", pb_tap:"TOCAR",
+    ms_failTitle:"Jardín Lleno", ms_failBody:"¡Una columna llegó hasta arriba! Combina las plantas iguales para mantener las columnas bajas. ¡Inténtalo de nuevo!",
+    prayBeadsName:"Reza el Rosario", pb_intro:"¡Toca en cualquier parte de la pantalla cuando una cuenta esté dentro del aro! Algunas cuentas pasan muy cerca unas de otras, ¡así que toca rápidamente!", pb_tap:"TOCAR",
     pb_ourFather:"Padre Nuestro", pb_hailMary:"Ave María", pb_of:function(n,total){return n+" de "+total;}, pb_amen:"Amén",
     pb_perfect:"¡Perfecto!", pb_good:"¡Bien!", pb_early:"¡Muy pronto!", pb_miss:"¡Fallaste!",
     pb_failTitle:"¡Sigue Intentando!", pb_failBody:"Te quedaste sin oportunidades. ¡Mantén un ritmo constante e inténtalo de nuevo!",
-    jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén pulsado IZQUIERDA o DERECHA para mover a Jacob. Rebota por los peldaños hasta la puerta del cielo. La barra de la derecha muestra qué tan alto estás.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
-    jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob Cayó!", jl_failBody:"Jacob cayó demasiadas veces. ¡Inténtalo de nuevo!",
-    hopeGardenName:"Jardín de la Esperanza", hopeMenuName:"Unfinished", hg_sub:"Unfinished con Anamaria", hgi_with:"con Anamaria", hgi_quote:"\u201c\u2026el que comenz\u00f3 en ustedes la buena obra la ir\u00e1 consumando\u2026\u201d", hgi_ref:"FILIPENSES 1:6", hgi_tag:"Ayuda a las abejas a polinizar el Jard\u00edn de la Esperanza.", hgi_scan:"ESCANEA PARA VER", hgi_qrSoon:"C\u00f3digo QR pr\u00f3ximamente", hgi_play:"JUGAR JARD\u00cdN DE LA ESPERANZA", hgi_watch:"VER EN YOUTUBE", hgi_back:"VOLVER A LA AVENTURA", hgi_foot:"Tu historia sigue creciendo.", hgl_allDone:"\u00a1TODAS LAS RONDAS COMPLETAS!", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía a las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
+    jacobLadderName:"La Escalera de Jacob", jl_intro:"Mantén presionada IZQUIERDA o DERECHA para mover a Jacob. ¡Salta de un peldaño a otro hasta llegar a la puerta del cielo! La barra de la derecha muestra qué tan alto has llegado.", jl_ohno:"¡AY, NO!!!!", jl_left:"IZQUIERDA", jl_right:"DERECHA",
+    jl_height:function(n,total){return "Altura: "+n+" / "+total;}, jl_failTitle:"¡Jacob se cayó!", jl_failBody:"Jacob se cayó demasiadas veces. ¡Inténtalo de nuevo!",
+    hopeGardenName:"Jardín de la Esperanza", hopeMenuName:"Unfinished", hg_sub:"Unfinished con Anamaria", hgi_with:"con Anamaria", hgi_quote:"\u201c\u2026el que comenz\u00f3 en ustedes la buena obra la ir\u00e1 consumando\u2026\u201d", hgi_ref:"FILIPENSES 1:6", hgi_tag:"Ayuda a las abejas a polinizar el Jard\u00edn de la Esperanza.", hgi_scan:"ESCANEA PARA VER", hgi_qrSoon:"C\u00f3digo QR pr\u00f3ximamente", hgi_play:"JUGAR JARD\u00cdN DE LA ESPERANZA", hgi_watch:"VER EN YOUTUBE", hgi_back:"VOLVER A LA AVENTURA", hgi_foot:"Tu historia sigue creciendo.", hgl_allDone:"\u00a1TODAS LAS RONDAS COMPLETAS!", hg_level:function(n,total){return "Ronda "+n+"/"+total;}, hg_beesLabel:"Abejas", hg_startBtn:"Empezar", hg_playing:"¡Guía las abejas!", hg_intro:"Toca una abeja y arrastra el dedo hasta una flor del mismo color.", hg_play:"JUGAR", hg_home:function(n,total){return "Abejas en casa: "+n+" / "+total;}, hg_bump:"¡ABEJAS CHOCARON!",
     hg_noChances:"¡SIN OPORTUNIDADES!", hg_outTitle:"¡Sin Oportunidades!", hg_outBody:"Demasiadas abejas se fueron volando o chocaron. ¡Inténtalo de nuevo!", hg_failTitle:"¡Las Abejas Chocaron!", hg_failBody:"Dos abejas chocaron entre sí. ¡Inténtalo de nuevo!", hg_winTitle:"¡El Jardín Floreció!", hg_winBody:"Todas las abejas encontraron su flor. ¡Buen trabajo!",
     hg_guide:{d:"Abejas de colores llegan volando al jardín. Guía a cada una hasta una flor del mismo color que la abeja.", h:["Toca una abeja y arrastra el dedo hacia una flor del mismo color. Una línea punteada muestra el camino, pero solo llega hasta cierta distancia.",
-      "Levanta el dedo y la abeja vuela por la línea. Si llega a su flor, ¡ya está en casa!", "Una abeja que falla se va volando en una dirección al azar. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas y dentro de la pantalla! Si dos abejas chocan, o una se va volando, pierdes una oportunidad. Tienes 3.", "Las flores se abren y se cierran, y una abeja solo cuenta en una flor bien abierta. Las rondas siguientes traen mariposas y libélulas por el jardín: chocar con una también cuesta una oportunidad.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
-    fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una vecina para cambiarlas y formar 3 o más iguales. Reúne todas las frutas para encender todas las palabras.",
-    fs_found:"REÚNE CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
-    dovePeaceName:"Paloma de la Paz", dp_intro:"Toca en cualquier parte de la pantalla para aletear. Vuela por los huecos entre las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
+      "¡Levanta el dedo y la abeja volará siguiendo la línea! Si llega a su flor, ¡ya está en casa!", "Si una abeja falla, sale volando en una dirección aleatoria. Tócala de nuevo para guiarla de vuelta.", "¡Mantén separadas a las abejas y dentro de la pantalla! Si dos abejas chocan, o una se va volando, pierdes una oportunidad. Tienes 3.", "Las flores se abren y se cierran, y una abeja solo cuenta cuando llega a una flor que está completamente abierta. En las rondas siguientes, las mariposas y las libélulas vuelan por el jardín. Si chocas con alguna, te cuesta una oportunidad.", "Lleva a todas las abejas a casa para terminar las 3 rondas."]},
+    fruitsSpiritName:"Frutos del Espíritu", fs_intro:"Desliza una fruta hacia una fruta vecina para intercambiarlas y formar grupos de 3 o más. ¡Recolecta todas las frutas para iluminar todas las palabras!",
+    fs_found:"RECOLECTA CADA FRUTA", fs_hint:"PISTA", fs_shuffling:"MEZCLANDO", fs_names:["Amor","Alegría","Paz","Paciencia","Amabilidad","Bondad","Fidelidad","Mansedumbre"],
+    dovePeaceName:"Paloma de la Paz", dp_intro:"¡Toca en cualquier parte de la pantalla para aletear! Vuela entre los espacios de las nubes de tormenta para llevar la rama de olivo.", dp_ready:"¡Toca en cualquier parte para empezar!",
     dp_clouds:function(n,total){return "Nubes: "+n+" / "+total;}, dp_failTitle:"¡Fuera de Rumbo!", dp_failBody:"La paloma chocó con demasiadas nubes. ¡Inténtalo de nuevo!",
-    quitTitle:"\u00bfSeguro que quieres salir?", em_leaveTitle:"\u00bfSalir del juego?", em_leaveBody:"Volver\u00e1s al Men\u00fa Principal.", em_keep:"SEGUIR JUGANDO", em_leave:"SALIR", em_perfect:"\u00a1PERFECTO!", em_perfectBody:"\u00a1Encontraste todas las monedas!", emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar.\u00a1Cae sobre un carro para viajar en \u00e9l!",
-    pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. Construye un solo camino por todas las casillas, del peregrino a la iglesia.", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"SALIDA", pr_church:"IGLESIA",
+    quitTitle:"\u00bfSeguro que quieres salir?", em_leaveTitle:"\u00bfSalir del juego?", em_leaveBody:"Volver\u00e1s al Men\u00fa Principal.", em_keep:"SEGUIR JUGANDO", em_leave:"SALIR", em_perfect:"\u00a1PERFECTO!", em_perfectBody:"\u00a1Encontraste todas las monedas!", emmausName:"El Camino a Ema\u00fas", em_names:["Ma\u00f1ana en la aldea", "Mediod\u00eda en el mercado", "Atardecer en el camino"], em_hint:"Toca para saltar. ¡Cae sobre un carrito para viajar en él!",
+    pilgrimRoadName:"El Camino del Peregrino", pr_intro:"Toca una casilla para girarla. ¡Forma un camino que pase por todas las casillas, desde el peregrino hasta la iglesia!", pr_turns:function(n){return "Giros: "+n;}, pr_road:function(n,total){return "Camino: "+n+" / "+total;}, pr_start:"COMENZAR", pr_church:"IGLESIA",
     wordGroupsName:"Grupos de Palabras", themeUnderstanding:"Entendimiento", wg_intro:"Arrastra una palabra sobre otra para intercambiarlas. Pon cada grupo en su fila.", wg_found:function(n){return "¡Grupo encontrado: " + n + "!";}, wg_left:function(n){return n === 1 ? "Falta 1 grupo" : "Faltan " + n + " grupos";},
     wordTrailName:"Camino de Palabras", themeTruth:"Verdad", wt_intro:"Arrastra de letra en letra para formar las palabras de abajo.", wt_left:function(n){return n === 1 ? "Falta 1 palabra" : "Faltan " + n + " palabras";},
-    sd_intro:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila, columna y recuadro.", sd_intro2:"Toca una casilla y luego una imagen. Cada imagen va una vez en cada fila y columna.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
+    sd_intro:"Toca una casilla y luego una imagen. Cada imagen debe aparecer una sola vez en cada fila, columna y bloque.", sd_intro2:"Toca una casilla y luego una imagen. Cada imagen debe aparecer una sola vez en cada fila y columna.", sd_hint:function(n){return "PISTA ("+n+")";}, sd_erase:"Borrar",
     sd_passTitle:"¡Maestro de Rompecabezas!", sd_passBody:"¡Resolviste todos los rompecabezas de vitral!",
     eb_intro:"Adivina la historia bíblica con los emojis.", eb_story:function(n,total){return "Historia "+n+" de "+total;}, eb_next:"SIGUIENTE HISTORIA",
-    eb_failTitle:"¡Tan Cerca!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
+    eb_failTitle:"¡Casi lo logras!", eb_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otras historias!",
     eb_passTitle:"¡Experto en Historias Bíblicas!", eb_passBody:"¡Adivinaste las historias bíblicas con los emojis!",
     tl_intro:"Toca los eventos en el orden en que ocurrieron, del primero al último.", tl_round:function(n,total){return "Ronda "+n+" de "+total;},
-    tl_failTitle:"¡Tan Cerca!", tl_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otros eventos!",
+    tl_failTitle:"¡Casi lo logras!", tl_failBody:"Te quedaste sin oportunidades. ¡Inténtalo de nuevo con otros eventos!",
     tl_passTitle:"¡Maestro de la Línea de Tiempo!", tl_passBody:"¡Pusiste en orden la vida de Jesús!",
-    lc_intro:"Tómate un momento de calma. Elige por quién o por qué estás orando.", lc_for:function(n){return "Orando por: "+n;}, lc_hold:"Mantén presionado para encenderla.", lc_amen:"AMÉN",
-    lc_passTitle:"¡Una Luz Encendida!", lc_passBody:"Gracias por tomarte un momento de calma para orar.",
+    lc_intro:"Tómate un momento de tranquilidad. Elige por quién o por qué quieres orar.", lc_for:function(n){return "Orando por: "+n;}, lc_hold:"Mantén presionado para encenderla.", lc_amen:"AMÉN",
+    lc_passTitle:"¡Una Luz se ha Encendido!", lc_passBody:"Gracias por tomarte un momento de calma para orar.",
     lc_int_family:"Familia", lc_int_friends:"Amigos", lc_int_peace:"Paz", lc_int_thanks:"Gracias", lc_int_healing:"Sanación", lc_int_courage:"Valentía",
     lc_pray_family:"Señor, bendice y protege a mi familia. Ayúdanos a amarnos unos a otros como tú nos amas.",
     lc_pray_friends:"Señor, gracias por mis amigos. Ayúdame a ser un buen amigo y a estar cerca de quienes me necesitan.",
     lc_pray_peace:"Señor, trae paz a nuestros corazones, a nuestros hogares y a nuestro mundo. Ayúdame a ser un pacificador.",
-    lc_pray_thanks:"Gracias, Señor, por cada bendición de mi vida, grande y pequeña. Ayúdame a no olvidarla nunca.",
+    lc_pray_thanks:"Gracias, Señor, por cada bendición de mi vida, grande y pequeña. Ayúdame a nunca olvidarlo.",
     lc_pray_healing:"Señor, acompaña a todos los que sufren en el cuerpo o en el corazón. Dales tu consuelo y tu sanación.",
     lc_pray_courage:"Señor, dame valentía para hacer lo correcto, aunque sea difícil. Quédate conmigo y hazme valiente.",
 
-    pz_intro:"Arrastra cada pieza al marco para armar la imagen. Encaja en su lugar cuando coincide.",
+    pz_intro:"Arrastra cada pieza al marco para reconstruir la imagen. Cada pieza encajará automáticamente cuando esté en el lugar correcto.",
     pz_round:function(n,total){return "Nivel "+n+" de "+total;},
     pz_pieces:function(n,total){return "Piezas colocadas: "+n+" / "+total;},
     pz_solved:"¡Resuelto!", pz_congrats:"¡FELICIDADES!", pz_next:"Siguiente nivel en un momento...",
-    pz_passTitle:"¡Maestro del Rompecabezas!", pz_passBody:"¡Armaste las 4 imágenes de vitral!",
+    pz_passTitle:"¡Maestro de los Rompecabezas!", pz_passBody:"¡Armaste las 4 imágenes de vitral!",
   }
 };
 
@@ -1817,7 +1818,7 @@ var FAITH_FLASH_QUESTIONS = [
   {en:{q:"Which king is especially associated with the book of Proverbs?",a:["Hezekiah","Cyrus","Solomon"]}, es:{q:"¿Qué rey aparece especialmente asociado con el libro de los Proverbios?",a:["Ezequías","Ciro","Salomón"]}, correct:2},
   {en:{q:"What does \"fearing the Lord\" mean?",a:["Acknowledging His authority","Being afraid of God","Not speaking about God"]}, es:{q:"¿Qué significa «temer al Señor»?",a:["Reconocer su autoridad","Tenerle miedo a Dios","No hablar de Dios"]}, correct:0},
   {en:{q:"According to the Book of Wisdom, what is the relationship between wisdom and God?",a:["It is a gift that comes from God","It is reserved exclusively for kings","It is obtained only through political power"]}, es:{q:"Según el libro de la Sabiduría, ¿qué relación existe entre la sabiduría y Dios?",a:["Es un don que procede de Dios","Está reservada exclusivamente a los reyes","Se obtiene únicamente mediante el poder político"]}, correct:0},
-  {en:{q:"Which book of the Catholic Bible is also named after Sirach?",a:["Ecclesiastes","Ecclesiasticus","Lamentations"]}, es:{q:"¿Qué libro de la Biblia católica también recibe el nombre de Sirácida?",a:["Eclesiastés","Eclesiástico","Lamentaciones"]}, correct:1},
+  {en:{q:"Which book of the Catholic Bible is also named after Sirach?",a:["Ecclesiastes","Ecclesiasticus","Lamentations"]}, es:{q:"¿Qué libro de la Biblia católica también lleva el nombre de Sirácida?",a:["Eclesiastés","Eclesiástico","Lamentaciones"]}, correct:1},
   {en:{q:"How many books does the Catholic Bible contain?",a:["70","73","76"]}, es:{q:"¿Cuántos libros contiene la Biblia católica?",a:["70","73","76"]}, correct:1},
   {en:{q:"Which book chronicles the birth of the Church and the initial spread of the gospel?",a:["Acts of the Apostles","Apocalypse","Leviticus"]}, es:{q:"¿Qué libro narra el nacimiento de la Iglesia y la expansión inicial del Evangelio?",a:["Hechos de los Apóstoles","Apocalipsis","Levítico"]}, correct:0},
   {en:{q:"When in Holy Week is the institution of the Eucharist at the Last Supper remembered?",a:["Ash Wednesday","Maundy Thursday","Palm Sunday"]}, es:{q:"¿Cuándo en la Semana Santa se recuerda la institución de la Eucaristía en la Última Cena?",a:["Miércoles de Ceniza","Jueves Santo","Domingo de Ramos"]}, correct:1},
@@ -3980,7 +3981,14 @@ function fmIsRevealed(cardId){
   var s = state.session.faithMatch, c = s && s.cards[cardId];
   return !!c && (c.matched || s.flipped.indexOf(cardId) !== -1);
 }
-function fmSoundFor(cardId){ return fmIsFirstTile(cardId) ? "fmFirst" : (fmIsSecondTile(cardId) || fmIsRevealed(cardId) ? "none" : null); }
+// A tile that cannot be turned over right now (two tiles are already up and being checked, the level is over, no chances left, or the tile is already
+// turned over) takes no tap at all: no sound, no glow, no flip (2026-11-05, per Dan). Same conditions as fmFlip.
+function fmCanReveal(cardId){
+  var s = state.session.faithMatch, c = s && s.cards[cardId];
+  if(!s || !c || s.status !== "playing" || s.levelDone || s.celebrate || s.chances <= 0 || s.flipped.length >= 2) return false;
+  return !c.matched && s.flipped.indexOf(cardId) === -1;
+}
+function fmSoundFor(cardId){ return fmIsFirstTile(cardId) ? "fmFirst" : (fmIsSecondTile(cardId) || fmIsRevealed(cardId) || !fmCanReveal(cardId) ? "none" : null); }
 // A tile turns over the moment the finger touches it, together with its sound (2026-10-22, per Dan) -- before, it waited for the finger to lift.
 // The click that follows only does the work a keyboard press needs (event.detail is 0 then), or plays the tile's sound late if the sound engine
 // could not start on the touch itself (a phone's first tap): the sound is remembered from the touch, so it is the one for that moment.
@@ -4170,7 +4178,7 @@ function screenFaithMatch(){
   var dim = s.dim;
   var cellsHtml = s.cards.map(function(c){
     var shown = c.matched || s.flipped.indexOf(c.id) !== -1;
-    var cls = "matchCard" + (c.matched ? " matched" : (shown ? " flipped" : ""));
+    var cls = "matchCard" + (c.matched ? " matched" : (shown ? " flipped" : (fmCanReveal(c.id) ? "" : " locked")));
     // decoding="sync": render() replaces the WHOLE grid's innerHTML on every
     // flip/match, so every matchCard <img> (even an already-matched one) is a
     // brand-new DOM node each time -- if the browser's decoded-bitmap cache
@@ -5612,7 +5620,7 @@ var TL_EVENTS = {
   palm:{icon:"🌴", en:"Palm Sunday", es:"El Domingo de Ramos"},
   cross:{icon:"✝️", en:"The Crucifixion", es:"La Crucifixión"},
   ascension:{icon:"☁️", en:"The Ascension", es:"La Ascensión"},
-  sermon:{icon:"⛰️", en:"Sermon on the Mount", es:"El Sermón del Monte"},
+  sermon:{icon:"⛰️", en:"Sermon on the Mount", es:"El Sermón de la montaña"},
   transfig:{icon:"✨", en:"The Transfiguration", es:"La Transfiguración"}
 };
 // every set is listed in the correct order, first to last
@@ -12032,7 +12040,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-05 FS";
+var APP_BUILD = "2026-11-05 FU";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
