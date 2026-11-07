@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>TV Test</title>
+<style>
+  html,body{margin:0;height:100%;background:#0D1030;color:#fff;font-family:Arial,Helvetica,sans-serif;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;}
+  #stage{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6vmin;padding:5vmin 3vmin;box-sizing:border-box;}
+  #arrow{width:0;height:0;border-left:7vmin solid transparent;border-right:7vmin solid transparent;border-bottom:12vmin solid #FFC93A;}
+  #top{font-size:4.6vmin;font-weight:700;color:#FFC93A;letter-spacing:.3vmin;}
+  #size{font-size:7.5vmin;font-weight:700;}
+  #orient{font-size:4.6vmin;font-weight:700;color:#7ACB5A;}
+  #info{font-size:2.9vmin;line-height:1.3;text-align:center;color:#C9D4FF;max-width:94%;}
+  #info b{color:#fff;}
+  #touch{font-size:4vmin;font-weight:700;color:#6FB7F5;}
+  #log{font-size:2.5vmin;line-height:1.3;text-align:center;color:#9FB0E8;max-height:10vmin;overflow:hidden;}
+  .corner{position:fixed;font-size:4vmin;font-weight:700;color:#FF6B6B;}
+  #cTL{left:2vmin;top:2vmin}#cTR{right:2vmin;top:2vmin}#cBL{left:2vmin;bottom:2vmin}#cBR{right:2vmin;bottom:2vmin}
+  .dot{position:fixed;width:9vmin;height:9vmin;margin:-4.5vmin 0 0 -4.5vmin;border-radius:50%;background:rgba(255,201,58,.55);border:.6vmin solid #fff;pointer-events:none;}
+  #btns{display:flex;justify-content:center;gap:2vmin;flex-wrap:wrap;}
+  button{font:700 3.2vmin Arial,sans-serif;padding:1.6vmin 3vmin;border-radius:1.6vmin;border:.4vmin solid #fff;background:#2457A6;color:#fff;}
+  /* the "turned" preview: the same page drawn turned a quarter turn counter-clockwise */
+  body.ccw #stage{left:0;top:100vh;width:100vh;height:100vw;right:auto;bottom:auto;transform-origin:0 0;transform:rotate(-90deg);}
+  body.cw #stage{left:100vw;top:0;width:100vh;height:100vw;right:auto;bottom:auto;transform-origin:0 0;transform:rotate(90deg);}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="arrow"></div>
+  <div id="top">THE ARROW SHOULD POINT UP</div>
+  <div id="size">...</div>
+  <div id="orient">...</div>
+  <div id="touch">Touch the screen: 0 touches</div>
+  <div id="info"></div>
+  <div id="log"></div>
+  <div id="btns"><button id="bNone">Normal</button><button id="bCcw">Turn page counter-clockwise</button><button id="bCw">Turn page clockwise</button></div>
+</div>
+<div class="corner" id="cTL">TL</div><div class="corner" id="cTR">TR</div><div class="corner" id="cBL">BL</div><div class="corner" id="cBR">BR</div>
+<script>
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var maxT = 0, logLines = [];
+  function mm(q){ try { return window.matchMedia(q).matches; } catch(e){ return false; } }
+  function stamp(){ var d = new Date(); return ("0"+d.getMinutes()).slice(-2) + ":" + ("0"+d.getSeconds()).slice(-2); }
+  function log(s){ logLines.unshift(stamp() + "  " + s); logLines = logLines.slice(0, 5); $("log").innerHTML = logLines.join("<br>"); }
+  function show(){
+    var w = window.innerWidth, h = window.innerHeight, so = screen.orientation;
+    $("size").textContent = w + " x " + h;
+    $("orient").textContent = (w > h ? "LANDSCAPE (wider than tall)" : "PORTRAIT (taller than wide)") + (so && so.type ? "  |  " + so.type + " " + so.angle + "°" : "");
+    $("info").innerHTML =
+      "<b>screen</b> " + screen.width + " x " + screen.height + " &nbsp; <b>pixel ratio</b> " + window.devicePixelRatio + " &nbsp; <b>available</b> " + screen.availWidth + " x " + screen.availHeight + "<br>" +
+      "<b>media orientation</b> " + (mm("(orientation:landscape)") ? "landscape" : "portrait") + " &nbsp; <b>pointer</b> " + (mm("(pointer:coarse)") ? "coarse" : mm("(pointer:fine)") ? "fine" : "none") + " &nbsp; <b>hover</b> " + (mm("(hover:hover)") ? "yes" : "no") + "<br>" +
+      "<b>touch points</b> " + (navigator.maxTouchPoints || 0) + " &nbsp; <b>most fingers seen</b> " + maxT + " &nbsp; <b>fullscreen</b> " + (document.fullscreenElement ? "yes" : "no") + "<br>" +
+      "<b>browser</b> " + navigator.userAgent;
+  }
+  show(); log("page opened");
+  window.addEventListener("resize", function(){ show(); log("resize to " + window.innerWidth + " x " + window.innerHeight); });
+  window.addEventListener("orientationchange", function(){ show(); log("orientationchange"); });
+  try { screen.orientation.addEventListener("change", function(){ show(); log("screen.orientation " + screen.orientation.type); }); } catch(e){}
+  // touches: a dot for each finger, so a rotated screen whose touches do not line up is easy to see
+  var dots = {};
+  function dot(e){
+    var d = dots[e.pointerId]; if(!d){ d = dots[e.pointerId] = document.createElement("div"); d.className = "dot"; document.body.appendChild(d); }
+    d.style.left = e.clientX + "px"; d.style.top = e.clientY + "px";
+    var n = Object.keys(dots).length; if(n > maxT){ maxT = n; show(); } $("touch").textContent = "Touch the screen: " + n + " touch" + (n === 1 ? "" : "es");
+  }
+  function gone(e){ var d = dots[e.pointerId]; if(d && d.parentNode) d.parentNode.removeChild(d); delete dots[e.pointerId]; var n = Object.keys(dots).length; $("touch").textContent = "Touch the screen: " + n + " touch" + (n === 1 ? "" : "es"); }
+  document.addEventListener("pointerdown", function(e){ dot(e); }, true);
+  document.addEventListener("pointermove", function(e){ if(dots[e.pointerId]) dot(e); }, true);
+  ["pointerup","pointercancel"].forEach(function(t){ document.addEventListener(t, gone, true); });
+  function turn(c){ document.body.className = c; log("page turned: " + (c || "normal")); }
+  $("bNone").onclick = function(){ turn(""); }; $("bCcw").onclick = function(){ turn("ccw"); }; $("bCw").onclick = function(){ turn("cw"); };
+})();
+</script>
+</body>
+</html>
