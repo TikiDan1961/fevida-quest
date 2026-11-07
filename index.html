@@ -2914,6 +2914,7 @@ function screenWelcome(){
       '<button class="btn pixBtn ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'mainMenu\')">' + t("startQuest") + '</button>' +
       '<button class="btn pixBtn secondary ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();go(\'language\')">' + t("changeLanguage") + '</button>' +
       instBtnHtml(fit) +
+      shareBtnHtml("app", null, "welcome", t("shareAppBtn"), fit) +          // SHARE THE APP, last (2026-11-06, per Dan)
     '</div>' +
   '</div>';
 }
@@ -12577,7 +12578,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 HG";
+var APP_BUILD = "2026-11-06 HH";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
