@@ -1350,7 +1350,7 @@ var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [], rotHo
 })();
 
 function pixPaused(){ return quitAsk || rotHold || rotGate; }
-var PAUSE_ON_ROTATE = ["faithFlash","faithMatch","beTheLight","followLight","wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder"];
+var PAUSE_ON_ROTATE = ["faithFlash","faithMatch","beTheLight","followLight","wordUnscramble","catchLight","kindnessSort","hiddenBlessings","stainedGlass","lightCandle","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","fruitsSpirit","jacobLadder","mainMenu"];      // (mainMenu, 2026-11-06, per Dan: the pilgrim does not walk on while the phone is on its side)
 var pixPausedAnims = [];
 function pixPauseAnims(){          // the lights, plants and beads that move on el.animate() (not the CSS ones: body.quitPaused / body.rotPaused stop those)
   try {
@@ -12657,7 +12657,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 HM";
+var APP_BUILD = "2026-11-06 HN";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
