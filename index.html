@@ -978,8 +978,12 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pbBar{margin-top:10px;}
   .msBar.msDropBar{height:84px;}      /* (2026-10-26, per Dan) DROP TILE in Mustard Seed is taller: 84px, was 54 (msFit keeps it halfway between the grid and the bottom of the screen) */
   @media (max-height:700px){ .msBar.msDropBar{height:68px;} }
+  .msBar.msDropBar{font-size:2.3rem;line-height:1;letter-spacing:.05em;white-space:nowrap;}      /* (2026-11-06, per Dan) the words on DROP TILE are larger; the button keeps its size */
+  @media (max-height:700px){ .msBar.msDropBar{font-size:2rem;} }
   .msBar.pbBar{height:108px;}      /* (2026-10-25, per Dan) the bottom buttons of Pray the Beads and Jacob's Ladder are twice as tall: 108px, was 54 */
   @media (max-height:700px){ .msBar.pbBar,.jlBar{height:88px;} }
+  .msBar.pbBar{font-size:3.4rem;line-height:1;white-space:nowrap;}      /* (2026-11-06, per Dan) TAP is larger; the button keeps its size */
+  @media (max-height:700px){ .msBar.pbBar{font-size:2.8rem;} }
   /* Mustard Seed (2026-10-23): the garden board, the stage guide and the swipe bar. The whole area takes the swipe. */
   .msHud{display:flex;align-items:center;justify-content:space-between;gap:6px;width:min(100%,380px);margin:0 auto 6px;}
   .msHud .pixNote{margin:0;font-size:.875rem;}
@@ -1109,6 +1113,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixMission .clSlideZone::after{content:"";position:absolute;left:0;right:0;top:100%;height:100vh;}
   .pixMission.clScreen .btn.pixBtn{position:relative;z-index:1;}
   .pixMission .clSlideTxt{font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.5rem;letter-spacing:.12em;color:#FFC93A;text-shadow:2px 2px 0 #1B1F3B;pointer-events:none;}
+  .pixMission .clSlideTxt{font-size:3rem;line-height:1;white-space:nowrap;}      /* (2026-11-06, per Dan) SLIDE is larger; the band and the arrows keep their size */
+  @media (max-height:700px){ .pixMission .clSlideTxt{font-size:2.6rem;} }
   .pixMission .clArrow{width:0;height:0;border-top:13px solid transparent;border-bottom:13px solid transparent;filter:drop-shadow(2px 2px 0 #1B1F3B);pointer-events:none;}
   .pixMission .clArrow.l{border-right:18px solid #FFC93A;}
   .pixMission .clArrow.r{border-left:18px solid #FFC93A;}
@@ -1322,7 +1328,11 @@ var quitAsk = false, quitAskScreen = null, quitRafQ = [], quitTimerQ = [], rotHo
   ["pointerdown","pointermove","pointerup","pointercancel","touchstart","touchmove","touchend","touchcancel","mousedown","mousemove","mouseup"].forEach(function(type){
     window.addEventListener(type, function(e){
       if(!quitAsk && (rotGate || performance.now() < rotGateUntil)){          // (2026-11-06, per Dan) the tap that starts the game again is not a move of the game, nor is the rest of that tap
-        if(rotGate && (type === "pointerdown" || type === "touchstart" || type === "mousedown")) rotGateEnd(true);
+        if(rotGate && (type === "pointerdown" || type === "touchstart" || type === "mousedown")){
+          rotGateEnd(true);
+          if(type === "pointerdown" && state.screen === "catchLight") clSteerFrom(e);          // (Catch the Light, per Dan: the hands go to the finger that starts the game again, and follow it)
+        }
+        if(!rotGate && clDragging && e.pointerId !== undefined && e.pointerId === clPtrId && (type === "pointermove" || type === "pointerup" || type === "pointercancel")) return;      // that finger goes on steering the hands
         e.stopImmediatePropagation();
         return;
       }
@@ -1373,12 +1383,19 @@ function rotGateNeeded(scr){
   } catch(e){}
   return false;
 }
+// A finger that is down when the phone is turned is let go of: the hands of Catch the Light stay where they were (2026-11-06, per Dan: they went to the left edge, because the finger's place in the turned screen was
+// read as a slide), the fingers on Jacob's LEFT / RIGHT and the line being drawn in Hope Garden are dropped.
+function rotLetGo(){
+  try { if(typeof clDragging !== "undefined") clDragging = false; } catch(e){}
+  try { jlHold = {}; jlKeys.l = jlKeys.r = false; jlPaintHeld(); } catch(e){}
+  try { if(hgl) hgl.drag = null; } catch(e){}
+}
 function rotGateOpen(){
   if(rotGate) return;
   rotGate = true; rotGateScreen = state.screen;
   pixPauseAnims(); document.body.classList.add("rotPaused");
-  try { if(typeof jlHold !== "undefined"){ jlHold = {}; jlKeys.l = jlKeys.r = false; jlPaintHeld(); } if(hgl) hgl.drag = null; } catch(e){}          // (the fingers on Jacob's LEFT / RIGHT, and the line being drawn in Hope Garden, are let go)
-  try { if(typeof clDragging !== "undefined") clDragging = false; if(typeof emMoveSfxSet === "function") emMoveSfxSet(""); if(typeof hglDangerSfx === "function") hglDangerSfx(false); } catch(e){}
+  rotLetGo();
+  try { if(typeof emMoveSfxSet === "function") emMoveSfxSet(""); if(typeof hglDangerSfx === "function") hglDangerSfx(false); } catch(e){}
   var el = document.createElement("div"); el.className = "rotGate"; el.id = "rotGate"; el.textContent = t("dp_ready"); document.body.appendChild(el);
   dbgLog("pause: " + state.screen + " waits for a tap, the phone is the right way up");
 }
@@ -1400,7 +1417,7 @@ function rotHoldUpdate(){
   }
   if(want !== rotHold){
     rotHold = want;
-    if(want){ pixPauseAnims(); document.body.classList.add("rotPaused"); dbgLog("pause: " + scr + " stands still while the phone is on its side"); }
+    if(want){ rotLetGo(); pixPauseAnims(); document.body.classList.add("rotPaused"); dbgLog("pause: " + scr + " stands still while the phone is on its side"); }
     else {
       var open = false;
       if(!showing && rotArmed){ open = rotArmed === scr; rotArmed = null; }
@@ -5201,7 +5218,7 @@ function clInBand(ev){
 }
 function clPointerDown(ev){
   var s = state.session.catchLight;
-  if(!s || s.status !== "playing" || clFading) return;      // nothing moves while the lights fade away after a miss
+  if(!s || s.status !== "playing" || clFading || pixPaused()) return;      // nothing moves while the lights fade away after a miss, or the game stands still
   if(!clInBand(ev)) return;
   if(pixAudioStale) pixReviveOnTap();          // back from another app: the sound engine is woken by the first touch of the slide, not only when the finger lifts
   clDragging = true; clPtrId = ev.pointerId; clPtrX = ev.clientX;
@@ -5212,8 +5229,14 @@ function clPointerDown(ev){
 // round), which removes the band the finger went down on, and the player used to have to lift the finger and touch again (2026-10-22, per Dan). Now a
 // finger that is still down carries on steering the hands in the next round, from wherever it is.
 var clPtrId = null, clPtrX = 0;
+function clSteerFrom(ev){          // the tap that starts the game again after a turn of the phone: when it is on the SLIDE band the hands go to the finger and follow it
+  var s = state.session.catchLight;
+  if(!s || s.status !== "playing" || s.interlude || clFading || clWaiting || !clInBand(ev)) return;
+  clDragging = true; clPtrId = ev.pointerId; clPtrX = ev.clientX;
+  clMoveHandTo(ev.clientX);
+}
 function clWinMove(ev){
-  if(!clDragging || ev.pointerId !== clPtrId) return;
+  if(!clDragging || ev.pointerId !== clPtrId || pixPaused()) return;
   if(ev.pointerType === "mouse" && ev.buttons === 0){ clDragging = false; return; }       // a mouse button let go somewhere we did not hear about
   clPtrX = ev.clientX;
   if(!clFading && state.screen === "catchLight") clMoveHandTo(ev.clientX);
@@ -5438,7 +5461,7 @@ document.addEventListener("pointerdown", function(e){
 }, true);
 function clLayerGone(){ var all = document.querySelector(".clTapAll"); if(all && all.parentNode) all.parentNode.removeChild(all); }
 function clLayerMove(ev){
-  if(!clDragging || ev.pointerId !== clPtrId) return;
+  if(!clDragging || ev.pointerId !== clPtrId || pixPaused()) return;
   clPtrX = ev.clientX;
   if(!clFading && state.screen === "catchLight") clMoveHandTo(ev.clientX);
 }
@@ -12634,7 +12657,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 HJ";
+var APP_BUILD = "2026-11-06 HM";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
