@@ -403,6 +403,11 @@
   .instOverlay .pixGuide li b{color:#B3262C;}
   .pixBtnDock .btn.pixBtn.instBtn{margin-top:10px;}
   .optInstall{margin:16px 0 0;width:100%;}
+  .shareRow{display:flex;justify-content:center;width:100%;margin:12px 0 0;}      /* the SHARE buttons (2026-11-06, per Dan) */
+  .shareRow .btn.pixBtn{margin:0;}
+  .optShare{margin:16px 0 0;}
+  .pxShareRow{align-self:start;display:flex;justify-content:center;margin-top:14px;}
+  .shareToast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 90px);transform:translateX(-50%);z-index:100000;max-width:86%;padding:12px 18px;border-radius:14px;background:#1B1F3B;color:#fff;border:3px solid #FFC93A;text-align:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-size:1.25rem;line-height:1.15;pointer-events:none;}
   .optInstall .btn.pixBtn.instBtn{margin:0 auto;display:flex;}
   .howPaper{width:100%;max-width:400px;max-height:100%;overflow-y:auto;box-sizing:border-box;animation:folderPop .24s ease-out;}
   .howPaper .howTitle{text-align:center;font-size:1.75rem;margin-bottom:8px;}
@@ -1450,6 +1455,12 @@ var T = {
     continuePlaying:"CONTINUE PLAYING",
     cont_title:"Keep Going?",
     cont_body:"You can keep playing this game, or go back to the Main Menu and try another one.",
+    shareBtn:"SHARE", shareAppBtn:"SHARE THE APP", shareContinue:"CONTINUE", shareCopied:"Link copied!", shareCopyPrompt:"Copy this link:",
+    shareAppText:"Come play Fe y Vida Quest with me! It's a free game from Fe y Vida at NCYC 2026.",
+    shareBadgeText:function(game,theme){return "I earned the "+theme+" badge in "+game+" on Fe y Vida Quest! Come play too.";},
+    shareFullText:function(game,theme){return "I finished every round of "+game+" in Fe y Vida Quest and earned the "+theme+" badge! Come play too.";},
+    shareTicketText:"I earned the Golden Ticket in Fe y Vida Quest! Come play too.",
+    cardHeadBadge:"BADGE EARNED!", cardHeadFull:"ALL ROUNDS DONE!", cardHeadTicket:"GOLDEN TICKET!", cardHeadApp:"COME PLAY WITH ME!", cardPlayAt:"Play free at",
     cj_title:"Choose Joy",
     cj_body:"Go to the Fe y Vida booth (#301) to have a joyful instant photo taken with a friend! Once you've done it, tap the button below.",
     awardTitle:"Mission Complete!",
@@ -1622,6 +1633,12 @@ var T = {
     continuePlaying:"SEGUIR JUGANDO",
     cont_title:"¿Seguir jugando?",
     cont_body:"Puedes seguir jugando este juego o volver al Menú Principal y probar otro.",
+    shareBtn:"COMPARTIR", shareAppBtn:"COMPARTIR LA APP", shareContinue:"CONTINUAR", shareCopied:"¡Enlace copiado!", shareCopyPrompt:"Copia este enlace:",
+    shareAppText:"¡Ven a jugar Fe y Vida Quest conmigo! Es un juego gratis de Fe y Vida en NCYC 2026.",
+    shareBadgeText:function(game,theme){return "¡Gané el sello "+theme+" en "+game+" de Fe y Vida Quest! Ven a jugar tú también.";},
+    shareFullText:function(game,theme){return "¡Terminé todas las rondas de "+game+" en Fe y Vida Quest y gané el sello "+theme+"! Ven a jugar tú también.";},
+    shareTicketText:"¡Gané el Boleto Dorado en Fe y Vida Quest! Ven a jugar tú también.",
+    cardHeadBadge:"¡SELLO GANADO!", cardHeadFull:"¡TODAS LAS RONDAS!", cardHeadTicket:"¡BOLETO DORADO!", cardHeadApp:"¡JUEGA CONMIGO!", cardPlayAt:"Juega gratis en",
     cj_title:"Elige la Alegría",
     cj_body:"¡Visita el stand de Fe y Vida (#301) para tomarte una divertida foto instantánea con un amigo! Cuando hayas terminado, toca el botón de abajo.",
     awardTitle:"¡Misión Cumplida!",
@@ -3709,12 +3726,14 @@ function grantMission(id, missionState){
 // "Mission Complete!" message and what was won, like the other result screens.
 // No RETURN TO MAIN MENU button (2026-10-23, per Dan): the screen shows for 2.5 seconds (it was 2) and the Main Menu comes by itself (see awardAutoReturn, which
 // render() calls).
-var AWARD_SHOW_MS = 2500, awardTimer = 0, awardTimerFor = null, awardRotateWait = false;      // (2.5 s since 2026-10-25, per Dan; it was 2 s)
+var AWARD_SHOW_MS = 2500, awardTimer = 0, awardTimerFor = null, awardRotateWait = false, awardHeld = false, awardLeaveFn = null;      // (2.5 s since 2026-10-25, per Dan; it was 2 s)
 function awardAutoReturn(){
-  if(state.screen !== "award"){ clearTimeout(awardTimer); awardTimer = 0; awardRotateWait = false; return; }
+  if(state.screen !== "award"){ clearTimeout(awardTimer); awardTimer = 0; awardRotateWait = false; awardHeld = false; return; }
+  if(awardHeld) return;                                          // the SHARE button was tapped: the screen stays until CONTINUE (2026-11-06, per Dan)
   if(awardTimer && awardTimerFor === state.awardMissionId) return;      // already counting for this badge (a redraw of the same screen does not restart it)
   clearTimeout(awardTimer); awardTimer = 0;                // (a different badge: it gets its own full time)
   awardTimerFor = state.awardMissionId;
+  awardHeld = false;
   function leave(){
     awardTimer = 0;
     if(state.screen !== "award" || state.awardMissionId !== awardTimerFor){ awardRotateWait = false; return; }
@@ -3738,6 +3757,7 @@ function awardAutoReturn(){
     try { dbgLog("badge screen " + mission + ": painted " + Math.round(performance.now() - armedAt) + " ms after it was built, shown for " + AWARD_SHOW_MS + " ms"); } catch(e0){}
     awardTimer = setTimeout(leave, AWARD_SHOW_MS);
   }
+  awardLeaveFn = leave;
   awardTimer = setTimeout(begin, 1000);          // (also what stops a redraw of the same screen from starting a second count)
   try {
     var bimg = document.querySelector(".pixResBadge");
@@ -3749,8 +3769,9 @@ function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
   return pixResultHtml(m.nameKey, {cls:"pixLower pixTitlePin", title:t("awardTitle"), body:m.noBadge ? t("awardBodyJoy") : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
-    buttons:""});
+    buttons: m.noBadge ? "" : (awardHeld ? pixBtnHtml(t("shareContinue"), "awardContinue()") : "") + '<div class="shareRow">' + shareBtnHtml("badge", m.id, "award") + '</div>'});
 }
+function awardContinue(){ awardHeld = false; if(awardLeaveFn) awardLeaveFn(); else afterAward(); }
 
 function afterAward(){
   var awardedId = state.awardMissionId;
@@ -3771,7 +3792,7 @@ function screenRoundCont(){
   var id = state.contFor, m = id && missionById(id);
   if(!m || !roundContAlive(id)){ state.contFor = null; state.screen = "mainMenu"; return screenMainMenu(); }      // (the game was lost, e.g. the page was reloaded: just the Main Menu)
   return pixResultHtml(m.nameKey, {cls:"pixLower pixTitlePin", title:t("cont_title"), body:t("cont_body"),
-    buttons:pixBtnHtml(t("continuePlaying"), "roundContGo()") + pixBtnHtml(t("mainMenu"), "roundContMenu()", true)});
+    buttons:pixBtnHtml(t("continuePlaying"), "roundContGo()") + (m.noBadge ? "" : shareBtnHtml("badge", id, "keepgoing")) + pixBtnHtml(t("mainMenu"), "roundContMenu()", true)});
 }
 function roundContGo(){
   track("keep_going_choice", {mission_id: state.contFor, choice: "continue"});
@@ -4036,7 +4057,7 @@ function missionById(id){ return MISSIONS.filter(function(m){ return m.id === id
 function pixShell(inner, cls){ return '<div class="screen pixHome pixSky pixMission pixLower' + (cls ? ' ' + cls : '') + '">' + cloudsHtml() + inner + '</div>'; }
 
 // a pixel button with the glow and the press sound; secondary = the blue one
-function pixBigLabel(label){ return label === t("hg_play") || label === t("tryAgain") || label === t("playAgain") || label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu") || label === t("continuePlaying") || label === t("em_keep"); }      // (KEEP PLAYING in the quit window has the same large type as MAIN MENU, 2026-11-04, per Dan)
+function pixBigLabel(label){ return label === t("hg_play") || label === t("tryAgain") || label === t("playAgain") || label === t("startMission") || label === t("missionCompleted") || label === t("mainMenu") || label === t("continuePlaying") || label === t("em_keep") || label === t("shareBtn") || label === t("shareContinue"); }      // (KEEP PLAYING in the quit window has the same large type as MAIN MENU, 2026-11-04, per Dan)
 function pixBtnHtml(label, js, secondary){
   return '<button class="btn pixBtn pixBtnSm' + (pixBigLabel(label) ? ' pixBtnBig' : '') + (secondary ? ' secondary' : '') + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '">' + label + '</button>';
 }
@@ -12395,7 +12416,7 @@ function passportPageInner(page){
               : '<div class="badge8Locked"><img src="tiles/icons48/ic_lock.png" alt=""></div>') +
       '<div class="pxBadgeName">' + (earned ? t(m.themeKey) : t("badgeLocked")) + '</div>' +
       '<div class="pxBadgeMission">' + t(m.nameKey) + '</div>' +
-      '</div><div></div>';
+      '</div>' + (earned && state.missions[m.id].badge ? '<div class="pxShareRow">' + shareBtnHtml("badge", m.id, "passport") + '</div>' : '<div></div>');
   }
   return "";            // (the Joyous Photo page that used to follow the badges is gone: the photo is taken at the booth now, 2026-10-22, per Dan)
 }
@@ -12416,6 +12437,120 @@ function closeToHome(n){
   if(spr) spr.style.transform = "scale(1)";
   setTimeout(function(){ c.style.opacity = "0"; }, 260);
   setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); }, 560);
+}
+
+// ---- Share (2026-11-06, per Dan) ----
+// Players can share the app with friends (Options), and post what they have won: the badge (the badge screen, the Keep Going screen after round 1, the Passport), a game finished (the Passport page of a badge whose game has
+// all its rounds done), and the Golden Ticket. It is the phone's own share sheet (navigator.share, with a picture card when the phone can share a picture), and where there is none (a computer) the link is copied. Nothing
+// about the player is sent anywhere: the card is drawn on the phone from the badge picture, and the link carries only ?src=share_<what> (the "source of the visit", see phSrc), so the counts show which share brought a friend.
+var SHARE_URL = "https://feyvidaquest.org/";
+var shareCache = {};
+function shareLink(kind){ return SHARE_URL + "?src=share_" + kind; }
+function shareGame(id){ return MISSIONS.filter(function(x){ return x.id === id; })[0] || null; }
+// what is shared: the words, the picture's name, the link
+function shareContent(kind, id){
+  var m = id && shareGame(id), full = !!(m && state.missions[id] && state.missions[id].full), text, head;
+  if(kind === "badge" && m){ text = (full ? t("shareFullText") : t("shareBadgeText"))(t(m.nameKey), t(m.themeKey)); head = full ? t("cardHeadFull") : t("cardHeadBadge"); }
+  else if(kind === "ticket"){ text = t("shareTicketText"); head = t("cardHeadTicket"); }
+  else { kind = "app"; text = t("shareAppText"); head = t("cardHeadApp"); }
+  return {kind: kind, id: id || null, text: text, head: head, title: "Fe y Vida Quest", url: shareLink(kind), file: "fe-y-vida-quest-" + kind + (id ? "-" + id : "") + ".png", game: m ? t(m.nameKey) : "", theme: m ? t(m.themeKey) : ""};
+}
+function shareLoadImg(src){ return new Promise(function(res, rej){ var im = new Image(); im.onload = function(){ res(im); }; im.onerror = function(){ rej(new Error("picture " + src)); }; im.src = src; }); }
+function shareFonts(){
+  try { if(document.fonts && document.fonts.load) return Promise.all([document.fonts.load('700 100px "Jersey 10"'), document.fonts.load('400 100px "Jersey 10"')]).catch(function(){}); } catch(e){}
+  return Promise.resolve();
+}
+function shareLabel(ctx, txt, x, y, size, fill, stroke, maxW){
+  var fam = '"Jersey 10","Pixelify Sans",ui-monospace,monospace';
+  ctx.font = "700 " + size + "px " + fam; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  while(maxW && ctx.measureText(txt).width > maxW && size > 28){ size -= 4; ctx.font = "700 " + size + "px " + fam; }
+  ctx.lineJoin = "round"; ctx.lineWidth = Math.round(size * .2); ctx.strokeStyle = stroke; ctx.strokeText(txt, x, y);
+  ctx.fillStyle = fill; ctx.fillText(txt, x, y);
+}
+function shareCloud(ctx, cx, cy, u){
+  ctx.fillStyle = "#FFFFFF";
+  [[-3, 0, 6], [-4, 1, 8], [-2, -1, 4], [-1, -2, 2], [-4, 2, 8]].forEach(function(r){ ctx.fillRect(cx + r[0] * u, cy + r[1] * u, r[2] * u, u); });
+  ctx.fillStyle = "#DCEEFF"; ctx.fillRect(cx - 4 * u, cy + 3 * u, 8 * u, u);
+}
+// the picture card, 1080 x 1350: the pixel sky, the name of the game, a cream card with the badge (or the ticket, or a few badges for the app), and the address
+function shareCard(pack){
+  var key = pack.kind + ":" + (pack.id || "") + ":" + (state.lang || "en") + ":" + (state.missions[pack.id] && state.missions[pack.id].full ? "f" : "");
+  if(shareCache[key]) return shareCache[key];
+  var m = pack.id && shareGame(pack.id), W = 1080, H = 1350;
+  var imgs = [];
+  if(pack.kind === "badge" && m) imgs.push(shareLoadImg(badge8Src(m)));
+  else if(pack.kind === "ticket") imgs.push(shareLoadImg(ticketPic()));
+  else PASSPORT_MISSIONS.slice(0, 6).forEach(function(x){ imgs.push(shareLoadImg(badge8Src(x))); });
+  var p = Promise.all([shareFonts(), Promise.all(imgs)]).then(function(r){
+    var pics = r[1], cv = document.createElement("canvas"), ctx;
+    cv.width = W; cv.height = H; ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false;
+    var g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#3F8FE8"); g.addColorStop(1, "#C6E6FF"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    shareCloud(ctx, 190, 150, 24); shareCloud(ctx, 880, 300, 20); shareCloud(ctx, 120, 760, 22); shareCloud(ctx, 960, 1060, 26); shareCloud(ctx, 300, 1250, 18);
+    shareLabel(ctx, "FE Y VIDA QUEST", W / 2, 105, 118, "#FFC93A", "#1B1F3B", 960);
+    shareLabel(ctx, pack.head, W / 2, 225, 96, "#FFFFFF", "#1B1F3B", 960);
+    // the cream card
+    var cx = 90, cy = 310, cw = 900, ch = 830;
+    ctx.fillStyle = "#1B1F3B"; ctx.fillRect(cx - 12, cy - 12, cw + 24, ch + 24); ctx.fillStyle = "#FFF3D6"; ctx.fillRect(cx, cy, cw, ch);
+    ctx.fillStyle = "#FFC93A"; ctx.fillRect(cx, cy, cw, 12); ctx.fillRect(cx, cy + ch - 12, cw, 12);
+    if(pack.kind === "badge" && m){
+      var s = 6, bw = 96 * s;
+      ctx.drawImage(pics[0], cx + (cw - bw) / 2, cy + 40, bw, bw);
+      shareLabel(ctx, pack.theme.toUpperCase(), W / 2, cy + 40 + bw + 70, 92, "#1B1F3B", "#FFF3D6", 800);
+      shareLabel(ctx, pack.game, W / 2, cy + 40 + bw + 150, 64, "#3A4A9A", "#FFF3D6", 800);
+    } else if(pack.kind === "ticket"){
+      var tw = 800, th = Math.round(tw * pics[0].naturalHeight / pics[0].naturalWidth);
+      ctx.imageSmoothingEnabled = true; ctx.drawImage(pics[0], cx + (cw - tw) / 2, cy + (ch - th) / 2, tw, th);
+    } else {
+      var k, bs = 3, bwid = 96 * bs, gap = 20, x0 = cx + (cw - (3 * bwid + 2 * gap)) / 2, y0 = cy + (ch - (2 * bwid + gap)) / 2;      // six badges, in the middle of the card
+      for(k = 0; k < pics.length; k++) ctx.drawImage(pics[k], x0 + (k % 3) * (bwid + gap), y0 + Math.floor(k / 3) * (bwid + gap), bwid, bwid);
+    }
+    shareLabel(ctx, t("cardPlayAt"), W / 2, 1215, 60, "#FFFFFF", "#1B1F3B", 900);
+    shareLabel(ctx, "feyvidaquest.org", W / 2, 1288, 84, "#FFC93A", "#1B1F3B", 900);
+    return new Promise(function(res, rej){ cv.toBlob(function(b){ if(b) res(b); else rej(new Error("no picture")); }, "image/png"); });
+  });
+  shareCache[key] = p;
+  p.catch(function(){ delete shareCache[key]; });
+  return p;
+}
+function shareWarm(kind, id){ try { shareCard(shareContent(kind, id)); } catch(e){} }          // drawn ahead, so the share sheet opens at the very moment of the tap
+function shareToast(msg){
+  var old = document.querySelector(".shareToast"); if(old && old.parentNode) old.parentNode.removeChild(old);
+  var el = document.createElement("div"); el.className = "shareToast"; el.textContent = msg; document.body.appendChild(el);
+  window.pixSt(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 2600);
+}
+function shareCopy(pack, where){
+  var line = pack.text + " " + pack.url, ok = function(){ shareToast(t("shareCopied")); track("share_result", {where: where, kind: pack.kind, mission_id: pack.id, result: "copied"}); };
+  try { if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(line).then(ok, function(){ try { window.prompt(t("shareCopyPrompt"), pack.url); } catch(e){} }); return; } } catch(e0){}
+  try { window.prompt(t("shareCopyPrompt"), pack.url); } catch(e1){}
+  track("share_result", {where: where, kind: pack.kind, mission_id: pack.id, result: "prompt"});
+}
+// where = the screen the button is on (for the counts): options, award, keepgoing, passport, ticket. Returns a promise that settles when the share sheet is closed.
+function shareDo(kind, id, where){
+  var pack = shareContent(kind, id);
+  track("share_tapped", {where: where, kind: pack.kind, mission_id: pack.id, full: !!(pack.id && state.missions[pack.id] && state.missions[pack.id].full)});
+  var result = function(r){ track("share_result", {where: where, kind: pack.kind, mission_id: pack.id, result: r}); };
+  var fail = function(e){ if(e && e.name === "AbortError"){ result("cancelled"); return; } shareCopy(pack, where); };     // the player closed the sheet: nothing more; any other trouble: the link is copied
+  return shareCard(pack).then(function(b){ return b; }, function(){ return null; }).then(function(blob){
+    var file = null;
+    try { if(blob) file = new File([blob], pack.file, {type: "image/png"}); } catch(e){}
+    if(!navigator.share){ shareCopy(pack, where); return; }
+    if(file && navigator.canShare && navigator.canShare({files: [file]}))
+      return navigator.share({files: [file], title: pack.title, text: pack.text + "\n" + pack.url}).then(function(){ result("shared"); }, fail);
+    return navigator.share({title: pack.title, text: pack.text, url: pack.url}).then(function(){ result("shared"); }, fail);
+  });
+}
+function shareBtnHtml(kind, id, where, label, fit){
+  window.pixSt(function(){ shareWarm(kind, id); }, 300);
+  var js = "shareTap('" + kind + "'," + (id ? "'" + id + "'" : "null") + ",'" + where + "')";
+  if(!fit) return pixBtnHtml(label || t("shareBtn"), js, true);
+  return '<button class="btn pixBtn secondary ' + fit + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();' + js + '">' + (label || t("shareBtn")) + '</button>';      // (the same size as INSTALL THE APP, under it on the Options screen)
+}
+function shareTap(kind, id, where){
+  if(where === "award"){      // the badge screen leaves by itself after its 2.5 s: a player who shares keeps it until CONTINUE
+    awardHeld = true; clearTimeout(awardTimer); awardTimer = 0;
+    var p = shareDo(kind, id, where); render(); return p;
+  }
+  return shareDo(kind, id, where);
 }
 
 // ---- Options (2026-10-20, per Dan): two volume sliders, for the sound effects and for the music ----
@@ -12442,7 +12577,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-06 HF";
+var APP_BUILD = "2026-11-06 HG";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12455,6 +12590,7 @@ function screenOptions(){
       optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
       optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
+    '<div class="shareRow optShare">' + shareBtnHtml("app", null, "options", t("shareAppBtn"), t("shareAppBtn").length > 16 ? "pixBtnSm" : "pixBtnMd") + '</div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
     '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + '</div>' +
@@ -12525,6 +12661,7 @@ function screenGoldenTicket(){
         '<div class="pixResTitle">' + t("ticketTitle") + '</div>' +
         '<p class="pixResBody">' + t("ticketBody") + '</p>' +
       '</div></div>' +
+      '<div class="shareRow">' + shareBtnHtml("ticket", null, "ticket") + '</div>' +
     '</div>' +
   '</div>';
 }
