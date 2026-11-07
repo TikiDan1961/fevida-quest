@@ -2486,20 +2486,25 @@ var PIX_SFX = {
 };
 var pixSfxBytes = {}, pixSfxBuf = {}, pixSfxDecoding = {}, pixSfxCurrent = null;
 
-function pixSfxFetchAll(){
-  if(!window.fetch) return;
-  Object.keys(PIX_SFX).forEach(function(k){
-    if(pixSfxBytes[k]) return;
-    fetch(PIX_SFX[k].url).then(function(r){ return r.arrayBuffer(); }).then(function(ab){
-      pixSfxBytes[k] = ab;
-      if(pixAudioCtx) pixSfxDecode(k);
-    }).catch(function(){});
-  });
+// (2026-11-07, per Dan: a visitor on a slow connection waited 4 to 8 seconds for EVERY screen. All the sound effects (4 MB) and the music (4 MB) were asked for at the same moment as the first screen's pictures, and the pictures of the
+// whole game (5.6 MB) 0.7 s later, so the 25 KB that the first three screens need queued behind 14 MB. Now the sounds and the pictures are fetched in the background, one after the other, in the order they are needed (see pixBgBuild),
+// they start only after the first screen is up, they wait while a new screen is waiting for its own pictures, and they ask the phone for a low priority. A sound that is needed before its turn is fetched at once.)
+var PIX_BG_ORDER = ["p:stars_tile.png","p:icons/lc_peace.png","p:ms/ms_1.png","p:fruits/fs_3.png","p:icons/lc_healing.png","p:icons/lc_family.png","p:emoji/e_ladder.png","p:fruits/fs_8.png","p:icons/ic_sound.png","p:icons/lc_friends.png","p:fruits/fs_7.png","p:icons/lc_courage.png","p:icons/lc_thanks.png","p:icons/ic_tbd.png","p:fruits/fs_6.png","p:icons/ic_wordUnscramble.png","p:icons/ic_back.png","p:fruits/fs_1.png","p:fruits/fs_2.png","p:icons/ic_goldenTicket.png","p:icons/ic_passport.png","p:ms/ms_2.png","p:fruits/fs_4.png","p:icons/ic_music.png","p:icons/ic_beTheLight.png","p:icons/ic_faithFlash.png","p:icons/ic_lock.png","p:icons/ic_kindnessSort.png","p:pr/church.png","p:emoji/e_tablets.png","p:icons/ic_lightCandle.png","p:hands.png","p:fruits/fs_5.png","p:flame.png","p:icons/ic_faithMatch.png","p:emoji/e_cross.png","p:icons/ic_emojiStories.png","p:icons/ic_hiddenBlessings.png","p:fruits/fs_9.png","p:icons/ic_catchLight.png","p:dove.png","p:ms/ms_5.png","p:fruits/fs_9c.png","p:icons/ic_jesusTimeline.png","p:icons/ic_options.png","p:sheep_far.png","p:icons/ic_followLight.png","p:card_back.png","p:ms/ms_3.png","p:fruits/fs_9b.png","p:icons/ic_pathOfLight.png","p:icons/ic_chooseJoy.png","p:icons/ic_emmaus.png","p:fruits/fs_9d.png","p:candle.png","p:cat.png","p:icons/ic_sacredSudoku.png","p:emoji/e_mountain.png","p:sheep_near.png","p:dog.png","p:icons/ic_stainedGlass.png","p:emoji/e_heart.png","p:fence_front2.png","p:ms/ms_4.png","p:icons48/ic_dovePeace.png","p:emoji/e_crown.png","p:icons48/ic_mustardSeed.png","p:emoji/e_cup.png","p:icons48/ic_fruitsSpirit.png","p:emoji/e_sunrise.png","p:ms/ms_6.png","p:fence_front.png","p:anamaria_placeholder.png","p:emoji/e_bread.png","p:sheep.png","p:icons48/ic_prayBeads.png","p:emoji/e_dove.png","p:icons48/ic_pilgrimRoad.png","p:icons48/ic_tbd.png","p:dove2.png","p:emoji/e_tower.png","p:icons48/ic_emmaus.png","p:icons48/ic_followLight.png","p:icons48/ic_wordGroups.png","p:emoji/e_jar.png","p:icons48/ic_jacobLadder.png","p:icons48/ic_wordUnscramble.png","p:icons48/ic_sound.png","p:emoji/e_rain.png","p:icons48/ic_faithFlash.png","p:icons48/ic_passport.png","p:icons48/ic_hopeGarden.png","p:icons48/ic_lock.png","p:emoji/e_sailboat.png","p:icons48/ic_wordTrail.png","p:emoji/e_house.png","p:icons48/ic_music.png","p:emoji/e_walk.png","p:icons48/ic_goldenTicket.png","p:hands3.png","p:icons48/ic_beTheLight.png","p:icons48/ic_kindnessSort.png","p:icons48/ic_back.png","p:icons48/ic_emojiStories.png","p:hands2.png","p:emoji/e_sheep.png","p:emoji/e_pig.png","p:emoji/e_pray.png","p:icons48/ic_lightCandle.png","p:emoji/e_fire.png","p:emoji/e_star.png","p:icons48/ic_faithMatch.png","p:emoji/e_rainbow.png","p:icons48/ic_hiddenBlessings.png","p:icons48/ic_sacredSudoku.png","p:icons48/ic_catchLight.png","p:emoji/e_ship.png","p:emoji/e_tree.png","p:emoji/e_people.png","p:icons48/ic_jesusTimeline.png","p:icons48/ic_chooseJoy.png","p:emoji/e_seedling.png","p:emoji/e_apple.png","p:icons48/ic_stainedGlass.png","p:emoji/e_moon.png","p:icons48/ic_options.png","p:icons48/ic_pathOfLight.png","p:emoji/e_elephant.png","p:emoji/e_moneybag.png","p:emoji/e_fish.png","p:emoji/e_sun.png","p:blessings.png","p:emoji/e_herb.png","p:emoji/e_boy.png","p:emoji/e_baby.png","p:emoji/e_oldman.png","p:emoji/e_whale.png","p:emoji/e_earth.png","p:emoji/e_wave.png","p:emoji/e_snake.png","p:emoji/e_feet.png","p:hg_qr.png","p:emoji/e_target.png","p:emoji/e_lion.png","p:emoji/e_angel.png","p:emoji/e_ogre.png","p:lawn.png","p:faith_tile8_08.png","p:passport_bg.png","p:faith_tile8_10.png","p:faith_tile8_00.png","p:faith_tile8_01.png","p:clouds_menu.png","p:faith_tile8_07.png","p:faith_tile8_14.png","p:faith_tile8_06.png","p:faith_tile8_03.png","p:faith_tile8_09.png","p:faith_tile8_04.png","p:faith_tile8_15.png","p:faith_tile8_05.png","p:faith_tile8_02.png","p:logo_8bit.png","p:faith_tile8_11.png","p:faith_tile8_13.png","p:faith_tile8_12.png","p:badges8/b8_mercy.png","p:badges8/b8_love.png","p:badges8/b8_salvation.png","p:badges8/b8_faith.png","p:badges8/b8_forgiveness.png","p:badges8/b8_grace.png","p:badges8/b8_holiness.png","p:scene_home.png","p:badges8/b8_light.png","p:badges8/b8_hope.png","p:hb_scene.png","p:badges8/b8_friendship.png","p:church_interior.png","p:scene_world.png","p:scene_world2.png","p:badges96/b96_perseverance.png","p:badges96/b96_growth.png","p:badges96/b96_discipleship.png","s:wgPick","p:badges96/b96_scripture.png","p:badges96/b96_spirit.png","p:badges96/b96_wisdom.png","p:badges96/b96_truth.png","p:badges96/b96_beads.png","p:badges96/b96_mercy.png","p:badges96/b96_faith.png","p:badges96/b96_forgiveness.png","p:badges96/b96_salvation.png","p:badges96/b96_love.png","p:badges96/b96_friendship.png","p:badges96/b96_holiness.png","p:badges96/b96_grace.png","p:badges96/b96_light.png","p:badges96/b96_hope.png","p:faith_tile2_08.jpg","p:faith_tile2_07.jpg","p:faith_tile2_01.jpg","p:faith_tile2_10.jpg","s:fmMatch","p:faith_tile2_00.jpg","p:faith_tile2_09.jpg","s:fmMiss","s:fmLast","p:faith_tile2_06.jpg","p:faith_tile2_14.jpg","p:faith_tile2_11.jpg","p:anamaria.png","p:faith_tile2_02.jpg","p:faith_tile2_05.jpg","p:faith_tile2_03.jpg","p:faith_tile2_04.jpg","p:faith_tile2_13.jpg","p:faith_tile2_15.jpg","p:faith_tile2_12.jpg","s:msFall","s:dpFlap","s:emCrash","s:emBasket2","p:puzzle/pz_03.jpg","p:puzzle/pz_08.jpg","s:emRun","s:emHeart","s:ffRound","p:puzzle/pz_11.jpg","p:puzzle/pz_06.jpg","p:puzzle/pz_05.jpg","p:puzzle/pz_04.jpg","s:emCoin","p:puzzle/pz_01.jpg","p:puzzle/pz_07.jpg","p:puzzle/pz_10.jpg","p:puzzle/pz_12.jpg","s:jlCrumble","p:puzzle/pz_02.jpg","p:puzzle/pz_09.jpg","s:jlBounce","p:golden_ticket.png","p:golden_ticket_es.png","s:emBasket1","p:badge_discipleship.png","p:badge_perseverance.png","p:badge_growth.png","s:jlSuper","p:badge_wisdom.png","s:fmFirst","p:badge_truth.png","p:badge_scripture.png","p:badge_spirit.png","p:badge_beads.png","s:emPerfect","s:emCart","s:hglDanger","s:clFade","s:sheepBaa2","s:sheepBaa1","p:badge_faith.png","p:badge_love.png","p:badge_hope.png","p:badge_holiness.png","s:clCatch","p:badge_friendship.png","p:badge_light.png","p:badge_forgiveness.png","p:badge_mercy.png","p:badge_salvation.png","p:badge_grace.png","s:ticket","s:jlFall","s:churchBell","p:hg_intro_scene.png","s:missionDone","s:fmFanfare"];          // after the first pictures, the tap sound and the music: every other picture (p:) and sound effect (s:), the smallest first. A file that is not in this list is added at the end.
+var pixSfxFetching = {};
+function pixSfxFetchOne(k, done){
+  if(!window.fetch || !PIX_SFX[k] || pixSfxBytes[k] || pixSfxFetching[k]){ if(done) done(); return; }
+  pixSfxFetching[k] = true;
+  fetch(PIX_SFX[k].url, {priority: done ? "low" : "high"}).then(function(r){ return r.arrayBuffer(); }).then(function(ab){
+    pixSfxBytes[k] = ab;
+    if(pixAudioCtx) pixSfxDecode(k);
+    if(done) done();
+  }).catch(function(){ pixSfxFetching[k] = false; if(done) done(); });
 }
 var pixSfxWaiters = {};
 function pixSfxDecode(name, whenReady){
   if(pixSfxBuf[name]){ if(whenReady) whenReady(pixSfxBuf[name]); return; }
   if(whenReady) (pixSfxWaiters[name] = pixSfxWaiters[name] || []).push(whenReady);   // the very first tap waits here for its sound
+  if(whenReady && !pixSfxBytes[name]) pixSfxFetchOne(name);          // a sound that something is waiting for, and that is not here before its turn in the background queue, is fetched now (pixSfxDecodeAll asks for all of them without waiting: those are left to the queue)
   var ctx = pixCtx();
   if(!ctx || !pixSfxBytes[name] || pixSfxDecoding[name]) return;
   pixSfxDecoding[name] = true;
@@ -2517,12 +2522,14 @@ function pixSfxDecodeAll(){ Object.keys(PIX_SFX).forEach(function(k){ pixSfxDeco
 // of the visit, through the "music" bus (the Options slider). A fresh audio engine after sleep restarts it (pixMusicRestart).
 var PIX_MUSIC_URL = "sounds/music_loop.wav";
 var pixMusic = {bytes:null, buf:null, decoding:false, src:null, srcCtx:null, want:false};
-function pixMusicFetch(){
-  if(!window.fetch || pixMusic.bytes) return;
-  fetch(PIX_MUSIC_URL).then(function(r){ return r.arrayBuffer(); }).then(function(ab){
+function pixMusicFetch(done){
+  if(!window.fetch || pixMusic.bytes || pixMusic.fetching){ if(done) done(); return; }
+  pixMusic.fetching = true;
+  fetch(PIX_MUSIC_URL, {priority: "low"}).then(function(r){ return r.arrayBuffer(); }).then(function(ab){
     pixMusic.bytes = ab;
     if(pixAudioCtx) pixMusicDecode();
-  }).catch(function(){});
+    if(done) done();
+  }).catch(function(){ pixMusic.fetching = false; if(done) done(); });
 }
 function pixMusicDecode(){
   if(pixMusic.buf || pixMusic.decoding || !pixMusic.bytes) return;
@@ -2946,8 +2953,7 @@ function pixTapTarget(e){ var el = e.target && e.target.closest ? e.target.close
 document.addEventListener("pointerdown", function(e){ if(pixTapTarget(e)) pixPressSfx(); }, true);
 document.addEventListener("click", function(e){ if(pixTapTarget(e)) pixClickSfx(); }, true);
 document.addEventListener("pointerdown", tapOnTouch, false);      // bubbling: the sound handlers on the touched element (above) have run by now
-pixSfxFetchAll();
-pixMusicFetch();
+// (the sounds are fetched in the background queue now: see pixBgBuild)
 
 // iOS Safari only shows :active styles (the pressed glow) if the page has a touch listener.
 document.addEventListener("touchstart", function(){}, {passive:true});
@@ -12659,7 +12665,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-07 HO";
+var APP_BUILD = "2026-11-07 HP";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12869,29 +12875,67 @@ function pixHoldUntilLoaded(app){
     return !(s && pixReady[s.indexOf("data:") === 0 ? s : pixAbs(s)]);
   });
   if(!pending.length) return;
-  var t0 = performance.now(), scr = state.screen, shown = false;
+  var t0 = performance.now(), scr = state.screen, shown = false, wid = pixWaitBegin();
   dbgLog("assets: HIDDEN " + scr + " was drawn with " + pending.length + " picture(s) not complete: the screen stays hidden until they are");
   app.classList.add("assetsWait");
   var left = pending.length;
-  function reveal(){ if(mine === holdToken){ app.classList.remove("assetsWait"); if(!shown){ shown = true; dbgLog("assets: HIDDEN " + scr + " shown again after " + Math.round(performance.now() - t0) + " ms"); } } }
+  function reveal(){ pixWaitEnd(wid); if(mine === holdToken){ app.classList.remove("assetsWait"); if(!shown){ shown = true; dbgLog("assets: HIDDEN " + scr + " shown again after " + Math.round(performance.now() - t0) + " ms"); } } }
   function one(){ if(--left <= 0) reveal(); }
   pending.forEach(function(im){ im.addEventListener("load", one); im.addEventListener("error", one); });
   setTimeout(reveal, 1500);
 }
 // Every picture of the game (tiles/, all the .png and .jpg: 299 of them, about 5.6 MB), fetched a few at a time in the background after the first screen is up. New pictures put in tiles/ must be added to this list.
-var PRELOAD_LIST = "anamaria.png|anamaria_placeholder.png|badge_beads.png|badge_discipleship.png|badge_faith.png|badge_forgiveness.png|badge_friendship.png|badge_grace.png|badge_growth.png|badge_holiness.png|badge_hope.png|badge_light.png|badge_love.png|badge_mercy.png|badge_perseverance.png|badge_salvation.png|badge_scripture.png|badge_spirit.png|badge_truth.png|badge_wisdom.png|badges8/b8_faith.png|badges8/b8_forgiveness.png|badges8/b8_friendship.png|badges8/b8_grace.png|badges8/b8_holiness.png|badges8/b8_hope.png|badges8/b8_light.png|badges8/b8_love.png|badges8/b8_mercy.png|badges8/b8_salvation.png|badges96/b96_beads.png|badges96/b96_discipleship.png|badges96/b96_faith.png|badges96/b96_forgiveness.png|badges96/b96_friendship.png|badges96/b96_grace.png|badges96/b96_growth.png|badges96/b96_holiness.png|badges96/b96_hope.png|badges96/b96_light.png|badges96/b96_love.png|badges96/b96_mercy.png|badges96/b96_perseverance.png|badges96/b96_salvation.png|badges96/b96_scripture.png|badges96/b96_spirit.png|badges96/b96_truth.png|badges96/b96_wisdom.png|blessings.png|candle.png|card_back.png|cat.png|church_interior.png|church_interior2.png|clouds_1.png|clouds_2.png|clouds_3.png|clouds_menu.png|dog.png|dove.png|dove2.png|dove3.png|emoji/e_angel.png|emoji/e_apple.png|emoji/e_baby.png|emoji/e_boy.png|emoji/e_bread.png|emoji/e_cross.png|emoji/e_crown.png|emoji/e_cup.png|emoji/e_dove.png|emoji/e_earth.png|emoji/e_elephant.png|emoji/e_feet.png|emoji/e_fire.png|emoji/e_fish.png|emoji/e_heart.png|emoji/e_herb.png|emoji/e_house.png|emoji/e_jar.png|emoji/e_ladder.png|emoji/e_lion.png|emoji/e_moneybag.png|emoji/e_moon.png|emoji/e_mountain.png|emoji/e_ogre.png|emoji/e_oldman.png|emoji/e_people.png|emoji/e_pig.png|emoji/e_pray.png|emoji/e_rain.png|emoji/e_rainbow.png|emoji/e_sailboat.png|emoji/e_seedling.png|emoji/e_sheep.png|emoji/e_ship.png|emoji/e_snake.png|emoji/e_star.png|emoji/e_sun.png|emoji/e_sunrise.png|emoji/e_tablets.png|emoji/e_target.png|emoji/e_tower.png|emoji/e_tree.png|emoji/e_walk.png|emoji/e_wave.png|emoji/e_whale.png|faith_tile2_00.jpg|faith_tile2_01.jpg|faith_tile2_02.jpg|faith_tile2_03.jpg|faith_tile2_04.jpg|faith_tile2_05.jpg|faith_tile2_06.jpg|faith_tile2_07.jpg|faith_tile2_08.jpg|faith_tile2_09.jpg|faith_tile2_10.jpg|faith_tile2_11.jpg|faith_tile2_12.jpg|faith_tile2_13.jpg|faith_tile2_14.jpg|faith_tile2_15.jpg|faith_tile8_00.png|faith_tile8_01.png|faith_tile8_02.png|faith_tile8_03.png|faith_tile8_04.png|faith_tile8_05.png|faith_tile8_06.png|faith_tile8_07.png|faith_tile8_08.png|faith_tile8_09.png|faith_tile8_10.png|faith_tile8_11.png|faith_tile8_12.png|faith_tile8_13.png|faith_tile8_14.png|faith_tile8_15.png|fence_front.png|fence_front2.png|fence_front4.png|flame.png|fruits/fs_1.png|fruits/fs_2.png|fruits/fs_3.png|fruits/fs_4.png|fruits/fs_5.png|fruits/fs_6.png|fruits/fs_7.png|fruits/fs_8.png|fruits/fs_9.png|fruits/fs_9b.png|fruits/fs_9c.png|fruits/fs_9d.png|golden_ticket.png|golden_ticket_es.png|hands.png|hands2.png|hands3.png|hb_scene.png|heart_empty.png|heart_full.png|hg_intro_scene.png|hg_qr.png|icons/ic_back.png|icons/ic_beTheLight.png|icons/ic_catchLight.png|icons/ic_chooseJoy.png|icons/ic_emojiStories.png|icons/ic_faithFlash.png|icons/ic_faithMatch.png|icons/ic_followLight.png|icons/ic_goldenTicket.png|icons/ic_hiddenBlessings.png|icons/ic_jesusTimeline.png|icons/ic_kindnessSort.png|icons/ic_lightCandle.png|icons/ic_lock.png|icons/ic_music.png|icons/ic_options.png|icons/ic_passport.png|icons/ic_pathOfLight.png|icons/ic_sacredSudoku.png|icons/ic_sound.png|icons/ic_stainedGlass.png|icons/ic_tbd.png|icons/ic_wordUnscramble.png|icons/lc_courage.png|icons/lc_family.png|icons/lc_friends.png|icons/lc_healing.png|icons/lc_peace.png|icons/lc_thanks.png|icons48/ic_back.png|icons48/ic_beTheLight.png|icons48/ic_catchLight.png|icons48/ic_chooseJoy.png|icons48/ic_dovePeace.png|icons48/ic_emojiStories.png|icons48/ic_faithFlash.png|icons48/ic_faithMatch.png|icons48/ic_followLight.png|icons48/ic_fruitsSpirit.png|icons48/ic_goldenTicket.png|icons48/ic_hiddenBlessings.png|icons48/ic_hopeGarden.png|icons48/ic_jacobLadder.png|icons48/ic_jesusTimeline.png|icons48/ic_kindnessSort.png|icons48/ic_lightCandle.png|icons48/ic_lock.png|icons48/ic_music.png|icons48/ic_mustardSeed.png|icons48/ic_options.png|icons48/ic_passport.png|icons48/ic_pathOfLight.png|icons48/ic_pilgrimRoad.png|icons48/ic_prayBeads.png|icons48/ic_sacredSudoku.png|icons48/ic_sound.png|icons48/ic_stainedGlass.png|icons48/ic_tbd.png|icons48/ic_wordGroups.png|icons48/ic_wordTrail.png|icons48/ic_wordUnscramble.png|icons48p/ic_back.png|icons48p/ic_beTheLight.png|icons48p/ic_catchLight.png|icons48p/ic_chooseJoy.png|icons48p/ic_dovePeace.png|icons48p/ic_emojiStories.png|icons48p/ic_faithFlash.png|icons48p/ic_faithMatch.png|icons48p/ic_followLight.png|icons48p/ic_fruitsSpirit.png|icons48p/ic_goldenTicket.png|icons48p/ic_hiddenBlessings.png|icons48p/ic_hopeGarden.png|icons48p/ic_jacobLadder.png|icons48p/ic_jesusTimeline.png|icons48p/ic_kindnessSort.png|icons48p/ic_lightCandle.png|icons48p/ic_lock.png|icons48p/ic_music.png|icons48p/ic_mustardSeed.png|icons48p/ic_options.png|icons48p/ic_passport.png|icons48p/ic_pathOfLight.png|icons48p/ic_pilgrimRoad.png|icons48p/ic_prayBeads.png|icons48p/ic_sacredSudoku.png|icons48p/ic_sound.png|icons48p/ic_stainedGlass.png|icons48p/ic_tbd.png|icons48p/ic_wordGroups.png|icons48p/ic_wordTrail.png|icons48p/ic_wordUnscramble.png|lawn.png|logo_8bit.png|logo_small.png|ms/ms_1.png|ms/ms_2.png|ms/ms_3.png|ms/ms_4.png|ms/ms_5.png|ms/ms_6.png|passport_bg.png|pilgrim.png|pilgrim_back.png|pr/church.png|puzzle/pz_01.jpg|puzzle/pz_02.jpg|puzzle/pz_03.jpg|puzzle/pz_04.jpg|puzzle/pz_05.jpg|puzzle/pz_06.jpg|puzzle/pz_07.jpg|puzzle/pz_08.jpg|puzzle/pz_09.jpg|puzzle/pz_10.jpg|puzzle/pz_11.jpg|puzzle/pz_12.jpg|qr_feyvida.png|scene_church.png|scene_home.png|scene_world.png|scene_world2.png|scene_world4.png|sheep.png|sheep_far.png|sheep_far2.png|sheep_near.png|sheep_near2.png|sky_menu.png|spark.png|stars_tile.png|icons/ic_emmaus.png|icons48/ic_emmaus.png|icons48p/ic_emmaus.png".split("|");
-var pixPreloadDone = false;
-function pixPreloadAll(){
-  var i = 0, running = 0;
-  function next(){
-    while(running < 3 && i < PRELOAD_LIST.length){
-      running++;
-      pixLoad(pixAbs("tiles/" + PRELOAD_LIST[i++]), function(){ running--; next(); });
-    }
-    if(!running && i >= PRELOAD_LIST.length && !pixPreloadDone){ pixPreloadDone = true; if(pixGuard) pixGuard.disconnect(); dbgLog("assets: every picture is loaded" + (PIX_OFF ? "" : " and decoded") + ", " + Math.round(performance.now() / 1000) + " s after the page loaded"); pixWarmSounds(); }
-  }
-  next();
+var PRELOAD_LIST = "logo_small.png|qr_feyvida.png|scene_church.png|church_interior2.png|sky_menu.png|clouds_1.png|clouds_2.png|clouds_3.png|scene_world4.png|spark.png|fence_front4.png|dove3.png|pilgrim.png|pilgrim_back.png|sheep_near2.png|sheep_far2.png|heart_full.png|heart_empty.png|icons48p/ic_back.png|icons48p/ic_beTheLight.png|icons48p/ic_catchLight.png|icons48p/ic_chooseJoy.png|icons48p/ic_dovePeace.png|icons48p/ic_emojiStories.png|icons48p/ic_faithFlash.png|icons48p/ic_faithMatch.png|icons48p/ic_followLight.png|icons48p/ic_fruitsSpirit.png|icons48p/ic_goldenTicket.png|icons48p/ic_hiddenBlessings.png|icons48p/ic_hopeGarden.png|icons48p/ic_jacobLadder.png|icons48p/ic_jesusTimeline.png|icons48p/ic_kindnessSort.png|icons48p/ic_lightCandle.png|icons48p/ic_lock.png|icons48p/ic_music.png|icons48p/ic_mustardSeed.png|icons48p/ic_options.png|icons48p/ic_passport.png|icons48p/ic_pathOfLight.png|icons48p/ic_pilgrimRoad.png|icons48p/ic_prayBeads.png|icons48p/ic_sacredSudoku.png|icons48p/ic_sound.png|icons48p/ic_stainedGlass.png|icons48p/ic_tbd.png|icons48p/ic_wordGroups.png|icons48p/ic_wordTrail.png|icons48p/ic_wordUnscramble.png|icons48p/ic_emmaus.png|stars_tile.png|icons/lc_peace.png|ms/ms_1.png|fruits/fs_3.png|icons/lc_healing.png|icons/lc_family.png|emoji/e_ladder.png|fruits/fs_8.png|icons/ic_sound.png|icons/lc_friends.png|fruits/fs_7.png|icons/lc_courage.png|icons/lc_thanks.png|icons/ic_tbd.png|fruits/fs_6.png|icons/ic_wordUnscramble.png|icons/ic_back.png|fruits/fs_1.png|fruits/fs_2.png|icons/ic_goldenTicket.png|icons/ic_passport.png|ms/ms_2.png|fruits/fs_4.png|icons/ic_music.png|icons/ic_beTheLight.png|icons/ic_faithFlash.png|icons/ic_lock.png|icons/ic_kindnessSort.png|pr/church.png|emoji/e_tablets.png|icons/ic_lightCandle.png|hands.png|fruits/fs_5.png|flame.png|icons/ic_faithMatch.png|emoji/e_cross.png|icons/ic_emojiStories.png|icons/ic_hiddenBlessings.png|fruits/fs_9.png|icons/ic_catchLight.png|dove.png|ms/ms_5.png|fruits/fs_9c.png|icons/ic_jesusTimeline.png|icons/ic_options.png|sheep_far.png|icons/ic_followLight.png|card_back.png|ms/ms_3.png|fruits/fs_9b.png|icons/ic_pathOfLight.png|icons/ic_chooseJoy.png|icons/ic_emmaus.png|fruits/fs_9d.png|candle.png|cat.png|icons/ic_sacredSudoku.png|emoji/e_mountain.png|sheep_near.png|dog.png|icons/ic_stainedGlass.png|emoji/e_heart.png|fence_front2.png|ms/ms_4.png|icons48/ic_dovePeace.png|emoji/e_crown.png|icons48/ic_mustardSeed.png|emoji/e_cup.png|icons48/ic_fruitsSpirit.png|emoji/e_sunrise.png|ms/ms_6.png|fence_front.png|anamaria_placeholder.png|emoji/e_bread.png|sheep.png|icons48/ic_prayBeads.png|emoji/e_dove.png|icons48/ic_pilgrimRoad.png|icons48/ic_tbd.png|dove2.png|emoji/e_tower.png|icons48/ic_emmaus.png|icons48/ic_followLight.png|icons48/ic_wordGroups.png|emoji/e_jar.png|icons48/ic_jacobLadder.png|icons48/ic_wordUnscramble.png|icons48/ic_sound.png|emoji/e_rain.png|icons48/ic_faithFlash.png|icons48/ic_passport.png|icons48/ic_hopeGarden.png|icons48/ic_lock.png|emoji/e_sailboat.png|icons48/ic_wordTrail.png|emoji/e_house.png|icons48/ic_music.png|emoji/e_walk.png|icons48/ic_goldenTicket.png|hands3.png|icons48/ic_beTheLight.png|icons48/ic_kindnessSort.png|icons48/ic_back.png|icons48/ic_emojiStories.png|hands2.png|emoji/e_sheep.png|emoji/e_pig.png|emoji/e_pray.png|icons48/ic_lightCandle.png|emoji/e_fire.png|emoji/e_star.png|icons48/ic_faithMatch.png|emoji/e_rainbow.png|icons48/ic_hiddenBlessings.png|icons48/ic_sacredSudoku.png|icons48/ic_catchLight.png|emoji/e_ship.png|emoji/e_tree.png|emoji/e_people.png|icons48/ic_jesusTimeline.png|icons48/ic_chooseJoy.png|emoji/e_seedling.png|emoji/e_apple.png|icons48/ic_stainedGlass.png|emoji/e_moon.png|icons48/ic_options.png|icons48/ic_pathOfLight.png|emoji/e_elephant.png|emoji/e_moneybag.png|emoji/e_fish.png|emoji/e_sun.png|blessings.png|emoji/e_herb.png|emoji/e_boy.png|emoji/e_baby.png|emoji/e_oldman.png|emoji/e_whale.png|emoji/e_earth.png|emoji/e_wave.png|emoji/e_snake.png|emoji/e_feet.png|hg_qr.png|emoji/e_target.png|emoji/e_lion.png|emoji/e_angel.png|emoji/e_ogre.png|lawn.png|faith_tile8_08.png|passport_bg.png|faith_tile8_10.png|faith_tile8_00.png|faith_tile8_01.png|clouds_menu.png|faith_tile8_07.png|faith_tile8_14.png|faith_tile8_06.png|faith_tile8_03.png|faith_tile8_09.png|faith_tile8_04.png|faith_tile8_15.png|faith_tile8_05.png|faith_tile8_02.png|logo_8bit.png|faith_tile8_11.png|faith_tile8_13.png|faith_tile8_12.png|badges8/b8_mercy.png|badges8/b8_love.png|badges8/b8_salvation.png|badges8/b8_faith.png|badges8/b8_forgiveness.png|badges8/b8_grace.png|badges8/b8_holiness.png|scene_home.png|badges8/b8_light.png|badges8/b8_hope.png|hb_scene.png|badges8/b8_friendship.png|church_interior.png|scene_world.png|scene_world2.png|badges96/b96_perseverance.png|badges96/b96_growth.png|badges96/b96_discipleship.png|badges96/b96_scripture.png|badges96/b96_spirit.png|badges96/b96_wisdom.png|badges96/b96_truth.png|badges96/b96_beads.png|badges96/b96_mercy.png|badges96/b96_faith.png|badges96/b96_forgiveness.png|badges96/b96_salvation.png|badges96/b96_love.png|badges96/b96_friendship.png|badges96/b96_holiness.png|badges96/b96_grace.png|badges96/b96_light.png|badges96/b96_hope.png|faith_tile2_08.jpg|faith_tile2_07.jpg|faith_tile2_01.jpg|faith_tile2_10.jpg|faith_tile2_00.jpg|faith_tile2_09.jpg|faith_tile2_06.jpg|faith_tile2_14.jpg|faith_tile2_11.jpg|anamaria.png|faith_tile2_02.jpg|faith_tile2_05.jpg|faith_tile2_03.jpg|faith_tile2_04.jpg|faith_tile2_13.jpg|faith_tile2_15.jpg|faith_tile2_12.jpg|puzzle/pz_03.jpg|puzzle/pz_08.jpg|puzzle/pz_11.jpg|puzzle/pz_06.jpg|puzzle/pz_05.jpg|puzzle/pz_04.jpg|puzzle/pz_01.jpg|puzzle/pz_07.jpg|puzzle/pz_10.jpg|puzzle/pz_12.jpg|puzzle/pz_02.jpg|puzzle/pz_09.jpg|golden_ticket.png|golden_ticket_es.png|badge_discipleship.png|badge_perseverance.png|badge_growth.png|badge_wisdom.png|badge_truth.png|badge_scripture.png|badge_spirit.png|badge_beads.png|badge_faith.png|badge_love.png|badge_hope.png|badge_holiness.png|badge_friendship.png|badge_light.png|badge_forgiveness.png|badge_mercy.png|badge_salvation.png|badge_grace.png|hg_intro_scene.png".split("|");
+var pixPreloadDone = false, pixBgAllDone = false;
+// The background queue (2026-11-07, per Dan; see the note at pixSfxFetchOne). In order: the pictures the first screens and the Missions window need (the front of PRELOAD_LIST), the tap sound, the music, the rest of the pictures
+// (smallest first, the big badges last), then the other sounds (smallest first). Four at a time. Nothing new starts while a screen is waiting for its own pictures (pixScreensWaiting).
+var pixWaitSet = {}, pixWaitId = 0, pixIdleHooks = [], pixBgQ = [], pixBgRunning = 0, pixBgStarted = false, pixBgPics = 0, pixBgTimer = 0;
+function pixWaitBegin(){ var id = ++pixWaitId; pixWaitSet[id] = performance.now(); return id; }
+function pixScreensWaiting(){      // (a wait that was never ended counts for 7.5 s at most)
+  var now = performance.now(), any = false;
+  for(var k in pixWaitSet){ if(now - pixWaitSet[k] > 7500) delete pixWaitSet[k]; else any = true; }
+  return any;
 }
+function pixIdleKick(){ if(pixScreensWaiting()) return; for(var i = 0; i < pixIdleHooks.length; i++){ try { pixIdleHooks[i](); } catch(e){} } }
+function pixWaitEnd(id){ if(pixWaitSet[id] !== undefined){ delete pixWaitSet[id]; pixIdleKick(); } }
+(function tick(){ window.pixSt(function(){ pixIdleKick(); tick(); }, 1500); })();          // (nothing can stay held back for long)
+function pixBgBuild(){
+  var seen = {}, firstSet = {};
+  function pic(n){ if(seen[n]) return; seen[n] = 1; pixBgPics++; pixBgQ.push(function(done){ pixLoad(pixAbs("tiles/" + n), function(){ if(--pixBgPics === 0) pixBgPicturesDone(); done(); }, true); }); }
+  function snd(k){ if(seen["s:" + k] || !PIX_SFX[k]) return; seen["s:" + k] = 1; pixBgQ.push(function(done){ pixSfxFetchOne(k, done); }); }
+  PRELOAD_LIST.forEach(function(n, i){ if(i < PIX_FIRST_PICS){ firstSet[n] = 1; pic(n); } });
+  snd("tap");
+  pixBgQ.push(function(done){ pixMusicFetch(done); });
+  PIX_BG_ORDER.forEach(function(it){ if(it.charAt(0) === "p") pic(it.slice(2)); else snd(it.slice(2)); });
+  PRELOAD_LIST.forEach(function(n){ pic(n); });
+  Object.keys(PIX_SFX).forEach(snd);
+}
+function pixBgPicturesDone(){
+  if(pixPreloadDone) return;
+  pixPreloadDone = true; if(pixGuard) pixGuard.disconnect();
+  dbgLog("assets: every picture is loaded" + (PIX_OFF ? "" : " and decoded") + ", " + Math.round(performance.now() / 1000) + " s after the page loaded");
+}
+function pixBgNext(){
+  if(!pixBgStarted) return;
+  while(pixBgRunning < 4 && pixBgQ.length && !pixScreensWaiting()){
+    pixBgRunning++;
+    (function(fn){
+      var fin = false;
+      function done(){ if(fin) return; fin = true; pixBgRunning--; pixBgNext(); }
+      try { fn(done); } catch(e){ done(); }
+    })(pixBgQ.shift());
+  }
+  if(!pixBgRunning && !pixBgQ.length && !pixBgAllDone){
+    pixBgAllDone = true; pixBgPicturesDone();
+    dbgLog("assets: every picture and sound is loaded, " + Math.round(performance.now() / 1000) + " s after the page loaded");
+    pixWarmSounds();
+  }
+}
+pixIdleHooks.push(pixBgNext);
+function pixBgGo(){ if(pixBgStarted) return; pixBgStarted = true; pixBgBuild(); pixBgNext(); }
+function pixBgSoon(){ if(pixBgStarted || pixBgTimer) return; pixBgTimer = window.pixSt(pixBgGo, 800); }          // the first screen is up: a moment later the background loading starts
+// the first PIX_FIRST_PICS pictures of PRELOAD_LIST are the ones the first screens, the Main Menu and the Missions window use
+var PIX_FIRST_PICS = 51;
 // With the app installed (a service worker is in charge), every sound is fetched once in the background too, so the game plays completely offline, not only the sounds that have been heard (2026-11-02, per Dan).
 // The pictures too: on the very first visit the worker takes charge only after some of them were fetched, so they are asked for once more, through it. Done once per build on a phone.
 var pixWarmStarted = false;
@@ -12903,11 +12947,14 @@ function pixWarmSounds(){
   Object.keys(PIX_SFX).forEach(function(k){ var u = PIX_SFX[k] && PIX_SFX[k].url; if(u && urls.indexOf(u) === -1) urls.push(u); });
   PRELOAD_LIST.forEach(function(n){ urls.push("tiles/" + n); });
   urls.push("tiles/Jersey10.ttf", "tiles/PixelifySans.ttf", "emmaus_layout.js", location.pathname);      // (the page itself too: the first visit is not one the worker saw)
+  var finished = false;
   function next(){
-    while(running < 3 && i < urls.length){ running++; fetch(urls[i++]).then(function(r){ return r.blob(); }).then(done, done); }
-    if(!running && i >= urls.length){ try { localStorage.setItem("fevidaWarm", APP_BUILD); } catch(e){} dbgLog("offline: everything is saved on this phone"); }
+    if(finished) return;
+    while(running < 3 && i < urls.length && !pixScreensWaiting()){ running++; fetch(urls[i++], {priority: "low"}).then(function(r){ return r.blob(); }).then(done, done); }
+    if(!running && i >= urls.length){ finished = true; try { localStorage.setItem("fevidaWarm", APP_BUILD); } catch(e){} dbgLog("offline: everything is saved on this phone"); }
   }
   function done(){ running--; next(); }
+  pixIdleHooks.push(next);
   next();
 }
 
@@ -12925,11 +12972,12 @@ dbgLog("assets: waiting for pictures is " + (PIX_OFF ? "OFF (?noassets)" : "on")
 var pixGuardLogN = 0;
 var pixReady = {}, pixLoading = {}, pixImgs = {}, pixKeep = [], pixAbsCache = {}, pixAnchor = document.createElement("a");
 function pixAbs(u){ var a = pixAbsCache[u]; if(a) return a; pixAnchor.href = u; return (pixAbsCache[u] = pixAnchor.href); }
-function pixLoad(url, cb){
+function pixLoad(url, cb, low){
   if(pixReady[url]){ if(cb) cb(); return; }
   if(pixLoading[url]){ if(cb) pixLoading[url].push(cb); return; }
   pixLoading[url] = cb ? [cb] : [];
   var im = new Image();
+  try { im.fetchPriority = low ? "low" : "high"; } catch(e){}          // (a picture a screen is waiting for goes before the ones fetched in the background)
   function fin(){
     if(pixReady[url]) return;
     pixReady[url] = true; pixImgs[url] = im;
@@ -12996,8 +13044,8 @@ function pixMissing(html, isNew){
   return (list.length || !pixFontsOk) ? {urls: list, fonts: !pixFontsOk} : null;
 }
 function pixWhen(need, cb){
-  var left = need.urls.length + (need.fonts ? 1 : 0), fired = false;
-  function fire(){ if(fired) return; fired = true; clearTimeout(timer); cb(); }
+  var left = need.urls.length + (need.fonts ? 1 : 0), fired = false, wid = pixWaitBegin();
+  function fire(){ if(fired) return; fired = true; clearTimeout(timer); pixWaitEnd(wid); cb(); }
   function one(){ if(--left <= 0) fire(); }
   var timer = setTimeout(function(){ dbgLog("assets: gave up waiting for " + left + " after " + PIX_WAIT_MAX + " ms"); fire(); }, PIX_WAIT_MAX);
   need.urls.forEach(function(u){ pixLoad(u, one); });
@@ -13084,6 +13132,7 @@ function renderApply(html){
   app.classList.remove("assetsWait");
   var boot = document.getElementById("boot");          // the first screen is up: the loading screen goes at once (it used to fade out over .25 s; 2026-11-04, per Dan: no screen fades)
   if(boot && boot.parentNode) boot.parentNode.removeChild(boot);
+  pixBgSoon();
   var isNewScreen = state.screen !== lastRenderedScreen;
   var enteringPassportFresh = state.screen === "passport" && isNewScreen;
   var prevScreen = lastRenderedScreen;
@@ -13245,7 +13294,7 @@ render();
 // The service worker (sw.js) saves the game on the phone so it opens from the home screen and plays without a connection. It is registered with the build in its address, so every new build is a new worker with a fresh cache.
 if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
   window.addEventListener("load", function(){ try { navigator.serviceWorker.register("sw.js?v=" + encodeURIComponent(APP_BUILD)).catch(function(){}); } catch(e){} });
-  navigator.serviceWorker.addEventListener("controllerchange", function(){ if(pixPreloadDone) pixWarmSounds(); });
+  navigator.serviceWorker.addEventListener("controllerchange", function(){ if(pixBgAllDone) pixWarmSounds(); });
 }
 // Kicked off at boot, not when Faith Match is opened (2026-09-29, per Dan —
 // the first tile tapped showed blank white until its image finished
@@ -13255,10 +13304,8 @@ if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
 // still calls this too, but preloadMatchTiles() is idempotent
 // (matchTilesPreloaded guards it) so that call is now just a harmless no-op
 // safety net for the rare case someone reaches it before this finishes.
-preloadMatchTiles();
-// The badge pictures are fetched at boot too (2026-10-22, per Dan): the badge on a results screen showed a beat late, with a blank space where it goes.
-var badgePreload = PASSPORT_MISSIONS.map(function(m){ var img = new Image(); img.src = badge8Src(m); return img; });
-setTimeout(pixPreloadAll, 700);
+// (2026-11-07: the Faith Match tiles and the badge pictures are in the background queue now, which starts a moment after the first screen is up; see pixBgBuild. The queue is also started at 4 s whatever happens.)
+setTimeout(pixBgGo, 4000);
 </script>
 </body>
 </html>
