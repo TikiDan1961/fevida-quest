@@ -12753,7 +12753,9 @@ function boothClearTap(btn){
   var d = defaultState();
   state.points = 0; state.missions = d.missions; state.session = d.session;
   state.awardMissionId = null; state.contFor = null; state.pilgrimOwed = false; state.folderOpen = false;
-  pilgrimAllowBack = true; state.pilgrimIn = false; state.pilgrimSteps = 0; state.ticketUnlocked = false;
+  // The pilgrim is simply put back at the start, facing right, as at the very beginning of the app: he does NOT walk back (Dan, 2026-11-09)
+  state.pilgrimIn = false; state.pilgrimSteps = 0; state.ticketUnlocked = false; state.pilgrimP = 0;
+  pilgrimPos = 0; pilgrimFaceLeft = false; pilgrimAward = null; pilgrimGreetPending = false; pilgrimMsgI = 0;
   state.passportPage = 0; state.introMission = null;
   saveState(); go("mainMenu");
 }
@@ -12773,7 +12775,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B26</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B27</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -13457,7 +13459,9 @@ setTimeout(pixBgGo, 4000);
 (function(){
   var q = location.search || "";
   // The sound effects are the cleaned copies in soundsb/ (made by clean_sfx.py: background fuzz removed, harsh top softened; Dan picked this on the TV with tvsfx.html, 2026-11-09). ?rawsfx = the originals.
-  if(typeof PIX_SFX !== "undefined" && !/[?&]rawsfx(&|$)/.test(q)){ Object.keys(PIX_SFX).forEach(function(k){ var u = PIX_SFX[k].url; if(/^sounds[/]sfx_/.test(u)) PIX_SFX[k].url = u.replace("sounds/", "soundsb/").replace(".mp3", ".wav"); }); }
+  // RAW_SFX: sounds that stay the original (the cleaning turned the bird flap of Dove of Peace into a thud, Dan 2026-11-09: its flutter is noise). Keep in step with KEEP_ORIGINAL in clean_sfx.py.
+  var RAW_SFX = ["dpFlap"];
+  if(typeof PIX_SFX !== "undefined" && !/[?&]rawsfx(&|$)/.test(q)){ Object.keys(PIX_SFX).forEach(function(k){ if(RAW_SFX.indexOf(k) !== -1) return; var u = PIX_SFX[k].url; if(/^sounds[/]sfx_/.test(u)) PIX_SFX[k].url = u.replace("sounds/", "soundsb/").replace(".mp3", ".wav"); }); }
   if(/[?&]webaudio(&|$)/.test(q)) return;
   if(typeof PIX_SFX === "undefined" || typeof pixVolGain !== "function" || typeof pixMusic === "undefined") return;
   // The sound effects are ON, as in the version of 2026-11-09 (commit ff556e6): clean through the plain audio player, but this TV plays every sound the browser makes more than a second late
