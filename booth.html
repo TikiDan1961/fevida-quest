@@ -1308,7 +1308,26 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
 html,body{background:#000 !important;}
 /* The three drifting cloud layers stand still (2026-11-09, per Dan: booth.html?still worked much better on the TV, whose 4K screen could not keep up with them): the clouds are drawn, they just do not move. */
 .pixSkyClouds{animation:none !important;}
+/* Windows and flashes stay inside the 480-px app column (2026-11-09, per Dan: each Round Completed window reached past both ends of the screen into the black bands; the app fixes them to the whole window). Portrait only: turned on its side the app column is the whole window. */
+@media (orientation:portrait){
+  .pixMission > .pixRoundMid{left:max(18px,calc(50% - 222px));right:max(18px,calc(50% - 222px));}
+  .quitOverlay,.instOverlay,.rotGate,.pixFlash,.pixHome.pixSky > .folderOverlay,.pixHome.pixSky > .howOverlay{left:max(0px,calc(50% - 240px));right:max(0px,calc(50% - 240px));}
+}
+/* the logo at the top of the Main Menu: larger (was 128 px wide) */
+.pixMenu .pixMenuLogo{width:190px !important;}
+/* no empty rows where the SHARE buttons were */
+.shareRow,.pxShareRow{display:none !important;}
 </style>
+
+<script id="boothLag">
+var BOOTH_LAG = 1200;
+(function(){
+  var q = location.search || "", m = /[?&]lag=([0-9]+)/.exec(q);
+  if(m) BOOTH_LAG = parseInt(m[1], 10);
+  if(/[?&]nosfx(&|$)/.test(q)) BOOTH_LAG = 0;
+})();
+function boothLater(fn){ if(BOOTH_LAG > 0) setTimeout(fn, BOOTH_LAG); else fn(); }
+</script>
 </head>
 <body>
 <div id="boot" aria-hidden="true"><img src="data:image/png;base64,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" alt="" width="144" height="144"><span>Loading… · Cargando…</span><div class="bootBar"><i class="bootFill"></i><b class="bootPil"></b></div></div>
@@ -3752,7 +3771,7 @@ function screenMainMenu(){
   var pct = Math.min(100, Math.round(state.points/GOLDEN_TICKET_POINTS*100));
   var inFolder = MISSIONS.filter(function(m){ return !isMenuIconMission(m.id); });
   var doneCount = inFolder.filter(function(m){ return state.missions[m.id].done; }).length;
-  var unlocked = goldenTicketUnlocked();
+  var unlocked = true;          // (booth page, per Dan: the Golden Ticket icon is always unlocked)
   var mini = ["faithFlash", "faithMatch", "dovePeace", "stainedGlass"].map(function(id){ return iconSpr(id); }).join("");
   var icons =
     appIconHtml({onclick:"openFolder(this)", bg:"#8EC6F5", cls:"folderIcon", inner:'<div class="miniGrid">' + mini + '</div>',
@@ -3816,7 +3835,7 @@ function grantMission(id, missionState){
   if(state.contFor !== id) phMissionDone(id);          // (after round 1 the mission is not over yet: it ends with the last round, above)
   state.awardMissionId = id;
   pixSfxPlay("missionDone", true);       // the Mission Complete sound: the screen appears together with it
-  go("award");
+  boothLater(function(){ go("award"); });          // (booth page: the sound is heard BOOTH_LAG late, so the screen waits for it)
 }
 
 // The Mission Completed screen in the 8-bit look (2026-10-22, per Dan): the pixel sky, the mission's name, and a cream card with the badge, the
@@ -4064,17 +4083,16 @@ function pixRoundRun(key, getSession, giveAward, finish){
   var soundMs = s.interlude.final ? ROUND_MSG_FINAL_MS : ROUND_MSG_MS;      // the same for every round, the last included (2026-11-06, per Dan)
   pixAfterPaint(key, function(){
     if(!alive()){ pixRoundRunning[key] = false; return; }
-    pixSfxPlay("ffRound", false);
+    if(window.__boothRoundSounded){ window.__boothRoundSounded = false; } else pixSfxPlay("ffRound", false);
     setTimeout(function(){
       if(!alive()){ pixRoundRunning[key] = false; return; }
       // never on the last round (2026-10-22, per Dan): that one shows the message alone, since the mission is won
       var award = (giveAward && !s.interlude.final) ? giveAward(s) : false;
       if(award){
         s.interlude.phase = "award"; s.interlude.award = true;
-        saveState(); render();
-        pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
+        saveState(); pixSfxPlay("clCatch", false); boothLater(function(){ if(alive()) render(); });                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
       }
-      setTimeout(done, Math.max(soundMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
+      setTimeout(done, Math.max(soundMs - FF_INTERLUDE_AWARD_MS + (award ? BOOTH_LAG : 0), award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
     }, FF_INTERLUDE_AWARD_MS);
   });
 }
@@ -4110,17 +4128,16 @@ function ffInterlude(){
   var fanfareMs = lastRound ? ROUND_MSG_FINAL_MS : ROUND_MSG_MS;       // the same times as every other game (see ROUND_MSG_MS)
   pixAfterPaint("faithFlash", function(){
     if(!alive()){ ffInterludeRunning = false; return; }
-    pixSfxPlay("ffRound", false);
+    if(window.__boothRoundSounded){ window.__boothRoundSounded = false; } else pixSfxPlay("ffRound", false);
     setTimeout(function(){
       if(!alive()){ ffInterludeRunning = false; return; }
       var award = ffChancesLeft(s) < FF_CHANCES && s.index < s.order.length - 1;     // never after the last round (2026-10-22, per Dan)
       if(award){
         s.chances = ffChancesLeft(s) + 1;
         s.interlude.phase = "award"; s.interlude.award = true;
-        saveState(); render();
-        pixSfxPlay("clCatch", false);                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
+        saveState(); pixSfxPlay("clCatch", false); boothLater(function(){ if(alive()) render(); });                                // a heart is given back: sound_effect_1 (2026-10-25, per Dan)
       }
-      setTimeout(finish, Math.max(fanfareMs - FF_INTERLUDE_AWARD_MS, award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
+      setTimeout(finish, Math.max(fanfareMs - FF_INTERLUDE_AWARD_MS + (award ? BOOTH_LAG : 0), award ? 1200 + ROUND_SHOW_EXTRA_MS : 0));
     }, FF_INTERLUDE_AWARD_MS);
   });
 }
@@ -4616,17 +4633,22 @@ function flPlayPattern(){
       saveState(); render();
       return;
     }
-    s2.showingIndex = s2.pattern[step];
-    flPlayTone(s2.pattern[step], FL_SHOW_ON_MS * 0.8);
-    saveState(); render();
-    setTimeout(function(){
+    var tile = s2.pattern[step];
+    flPlayTone(tile, FL_SHOW_ON_MS * 0.8);              // (booth page: the note starts now, the tile lights BOOTH_LAG later, when the note is heard)
+    boothLater(function(){
       var s3 = state.session.followLight;
       if(!s3 || s3.phase !== "showing") return;
-      s3.showingIndex = -1;
+      s3.showingIndex = tile;
       saveState(); render();
-      step++;
-      setTimeout(showNext, FL_SHOW_GAP_MS);
-    }, FL_SHOW_ON_MS);
+      setTimeout(function(){
+        var s4 = state.session.followLight;
+        if(!s4 || s4.phase !== "showing") return;
+        s4.showingIndex = -1;
+        saveState(); render();
+        step++;
+        setTimeout(showNext, FL_SHOW_GAP_MS);
+      }, FL_SHOW_ON_MS);
+    });
   }
   showNext();
 }
@@ -5001,23 +5023,31 @@ var WU_SFX_EARLY_MS = 200;
 function wuCheck(s){
   wuEnsureSkips(s);
   var guess = s.slots.map(function(pos){ return s.letters[pos]; }).join("");
-  // The word's sound (right = sound_effect_6, wrong = the SKIP sound) waits until the last letter's own sound has finished (2026-10-23, per Dan).
-  // The letter sound's last 0.2 s is only a faint tail, so the word sound comes in a little early (the gap was too long, 2026-10-23, per Dan).
+  var ok = (guess === s.word);
+  // (booth page) the word's sound starts at once, after the last letter's own sound as in the app; the squares answer BOOTH_LAG later, when it is heard
   var wait = pixSfxWait("fmFirst", WU_SFX_EARLY_MS);
-  if(guess === s.word){
+  s.feedback = "hold";
+  saveState(); render();
+  pixAfterSfx("fmFirst", function(){ pixSfxPlay(ok ? "fmMatch" : "clFade", true); }, WU_SFX_EARLY_MS);
+  setTimeout(function(){
+    if(state.session.wordUnscramble !== s) return;
+    s.feedback = null;
+    wuAnswer(s, ok);
+  }, wait + BOOTH_LAG);
+}
+function wuAnswer(s, ok){
+  if(ok){
     s.feedback = "correct";
-    pixAfterSfx("fmFirst", function(){ pixSfxPlay("fmMatch", true); }, WU_SFX_EARLY_MS);
     saveState(); render();
     wuEnsureSkips(s); s.past[s.index] = "done";
     setTimeout(function(){
       var s2 = state.session.wordUnscramble;
       if(!s2) return;
       wuAdvance(s2);
-    }, 900 + wait);
+    }, 900);
   } else {
     s.feedback = "wrong";
     s.chances = Math.max(0, s.chances - 1);                         // the heart goes as the squares turn red
-    pixAfterSfx("fmFirst", function(){ pixSfxPlay("clFade", true); }, WU_SFX_EARLY_MS);
     saveState(); render();
     setTimeout(function(){
       var s2 = state.session.wordUnscramble;
@@ -5026,7 +5056,7 @@ function wuCheck(s){
       for(var i = 0; i < s2.slots.length; i++) if(s2.hinted.indexOf(i) === -1) s2.slots[i] = null;
       s2.feedback = null;
       saveState(); render();
-    }, 900 + wait);
+    }, 900);
   }
 }
 
@@ -6702,11 +6732,11 @@ function wtUp(){
   if(s.remaining.indexOf(word) !== -1){
     s.busy = true;
     pixSfxPlay("fmMatch", true);
-    wtPaint("ok");
+    boothLater(function(){ if(!wtDrag) return; wtPaint("ok");
     path.forEach(function(i){                                              // every letter of the word sparkles (2026-10-26, per Dan: the burst of Fruits of the Spirit)
       var q = wtDrag.rects && wtDrag.rects[i];
       if(q) pixBurst(Math.round(q.l + q.w / 2), Math.round(q.t + q.h / 2), .55, 14);
-    });
+    }); });
     setTimeout(function(){
       wtDrag = null;
       var s2 = state.session.wordTrail;
@@ -6719,23 +6749,22 @@ function wtUp(){
         s2.interlude = {n: s2.round + 1, phase: "msg", award: false, final: s2.round >= WT_ROUNDS.length - 1};
         saveState(); render();
       } else { saveState(); render(); }
-    }, 450);
+    }, 450 + BOOTH_LAG);
   } else if(path.length >= 3){
     wtEnsureChances(s);
     s.chances = Math.max(0, s.chances - 1);                                // letters that spell nothing on the list: a heart is lost
     var lastOne = s.chances <= 0;
     pixSfxPlay(lastOne ? "fmLast" : "fmMiss", true);
-    wtPaint("bad");
-    wtHeartsPaint(); saveState();
+    saveState(); boothLater(function(){ wtPaint("bad"); wtHeartsPaint(); });
     if(lastOne){
       s.busy = true;                                                       // the last heart: nothing more can be traced, and the Keep Trying screen follows
       setTimeout(function(){
         var s2 = state.session.wordTrail;
         if(!s2 || s2 !== s || s2.status !== "playing") return;
         wtDrag = null; s2.busy = false; s2.status = "failed"; saveState(); render();
-      }, 1100);
+      }, 1100 + BOOTH_LAG);
     }
-    setTimeout(function(){ if(wtDrag && wtDrag.path.join() === path.join()) wtCancel(); }, 260);
+    setTimeout(function(){ if(wtDrag && wtDrag.path.join() === path.join()) wtCancel(); }, 260 + BOOTH_LAG);
     wtDrag.path = path; wtDrag.done = true;
     return;
   } else wtCancel();
@@ -7249,13 +7278,13 @@ var PB_CHANCES = 3;
 // Spacing (2026-10-25, per Dan): round 1 is as it was (PB_APART and PB_BURST below); round 2 has its beads closer together, and more groups of close beads, and round 3 closer still. apart = how far
 // from the last bead a bead comes, in usual gaps; burst = how often a bead is followed by a group of close ones, how many, and how close.
 var PB_ROUNDS = [{gap: 600},      // (2026-10-25, per Dan: round 1 faster, was 700, and round 3 slower, was 380; round 2 as it was)
-  {gap: 540, apart: [.95, 1.9], burst: {chance: .4, count: [1, 3], apart: [.6, .85]}},      // (later the same day, per Dan: more distance again; round 3 had been too hard)
-  {gap: 450, apart: [.85, 1.6], burst: {chance: .5, count: [1, 3], apart: [.6, .8]}}];      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
-var PB_MIN_MS = {normal: 300, burst: 220};
+  {gap: 540, apart: [.95, 1.9], burst: {chance: .4, count: [1, 3], apart: [.8, 1.05]}},      // (later the same day, per Dan: more distance again; round 3 had been too hard)
+  {gap: 450, apart: [.85, 1.6], burst: {chance: .5, count: [1, 3], apart: [.8, 1.0]}}];      // (2026-10-25, per Dan: round 1 a little faster, was 760; then round 3 got round 2's old speed (380), round 2 a speed halfway between rounds 1 and 3 (540), and every round 20 more beads: 40 / 50 / 60)
+var PB_MIN_MS = {normal: 300, burst: 300};
 var PB_MIN_WINDOW = {good: 110, perfect: 55};
 var PB_FIRST_MS = 1500;                                                    // the first bead is never sooner than this after the round starts
 var PB_APART = [.9, 2.2];
-var PB_BURST = {chance: .35, count: [1, 3], apart: [.55, .8]};            // now and then a bead is followed by 1 to 3 close ones (2026-10-24, per Dan), to be tapped quickly one after the other                                                // the distance from one bead to the next is random, this many times the usual one (never closer than one bead at a time in the ring)
+var PB_BURST = {chance: .35, count: [1, 3], apart: [.75, 1.0]};            // now and then a bead is followed by 1 to 3 close ones (2026-10-24, per Dan), to be tapped quickly one after the other                                                // the distance from one bead to the next is random, this many times the usual one (never closer than one bead at a time in the ring)
 var PB_FIRST = 2;                                                          // the first bead reaches the ring this many usual gaps after the round starts
 var PB_TRAVEL = 4;                                                         // the beads are this many gaps apart along the string's length: with the ring only a little bigger than a bead, one at a time is in it
 var PB_RING = .15;                                                         // the ring's width, and a bead is .12, as fractions of the stage's width
@@ -8391,13 +8420,15 @@ function fsLandSound(at, pitch){
 var FS_LAND_GAP = .03;                                                       // seconds: landings closer together than this share one tick, so a whole board falling is not a buzz
 function fsDrop(list, gap){
   list.sort(function(a, b){ return (b.to - a.to) || (a.x - b.x); });
-  var total = 0, lands = [];
+  var total = 0, lands = [], tmin = 9, lag = BOOTH_LAG / 1000, e = 0, D = 0;
+  list.forEach(function(f, k){ var dist = Math.max(.5, f.to - f.from); tmin = Math.min(tmin, k * gap + FS_FALL[0] + dist * FS_FALL[1]); });
+  if(lag > 0){ e = Math.min(tmin, lag); D = lag - e; }          // (booth page) the ticks start e seconds before each landing is due; the fall itself waits D, so tick and landing meet
   list.forEach(function(f, k){
-    var dist = Math.max(.5, f.to - f.from), dur = FS_FALL[0] + dist * FS_FALL[1], delay = k * gap;
+    var dist = Math.max(.5, f.to - f.from), dur = FS_FALL[0] + dist * FS_FALL[1], delay = k * gap + D;
     f.el.style.transition = "top " + dur.toFixed(3) + "s cubic-bezier(.45,0,.85,.55) " + delay.toFixed(3) + "s";
     fsSetXY(f.el, f.x, f.to);
     total = Math.max(total, delay + dur);
-    lands.push({t: delay + dur, d: dist});
+    lands.push({t: k * gap + dur - e, d: dist});
   });
   lands.sort(function(a, b){ return a.t - b.t; });
   var lastTick = -9;
@@ -8405,6 +8436,7 @@ function fsDrop(list, gap){
   setTimeout(function(){ list.forEach(function(f){ f.el.style.transition = ""; }); }, total * 1000 + 80);
   return total;
 }
+
 // at the start of a round the board is filled by dropping every fruit in from above the top of it, one after another
 function fsIntro(s){
   var N = FS_N, list = [], i;
@@ -8480,9 +8512,9 @@ function fsPump(s){
   if(fsRevealing || !fsQueue.length || !fsAlive(s)) return;
   fsRevealing = true; fsRevealAt = performance.now();
   var ty = fsQueue.shift();
-  s.goals[ty - 1].shown = true; fsPaintWords(s); fsWordBurst(ty);
-  fsPopup(t("fs_names")[ty - 1] + "!"); pixSfxPlay("ticket", false);
-  setTimeout(function(){ fsRevealing = false; fsPump(s); }, 1550);
+  pixSfxPlay("ticket", false);          // (booth page: the sound starts now, the sparkles and the name BOOTH_LAG later, when it is heard)
+  boothLater(function(){ if(!fsAlive(s)) return; s.goals[ty - 1].shown = true; fsPaintWords(s); fsWordBurst(ty); fsPopup(t("fs_names")[ty - 1] + "!"); });
+  setTimeout(function(){ fsRevealing = false; fsPump(s); }, 1550 + BOOTH_LAG);
 }
 function fsPopup(text){
   var wrap = document.querySelector(".fsBoardWrap"); if(!wrap) return;
@@ -12643,6 +12675,7 @@ function shareDo(kind, id, where){
   });
 }
 function shareBtnHtml(kind, id, where, label, fit){
+  return "";          // (booth page: no SHARE buttons, per Dan)
   window.pixSt(function(){ shareWarm(kind, id); }, 300);
   var js = "shareTap('" + kind + "'," + (id ? "'" + id + "'" : "null") + ",'" + where + "')";
   if(!fit) return pixBtnHtml(label || t("shareBtn"), js, true);
@@ -12681,6 +12714,22 @@ function optionPreview(kind){ track("setting_changed", {setting: kind, value: ki
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
 var APP_BUILD = "2026-11-07 HP";
+var boothClearArmed = 0;
+function boothClearTap(btn){
+  var es = state.lang === 'es';
+  if(!boothClearArmed){
+    boothClearArmed = setTimeout(function(){ boothClearArmed = 0; if(btn && btn.isConnected) btn.textContent = es ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS'; }, 4000);
+    btn.textContent = es ? 'TOCA DE NUEVO PARA BORRAR' : 'TAP AGAIN TO CLEAR';
+    return;
+  }
+  clearTimeout(boothClearArmed); boothClearArmed = 0;
+  var d = defaultState();
+  state.points = 0; state.missions = d.missions; state.session = d.session;
+  state.awardMissionId = null; state.contFor = null; state.pilgrimOwed = false; state.folderOpen = false;
+  pilgrimAllowBack = true; state.pilgrimIn = false; state.pilgrimSteps = 0; state.ticketUnlocked = false;
+  state.passportPage = 0; state.introMission = null;
+  saveState(); go("mainMenu");
+}
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12694,6 +12743,7 @@ function screenOptions(){
       optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
     '<div class="shareRow optShare">' + shareBtnHtml("app", null, "options", t("shareAppBtn"), t("shareAppBtn").length > 16 ? "pixBtnSm" : "pixBtnMd") + '</div>' +
+    '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
     '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + '</div>' +
@@ -13368,6 +13418,8 @@ setTimeout(pixBgGo, 4000);
 <script id="boothFlags">
 (function(){
   var q = location.search || "";
+  // No long-press menu ("Download, Share, Print"...) anywhere: on Catch the Light a press that was held a moment opened it instead of letting the hands slide (2026-11-09, per Dan).
+  document.addEventListener("contextmenu", function(e){ e.preventDefault(); }, true);
   function css(t){ var s = document.createElement("style"); s.textContent = t; document.head.appendChild(s); }
   var calm = /[?&]calm(&|$)/.test(q);
   if(calm) css("[class*='Overlay'],[class*='Paper'],[class*='Panel'],.screen-enter{animation:none !important;} .tapGlow,.tapHold{filter:none !important;}");
@@ -13379,6 +13431,10 @@ setTimeout(pixBgGo, 4000);
   var q = location.search || "";
   if(/[?&]webaudio(&|$)/.test(q)) return;
   if(typeof PIX_SFX === "undefined" || typeof pixVolGain !== "function" || typeof pixMusic === "undefined") return;
+  // The sound effects are ON, as in the version of 2026-11-09 (commit ff556e6): clean through the plain audio player, but this TV plays every sound the browser makes more than a second late
+  // (Dan's tests; a Web Audio engine reports 171 ms of its own delay), and DAN DECIDED TO KEEP IT THAT WAY. Add ?nosfx to the address to switch the sound effects off (music stays).
+  var SFX_ON = !/[?&]nosfx(&|$)/.test(q);
+  if(!SFX_ON){ var oVG = window.pixVolGain; window.pixVolGain = function(kind){ return kind === "music" ? oVG(kind) : 0; }; }
   var pool = {}, curEx = null, mus = null;
   function sfxEl(name){
     var d = PIX_SFX[name]; if(!d) return null;
@@ -13388,6 +13444,7 @@ setTimeout(pixBgGo, 4000);
     return a;
   }
   window.pixSfxPlayNow = function(name, exclusive){
+    if(!SFX_ON) return true;                                  // silent: nothing is played and nothing is waited for
     var a = sfxEl(name); if(!a) return false;
     try {
       if(exclusive && curEx){ try { curEx.pause(); } catch(e1){} }
@@ -13411,12 +13468,33 @@ setTimeout(pixBgGo, 4000);
     pixTap(null, name);
   };
   function musVol(){ return Math.max(0, Math.min(1, pixVolGain("music"))); }
+  // The music is two audio elements that take turns (2026-11-09, per Dan: a looping element stopped for about a second at every restart on this TV, because its sound is buffered for a long time and a loop
+  // restart flushes that buffer). The next one is started a little BEFORE the current one ends, MUSIC_LEAD ms (350 unless the address has ?musiclead=NNN, so it can be tuned by ear on the TV: a longer lead
+  // overlaps the two a little, a shorter one leaves a gap).
+  var MUSIC_LEAD = 350, ml = /[?&]musiclead=([0-9]+)/.exec(q); if(ml) MUSIC_LEAD = parseInt(ml[1], 10);
+  var musA = null, musB = null, musNext = null, musTimer = 0;
   function armRetry(){ var f = function(){ document.removeEventListener("pointerdown", f, true); musPlay(); }; document.addEventListener("pointerdown", f, true); }
+  function musNew(){ var e = new Audio(PIX_MUSIC_URL); e.preload = "auto"; e.loop = false; return e; }
+  function musTick(){
+    if(!mus) return;
+    var d = mus.duration;
+    if(!musNext && !mus.paused && isFinite(d) && d > 0 && mus.currentTime >= d - MUSIC_LEAD / 1000){
+      musNext = (mus === musA) ? musB : musA;
+      try { musNext.currentTime = 0; } catch(e6){}
+      musNext.volume = musVol();
+      var p2 = musNext.play(); if(p2 && p2.catch) p2.catch(function(){});
+    }
+    if(mus.ended){
+      if(musNext){ mus = musNext; musNext = null; }
+      else { try { mus.currentTime = 0; } catch(e7){} var p3 = mus.play(); if(p3 && p3.catch) p3.catch(function(){}); }
+    }
+  }
   function musPlay(){
     if(!pixMusic.want) return;
-    if(!mus){ mus = new Audio(PIX_MUSIC_URL); mus.loop = true; mus.preload = "auto"; }
-    mus.volume = musVol();
-    if(!mus.paused) return;
+    if(!mus){ musA = musNew(); musB = musNew(); mus = musA; }
+    musA.volume = musB.volume = musVol();
+    if(!musTimer) musTimer = setInterval(musTick, 100);
+    if(!mus.paused || musNext) return;
     var pr = mus.play(); if(pr && pr.catch) pr.catch(function(){ armRetry(); });
   }
   window.pixMusicStart = function(){ pixMusic.want = true; musPlay(); };
@@ -13424,15 +13502,106 @@ setTimeout(pixBgGo, 4000);
   window.pixMusicRestart = function(){ musPlay(); };
   window.pixMusicFetch = function(done){ if(done) done(); };
   window.pixMusicDecode = function(){};
+  function musVolSet(){ if(musA){ musA.volume = musB.volume = musVol(); } }
   var oApply = window.pixApplyVolumes;
-  window.pixApplyVolumes = function(){ try { oApply(); } catch(e4){} if(mus) mus.volume = musVol(); };
+  window.pixApplyVolumes = function(){ try { oApply(); } catch(e4){} musVolSet(); };
   var oDuck = window.pixSetMusicDuck;
-  window.pixSetMusicDuck = function(f){ try { oDuck(f); } catch(e5){} if(mus) mus.volume = musVol(); };
-  document.addEventListener("visibilitychange", function(){ if(!mus) return; if(document.hidden) mus.pause(); else musPlay(); });
+  window.pixSetMusicDuck = function(f){ try { oDuck(f); } catch(e5){} musVolSet(); };
+  document.addEventListener("visibilitychange", function(){
+    if(!mus) return;
+    if(document.hidden){ musA.pause(); musB.pause(); }
+    else { [musA, musB].forEach(function(e){ if(e.currentTime > 0 && !e.ended){ var pq = e.play(); if(pq && pq.catch) pq.catch(function(){}); } }); musPlay(); }
+  });
+  // The synthesized notes (Follow the Light's notes, the Pray the Beads chime, the wrong-tap buzz) are drawn once into little WAV files and played through the plain audio player as well:
+  // the Web Audio engine plays them late and distorted on this TV, like everything else it makes.
+  var SYN_RATE = 22050, synPool = {};
+  function wavUrl(f32){
+    var n = f32.length, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    function ws(o, s){ for(var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+    ws(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); ws(8, "WAVE"); ws(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, SYN_RATE, true); v.setUint32(28, SYN_RATE * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); ws(36, "data"); v.setUint32(40, n * 2, true);
+    for(var i = 0; i < n; i++){ var x = Math.max(-1, Math.min(1, f32[i])); v.setInt16(44 + i * 2, Math.round(x * 32767), true); }
+    return URL.createObjectURL(new Blob([buf], {type: "audio/wav"}));
+  }
+  function synPlay(key, make){
+    if(!SFX_ON) return;
+    var p = synPool[key];
+    if(!p){ var url = wavUrl(make()); p = synPool[key] = {els: [], n: 0}; for(var i = 0; i < 3; i++){ var e = new Audio(url); e.preload = "auto"; p.els.push(e); } }
+    var a = p.els[p.n % 3]; p.n++;
+    try { a.volume = Math.max(0, Math.min(1, pixVolGain("sfx"))); a.currentTime = 0; var pr = a.play(); if(pr && pr.catch) pr.catch(function(){}); } catch(e1){}
+  }
+  function bell(f, parts){        // parts: [pitch ratio, loudness, seconds it rings], as in the app's own notes
+    var dur = 0; parts.forEach(function(p){ dur = Math.max(dur, p[2]); }); dur += 0.05;
+    var n = Math.ceil(dur * SYN_RATE), out = new Float32Array(n);
+    parts.forEach(function(p){
+      var amp = p[1] * 2, len = p[2], w = 2 * Math.PI * f * p[0] / SYN_RATE, k = Math.min(n, Math.ceil(len * SYN_RATE));
+      for(var i = 0; i < k; i++){ var t = i / SYN_RATE, env = t < 0.004 ? amp * t / 0.004 : amp * Math.pow(0.0001 / amp, (t - 0.004) / (len - 0.004)); out[i] += env * Math.sin(w * i); }
+    });
+    return out;
+  }
+  function failWave(){
+    var n = Math.ceil(0.3 * SYN_RATE), out = new Float32Array(n), ph = 0;
+    for(var i = 0; i < n; i++){ var t = i / SYN_RATE, fr = 220 * Math.pow(80 / 220, Math.min(t, 0.25) / 0.25), g = 0.4 * Math.pow(0.001 / 0.2, t / 0.3); ph += fr / SYN_RATE; out[i] = (2 * (ph % 1) - 1) * g; }
+    return out;
+  }
+  function landWave(p){
+    var n = Math.ceil(0.09 * SYN_RATE), out = new Float32Array(n), ph = 0, ph2 = 0;
+    for(var i = 0; i < n; i++){
+      var t = i / SYN_RATE, v = 0;
+      ph += 260 * p * Math.pow(0.5, Math.min(t, 0.05) / 0.05) / SYN_RATE;
+      if(t < 0.075) v += Math.sin(2 * Math.PI * ph) * (t < 0.004 ? 0.32 * t / 0.004 : 0.32 * Math.pow(0.0001 / 0.16, (t - 0.004) / 0.071));
+      ph2 += 1100 * p / SYN_RATE;
+      if(t < 0.02) { var tri = 4 * Math.abs((ph2 % 1) - 0.5) - 1; v += tri * (t < 0.002 ? 0.1 * t / 0.002 : 0.1 * Math.pow(0.0001 / 0.05, (t - 0.002) / 0.018)); }
+      out[i] = v;
+    }
+    return out;
+  }
+  if(typeof FL_HYMNS !== "undefined" && typeof flPlayTone === "function"){
+    window.flPlayTone = function(tile){
+      var fs = state.session.followLight, hymn = fs ? FL_HYMNS[FL_LEVEL_HYMN[(fs.level || 0) % FL_LEVEL_HYMN.length]] : null;
+      var f = (hymn ? hymn.scale[tile % hymn.scale.length] : FL_TONES[tile % FL_TONES.length]) * 2;
+      synPlay("fl" + f, function(){ return bell(f, [[1, 0.18, 1.7], [2.0, 0.08, 1.1], [2.76, 0.06, 0.65], [4.07, 0.03, 0.4], [5.43, 0.02, 0.25]]); });
+    };
+    window.fsLandSound = function(at, pitch){           // Fruits of the Spirit: the tick of a landing fruit
+      setTimeout(function(){ synPlay("land" + pitch.toFixed(2), function(){ return landWave(pitch); }); }, Math.max(0, at) * 1000);
+    };
+    window.pixChime = function(freq){ var f = freq * 4; synPlay("ch" + f, function(){ return bell(f, [[1, 0.15, 1.3], [1.004, 0.07, 1.1], [3.0, 0.05, 0.4], [4.2, 0.03, 0.2]]); }); };
+    window.flPlayFailSound = function(){ synPlay("fail", failWave); };
+  }
   window.__boothAudio = {pool: pool, music: function(){ return mus; }};
   // warm the sound files a few seconds after the page is up, so the first tap of each sound does not wait for its file
-  setTimeout(function(){ Object.keys(PIX_SFX).forEach(function(k){ sfxEl(k); }); }, 4000);
-  if(typeof dbgLog === "function") dbgLog("audio: booth page: sounds and music play through the plain audio player (add ?webaudio to the address to use the app's own engine)");
+  if(SFX_ON) setTimeout(function(){ Object.keys(PIX_SFX).forEach(function(k){ sfxEl(k); }); }, 4000);
+  if(typeof dbgLog === "function") dbgLog("audio: booth page: music plays through the plain audio player, sound effects are " + (SFX_ON ? "on (add ?nosfx to the address to switch them off)" : "off (?nosfx)"));
+})();
+</script>
+
+<script id="boothSync">
+(function(){
+  if(typeof render !== "function" || typeof pixSfxPlay !== "function" || !BOOTH_LAG) return;
+  var oRender = render, rendered = false, lastIl = null, deferIl = null, shownIl = null;
+  function freshIl(){
+    var o = null;
+    try { var k = state.screen; o = (k === "emmaus") ? em : (k === "hopeGardenL") ? hgl : (state.session ? state.session[k] : null); } catch(e){ o = null; }
+    var il = o && o.interlude;
+    return (il && il.phase === "msg" && !il.award && !il.resumed) ? il : null;
+  }
+  window.render = function(){
+    var il = freshIl();
+    if(il){
+      if(il === deferIl) return;
+      if(rendered && il !== lastIl && il !== shownIl){
+        deferIl = il;
+        window.__boothRoundSounded = true;
+        setTimeout(function(){ window.__boothRoundSounded = false; }, BOOTH_LAG + 3000);
+        pixSfxPlay("ffRound", false);
+        setTimeout(function(){ shownIl = il; deferIl = null; window.render(); }, BOOTH_LAG);
+        return;
+      }
+    }
+    oRender();
+    rendered = true; lastIl = il;
+  };
+  if(typeof dbgLog === "function") dbgLog("booth: sounds and pictures lined up, the TV plays sounds about " + BOOTH_LAG + " ms late (?lag=NNN to change it)");
 })();
 </script>
 </body>
