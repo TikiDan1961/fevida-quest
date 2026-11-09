@@ -1306,6 +1306,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
 <style id="boothStyle">
 /* BOOTH TV (made by make_booth.py): plain black behind the app column */
 html,body{background:#000 !important;}
+/* The three drifting cloud layers stand still (2026-11-09, per Dan: booth.html?still worked much better on the TV, whose 4K screen could not keep up with them): the clouds are drawn, they just do not move. */
+.pixSkyClouds{animation:none !important;}
 </style>
 </head>
 <body>
@@ -13367,8 +13369,7 @@ setTimeout(pixBgGo, 4000);
 (function(){
   var q = location.search || "";
   function css(t){ var s = document.createElement("style"); s.textContent = t; document.head.appendChild(s); }
-  var still = /[?&]still(&|$)/.test(q), calm = /[?&]calm(&|$)/.test(q);
-  if(still || calm) css(".pixSkyClouds{animation:none !important;}");
+  var calm = /[?&]calm(&|$)/.test(q);
   if(calm) css("[class*='Overlay'],[class*='Paper'],[class*='Panel'],.screen-enter{animation:none !important;} .tapGlow,.tapHold{filter:none !important;}");
 })();
 </script>
