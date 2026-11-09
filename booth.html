@@ -1320,7 +1320,7 @@ html,body{background:#000 !important;}
 </style>
 
 <script id="boothLag">
-var BOOTH_LAG = 1200;
+var BOOTH_LAG = 1000;          /* 1000 ms matched the sheep's baa on Dan's TV (2026-11-09; 1200 was a little late) */
 (function(){
   var q = location.search || "", m = /[?&]lag=([0-9]+)/.exec(q);
   // ?lag=NNN is REMEMBERED on this device (so it also works in the installed app, which opens the plain address): open booth.html?lag=NNN once; ?lag=default forgets it
