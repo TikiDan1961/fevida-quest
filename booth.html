@@ -1077,7 +1077,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixHud{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:0 2px;}
   .pixHud .pixNote{margin:0;font-size:.9375rem;}
   .pixMission .matchGrid{margin:10px 0;}
-  .pixMission .matchCard,.pixMission .flPad{aspect-ratio:1/1;border-radius:8px;border:3px solid #1B1F3B;background:#3A5BD0 url("tilesb/card_back.png") center / 100% 100% no-repeat;image-rendering:pixelated;
+  .pixMission .matchCard,.pixMission .flPad{aspect-ratio:1/1;border-radius:8px;border:3px solid #1B1F3B;background:#3A5BD0 var(--boothBack) center / 100% 100% no-repeat;image-rendering:pixelated;
     box-shadow:inset 0 0 0 2px #FFC93A,0 4px 0 rgba(20,30,90,.4);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:none;}
   .pixMission .matchCard:active,.pixMission .flPad:active{transform:none;box-shadow:inset 0 0 0 2px #FFC93A,0 0 var(--gBlur) var(--gSpread) rgba(255,236,120,.85);}
   .pixMission .matchCard.flipped,.pixMission .matchCard.matched,.pixMission .flPad.lit{background:#fff;}
@@ -1317,6 +1317,7 @@ html,body{background:#000 !important;}
 .pixMenu .pixMenuLogo{width:190px !important;}
 /* Faith Match: the tile pictures and the card back are scaled smoothly, so they are less pixelated */
 .pixMission .matchCard,.pixMission .matchCard img{image-rendering:auto !important;}
+html.boothHard .pixMission .matchCard,html.boothHard .pixMission .matchCard img{image-rendering:pixelated !important;}
 /* no empty rows where the SHARE buttons were */
 .shareRow,.pxShareRow{display:none !important;}
 </style>
@@ -1332,6 +1333,16 @@ var BOOTH_LAG = 1000;          /* 1000 ms matched the sheep's baa on Dan's TV (2
   if(/[?&]nosfx(&|$)/.test(q)) BOOTH_LAG = 0;
 })();
 function boothLater(fn){ if(BOOTH_LAG > 0) setTimeout(fn, BOOTH_LAG); else fn(); }
+/* the Faith Match pictures: ?tiles=1 the original hard pixels, 2 enlarged + a little soft, 3 enlarged + crisper (default); remembered on the device */
+var BOOTH_TILES = 3, BOOTH_TD = "tilesc/";
+(function(){
+  var q = location.search || "", m = /[?&]tiles=([123])/.exec(q);
+  if(m){ BOOTH_TILES = parseInt(m[1], 10); try { localStorage.setItem("boothTiles", m[1]); } catch(e0){} }
+  else { try { var sv = localStorage.getItem("boothTiles"); if(sv === "1" || sv === "2" || sv === "3") BOOTH_TILES = parseInt(sv, 10); } catch(e2){} }
+  BOOTH_TD = BOOTH_TILES === 1 ? "tiles/" : BOOTH_TILES === 2 ? "tilesb/" : "tilesc/";
+  document.documentElement.style.setProperty("--boothBack", 'url("' + BOOTH_TD + 'card_back.png")');
+  if(BOOTH_TILES === 1) document.documentElement.className += " boothHard";
+})();
 /* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
 var BOOTH_FS_SHIFT = 700;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09) */
 (function(){
@@ -2045,16 +2056,16 @@ var FAITH_FLASH_QUESTIONS = [
 ];
 
 var MATCH_SYMBOLS = [
-  "tilesb/faith_tile8_00.png","tilesb/faith_tile8_01.png","tilesb/faith_tile8_02.png","tilesb/faith_tile8_03.png",
-  "tilesb/faith_tile8_04.png","tilesb/faith_tile8_05.png","tilesb/faith_tile8_06.png","tilesb/faith_tile8_07.png",
-  "tilesb/faith_tile8_08.png","tilesb/faith_tile8_09.png","tilesb/faith_tile8_10.png","tilesb/faith_tile8_11.png",
-  "tilesb/faith_tile8_12.png","tilesb/faith_tile8_13.png","tilesb/faith_tile8_14.png","tilesb/faith_tile8_15.png"
+  BOOTH_TD + "faith_tile8_00.png",BOOTH_TD + "faith_tile8_01.png",BOOTH_TD + "faith_tile8_02.png",BOOTH_TD + "faith_tile8_03.png",
+  BOOTH_TD + "faith_tile8_04.png",BOOTH_TD + "faith_tile8_05.png",BOOTH_TD + "faith_tile8_06.png",BOOTH_TD + "faith_tile8_07.png",
+  BOOTH_TD + "faith_tile8_08.png",BOOTH_TD + "faith_tile8_09.png",BOOTH_TD + "faith_tile8_10.png",BOOTH_TD + "faith_tile8_11.png",
+  BOOTH_TD + "faith_tile8_12.png",BOOTH_TD + "faith_tile8_13.png",BOOTH_TD + "faith_tile8_14.png",BOOTH_TD + "faith_tile8_15.png"
 ];
 
 // The tile pictures, and the card back every tile shows face down (2026-10-22, per Dan): the card back is a CSS background, which was only fetched when the first
 // tile was drawn, so Faith Match opened with plain blue tiles and the artwork came a beat later. It is now loaded and kept with the others, and the game
 // waits for it too.
-var MATCH_PRELOAD = MATCH_SYMBOLS.concat(["tilesb/card_back.png"]);
+var MATCH_PRELOAD = MATCH_SYMBOLS.concat([BOOTH_TD + "card_back.png"]);
 var matchTilesPreloaded = false;
 var matchTilesReady = false; // true once every tile below has actually finished loading+decoding
 // decoding="sync" on the game-grid <img> tags (see screenFaithMatch) wasn't
@@ -6485,7 +6496,7 @@ function sdNextPuzzle(s){
 function sdCollectAward(){ state.session.sacredSudoku = null; grantMission("sacredSudoku"); }
 function sdQuit(){ state.session.sacredSudoku = null; go("mainMenu"); }
 
-function sdPicUrl(lv, v){ return 'tilesb/faith_tile8_' + ("0" + lv.syms[v - 1]).slice(-2) + '.png'; }
+function sdPicUrl(lv, v){ return BOOTH_TD + 'faith_tile8_' + ("0" + lv.syms[v - 1]).slice(-2) + '.png'; }
 
 function screenSacredSudoku(){
   var s = state.session.sacredSudoku;
@@ -12760,7 +12771,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B21</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B22</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
