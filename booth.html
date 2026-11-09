@@ -3408,7 +3408,7 @@ function petTap(id){
   el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop");
   setTimeout(function(){ el.classList.remove("hop"); }, 450);
   pixSfxPlayHeld(Math.random() < 0.5 ? "sheepBaa1" : "sheepBaa2", false);        // a random one of the two baa sounds (the button sound is switched off on the sheep: data-sfx="own")
-  pilgrimSay(t("sheepSays"), el, 2200);
+  boothLater(function(){ pilgrimSay(t("sheepSays"), el, 2200); });          // (booth page: the bubble waits for the sound)
 }
 function pilgrimHide(){
   clearTimeout(pilgrimBubbleTimer);
