@@ -1323,7 +1323,10 @@ html,body{background:#000 !important;}
 var BOOTH_LAG = 1200;
 (function(){
   var q = location.search || "", m = /[?&]lag=([0-9]+)/.exec(q);
-  if(m) BOOTH_LAG = parseInt(m[1], 10);
+  // ?lag=NNN is REMEMBERED on this device (so it also works in the installed app, which opens the plain address): open booth.html?lag=NNN once; ?lag=default forgets it
+  if(m){ BOOTH_LAG = parseInt(m[1], 10); try { localStorage.setItem("boothLag", m[1]); } catch(e0){} }
+  else if(/[?&]lag=default(&|$)/.test(q)){ try { localStorage.removeItem("boothLag"); } catch(e1){} }
+  else { try { var sv = localStorage.getItem("boothLag"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_LAG = parseInt(sv, 10); } catch(e2){} }
   if(/[?&]nosfx(&|$)/.test(q)) BOOTH_LAG = 0;
 })();
 function boothLater(fn){ if(BOOTH_LAG > 0) setTimeout(fn, BOOTH_LAG); else fn(); }
