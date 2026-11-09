@@ -16,15 +16,13 @@
 </head>
 <body>
 <h1>TV sound effect test</h1>
-<p>One sound (the one Fruits of the Spirit plays when a fruit reaches its number), played five different ways. Tap each button and tell me which letters sound <b>clean</b> and which sound <b>distorted</b>. It may arrive late: that is not what we are testing, only the quality. Keep the TV volume at a normal level.</p>
+<p>The same Fruits of the Spirit sound (a fruit reached its number) in five cleaned-up versions. I found that the original has a lot of fuzz and sharp high notes in it, so I made softer versions. Tap each button and tell me which letters sound <b>cleanest</b> (and whether any is clearly better than A). It may arrive late: that is not what we are testing. Keep the TV volume at a normal level.</p>
 
-<button onclick="play('ticket_orig.wav',1)">A: as the app plays it now (WAV)</button>
-<button onclick="play('ticket_lead.wav',1)">B: WAV at 48000 Hz with a quiet lead-in</button>
-<button onclick="play('ticket.mp3',1)">C: MP3</button>
-<button onclick="play('ticket_orig.wav',0.4)">D: as now but at 40% volume</button>
-<button onclick="vid('ticket.mp3')">E: MP3 through a video element</button>
-
-<button class="g" onclick="hum()">G: start a very quiet background hum (keeps the speaker awake). Tap again to stop. Then try A to E again with the hum ON.</button>
+<button onclick="play('t_orig.wav',1)">A: the sound exactly as the app has it now</button>
+<button onclick="play('t_lp8.wav',1)">B: the same sound with the harsh top cut off (softer)</button>
+<button onclick="play('t_lp5.wav',1)">C: the same, cut off lower (softer still, a bit duller)</button>
+<button onclick="play('t_dn.wav',1)">D: the same with the background fuzz removed</button>
+<button onclick="play('t_dnlp.wav',1)">E: fuzz removed AND the top softened</button>
 <button class="stop" onclick="stopAll()">STOP everything</button>
 
 <script>
