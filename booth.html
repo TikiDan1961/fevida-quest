@@ -1332,6 +1332,14 @@ var BOOTH_LAG = 1000;          /* 1000 ms matched the sheep's baa on Dan's TV (2
   if(/[?&]nosfx(&|$)/.test(q)) BOOTH_LAG = 0;
 })();
 function boothLater(fn){ if(BOOTH_LAG > 0) setTimeout(fn, BOOTH_LAG); else fn(); }
+/* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
+var BOOTH_FS_SHIFT = 250;
+(function(){
+  var q = location.search || "", m = /[?&]fsshift=([0-9]+)/.exec(q);
+  if(m){ BOOTH_FS_SHIFT = parseInt(m[1], 10); try { localStorage.setItem("boothFsShift", m[1]); } catch(e0){} }
+  else if(/[?&]fsshift=default(&|$)/.test(q)){ try { localStorage.removeItem("boothFsShift"); } catch(e1){} }
+  else { try { var sv = localStorage.getItem("boothFsShift"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_FS_SHIFT = parseInt(sv, 10); } catch(e2){} }
+})();
 </script>
 </head>
 <body>
@@ -13435,6 +13443,8 @@ setTimeout(pixBgGo, 4000);
 <script id="boothAudio">
 (function(){
   var q = location.search || "";
+  // The sound effects are the cleaned copies in soundsb/ (made by clean_sfx.py: background fuzz removed, harsh top softened; Dan picked this on the TV with tvsfx.html, 2026-11-09). ?rawsfx = the originals.
+  if(typeof PIX_SFX !== "undefined" && !/[?&]rawsfx(&|$)/.test(q)){ Object.keys(PIX_SFX).forEach(function(k){ var u = PIX_SFX[k].url; if(/^sounds[/]sfx_/.test(u)) PIX_SFX[k].url = u.replace("sounds/", "soundsb/").replace(".mp3", ".wav"); }); }
   if(/[?&]webaudio(&|$)/.test(q)) return;
   if(typeof PIX_SFX === "undefined" || typeof pixVolGain !== "function" || typeof pixMusic === "undefined") return;
   // The sound effects are ON, as in the version of 2026-11-09 (commit ff556e6): clean through the plain audio player, but this TV plays every sound the browser makes more than a second late
@@ -13633,7 +13643,7 @@ setTimeout(pixBgGo, 4000);
       var pk = 0; for(i = 0; i < n; i++) pk = Math.max(pk, Math.abs(out[i]));
       if(pk > 0.9){ var sc = 0.9 / pk; for(i = 0; i < n; i++) out[i] *= sc; }
       var url = wavUrl(out), a = new Audio(url); a.preload = "auto"; a.volume = Math.max(0, Math.min(1, pixVolGain("sfx")));
-      setTimeout(function(){ try { var pr = a.play(); if(pr && pr.catch) pr.catch(function(){}); } catch(e8){} }, t0 * 1000);
+      setTimeout(function(){ try { var pr = a.play(); if(pr && pr.catch) pr.catch(function(){}); } catch(e8){} }, t0 * 1000 + (BOOTH_LAG > 0 ? BOOTH_FS_SHIFT : 0));
       setTimeout(function(){ try { URL.revokeObjectURL(url); } catch(e9){} }, (t0 + tmax) * 1000 + 8000);
     }
     window.pixChime = function(freq){ var f = freq * 4; synPlay("ch" + f, function(){ return bell(f, [[1, 0.15, 1.3], [1.004, 0.07, 1.1], [3.0, 0.05, 0.4], [4.2, 0.03, 0.2]]); }); };
