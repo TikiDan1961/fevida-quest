@@ -1333,15 +1333,16 @@ var BOOTH_LAG = 1000;          /* 1000 ms matched the sheep's baa on Dan's TV (2
   if(/[?&]nosfx(&|$)/.test(q)) BOOTH_LAG = 0;
 })();
 function boothLater(fn){ if(BOOTH_LAG > 0) setTimeout(fn, BOOTH_LAG); else fn(); }
-/* the Faith Match pictures: ?tiles=1 the original hard pixels, 2 enlarged + gentle, 3 enlarged + crisper (default); remembered on the device */
-var BOOTH_TILES = 3, BOOTH_TD = "tilese/";
+/* the Faith Match pictures to be matched: the smooth originals (faith_tile2_NN.jpg); ?tiles=1 = the pixel pictures instead, ?tiles=default = back to the smooth ones (remembered on the device) */
+var BOOTH_PIXEL_TILES = false;
 (function(){
-  var q = location.search || "", m = /[?&]tiles=([123])/.exec(q);
-  if(m){ BOOTH_TILES = parseInt(m[1], 10); try { localStorage.setItem("boothTiles", m[1]); } catch(e0){} }
-  else { try { var sv = localStorage.getItem("boothTiles"); if(sv === "1" || sv === "2" || sv === "3") BOOTH_TILES = parseInt(sv, 10); } catch(e2){} }
-  BOOTH_TD = BOOTH_TILES === 1 ? "tiles/" : BOOTH_TILES === 2 ? "tilesd/" : "tilese/";
-  if(BOOTH_TILES === 1) document.documentElement.className += " boothHard";
+  var q = location.search || "";
+  if(/[?&]tiles=1(&|$)/.test(q)){ BOOTH_PIXEL_TILES = true; try { localStorage.setItem("boothTiles2", "1"); } catch(e0){} }
+  else if(/[?&]tiles=default(&|$)/.test(q)){ try { localStorage.removeItem("boothTiles2"); } catch(e1){} }
+  else { try { BOOTH_PIXEL_TILES = localStorage.getItem("boothTiles2") === "1"; } catch(e2){} }
+  if(BOOTH_PIXEL_TILES) document.documentElement.className += " boothHard";
 })();
+function boothTile(nn){ return BOOTH_PIXEL_TILES ? "tiles/faith_tile8_" + nn + ".png" : "tiles/faith_tile2_" + nn + ".jpg"; }
 /* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
 var BOOTH_FS_SHIFT = 700;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09) */
 (function(){
@@ -2055,10 +2056,10 @@ var FAITH_FLASH_QUESTIONS = [
 ];
 
 var MATCH_SYMBOLS = [
-  BOOTH_TD + "faith_tile8_00.png",BOOTH_TD + "faith_tile8_01.png",BOOTH_TD + "faith_tile8_02.png",BOOTH_TD + "faith_tile8_03.png",
-  BOOTH_TD + "faith_tile8_04.png",BOOTH_TD + "faith_tile8_05.png",BOOTH_TD + "faith_tile8_06.png",BOOTH_TD + "faith_tile8_07.png",
-  BOOTH_TD + "faith_tile8_08.png",BOOTH_TD + "faith_tile8_09.png",BOOTH_TD + "faith_tile8_10.png",BOOTH_TD + "faith_tile8_11.png",
-  BOOTH_TD + "faith_tile8_12.png",BOOTH_TD + "faith_tile8_13.png",BOOTH_TD + "faith_tile8_14.png",BOOTH_TD + "faith_tile8_15.png"
+  boothTile("00"),boothTile("01"),boothTile("02"),boothTile("03"),
+  boothTile("04"),boothTile("05"),boothTile("06"),boothTile("07"),
+  boothTile("08"),boothTile("09"),boothTile("10"),boothTile("11"),
+  boothTile("12"),boothTile("13"),boothTile("14"),boothTile("15")
 ];
 
 // The tile pictures, and the card back every tile shows face down (2026-10-22, per Dan): the card back is a CSS background, which was only fetched when the first
@@ -6495,7 +6496,7 @@ function sdNextPuzzle(s){
 function sdCollectAward(){ state.session.sacredSudoku = null; grantMission("sacredSudoku"); }
 function sdQuit(){ state.session.sacredSudoku = null; go("mainMenu"); }
 
-function sdPicUrl(lv, v){ return BOOTH_TD + 'faith_tile8_' + ("0" + lv.syms[v - 1]).slice(-2) + '.png'; }
+function sdPicUrl(lv, v){ return 'tiles/faith_tile8_' + ("0" + lv.syms[v - 1]).slice(-2) + '.png'; }
 
 function screenSacredSudoku(){
   var s = state.session.sacredSudoku;
@@ -12770,7 +12771,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B24</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B25</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
