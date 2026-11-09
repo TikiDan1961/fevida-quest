@@ -13373,5 +13373,67 @@ setTimeout(pixBgGo, 4000);
   if(calm) css("[class*='Overlay'],[class*='Paper'],[class*='Panel'],.screen-enter{animation:none !important;} .tapGlow,.tapHold{filter:none !important;}");
 })();
 </script>
+
+<script id="boothAudio">
+(function(){
+  var q = location.search || "";
+  if(/[?&]webaudio(&|$)/.test(q)) return;
+  if(typeof PIX_SFX === "undefined" || typeof pixVolGain !== "function" || typeof pixMusic === "undefined") return;
+  var pool = {}, curEx = null, mus = null;
+  function sfxEl(name){
+    var d = PIX_SFX[name]; if(!d) return null;
+    var p = pool[name];
+    if(!p){ p = pool[name] = {els: [], n: 0}; for(var i = 0; i < 3; i++){ var e = new Audio(d.url); e.preload = "auto"; p.els.push(e); } }
+    var a = p.els[p.n % p.els.length]; p.n++;
+    return a;
+  }
+  window.pixSfxPlayNow = function(name, exclusive){
+    var a = sfxEl(name); if(!a) return false;
+    try {
+      if(exclusive && curEx){ try { curEx.pause(); } catch(e1){} }
+      a.volume = Math.max(0, Math.min(1, PIX_SFX[name].gain * pixVolGain("sfx")));
+      try { a.currentTime = 0; } catch(e2){}
+      var pr = a.play(); if(pr && pr.catch) pr.catch(function(){});
+      pixSfxLast[name] = {t: performance.now(), ms: (isFinite(a.duration) && a.duration > 0 ? a.duration : 0.5) * 1000};
+      if(exclusive) curEx = a;
+      return true;
+    } catch(e3){ return false; }
+  };
+  window.pixSfxPlay = window.pixSfxPlayHeld = function(name, exclusive){ return window.pixSfxPlayNow(name, exclusive); };
+  window.pixBlip = function(){};
+  window.pixPressSfx = function(name){
+    var now = performance.now(); if(now - pixLastPressAt < 40) return; pixLastPressAt = now;
+    pixBlipPlayed = false; pixTap(null, name); pixBlipPlayed = true;
+  };
+  window.pixClickSfx = function(name){
+    var now = performance.now(); if(now - pixLastClickAt < 40) return; pixLastClickAt = now;
+    if(pixBlipPlayed){ pixBlipPlayed = false; return; }
+    pixTap(null, name);
+  };
+  function musVol(){ return Math.max(0, Math.min(1, pixVolGain("music"))); }
+  function armRetry(){ var f = function(){ document.removeEventListener("pointerdown", f, true); musPlay(); }; document.addEventListener("pointerdown", f, true); }
+  function musPlay(){
+    if(!pixMusic.want) return;
+    if(!mus){ mus = new Audio(PIX_MUSIC_URL); mus.loop = true; mus.preload = "auto"; }
+    mus.volume = musVol();
+    if(!mus.paused) return;
+    var pr = mus.play(); if(pr && pr.catch) pr.catch(function(){ armRetry(); });
+  }
+  window.pixMusicStart = function(){ pixMusic.want = true; musPlay(); };
+  window.pixMusicPlay = musPlay;
+  window.pixMusicRestart = function(){ musPlay(); };
+  window.pixMusicFetch = function(done){ if(done) done(); };
+  window.pixMusicDecode = function(){};
+  var oApply = window.pixApplyVolumes;
+  window.pixApplyVolumes = function(){ try { oApply(); } catch(e4){} if(mus) mus.volume = musVol(); };
+  var oDuck = window.pixSetMusicDuck;
+  window.pixSetMusicDuck = function(f){ try { oDuck(f); } catch(e5){} if(mus) mus.volume = musVol(); };
+  document.addEventListener("visibilitychange", function(){ if(!mus) return; if(document.hidden) mus.pause(); else musPlay(); });
+  window.__boothAudio = {pool: pool, music: function(){ return mus; }};
+  // warm the sound files a few seconds after the page is up, so the first tap of each sound does not wait for its file
+  setTimeout(function(){ Object.keys(PIX_SFX).forEach(function(k){ sfxEl(k); }); }, 4000);
+  if(typeof dbgLog === "function") dbgLog("audio: booth page: sounds and music play through the plain audio player (add ?webaudio to the address to use the app's own engine)");
+})();
+</script>
 </body>
 </html>
