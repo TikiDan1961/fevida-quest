@@ -1315,9 +1315,8 @@ html,body{background:#000 !important;}
 }
 /* the logo at the top of the Main Menu: larger (was 128 px wide) */
 .pixMenu .pixMenuLogo{width:190px !important;}
-/* Faith Match: the tile pictures and the card back are scaled smoothly, so they are less pixelated */
-.pixMission .matchCard img{image-rendering:auto !important;}
-html.boothHard .pixMission .matchCard img{image-rendering:pixelated !important;}
+/* Faith Match: only in the ?tiles=smooth mode the pictures are scaled smoothly (the others are pixel pictures, drawn with hard pixel edges like the rest of the app) */
+html.boothSmooth .pixMission .matchCard img{image-rendering:auto !important;}
 /* no empty rows where the SHARE buttons were */
 .shareRow,.pxShareRow{display:none !important;}
 </style>
@@ -1333,16 +1332,19 @@ var BOOTH_LAG = 1000;          /* 1000 ms matched the sheep's baa on Dan's TV (2
   if(/[?&]nosfx(&|$)/.test(q)) BOOTH_LAG = 0;
 })();
 function boothLater(fn){ if(BOOTH_LAG > 0) setTimeout(fn, BOOTH_LAG); else fn(); }
-/* the Faith Match pictures to be matched: the smooth originals (faith_tile2_NN.jpg); ?tiles=1 = the pixel pictures instead, ?tiles=default = back to the smooth ones (remembered on the device) */
-var BOOTH_PIXEL_TILES = false;
+/* the Faith Match pictures to be matched. Default "B" = 90 x 90 pixel pictures made from the smooth originals (tiles90/, Dan's pick, with hard pixel edges). ?tiles=1 = the app's 40 x 40 pixel pictures,
+   ?tiles=smooth = the smooth originals (faith_tile2_NN.jpg), ?tiles=default = back to B. Remembered on the device (key boothTiles3). */
+var BOOTH_TILE_MODE = "b";
 (function(){
-  var q = location.search || "";
-  if(/[?&]tiles=1(&|$)/.test(q)){ BOOTH_PIXEL_TILES = true; try { localStorage.setItem("boothTiles2", "1"); } catch(e0){} }
-  else if(/[?&]tiles=default(&|$)/.test(q)){ try { localStorage.removeItem("boothTiles2"); } catch(e1){} }
-  else { try { BOOTH_PIXEL_TILES = localStorage.getItem("boothTiles2") === "1"; } catch(e2){} }
-  if(BOOTH_PIXEL_TILES) document.documentElement.className += " boothHard";
+  var q = location.search || "", m = /[?&]tiles=(1|smooth|default)(&|$)/.exec(q);
+  try {
+    if(m){ if(m[1] === "default") localStorage.removeItem("boothTiles3"); else localStorage.setItem("boothTiles3", m[1]); }
+    var sv = localStorage.getItem("boothTiles3");
+    if(sv === "1" || sv === "smooth") BOOTH_TILE_MODE = sv;
+  } catch(e0){ if(m && m[1] !== "default") BOOTH_TILE_MODE = m[1]; }
+  if(BOOTH_TILE_MODE === "smooth") document.documentElement.className += " boothSmooth";
 })();
-function boothTile(nn){ return BOOTH_PIXEL_TILES ? "tiles/faith_tile8_" + nn + ".png" : "tiles/faith_tile2_" + nn + ".jpg"; }
+function boothTile(nn){ return BOOTH_TILE_MODE === "1" ? "tiles/faith_tile8_" + nn + ".png" : BOOTH_TILE_MODE === "smooth" ? "tiles/faith_tile2_" + nn + ".jpg" : "tiles90/faith_tile90_" + nn + ".png"; }
 /* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
 var BOOTH_FS_SHIFT = 700;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09) */
 (function(){
@@ -12771,7 +12773,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B25</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B26</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
