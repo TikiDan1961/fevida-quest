@@ -4,3 +4,7 @@
 /manifest.webmanifest
   Content-Type: application/manifest+json
   Cache-Control: no-cache
+
+/booth.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: no-cache
