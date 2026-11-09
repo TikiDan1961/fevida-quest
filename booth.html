@@ -1333,7 +1333,7 @@ var BOOTH_LAG = 1000;          /* 1000 ms matched the sheep's baa on Dan's TV (2
 })();
 function boothLater(fn){ if(BOOTH_LAG > 0) setTimeout(fn, BOOTH_LAG); else fn(); }
 /* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
-var BOOTH_FS_SHIFT = 250;
+var BOOTH_FS_SHIFT = 700;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09) */
 (function(){
   var q = location.search || "", m = /[?&]fsshift=([0-9]+)/.exec(q);
   if(m){ BOOTH_FS_SHIFT = parseInt(m[1], 10); try { localStorage.setItem("boothFsShift", m[1]); } catch(e0){} }
