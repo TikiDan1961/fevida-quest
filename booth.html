@@ -1301,17 +1301,18 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
 <style id="boothStyle">
 /* BOOTH TV (made by make_booth.py): the bars beside the 480-px column carry a wider copy of the screen's own background. */
 body[data-fam="sky"]{background:url("tiles/booth_sky_wide.png?v=4f081a02") center bottom / calc(480px * 189 / 125) auto no-repeat,#2F8FE8;image-rendering:pixelated;}
-body[data-fam="lang"]{background:url("tiles/booth_church_scene_wide.png?v=bc0ebf76") center top 34px / calc(480px * 189 / 125) auto no-repeat,linear-gradient(#4FB0F2 0,#4FB0F2 150px,#52B043 150px);image-rendering:pixelated;}
-body[data-fam="church"]{background:url("tiles/booth_church_inside_wide.png?v=6df2b30d") center bottom / calc(480px * 189 / 125) auto no-repeat,#6B4423;image-rendering:pixelated;}
+body[data-fam="lang"]{background:url("tiles/booth_church_scene_wide.png?v=b791e805") center top 34px / calc(480px * 205 / 125) auto no-repeat,linear-gradient(#4FB0F2 0,#4FB0F2 150px,#52B043 150px);image-rendering:pixelated;}
+#app .pixHome.pixLang{background:none !important;}          /* the first screen's own picture is part of the wide one behind it */
+body[data-fam="church"]{background:url("tiles/booth_church_inside_wide.png?v=a70a77ba") center bottom / calc(480px * 205 / 125) auto no-repeat,#6B4423;image-rendering:pixelated;}
+#app .pixHome.pixChurch{background:none !important;}          /* the Welcome screen's own picture is part of the wide one behind it */
 /* Bars: the drifting clouds of the sky screens carry on into them, and on the Main Menu the painted hill scene as well. The script below places them. */
 #boothBarL,#boothBarR{position:fixed;top:0;bottom:0;overflow:hidden;z-index:-1;pointer-events:none;display:none;}
 #boothBarL i,#boothBarR i{position:absolute;display:block;image-rendering:pixelated;}
 #boothBarL .art,#boothBarR .art{background-repeat:no-repeat;background-size:100% 100%;display:none;}
-#boothBarL .art{background-image:url("tiles/booth_world_left.png?v=92582171");}
-#boothBarR .art{background-image:url("tiles/booth_world_right.png?v=385cc2f4");}
+#boothBarL .art{background-image:url("tiles/booth_world_left.png?v=c1347793");}
+#boothBarR .art{background-image:url("tiles/booth_world_right.png?v=de7cfac2");}
 #boothBarL .lawn,#boothBarR .lawn{left:0;right:0;bottom:0;background:#52B043;display:none;}
 #boothBarL.scene .art,#boothBarR.scene .art,#boothBarL.scene .lawn,#boothBarR.scene .lawn{display:block;}
-#boothBarL .pixSkyClouds,#boothBarR .pixSkyClouds{z-index:auto;}
 </style>
 </head>
 <body>
@@ -3312,7 +3313,7 @@ function petsInit(){
 function pilgrimSceneHtml(extra){
   var lit = goldenTicketUnlocked();
   return '<div class="pixScene" id="pixScene"><div class="pixSceneBox" id="pixSceneBox">' +
-    '<img class="pixSceneArt" src="tiles/scene_world4.png" alt="">' +
+    '<img class="pixSceneArt" src="tiles/booth_world_center.png?v=dd6bbe47" alt="">' +
     '<div class="churchGlow' + (lit ? ' lit' : '') + '"></div>' +
     '<img class="pixSpark" src="tiles/spark.png" alt="">' +
     PETS.map(petHtml).join("") +
@@ -13326,13 +13327,12 @@ setTimeout(pixBgGo, 4000);
 
 <script id="boothScript">
 /* BOOTH TV (made by make_booth.py): (1) tell the page which family of background the screen on show belongs to, so the bars match it;
-   (2) on the sky screens, carry the drifting clouds on into the two bars (the same layers, the same speed, shifted one screen width, so
-   a cloud leaves the column and keeps going); (3) on the Main Menu, put the painted continuation of the hill scene in the bars, lined up
+   (2) on the Main Menu, put the painted continuation of the hill scene in the bars, lined up
    with the scene in the column. */
 (function(){
   var app = document.getElementById("app");
   if(!app) return;
-  var ART_W = 125, PAD = 32, DURS = [["cl1", 100], ["cl2", 60], ["cl3", 34]];
+  var ART_W = 125, PAD = 32;
   function fam(){
     var s = app.querySelector(".screen"), f = "";
     if(s){ var c = s.classList; f = c.contains("pixLang") ? "lang" : c.contains("pixChurch") ? "church" : c.contains("pixSky") ? "sky" : ""; }
@@ -13340,36 +13340,22 @@ setTimeout(pixBgGo, 4000);
   }
   function bar(id){
     var d = document.createElement("div"); d.id = id;
-    var secs = (Date.now() - (window.CLOUD_T0 || Date.now())) / 1000, h = "";
-    DURS.forEach(function(c){ h += '<div class="pixSkyClouds ' + c[0] + '" style="animation-delay:-' + (secs % c[1]).toFixed(2) + 's"></div>'; });
-    d.innerHTML = h + '<i class="art"></i><i class="lawn"></i>';
+    d.innerHTML = '<i class="art"></i><i class="lawn"></i>';
     document.body.appendChild(d); return d;
   }
-  var L = bar("boothBarL"), R = bar("boothBarR"), lastKey = "", shown = false;
-  // A CSS animation only starts when its element is first shown (the bars are hidden at first), so the start offset must be worked out at
-  // that moment, from the app's own cloud clock (CLOUD_T0), exactly as the app does for the layers in the column.
-  function syncClouds(){
-    var secs = (Date.now() - (window.CLOUD_T0 || Date.now())) / 1000;
-    DURS.forEach(function(c){
-      [].forEach.call(document.querySelectorAll("#boothBarL ." + c[0] + ", #boothBarR ." + c[0]), function(e){ e.style.animationDelay = "-" + (secs % c[1]).toFixed(2) + "s"; });
-    });
-  }
+  var L = bar("boothBarL"), R = bar("boothBarR"), lastKey = "";
   function place(){
     var sky = app.querySelector(".screen.pixSky"), vw = document.documentElement.clientWidth;
     var r = sky ? sky.getBoundingClientRect() : null;
-    if(!r || r.width < 50 || (r.left < 1 && vw - r.right < 1)){ if(lastKey !== "off"){ L.style.display = R.style.display = "none"; lastKey = "off"; shown = false; } return; }
+    if(!r || r.width < 50 || (r.left < 1 && vw - r.right < 1)){ if(lastKey !== "off"){ L.style.display = R.style.display = "none"; lastKey = "off"; } return; }
     var art = sky.querySelector(".pixSceneArt"), a = art ? art.getBoundingClientRect() : null;
     var key = [Math.round(r.left), Math.round(r.right), Math.round(r.top), Math.round(r.height), vw, a ? Math.round(a.top) + "/" + Math.round(a.height) : "-"].join(",");
     if(key === lastKey) return; lastKey = key;
     var cw = r.width;
     L.style.display = R.style.display = "block";
-    if(!shown){ syncClouds(); shown = true; }
     var U = 4;          // each bar reaches U px under the column (the column is painted over it), so no hairline of sky can show between them
     L.style.left = "0"; L.style.width = (Math.max(0, r.left) + U) + "px";
     R.style.left = (r.right - U) + "px"; R.style.width = (Math.max(0, vw - r.right) + U) + "px";
-    // clouds: a layer is two screen widths wide and drifts one screen width; the copy for the left bar sits one screen width to the left of the column's own, the copy for the right bar sits where the column's own is
-    [].forEach.call(L.querySelectorAll(".pixSkyClouds"), function(e){ e.style.cssText += ";left:" + (r.left - cw) + "px;top:" + r.top + "px;width:" + (2 * cw) + "px;height:" + r.height + "px"; });
-    [].forEach.call(R.querySelectorAll(".pixSkyClouds"), function(e){ e.style.cssText += ";left:" + (r.left - r.right + U) + "px;top:" + r.top + "px;width:" + (2 * cw) + "px;height:" + r.height + "px"; });
     if(a && a.width > 50){
       var s = a.width / ART_W, sw = PAD * s;
       L.className = R.className = "scene";
@@ -13378,10 +13364,29 @@ setTimeout(pixBgGo, 4000);
       L.querySelector(".lawn").style.top = R.querySelector(".lawn").style.top = (a.top + a.height - 1) + "px";
     } else L.className = R.className = "";
   }
-  function all(){ fam(); place(); }
+  // The Welcome card (the "window" at the top of the first screen after the language) sits centred between the top of the screen and the top of the arch above the cross
+  var ARCH_ROW = 108, PIC_ROWS = 270, cardKey = "";
+  function centerCard(){
+    var card = app.querySelector(".pixWelcomeCard"), scr = app.querySelector(".screen.pixChurch");
+    if(!card || !scr) { cardKey = ""; return; }
+    var r = scr.getBoundingClientRect(), s = r.width / ART_W;
+    var cur = parseFloat(card.style.marginTop) || 0, cr = card.getBoundingClientRect();
+    var natural = cr.top - cur, h = cr.height;
+    var archTop = r.bottom - (PIC_ROWS - ARCH_ROW) * s;
+    var target = Math.max(natural, (archTop - h) / 2);
+    var key = [Math.round(r.bottom), Math.round(h), Math.round(natural), Math.round(s * 100)].join(",");
+    if(key === cardKey && Math.abs(cur - (target - natural)) < 0.5) return;
+    cardKey = key;
+    card.style.marginTop = Math.max(0, target - natural) + "px";
+  }
+  // Test switches for the TV (add to the address): ?still stops every drifting cloud, ?nobars hides the painted side bars. They let us see what the TV's graphics can not keep up with.
+  var q = location.search || "";
+  if(/[?&]still(&|$)/.test(q)){ var st = document.createElement("style"); st.textContent = ".pixSkyClouds{animation:none !important;}"; document.head.appendChild(st); }
+  if(/[?&]nobars(&|$)/.test(q)){ var nb = document.createElement("style"); nb.textContent = "#boothBarL,#boothBarR{display:none !important;}"; document.head.appendChild(nb); }
+  function all(){ fam(); place(); centerCard(); }
   try { new MutationObserver(all).observe(app, {childList: true, subtree: true}); } catch(e){}
   window.addEventListener("resize", all);
-  setInterval(place, 300);
+  setInterval(function(){ place(); centerCard(); }, 1000);
   all();
 })();
 </script>
