@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TV audio test</title>
+<style>
+  html,body{margin:0;background:#000;color:#fff;font-family:system-ui,Arial,sans-serif;}
+  body{padding:14px;font-size:20px;line-height:1.3;}
+  h1{font-size:26px;margin:4px 0 8px;color:#FFC93A;}
+  p{margin:6px 0;}
+  button{display:block;width:100%;box-sizing:border-box;margin:10px 0;padding:18px 12px;font-size:21px;font-weight:700;color:#fff;background:#1d4fd8;border:3px solid #9fb8ff;border-radius:14px;}
+  button.stop{background:#a01818;border-color:#ff9f9f;}
+  #log{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:17px;background:#111;border:1px solid #444;border-radius:8px;padding:8px;margin-top:10px;min-height:120px;}
+  .k{color:#7CFF9B;}
+</style>
+</head>
+<body>
+<h1>TV audio test</h1>
+<p>Tap each button, one at a time, and listen. Tell me which ones sound <b>clean and instant</b> and which sound <b>muffled, distorted or late</b>. Turn the TV volume to a normal level first.</p>
+<div id="info" class="k"></div>
+
+<button onclick="tap('A','default')">A: button sound, normal audio engine (how the app does it)</button>
+<button onclick="tap('B','playback')">B: button sound, engine tuned for smooth playback</button>
+<button onclick="tap('C','r48000')">C: button sound, engine at 48000 Hz</button>
+<button onclick="tap('D','r44100')">D: button sound, engine at 44100 Hz</button>
+<button onclick="htmlTap()">E: button sound, plain web audio (not the engine)</button>
+<button onclick="tone()">F: a steady tone (440 Hz) for 1.5 seconds, normal engine</button>
+<button onclick="music('default')">G: the music, normal audio engine (how the app does it)</button>
+<button onclick="musicHtml()">H: the music, plain web audio</button>
+<button class="stop" onclick="stopAll()">STOP everything</button>
+<div id="log"></div>
+
+<script>
+var logEl = document.getElementById("log"), ctxs = {}, bufs = {}, running = [], htmlEl = null;
+function log(t){ logEl.textContent += t + "\n"; }
+function fmt(c){ return "sampleRate " + c.sampleRate + " Hz, baseLatency " + (c.baseLatency == null ? "?" : Math.round(c.baseLatency * 1000) + " ms") + ", outputLatency " + (c.outputLatency == null ? "?" : Math.round(c.outputLatency * 1000) + " ms") + ", state " + c.state; }
+function engine(kind){
+  if(ctxs[kind]) return ctxs[kind];
+  var AC = window.AudioContext || window.webkitAudioContext, c;
+  if(kind === "playback") c = new AC({latencyHint: "playback"});
+  else if(kind === "r48000") c = new AC({sampleRate: 48000});
+  else if(kind === "r44100") c = new AC({sampleRate: 44100});
+  else c = new AC();
+  ctxs[kind] = c; log("engine '" + kind + "' made: " + fmt(c));
+  return c;
+}
+function load(kind, url, cb){
+  var c = engine(kind), key = kind + "|" + url;
+  if(bufs[key]) return cb(c, bufs[key]);
+  fetch(url).then(function(r){ return r.arrayBuffer(); }).then(function(ab){
+    c.decodeAudioData(ab, function(b){ bufs[key] = b; log("loaded " + url + " (" + b.sampleRate + " Hz file, " + b.duration.toFixed(2) + " s)"); cb(c, b); }, function(){ log("could not decode " + url); });
+  }).catch(function(e){ log("could not load " + url + ": " + e); });
+}
+function tap(letter, kind){
+  var c = engine(kind); if(c.resume) c.resume();
+  load(kind, "sounds/sfx_tap.wav", function(c, b){
+    var s = c.createBufferSource(), g = c.createGain(); g.gain.value = 1.0; s.buffer = b; s.connect(g); g.connect(c.destination);
+    var t0 = performance.now(); s.start(); log(letter + ": played (" + fmt(c) + ")");
+  });
+}
+function htmlTap(){
+  var a = new Audio("sounds/sfx_tap.wav"); a.volume = 1; var p = a.play(); if(p && p.catch) p.catch(function(e){ log("E: blocked: " + e); }); log("E: played with the plain web audio element");
+}
+function tone(){
+  var c = engine("default"); if(c.resume) c.resume();
+  var o = c.createOscillator(), g = c.createGain(); o.frequency.value = 440; g.gain.value = 0.2; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + 1.5);
+  running.push(o); log("F: tone started (" + fmt(c) + ")");
+}
+function music(kind){
+  var c = engine(kind); if(c.resume) c.resume();
+  load(kind, "sounds/music_loop.wav", function(c, b){
+    var s = c.createBufferSource(), g = c.createGain(); g.gain.value = 0.5; s.buffer = b; s.loop = true; s.connect(g); g.connect(c.destination); s.start();
+    running.push(s); log("G: music playing (" + fmt(c) + ")");
+  });
+}
+function musicHtml(){
+  if(htmlEl) htmlEl.pause(); htmlEl = new Audio("sounds/music_loop.wav"); htmlEl.loop = true; htmlEl.volume = 0.5;
+  var p = htmlEl.play(); if(p && p.catch) p.catch(function(e){ log("H: blocked: " + e); }); log("H: music playing with the plain web audio element");
+}
+function stopAll(){
+  running.forEach(function(n){ try { n.stop(); } catch(e){} }); running = [];
+  if(htmlEl){ htmlEl.pause(); htmlEl = null; }
+  log("stopped");
+}
+(function(){
+  var AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC){ document.getElementById("info").textContent = "No Web Audio engine in this browser."; return; }
+  var c = new AC(); ctxs["default"] = c;
+  document.getElementById("info").innerHTML = "This browser's normal audio engine: " + fmt(c) + "<br>Browser: " + navigator.userAgent.slice(0, 110);
+})();
+</script>
+</body>
+</html>
