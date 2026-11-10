@@ -82,39 +82,47 @@
   @keyframes bootWalk{from{background-position:0 0;}to{background-position:-66px 0;}}
 
   /* ---- the Fe y Vida screen (2026-11-09, per Dan): a plain modern page, not 8-bit. Fe y Vida's own greens and purple (from feyvida.org). It is a window of its own on top of the Main Menu. ---- */
-  .pixMenuTitle[role="button"]{cursor:pointer;padding:3px 14px 5px;-webkit-tap-highlight-color:transparent;}
+  /* the logo on the Main Menu is a button (2026-11-09, per Dan: so that players know to tap it): a cream plate with the app's dark outline, a drop edge like the other buttons, and a small "i" badge */
+  .pixMenuTitle[role="button"]{position:relative;cursor:pointer;width:-moz-fit-content;width:fit-content;margin:4px auto 6px;padding:3px 12px 3px;background:#FFF6D6;border-radius:12px;box-shadow:0 0 0 3px #1B1F3B,0 6px 0 3px rgba(27,31,59,.4);-webkit-tap-highlight-color:transparent;}
+  .pixMenuTitle[role="button"]:after{content:"i";position:absolute;right:-10px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1B1F3B;color:#FFC93A;box-shadow:0 0 0 2px #FFF6D6;font:700 16px/22px Georgia,"Times New Roman",serif;text-align:center;pointer-events:none;}
+  .pixMenuTitle[role="button"].tapGlow,.pixMenuTitle[role="button"].tapHold{background:#FFE9A0;}
   .fvOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:80;background:#F5F8F6;color:#171A17;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
     font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;animation:folderFade .2s ease-out;-webkit-user-select:none;user-select:none;}
   .fvOverlay *{box-sizing:border-box;}
   .fvTop{position:sticky;top:0;z-index:2;background:#084A1B;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;}
   .fvBack{border:0;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font:800 14px/1 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;padding:11px 18px;cursor:pointer;}
   .fvBack.tapGlow,.fvBack.tapHold{background:rgba(255,255,255,.34);}
-  .fvHero{background:linear-gradient(180deg,#084A1B 0%,#0D6C28 62%,#2FA23F 100%);color:#fff;text-align:center;padding:10px 22px 34px;border-radius:0 0 28px 28px;}
-  .fvCross{width:54px;height:54px;margin:6px auto 12px;border-radius:50%;background:#fff;position:relative;box-shadow:0 4px 14px rgba(0,0,0,.18);}
-  .fvCross:before,.fvCross:after{content:"";position:absolute;background:#39B54A;border-radius:3px;}
-  .fvCross:before{left:24px;top:12px;width:6px;height:30px;}
-  .fvCross:after{left:16px;top:20px;width:22px;height:6px;}
+  .fvHero{background:linear-gradient(180deg,#084A1B 0%,#0D6C28 55%,#2FA23F 100%);color:#fff;text-align:center;padding:4px 22px 70px;border-radius:0 0 28px 28px;position:relative;}
+  .fvLogo{display:block;width:132px;height:auto;margin:6px auto 12px;background:#fff;border-radius:22px;padding:10px 12px 8px;box-shadow:0 6px 18px rgba(0,0,0,.25);}
   .fvOverlay h1.fvTitle{margin:0;font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:34px;line-height:1.1;font-weight:800;letter-spacing:.01em;color:#fff;text-shadow:none;text-align:center;}
-  .fvOverlay h2{text-shadow:none;font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:left;}
   .fvSub{margin:10px auto 0;max-width:360px;font-size:16px;color:#E1F2DE;}
-  .fvWrap{max-width:560px;margin:0 auto;padding:18px 16px calc(28px + env(safe-area-inset-bottom));}
-  .fvCard{background:#fff;border-radius:18px;padding:18px 18px 16px;margin:0 0 14px;box-shadow:0 1px 3px rgba(13,60,30,.10),0 6px 18px rgba(13,60,30,.06);}
-  .fvCard h2{margin:0 0 8px;text-align:left;font-size:12.5px;line-height:1.2;font-weight:800;letter-spacing:.14em;color:#92278F;}
+  .fvPhoto{margin:-52px 16px 0;position:relative;z-index:1;max-width:528px;}
+  .fvPhoto img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:20px;border:4px solid #fff;box-shadow:0 10px 26px rgba(13,60,30,.28);background:#BEE3B9;}
+  .fvCap{margin:8px 6px 0;text-align:center;font-size:13px;line-height:1.35;color:#5C3A5B;font-style:italic;}
+  .fvWrap{max-width:560px;margin:0 auto;padding:16px 16px calc(28px + env(safe-area-inset-bottom));}
+  @media (min-width:600px){ .fvPhoto{margin-left:auto;margin-right:auto;} }
+  .fvCard{background:#fff;border-radius:18px;padding:16px 18px 16px;margin:0 0 14px;border-top:6px solid var(--fv,#39B54A);box-shadow:0 1px 3px rgba(13,60,30,.10),0 6px 18px rgba(13,60,30,.06);}
+  .fvCard h2{margin:0 0 8px;text-align:left;font-size:13px;line-height:1.2;font-weight:800;letter-spacing:.14em;color:var(--fv,#92278F);}
   .fvCard p{margin:0;font-size:16px;}
   .fvCard p + p{margin-top:10px;}
+  .fvGreen{--fv:#2FA23F;} .fvPurple{--fv:#92278F;} .fvBlue{--fv:#1B75BC;} .fvGold{--fv:#D98E04;}
   .fvStats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px;}
-  .fvStat{background:#fff;border-radius:18px;padding:14px 10px 12px;text-align:center;box-shadow:0 1px 3px rgba(13,60,30,.10),0 6px 18px rgba(13,60,30,.06);}
-  .fvStat b{display:block;font-size:30px;line-height:1.1;font-weight:800;color:#0D6C28;}
-  .fvStat span{display:block;margin-top:2px;font-size:13px;line-height:1.25;color:#475149;font-weight:700;}
+  .fvStat{border-radius:18px;padding:14px 10px 12px;text-align:center;color:#fff;box-shadow:0 6px 16px rgba(13,60,30,.16);}
+  .fvStat b{display:block;font-size:30px;line-height:1.1;font-weight:800;}
+  .fvStat span{display:block;margin-top:2px;font-size:13px;line-height:1.25;font-weight:700;opacity:.95;}
+  .fvS1{background:linear-gradient(145deg,#0D6C28,#2FA23F);} .fvS2{background:linear-gradient(145deg,#7A1F78,#B03FAD);} .fvS3{background:linear-gradient(145deg,#145C99,#2F8AD4);} .fvS4{background:linear-gradient(145deg,#C77A00,#F0A91A);}
   .fvList{list-style:none;margin:0;padding:0;}
   .fvList li{position:relative;padding:0 0 0 22px;margin:0 0 10px;font-size:15.5px;}
   .fvList li:last-child{margin-bottom:0;}
-  .fvList li:before{content:"";position:absolute;left:2px;top:8px;width:9px;height:9px;border-radius:50%;background:#39B54A;}
+  .fvList li:before{content:"";position:absolute;left:2px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--dot,#39B54A);}
+  .fvList li:nth-child(1){--dot:#39B54A;} .fvList li:nth-child(2){--dot:#92278F;} .fvList li:nth-child(3){--dot:#1B75BC;} .fvList li:nth-child(4){--dot:#F0A91A;} .fvList li:nth-child(5){--dot:#39B54A;}
   .fvList b{color:#0D6C28;font-weight:800;}
-  .fvWalk{margin:18px 0 14px;text-align:center;font-size:20px;font-weight:800;color:#0D6C28;}
+  .fvWalk{margin:20px 0 14px;text-align:center;font-size:21px;font-weight:800;color:#92278F;}
   .fvVisit{display:block;width:min(100%,320px);margin:0 auto 10px;padding:14px 18px;border-radius:999px;background:#39B54A;color:#0B2914;text-align:center;text-decoration:none;font:800 15px/1.2 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;}
-  .fvAddr{display:none;text-align:center;font-size:18px;font-weight:800;color:#0D6C28;margin:0 0 12px;}
-  .fvDone{display:block;width:min(100%,320px);margin:0 auto;padding:14px 18px;border:2px solid #0D6C28;border-radius:999px;background:#fff;color:#0D6C28;text-align:center;font:800 15px/1.2 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;cursor:pointer;}
+  .fvFb{display:flex;align-items:center;justify-content:center;gap:10px;width:min(100%,320px);margin:0 auto;padding:14px 18px;border-radius:999px;background:#1877F2;color:#fff;text-align:center;text-decoration:none;font:800 15px/1.2 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;box-shadow:0 4px 12px rgba(24,119,242,.35);}
+  .fvFb i{display:inline-block;width:26px;height:26px;border-radius:50%;background:#fff;color:#1877F2;font:900 20px/27px Arial,Helvetica,sans-serif;font-style:normal;text-align:center;}
+  .fvAddr{display:none;text-align:center;font-size:18px;line-height:1.5;font-weight:800;color:#0D6C28;margin:0 0 12px;}
+  .fvDone{display:none;width:min(100%,320px);margin:0 auto;padding:14px 18px;border:2px solid #0D6C28;border-radius:999px;background:#fff;color:#0D6C28;text-align:center;font:800 15px/1.2 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;cursor:pointer;}
   .fvDone.tapGlow,.fvDone.tapHold{background:#E1F2DE;}
   .screen{
     flex:1;
@@ -1357,7 +1365,8 @@ html.boothSmooth .pixMission .matchCard img{image-rendering:auto !important;}
 .shareRow,.pxShareRow{display:none !important;}
 
 @media (orientation:portrait){ .fvOverlay{left:max(0px,calc(50% - 240px));right:max(0px,calc(50% - 240px));} }
-.fvVisit{display:none !important;}
+.fvVisit,.fvFb{display:none !important;}
+.fvDone{display:block !important;}
 .fvAddr{display:block !important;}
 </style>
 
@@ -12834,7 +12843,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B35</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B36</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -13495,7 +13504,7 @@ var FV_TEXT = {
             ["Pastoral courses", "youth ministry, pastoral leadership and Bible courses for the people who accompany young people."],
             ["Online Campus", "courses, materials and guidance, with a certificate at the end."]],
     whereH: "WHERE WE ARE", where: "Fe y Vida is based at Fitzpatrick House on the campus of Lewis University in Romeoville, Illinois. It is a ministry of the Christian Brothers of La Salle, Midwest District.",
-    walk: "Walk with us!", visit: "VISIT FEYVIDA.ORG", done: "BACK TO THE GAME"
+    walk: "Walk with us!", visit: "VISIT FEYVIDA.ORG", fb: "FIND US ON FACEBOOK", cap: "Participants of the National Catholic Leadership Program (PNL), 2025", done: "BACK TO THE GAME"
   },
   es: {
     back: "← ATRÁS", title: "Fe y Vida", sub: "Instituto Fe y Vida: un ministerio católico para jóvenes latinos, familias y líderes pastorales",
@@ -13512,29 +13521,31 @@ var FV_TEXT = {
             ["Cursos de pastoral", "pastoral juvenil, liderazgo pastoral y cursos bíblicos para quienes acompañan a los jóvenes."],
             ["Campus en línea", "cursos, materiales y orientación, con certificado al terminar."]],
     whereH: "DÓNDE ESTAMOS", where: "Fe y Vida tiene su sede en Fitzpatrick House, en el campus de Lewis University, en Romeoville, Illinois. Es un ministerio de los Hermanos de las Escuelas Cristianas (De La Salle), Distrito del Medio Oeste.",
-    walk: "¡Camina con nosotros!", visit: "VISITAR FEYVIDA.ORG", done: "VOLVER AL JUEGO"
+    walk: "¡Camina con nosotros!", visit: "VISITAR FEYVIDA.ORG", fb: "SÍGUENOS EN FACEBOOK", cap: "Participantes del Programa Nacional de Liderazgo Católico (PNL), 2025", done: "VOLVER AL JUEGO"
   }
 };
 function fvOpen(){
   if(document.getElementById("fvOverlay")) return;
   var x = FV_TEXT[state && state.lang === "es" ? "es" : "en"], i, stats = "", progs = "";
-  for(i = 0; i < x.stats.length; i++) stats += '<div class="fvStat"><b>' + x.stats[i][0] + '</b><span>' + x.stats[i][1] + '</span></div>';
+  for(i = 0; i < x.stats.length; i++) stats += '<div class="fvStat fvS' + (i + 1) + '"><b>' + x.stats[i][0] + '</b><span>' + x.stats[i][1] + '</span></div>';
   for(i = 0; i < x.progs.length; i++) progs += '<li><b>' + x.progs[i][0] + '</b>: ' + x.progs[i][1] + '</li>';
   var el = document.createElement("div");
   el.id = "fvOverlay"; el.className = "fvOverlay";
   el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Fe y Vida");
   el.innerHTML = '<div class="fvTop"><button class="fvBack" onclick="fvClose()">' + x.back + '</button></div>' +
-    '<div class="fvHero"><div class="fvCross"></div><h1 class="fvTitle">' + x.title + '</h1><p class="fvSub">' + x.sub + '</p></div>' +
+    '<div class="fvHero"><img class="fvLogo" src="fyv/fyv_logo.png" alt="Fe y Vida"><h1 class="fvTitle">' + x.title + '</h1><p class="fvSub">' + x.sub + '</p></div>' +
+    '<div class="fvPhoto"><img src="fyv/fyv_pnl_group.jpg" alt="' + x.cap + '"><p class="fvCap">' + x.cap + '</p></div>' +
     '<div class="fvWrap">' +
-      '<div class="fvCard"><h2>' + x.whoH + '</h2><p>' + x.who1 + '</p><p>' + x.who2 + '</p></div>' +
+      '<div class="fvCard fvGreen"><h2>' + x.whoH + '</h2><p>' + x.who1 + '</p><p>' + x.who2 + '</p></div>' +
       '<div class="fvStats">' + stats + '</div>' +
-      '<div class="fvCard"><h2>' + x.missH + '</h2><p>' + x.miss + '</p></div>' +
-      '<div class="fvCard"><h2>' + x.visH + '</h2><p>' + x.vis + '</p></div>' +
-      '<div class="fvCard"><h2>' + x.doH + '</h2><ul class="fvList">' + progs + '</ul></div>' +
-      '<div class="fvCard"><h2>' + x.whereH + '</h2><p>' + x.where + '</p></div>' +
+      '<div class="fvCard fvPurple"><h2>' + x.missH + '</h2><p>' + x.miss + '</p></div>' +
+      '<div class="fvCard fvBlue"><h2>' + x.visH + '</h2><p>' + x.vis + '</p></div>' +
+      '<div class="fvCard fvGreen"><h2>' + x.doH + '</h2><ul class="fvList">' + progs + '</ul></div>' +
+      '<div class="fvCard fvGold"><h2>' + x.whereH + '</h2><p>' + x.where + '</p></div>' +
       '<div class="fvWalk">' + x.walk + '</div>' +
       '<a class="fvVisit" href="https://feyvida.org" target="_blank" rel="noopener">' + x.visit + '</a>' +
-      '<div class="fvAddr">feyvida.org</div>' +
+      '<a class="fvFb" href="https://www.facebook.com/feyvida.ministerio.3" target="_blank" rel="noopener"><i>f</i>' + x.fb + '</a>' +
+      '<div class="fvAddr">feyvida.org<br>facebook.com/feyvida.ministerio.3</div>' +
       '<button class="fvDone" onclick="fvClose()">' + x.done + '</button>' +
     '</div>';
   document.body.appendChild(el);
