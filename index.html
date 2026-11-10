@@ -885,6 +885,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixSlot[role=button]{cursor:pointer;}
   .pixSlot.hinted{background:#7FD36F;border-color:#1E6B2B;}
   .pixWuRow.correct .pixSlot{background:#52C246;border-color:#1E6B2B;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);}
+  .pixSlot.wrongOne{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
   .pixWuRow.wrong .pixSlot{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
   .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;margin:20px 0 6px;}   /* one row, even for 6 letters: the tiles shrink a little to fit */
   .pixTile{flex:1 1 0;min-width:0;max-width:46px;width:auto;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
@@ -1591,7 +1592,7 @@ var T = {
       faithMatch:{d:"Flip the tiles and find all the matching pairs.", h:["Tap two tiles to turn them over.", "A match stays face up. If they do not match, they flip back and you lose a chance.", "Match every pair to clear a level. Clear all 3 levels to win."]},
       stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "Finish all 4 puzzles to win."]},
       followLight:{d:"Watch the tiles light up, then play the same notes back.", h:["Listen to the hymn notes and watch the tiles that light up.", "Tap the same tiles in the same order. Tap REPEAT to see the pattern again.", "A wrong tap costs a chance. You have 3 in all. Finish all 8 levels to win."]},
-      wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "You have 5 chance hearts. A wrong word costs one, and finishing a level wins one back.", "Finish 3 levels of 5 words to win."]},
+      wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "You have 5 chance hearts. A wrong letter costs one, and finishing a level wins one back.", "Finish 3 levels of 5 words to win."]},
       catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 8 rounds to win."]},
       kindnessSort:{d:"Decide if each situation is kind or not kind.", h:["Read each situation.", "Tap KIND or NOT KIND.", "A wrong answer costs a chance. You have 3."]},
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
@@ -1770,7 +1771,7 @@ var T = {
       faithMatch:{d:"Voltea las fichas y encuentra todos los pares.", h:["Toca dos fichas para voltearlas.", "Si coinciden, permanecen boca arriba. Si no coinciden, se voltean de nuevo y pierdes una oportunidad.", "Empareja todos los pares para pasar de nivel. Supera los 3 niveles para ganar."]},
       stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
-      wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Tienes 5 corazones de oportunidad. Una palabra incorrecta te cuesta uno, y al terminar un nivel recuperas uno.", "Termina 3 niveles de 5 palabras para ganar."]},
+      wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Tienes 5 corazones de oportunidad. Una letra incorrecta te cuesta uno, y al terminar un nivel recuperas uno.", "Termina 3 niveles de 5 palabras para ganar."]},
       catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo hacia la izquierda y hacia la derecha sobre la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que caiga. Si dejas escapar una, perderás una oportunidad. Tienes 5 oportunidades en total.", "Supera las 8 rondas para ganar."]},
       kindnessSort:{d:"Decide si cada situación es un acto de bondad o no.", h:["Lee cada situación.", "Toca BONDAD o NO ES BONDAD.", "Una respuesta incorrecta cuesta una oportunidad. Tienes 3."]},
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
@@ -4675,10 +4676,27 @@ function initFollowLightRun(){
   flSetupLevel(0);
 }
 
+// a random pattern of `len` tiles (0 to 8): never the same tile twice in a row, and every tile of the grid is used about equally (a tile is picked from those least used so far), and never the same as `prev`
+function flRandomPattern(len, prev){
+  for(var tries = 0; tries < 20; tries++){
+    var pat = [], used = [0,0,0,0,0,0,0,0,0];
+    for(var i = 0; i < len; i++){
+      var low = Math.min.apply(null, used), pool = [];
+      for(var t = 0; t < FL_GRID_TILES; t++){ if(used[t] <= low + (i < 5 ? 0 : 1) && t !== pat[i - 1]) pool.push(t); }
+      if(!pool.length){ for(var t2 = 0; t2 < FL_GRID_TILES; t2++){ if(t2 !== pat[i - 1]) pool.push(t2); } }
+      var pick = pool[Math.floor(Math.random() * pool.length)];
+      pat.push(pick); used[pick]++;
+    }
+    var same = prev && prev.length >= pat.length;
+    if(same){ for(var k = 0; k < pat.length; k++){ if(prev[k] !== pat[k]){ same = false; break; } } }
+    if(!same) return pat;
+  }
+  return pat;
+}
 function flSetupLevel(levelIdx){
   var s = state.session.followLight;
   var patternLen = FL_LEVELS[levelIdx];
-  var pattern = FL_HYMNS[FL_LEVEL_HYMN[levelIdx % FL_LEVEL_HYMN.length]].notes.slice(0, patternLen);
+  var pattern = flRandomPattern(patternLen, s.pattern);          // (2026-11-10, per Dan: a new random pattern each level and each game, not a hymn's fixed notes)
   s.level = levelIdx;
   s.tiles = shuffle(MATCH_SYMBOLS).slice(0, FL_GRID_TILES);
   s.pattern = pattern;
@@ -5030,7 +5048,25 @@ function wuPick(letterPos){
   var e = wuFirstEmpty(s);
   if(e < 0) return;
   s.slots[e] = letterPos;
+  if(s.letters[letterPos] !== s.word.charAt(e)){ wuWrongLetter(s, e); return; }          // (2026-11-10, per Dan: a letter in the wrong square costs a heart)
   if(wuFirstEmpty(s) < 0) wuCheck(s); else { saveState(); render(); }
+}
+// a letter in a square where it does not belong: the heart goes, the square turns red and shakes, then the letter goes back to the row (2026-11-10, per Dan)
+function wuWrongLetter(s, e){
+  var wait = pixSfxWait("fmFirst", WU_SFX_EARLY_MS);
+  s.feedback = "wrong"; s.wrongSlot = e;
+  s.chances = Math.max(0, s.chances - 1);
+  pixAfterSfx("fmFirst", function(){ pixSfxPlay("clFade", true); }, WU_SFX_EARLY_MS);
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.wordUnscramble;
+    if(!s2 || s2 !== s || s2.feedback !== "wrong") return;
+    s2.wrongSlot = null;
+    if(s2.chances <= 0){ s2.feedback = null; s2.status = "failed"; saveState(); render(); return; }       // the last heart: the Keep Trying screen
+    if(s2.hinted.indexOf(e) === -1) s2.slots[e] = null;
+    s2.feedback = null;
+    saveState(); render();
+  }, 800 + wait);
 }
 // tapping a letter that has been placed sends it back to the row of letters (not one placed by a hint)
 function wuUnplace(i){
@@ -5176,12 +5212,12 @@ function screenWordUnscramble(){
   }
 
   wuEnsure(s); wuEnsureSkips(s);
-  var rowCls ="pixWuRow" + (s.feedback ? " " + s.feedback : "");
+  var rowCls ="pixWuRow" + (s.feedback && !(s.feedback === "wrong" && typeof s.wrongSlot === "number") ? " " + s.feedback : "");          // (one wrong letter reddens its own square only)
   var slotsHtml = "";
   for(var i=0;i<s.word.length;i++){
     var filled = s.slots[i] !== null, hinted = s.hinted.indexOf(i) !== -1;
     var tappable = filled && !hinted && !s.feedback;      // a placed letter goes back to the row when it is tapped
-    slotsHtml += '<div class="pixSlot' + (filled?' filled':'') + (hinted?' hinted':'') + '"' + (tappable ? ' role="button" onclick="wuUnplace(' + i + ')"' : '') + '>' + (filled ? s.letters[s.slots[i]] : "") + '</div>';
+    slotsHtml += '<div class="pixSlot' + (filled?' filled':'') + (hinted?' hinted':'') + (s.feedback === "wrong" && s.wrongSlot === i ? ' wrongOne' : '') + '"' + (tappable ? ' role="button" onclick="wuUnplace(' + i + ')"' : '') + '>' + (filled ? s.letters[s.slots[i]] : "") + '</div>';
   }
   var trayHtml = s.letters.map(function(ch, pos){
     var used = s.slots.indexOf(pos) !== -1;
@@ -5204,7 +5240,7 @@ function screenWordUnscramble(){
     '</div>' +
     '<div class="pixTray">' + trayHtml + '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn pixBtn pixBtnSm" data-sfx="own" onpointerdown="pixPressSfx(\'fmMiss\')" onclick="pixClickSfx(\'fmMiss\');wuClear()">' + t("clearWord") + '</button>' +
+    '<button class="btn pixBtn pixBtnSm pixBtnBig" data-sfx="own" onpointerdown="pixPressSfx(\'fmMiss\')" onclick="pixClickSfx(\'fmMiss\');wuClear()">' + t("clearWord") + '</button>' +
     (s.feedback === "correct" ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
@@ -12797,7 +12833,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IJ";
+var APP_BUILD = "2026-11-10 IK";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
