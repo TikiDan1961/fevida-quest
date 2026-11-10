@@ -140,6 +140,9 @@
 
   /* the screen after a turn of the phone (2026-11-09, per Dan's iPhone test): no white behind the page, and the app's height can be corrected by script (--appH, see vpResync) */
   html{background:#4FB0F2;}
+  /* (2026-11-09, per Dan's second iPhone test: "it works but it's not pretty": a blue bar at the bottom, a flash and a jump when the phone is turned back.) For a moment after the phone comes back upright a cover of the Rotate message's colour stays over the page, and fades away once the page has been put right, so the correction is not seen. */
+  #vpCover{position:fixed;left:-80px;top:-80px;right:-80px;bottom:-80px;background:#1D2350;opacity:0;pointer-events:none;z-index:99998;transition:opacity .28s ease-out;}
+  html.vpHold #vpCover{opacity:1;transition:none;}
   html.vpFix #app{height:var(--appH);}          /* (only while the numbers disagree: the class is put on by vpResync) */
   .screen{
     flex:1;
@@ -12754,7 +12757,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 HX";
+var APP_BUILD = "2026-11-09 HY";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13541,6 +13544,7 @@ function vpMetrics(){
 }
 function vpText(m){ return "ih " + m.ih + " ch " + m.ch + " vv " + m.vh + "+" + m.vt + " x" + m.vs + " scrollY " + m.sy + " app " + m.at + ".." + m.ab; }
 function vpResync(why, always){
+  vpTurnCheck();          // (the size a phone reports at the moment of the turn is often the old one: look again at every step)
   var m0 = vpMetrics(), bad = m0.sy !== 0 || (m0.vt !== null && Math.abs(m0.vt) > 1) || (m0.at !== null && Math.abs(m0.at) > 1) || (m0.ab !== null && Math.abs(m0.ab - m0.ih) > 2);
   try { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch(e){}
   var de = document.documentElement, want = Math.max(m0.ih, m0.vh !== null ? m0.vh + Math.max(0, m0.vt || 0) : 0);
@@ -13553,8 +13557,21 @@ function vpResyncSoon(why){
   var n = 0, steps = [0, 150, 450, 1000, 2000];
   (function go(){ vpResync(why, n === 3); n++; if(n < steps.length) vpTimer = window.setTimeout(go, steps[n] - steps[n - 1]); })();
 }
-window.addEventListener("orientationchange", function(){ vpResyncSoon("turned"); });
-window.addEventListener("resize", function(){ vpResyncSoon("resized"); });
+var vpWasLandscape = window.innerWidth > window.innerHeight, vpHoldTimer = 0;
+function vpHoldOn(){
+  var el = document.getElementById("vpCover");
+  if(!el){ el = document.createElement("div"); el.id = "vpCover"; document.body.appendChild(el); }
+  document.documentElement.classList.add("vpHold");
+  window.clearTimeout(vpHoldTimer);
+  vpHoldTimer = window.setTimeout(function(){ document.documentElement.classList.remove("vpHold"); }, 800);
+}
+function vpTurnCheck(){
+  var land = window.innerWidth > window.innerHeight;
+  if(vpWasLandscape && !land){ vpHoldOn(); try { dbgLog("view: the phone is upright again, the page is covered for a moment while it is put right"); } catch(e){} }
+  vpWasLandscape = land;
+}
+window.addEventListener("orientationchange", function(){ vpTurnCheck(); vpResyncSoon("turned"); });
+window.addEventListener("resize", function(){ vpTurnCheck(); vpResyncSoon("resized"); });
 if(window.visualViewport){ window.visualViewport.addEventListener("resize", function(){ vpResyncSoon("viewport"); }); window.visualViewport.addEventListener("scroll", function(){ if(Math.abs(window.visualViewport.offsetTop) > 1 || (window.pageYOffset || 0) !== 0) vpResyncSoon("scrolled"); }); }
 
 window.addEventListener("pagehide", saveState);
