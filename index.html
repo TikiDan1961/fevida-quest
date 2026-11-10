@@ -85,6 +85,8 @@
   /* the logo on the Main Menu is a button (2026-11-09, per Dan: so that players know to tap it): a cream plate with the app's dark outline, a drop edge like the other buttons, and a small "i" badge */
   .pixMenuTitle[role="button"]{position:relative;top:20px;cursor:pointer;width:-moz-fit-content;width:fit-content;margin:4px auto 6px;padding:3px 12px 3px;background:#A8DC9C;border-radius:12px;box-shadow:0 0 0 3px #1B1F3B,0 6px 0 3px rgba(27,31,59,.4);-webkit-tap-highlight-color:transparent;}
   .pixMenuTitle[role="button"]:after{content:"i";position:absolute;right:-10px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1B1F3B;color:#FFC93A;box-shadow:0 0 0 2px #A8DC9C;font:700 16px/22px Georgia,"Times New Roman",serif;text-align:center;pointer-events:none;}
+  /* (2026-11-09, per Dan) the logo cannot be tapped while the pilgrim talks and walks after a badge, like the icons: it goes grey the same way */
+  .pixMenu.pilgrimBusy .pixMenuTitle[role="button"]{pointer-events:none;filter:grayscale(1);opacity:.55;}
   /* (2026-11-09, per Dan: too much space between the score bar and the icons) the logo and the score bar sit 20 px lower; the icons and everything below stay where they are (top: moves only the thing itself) */
   .pixMenu .progressWrap{position:relative;top:28px;}          /* (2026-11-09, per Dan: just the score bar and its 0 / 500 text 8 px lower than the logo, so 28) */
   /* tapped: the same glow as the app buttons (the pressed look of the icons: it sinks 3 px, and the outline glows, the size --gBlur / --gSpread) */
@@ -362,7 +364,17 @@
      phone), which left a band of (safe area - 18) px of the purple page; now the sky is pulled out the whole safe area, so it reaches the edge; (2) the buttons sat 8 px under the text window: they get room. */
   @media (orientation:landscape){
     body.awardWide .screen.pixSky{margin-left:calc(-1 * env(safe-area-inset-left,0px));margin-right:calc(-1 * env(safe-area-inset-right,0px));}
-    body.awardWide.needLandscape .pixTitlePin .pixResMid{padding-top:0;margin-bottom:16px;}          /* (the top padding of the pinned title is taken out to pay for the gap: the screen is short on its side) */
+    /* (2026-11-09, per Dan, two photos) Both Emmaus screens on their side share one layout: the title, the window and the buttons are one group. KEEP GOING is centered top to bottom as that group; the BADGE REWARD screen puts its
+       title where KEEP GOING's is (the top of a group of KEEP GOING's height, --emKG, centered), and both leave the same space between the window and the first button. */
+    body.awardWide .screen.pixSky.pixMission{padding-top:0;padding-bottom:0;justify-content:center;}
+    body.awardWide .pixTitlePin .pixResMid{flex:none;padding-top:0;margin-bottom:17px;}
+    body.awardWide .screen.pixMission .shareRow{margin-top:0;}          /* (the buttons are 6 px apart on both screens) */
+    body.awardWide .pixTitlePin .pixIntroTitle{margin-top:0;margin-bottom:2px;}
+    body.awardWide .pixTitlePin .pixResBadge{margin-bottom:2px;}
+    body.awardWide .pixTitlePin .pixResBody{margin-top:4px;line-height:1.2;}
+    body.awardWide .screen.pixMission > .btn:last-child,body.awardWide .screen.pixMission > .shareRow:last-child{margin-bottom:0;}          /* (so that the group is centered by what can be seen) */
+    body.awardWide .pixTitlePin .pixPaper{padding-top:4px;padding-bottom:4px;}          /* (the Badge Reward window is tall: it has to fit under the title with the buttons below it, in Spanish too) */
+    body.awardWide:not(.needLandscape) .screen.pixSky.pixMission{justify-content:flex-start;padding-top:max(0px,calc((100dvh - var(--emKG,270.2px)) / 2));}
   }
   /* the landscape Hope Garden held upright: the same message, and the little phone turns the other way (2026-10-27, per Dan) */
   @media (orientation:portrait){ body.hglMode .rotateMsg{display:flex;} }
@@ -1094,6 +1106,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   @keyframes msPop{0%{transform:scale(.7);}60%{transform:scale(1.14);}100%{transform:scale(1);}}
   @keyframes msSpawn{0%{transform:scale(.3);opacity:.2;}100%{transform:scale(1);opacity:1;}}
   .msLegend{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 6px;}
+  .msArea .msLegend,.msArea .msBar{position:relative;top:var(--msDrop,0px);}          /* (2026-11-09, per Dan) the legend squares and DROP TILE sit up to 20 px lower (msFit sets --msDrop) */
   .msStage{width:30px;height:30px;flex:none;}
   .msStage.isGoal .msTile{box-shadow:0 0 0 3px #fff,0 0 0 6px #FFC93A;}
   .msArrow{flex:none;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #FFC93A;filter:drop-shadow(1px 1px 0 #1B1F3B);}
@@ -7183,6 +7196,7 @@ function msFit(){
     var byW = (Math.min(area.clientWidth, 380) - 22 - (n - 1) * 5) / n;
     return Math.floor(Math.min(byH, byW, 62));
   }
+  area.style.setProperty("--msDrop", "0px");          // (measure without the shift)
   area.classList.remove("noLegend");
   var cell = solve();
   if(cell < 34){ area.classList.add("noLegend"); cell = solve(); }          // a short screen: the stage guide goes so the squares can stay big enough
@@ -7194,6 +7208,8 @@ function msFit(){
     if(Math.abs(extra) < .5) break;
     mt = Math.max(0, mt + extra); bar.style.marginTop = mt + "px";
   }
+  var brEnd = bar.getBoundingClientRect(), room = Math.max(0, vh - 6 - brEnd.bottom);
+  area.style.setProperty("--msDrop", Math.min(20, room) + "px");          // (2026-11-09, per Dan: the legend squares touched the bottom of the play area: they and DROP TILE go 20 px lower, if the screen has room)
   msPlace();
 }
 pixFitSoon("mustardSeed", msFit);
@@ -12780,7 +12796,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 IC";
+var APP_BUILD = "2026-11-09 IF";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13481,6 +13497,7 @@ var FV_TEXT = {
 };
 function fvOpen(){
   if(document.getElementById("fvOverlay")) return;
+  if(document.querySelector(".pixMenu.pilgrimBusy")) return;          // (the pilgrim is talking or walking: the logo cannot be used, 2026-11-09, per Dan)
   if(typeof toastHide === "function") toastHide();          // (a message such as "Earn 500 points..." must not stay over this page)
   if(typeof toastHide === "function") toastHide();          // (a message such as "Earn 500 points..." must not stay over this page)
   var x = FV_TEXT[state && state.lang === "es" ? "es" : "en"], i, stats = "", progs = "";
