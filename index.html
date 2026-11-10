@@ -137,6 +137,10 @@
   .gtTwo .gtTk .pixTicketBig{width:min(62%,184px);margin:0 auto 4px;}
   .gtTwo .gtCheck{top:-10px;right:calc(50% - min(31%,92px) - 12px);width:30px;height:30px;font-size:18px;line-height:24px;}
   .gtTwo .pixResTitle{margin-top:2px;}
+
+  /* the screen after a turn of the phone (2026-11-09, per Dan's iPhone test): no white behind the page, and the app's height can be corrected by script (--appH, see vpResync) */
+  html{background:#4FB0F2;}
+  html.vpFix #app{height:var(--appH);}          /* (only while the numbers disagree: the class is put on by vpResync) */
   .screen{
     flex:1;
     display:flex;
@@ -3174,11 +3178,13 @@ function toast(text, ms){            // ms = how long it stays up (2600 unless a
   clearTimeout(toastTimer);
   toastTimer = setTimeout(function(){ el.classList.remove("show"); }, ms || 2600);   // 2600 is long enough to read the longer messages
 }
+function toastHide(){ var el = document.getElementById("toast"); clearTimeout(toastTimer); if(el) el.classList.remove("show"); }          // (2026-11-09, per Dan) takes a message away at once
 function comingSoon(){ toast(t("comingSoonToast")); }
 function ticketLocked(){ track("golden_ticket_tapped", {locked: true}); toast(t("ticketLocked")(GOLDEN_TICKET_POINTS), 1560); }   // the "Earn 500 points..." message stays 40% less long than the 2600 ms it had (2026-10-22, per Dan)
 
 // ---- the Missions folder ----
 function openFolder(icon){
+  toastHide();          // (a message such as "Earn 500 points..." must not stay over the Missions window)
   track("missions_folder_opened");
   state.folderOpen = true; saveState(); render();
   // grow the panel out of the folder icon it came from
@@ -12748,7 +12754,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 HW";
+var APP_BUILD = "2026-11-09 HX";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13525,6 +13531,31 @@ function ticketsHtml(){
   }
   return out;
 }
+
+
+// ---- the screen after a turn of the phone (2026-11-09, per Dan's iPhone test: white band at the bottom, the top pushed up, buttons needing several taps; Master Change List 13) ----
+function vpMetrics(){
+  var vv = window.visualViewport, app = document.getElementById("app"), r = app ? app.getBoundingClientRect() : null, de = document.documentElement;
+  return {ih: window.innerHeight, ch: de.clientHeight, vh: vv ? Math.round(vv.height) : null, vt: vv ? Math.round(vv.offsetTop) : null, vs: vv ? Math.round(vv.scale * 100) / 100 : null,
+          sy: Math.round(window.pageYOffset || 0), at: r ? Math.round(r.top) : null, ab: r ? Math.round(r.bottom) : null};
+}
+function vpText(m){ return "ih " + m.ih + " ch " + m.ch + " vv " + m.vh + "+" + m.vt + " x" + m.vs + " scrollY " + m.sy + " app " + m.at + ".." + m.ab; }
+function vpResync(why, always){
+  var m0 = vpMetrics(), bad = m0.sy !== 0 || (m0.vt !== null && Math.abs(m0.vt) > 1) || (m0.at !== null && Math.abs(m0.at) > 1) || (m0.ab !== null && Math.abs(m0.ab - m0.ih) > 2);
+  try { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch(e){}
+  var de = document.documentElement, want = Math.max(m0.ih, m0.vh !== null ? m0.vh + Math.max(0, m0.vt || 0) : 0);
+  if(bad && want > 0){ de.style.setProperty("--appH", want + "px"); de.classList.add("vpFix"); } else { de.style.removeProperty("--appH"); de.classList.remove("vpFix"); }
+  if(bad || always){ var m1 = vpMetrics(); try { dbgLog("view " + why + ": " + vpText(m0) + (bad ? " -> fixed: " + vpText(m1) : " (fine)")); } catch(e){} }
+}
+var vpTimer = 0;
+function vpResyncSoon(why){
+  window.clearTimeout(vpTimer);
+  var n = 0, steps = [0, 150, 450, 1000, 2000];
+  (function go(){ vpResync(why, n === 3); n++; if(n < steps.length) vpTimer = window.setTimeout(go, steps[n] - steps[n - 1]); })();
+}
+window.addEventListener("orientationchange", function(){ vpResyncSoon("turned"); });
+window.addEventListener("resize", function(){ vpResyncSoon("resized"); });
+if(window.visualViewport){ window.visualViewport.addEventListener("resize", function(){ vpResyncSoon("viewport"); }); window.visualViewport.addEventListener("scroll", function(){ if(Math.abs(window.visualViewport.offsetTop) > 1 || (window.pageYOffset || 0) !== 0) vpResyncSoon("scrolled"); }); }
 
 window.addEventListener("pagehide", saveState);
 window.addEventListener("visibilitychange", saveState);
