@@ -3987,7 +3987,7 @@ function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
   return pixResultHtml(m.nameKey, {cls:"pixLower pixTitlePin", title:t("awardTitle"), body:m.noBadge ? t("awardBodyJoy") : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
-    buttons: m.noBadge ? "" : (awardHeld ? pixBtnHtml(t("shareContinue"), "awardContinue()") : "") + '<div class="shareRow">' + shareBtnHtml("badge", m.id, "award") + '</div>'});
+    buttons: ""});          // (no SHARE button on the Badge Reward screen, 2026-11-10, per Dan: it times out to KEEP GOING)
 }
 function awardContinue(){ awardHeld = false; if(awardLeaveFn) awardLeaveFn(); else afterAward(); }
 
@@ -12851,7 +12851,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IO";
+var APP_BUILD = "2026-11-10 IP";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
