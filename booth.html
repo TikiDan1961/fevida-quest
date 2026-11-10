@@ -1345,13 +1345,22 @@ var BOOTH_TILE_MODE = "b";
   if(BOOTH_TILE_MODE === "smooth") document.documentElement.className += " boothSmooth";
 })();
 function boothTile(nn){ return BOOTH_TILE_MODE === "1" ? "tiles/faith_tile8_" + nn + ".png" : BOOTH_TILE_MODE === "smooth" ? "tiles/faith_tile2_" + nn + ".jpg" : "tiles90/faith_tile90_" + nn + ".png"; }
+/* Word Trail: the sparkles / red trail come this many ms EARLIER than the plain delay (Dan, 2026-11-09: the word sounds started a little too soon); ?wtearly=NNN sets it (remembered), ?wtearly=default forgets it */
+var BOOTH_WT_EARLY = 200;
+(function(){
+  var q = location.search || "", m = /[?&]wtearly=([0-9]+)/.exec(q);
+  if(m){ BOOTH_WT_EARLY = parseInt(m[1], 10); try { localStorage.setItem("boothWtEarly", m[1]); } catch(e0){} }
+  else if(/[?&]wtearly=default(&|$)/.test(q)){ try { localStorage.removeItem("boothWtEarly"); } catch(e1){} }
+  else { try { var sv = localStorage.getItem("boothWtEarly"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_WT_EARLY = parseInt(sv, 10); } catch(e2){} }
+})();
+function boothLaterWt(fn){ if(BOOTH_LAG > 0) setTimeout(fn, Math.max(0, BOOTH_LAG - BOOTH_WT_EARLY)); else fn(); }
 /* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
-var BOOTH_FS_SHIFT = 700;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09) */
+var BOOTH_FS_SHIFT = 600;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09 earlier), then it came a little late: 600 (the storage key was renamed so an old remembered value does not override the new default) */
 (function(){
   var q = location.search || "", m = /[?&]fsshift=([0-9]+)/.exec(q);
-  if(m){ BOOTH_FS_SHIFT = parseInt(m[1], 10); try { localStorage.setItem("boothFsShift", m[1]); } catch(e0){} }
-  else if(/[?&]fsshift=default(&|$)/.test(q)){ try { localStorage.removeItem("boothFsShift"); } catch(e1){} }
-  else { try { var sv = localStorage.getItem("boothFsShift"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_FS_SHIFT = parseInt(sv, 10); } catch(e2){} }
+  if(m){ BOOTH_FS_SHIFT = parseInt(m[1], 10); try { localStorage.setItem("boothFsShift2", m[1]); } catch(e0){} }
+  else if(/[?&]fsshift=default(&|$)/.test(q)){ try { localStorage.removeItem("boothFsShift2"); } catch(e1){} }
+  else { try { var sv = localStorage.getItem("boothFsShift2"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_FS_SHIFT = parseInt(sv, 10); } catch(e2){} }
 })();
 </script>
 </head>
@@ -3682,8 +3691,8 @@ function pilgrimInit(isNew){
   var dist = target - pilgrimPos;
   if(pilgrimAward) pilgrimBusy(el, true);                  // nothing can be tapped until he has arrived
   if(pilgrimAward === "great"){
-    pilgrimGreetTimer = setTimeout(function(){ if(el.isConnected) pilgrimSay(t("pilgrimGreat"), null, 1800); }, 600);
-    pilgrimStartTimer = setTimeout(function(){ if(!el.isConnected) return; pilgrimAward = "walk"; pilgrimWalk(el, target, calm); }, 2700);
+    pilgrimGreetTimer = setTimeout(function(){ if(el.isConnected) pilgrimSay(t("pilgrimGreat"), null, 1500); }, 300);
+    pilgrimStartTimer = setTimeout(function(){ if(!el.isConnected) return; pilgrimAward = "walk"; pilgrimWalk(el, target, calm); }, 1300);
     return;
   }
   pilgrimWalk(el, target, calm);
@@ -3736,7 +3745,7 @@ function pilgrimWalk(el, target, calm){
       pilgrimRaf = requestAnimationFrame(step);
     }
     boothLater(function(){ if(!el.isConnected) return; el.classList.add("walking"); last = performance.now(); pilgrimRaf = requestAnimationFrame(step); });
-  }, 350);
+  }, 150);
 }
 
 // The back icon (2026-10-20, per Dan): the Welcome screen is the screen before the Main Menu, and its CHANGE LANGUAGE button leads to the one
@@ -6759,7 +6768,7 @@ function wtUp(){
   if(s.remaining.indexOf(word) !== -1){
     s.busy = true;
     pixSfxPlay("fmMatch", true);
-    boothLater(function(){ if(!wtDrag) return; wtPaint("ok");
+    boothLaterWt(function(){ if(!wtDrag) return; wtPaint("ok");
     path.forEach(function(i){                                              // every letter of the word sparkles (2026-10-26, per Dan: the burst of Fruits of the Spirit)
       var q = wtDrag.rects && wtDrag.rects[i];
       if(q) pixBurst(Math.round(q.l + q.w / 2), Math.round(q.t + q.h / 2), .55, 14);
@@ -6782,7 +6791,7 @@ function wtUp(){
     s.chances = Math.max(0, s.chances - 1);                                // letters that spell nothing on the list: a heart is lost
     var lastOne = s.chances <= 0;
     pixSfxPlay(lastOne ? "fmLast" : "fmMiss", true);
-    saveState(); boothLater(function(){ wtPaint("bad"); wtHeartsPaint(); });
+    saveState(); boothLaterWt(function(){ wtPaint("bad"); wtHeartsPaint(); });
     if(lastOne){
       s.busy = true;                                                       // the last heart: nothing more can be traced, and the Keep Trying screen follows
       setTimeout(function(){
@@ -12768,7 +12777,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B29</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B31</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
