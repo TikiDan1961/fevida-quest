@@ -12796,7 +12796,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 IF";
+var APP_BUILD = "2026-11-09 IG";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13642,6 +13642,7 @@ dbgLog("page loaded " + APP_BUILD + " " + dbgView() + " nav:" + (function(){ try
 pixFontsLoad();
 pixGuardStart();
 phInit();
+try { pixSfxFetchOne("tap"); } catch(e){}          // (the button sound first of all, whether or not the loading screen runs)
 pixGateStart();
 render();
 // The service worker (sw.js) saves the game on the phone so it opens from the home screen and plays without a connection. It is registered with the build in its address, so every new build is a new worker with a fresh cache.
