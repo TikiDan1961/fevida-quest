@@ -893,6 +893,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .pixTile:active,.pixTile.tapGlow,.pixTile.tapHold {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
   .pixTile.locked{pointer-events:none;}          /* (no letter tap while a wrong letter is red, 2026-11-10, per Dan) */
+  .wuHearts + .pixPaper{margin-top:calc(1.9rem + 4px);}          /* (the window as far under the hearts as Word Trail's letter grid, 2026-11-10, per Dan) */
+  @media (max-height:640px){ .wuHearts + .pixPaper{margin-top:calc(1.5rem + 4px);} }
   .pixTile.used{pointer-events:none;background:rgba(27,31,59,.22);border-color:rgba(27,31,59,.4);color:transparent;text-shadow:none;box-shadow:none;}
   @media (max-height:640px){
     .pixWuIntro{margin-bottom:10px;font-size:1rem;}
@@ -12849,7 +12851,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IN";
+var APP_BUILD = "2026-11-10 IO";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
