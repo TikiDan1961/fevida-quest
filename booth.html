@@ -12794,7 +12794,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B33</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B34</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -13479,7 +13479,7 @@ setTimeout(pixBgGo, 4000);
   var q = location.search || "";
   // The sound effects are the cleaned copies in soundsb/ (made by clean_sfx.py: background fuzz removed, harsh top softened; Dan picked this on the TV with tvsfx.html, 2026-11-09). ?rawsfx = the originals.
   // RAW_SFX: sounds that stay the original (the cleaning turned the bird flap of Dove of Peace into a thud, Dan 2026-11-09: its flutter is noise). Keep in step with KEEP_ORIGINAL in clean_sfx.py.
-  var RAW_SFX = ["dpFlap"];
+  var RAW_SFX = ["dpFlap", "jlBounce"];
   if(typeof PIX_SFX !== "undefined" && !/[?&]rawsfx(&|$)/.test(q)){ Object.keys(PIX_SFX).forEach(function(k){ if(RAW_SFX.indexOf(k) !== -1) return; var u = PIX_SFX[k].url; if(/^sounds[/]sfx_/.test(u)) PIX_SFX[k].url = u.replace("sounds/", "soundsb/").replace(".mp3", ".wav"); }); }
   if(/[?&]webaudio(&|$)/.test(q)) return;
   if(typeof PIX_SFX === "undefined" || typeof pixVolGain !== "function" || typeof pixMusic === "undefined") return;
