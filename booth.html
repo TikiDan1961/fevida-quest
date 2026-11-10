@@ -7719,7 +7719,7 @@ function prWalk(s, done){
     else setTimeout(function(){                                            // at the church: in at the door
       if(state.screen !== "pilgrimRoad" || state.session.pilgrimRoad !== s) return;
       walker.style.opacity = "0"; pixSfxPlay("churchBell", false);       // the church bell as he goes in (2026-10-26, per Dan); the round message waits for it to finish
-      setTimeout(function(){ pixAfterSfx("churchBell", done); }, 800);
+      setTimeout(function(){ pixAfterSfx("churchBell", done, -500); }, 800);
     }, step + 100);
   }
   setTimeout(next, 450);
@@ -12768,7 +12768,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B28</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B29</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
