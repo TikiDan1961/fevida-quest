@@ -1354,6 +1354,14 @@ var BOOTH_WT_EARLY = 200;
   else { try { var sv = localStorage.getItem("boothWtEarly"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_WT_EARLY = parseInt(sv, 10); } catch(e2){} }
 })();
 function boothLaterWt(fn){ if(BOOTH_LAG > 0) setTimeout(fn, Math.max(0, BOOTH_LAG - BOOTH_WT_EARLY)); else fn(); }
+/* Word Unscramble: the green / red squares come this many ms EARLIER than the plain delay (Dan, 2026-11-09: the word sounds started a little too soon); ?wuearly=NNN sets it (remembered), ?wuearly=default forgets it */
+var BOOTH_WU_EARLY = 200;
+(function(){
+  var q = location.search || "", m = /[?&]wuearly=([0-9]+)/.exec(q);
+  if(m){ BOOTH_WU_EARLY = parseInt(m[1], 10); try { localStorage.setItem("boothWuEarly", m[1]); } catch(e0){} }
+  else if(/[?&]wuearly=default(&|$)/.test(q)){ try { localStorage.removeItem("boothWuEarly"); } catch(e1){} }
+  else { try { var sv = localStorage.getItem("boothWuEarly"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_WU_EARLY = parseInt(sv, 10); } catch(e2){} }
+})();
 /* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
 var BOOTH_FS_SHIFT = 600;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09 earlier), then it came a little late: 600 (the storage key was renamed so an old remembered value does not override the new default) */
 (function(){
@@ -5069,7 +5077,7 @@ function wuCheck(s){
     if(state.session.wordUnscramble !== s) return;
     s.feedback = null;
     wuAnswer(s, ok);
-  }, wait + BOOTH_LAG);
+  }, wait + (BOOTH_LAG > 0 ? Math.max(0, BOOTH_LAG - BOOTH_WU_EARLY) : 0));
 }
 function wuAnswer(s, ok){
   if(ok){
@@ -12777,7 +12785,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B31</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B32</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
