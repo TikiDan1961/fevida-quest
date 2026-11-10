@@ -7770,7 +7770,7 @@ function prTurn(r, c){
   if(reach.won){
     s.busy = true;                                                         // the road is done: the pilgrim walks it, then ROUND X COMPLETED!
     var bd = document.getElementById("prBoard"); if(bd) bd.classList.add("prDone");      // the finished board reads no taps at all: no turn, no button sound, no glow (2026-11-05, per Dan)
-    pixSfxPlay("clCatch", false);                                          // the road is finished: sound_effect_1 (2026-10-25, per Dan)
+    // (booth page: no sound here, per Dan)                                          // the road is finished: sound_effect_1 (2026-10-25, per Dan)
     saveState();
     prWalk(s, function(){
       var s2 = state.session.pilgrimRoad;
@@ -12741,15 +12741,8 @@ function optionPreview(kind){ track("setting_changed", {setting: kind, value: ki
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
 var APP_BUILD = "2026-11-07 HP";
-var boothClearArmed = 0;
 function boothClearTap(btn){
-  var es = state.lang === 'es';
-  if(!boothClearArmed){
-    boothClearArmed = setTimeout(function(){ boothClearArmed = 0; if(btn && btn.isConnected) btn.textContent = es ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS'; }, 4000);
-    btn.textContent = es ? 'TOCA DE NUEVO PARA BORRAR' : 'TAP AGAIN TO CLEAR';
-    return;
-  }
-  clearTimeout(boothClearArmed); boothClearArmed = 0;
+  // one tap clears everything and closes the Options screen (Dan, 2026-11-09)
   var d = defaultState();
   state.points = 0; state.missions = d.missions; state.session = d.session;
   state.awardMissionId = null; state.contFor = null; state.pilgrimOwed = false; state.folderOpen = false;
@@ -12775,7 +12768,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B27</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B28</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -13468,6 +13461,8 @@ setTimeout(pixBgGo, 4000);
   // (Dan's tests; a Web Audio engine reports 171 ms of its own delay), and DAN DECIDED TO KEEP IT THAT WAY. Add ?nosfx to the address to switch the sound effects off (music stays).
   var SFX_ON = !/[?&]nosfx(&|$)/.test(q);
   if(!SFX_ON){ var oVG = window.pixVolGain; window.pixVolGain = function(kind){ return kind === "music" ? oVG(kind) : 0; }; }
+  // lengths (seconds) of the sound files, for the first play of a sound, when its element has not loaded yet and does not know its length (the church bell: the round message waits for it, pixAfterSfx)
+  var SFX_MS = {"sfx_church_bell.wav": 4.5, "sfx_cl_catch.wav": 1.25, "sfx_cl_fade.wav": 0.95, "sfx_dp_flap.wav": 0.407, "sfx_em_basket1.wav": 1.291, "sfx_em_basket2.wav": 0.475, "sfx_em_cart.wav": 2.354, "sfx_em_coin.wav": 0.7, "sfx_em_crash.wav": 0.431, "sfx_em_heart.wav": 0.6, "sfx_em_perfect.wav": 1.52, "sfx_em_thump.wav": 0.8, "sfx_fm_first.wav": 0.651, "sfx_hgl_danger.wav": 4.0, "sfx_jl_bounce.wav": 0.482, "sfx_jl_crumble.wav": 0.416, "sfx_jl_fall.wav": 1.628, "sfx_jl_super.wav": 0.688, "sfx_mission_done.wav": 2.4, "sfx_ms_fall.wav": 0.392, "sfx_sheep_baa1.wav": 1.064, "sfx_sheep_baa2.wav": 1.054, "sfx_sound3.wav": 3.7, "sfx_tap.wav": 0.095, "sfx_ticket.wav": 1.6, "sfx_wg_pick.wav": 0.065, "sfx_fm_fanfare.wav": 3.336, "sfx_fm_last.wav": 1.332, "sfx_fm_match.wav": 1.071, "sfx_fm_miss.wav": 1.32};
   var pool = {}, curEx = null, mus = null;
   function sfxEl(name){
     var d = PIX_SFX[name]; if(!d) return null;
@@ -13484,7 +13479,7 @@ setTimeout(pixBgGo, 4000);
       a.volume = Math.max(0, Math.min(1, PIX_SFX[name].gain * pixVolGain("sfx")));
       try { a.currentTime = 0; } catch(e2){}
       var pr = a.play(); if(pr && pr.catch) pr.catch(function(){});
-      pixSfxLast[name] = {t: performance.now(), ms: (isFinite(a.duration) && a.duration > 0 ? a.duration : 0.5) * 1000};
+      pixSfxLast[name] = {t: performance.now(), ms: (isFinite(a.duration) && a.duration > 0 ? a.duration : (SFX_MS[(PIX_SFX[name].url || '').split('/').pop()] || 0.5)) * 1000};
       if(exclusive) curEx = a;
       return true;
     } catch(e3){ return false; }
