@@ -71,7 +71,7 @@
   /* The church icon and the words wait 0.4 s before they show (2026-11-05, per Dan: "when the app first runs I can see the image of the church appear for 1 frame in the middle of the screen"). The first screen is usually up in 0.1 s, and since the loading
      screen no longer fades out the icon was seen for a few frames and then cut away. Now a quick start shows only the plain blue, and the icon only appears when the loading really takes a while (a cold start of the home-screen app). */
   #boot > img,#boot > span{opacity:0;animation:bootShow .01s linear 1.5s forwards;}
-  #boot.gate > img,#boot.gate > span{animation-delay:.4s;}          /* (the first visit of a build, with the loading bar, shows its picture at once) */
+  #boot.gate > img,#boot.gate > span,#boot.gate .bootBar{animation-delay:0s;}          /* (the first visit of a build, with the loading bar, shows its picture at once) */
   @keyframes bootShow{to{opacity:1;}}
   .loadWait{opacity:0;animation:bootShow .01s linear .4s forwards;}      /* the "Loading tiles..." card of Faith Match and the Stained-Glass Puzzle shows only if loading takes more than 0.4 s (2026-11-05, per Dan: it flashed for one frame) */
   #boot img{width:144px;height:144px;border-radius:32px;image-rendering:pixelated;box-shadow:0 0 0 4px #1B1F3B,0 8px 0 4px rgba(27,31,59,.35);}
@@ -12797,7 +12797,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 IH";
+var APP_BUILD = "2026-11-10 II";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13422,7 +13422,7 @@ function renderApply(html){
 // On the first visit of a build every picture (5 MB) is fetched and decoded behind the loading screen before the first tap is possible, so no screen waits for its pictures, no Faith Match tile shows white, and the tap sound
 // is in. The bar fills with the bytes that arrive and a pilgrim walks along it. After PIX_GATE_MAX it opens anyway (the rest goes on in the background, as before). A phone that has already saved everything of this build (the
 // "offline: everything is saved" step sets fevidaWarm) skips it. The sounds and the music load in the background once it is done (pixBgGo).
-var pixGateActive = false, pixGateT0 = 0, PIX_GATE_MAX = 12000;
+var pixGateActive = false, pixGateT0 = 0, PIX_GATE_MAX = 12000, PIX_GATE_MIN = 2000;
 function pixGateNeeded(){
   if(PIX_OFF || !window.fetch) return false;
   try { if(localStorage.getItem("fevidaWarm") === APP_BUILD) return false; } catch(e){}
@@ -13443,7 +13443,7 @@ function pixGateStart(){
     boot.style.setProperty("--p", 100);
     pixGateActive = false;
     dbgLog("assets: the loading screen was up " + Math.round(performance.now() - pixGateT0) + " ms (" + why + ", " + Math.round(100 * got / total) + "% of the bytes)");
-    window.pixSt(function(){ var b = document.getElementById("boot"); if(b && b.parentNode && lastRenderedScreen) b.parentNode.removeChild(b); pixBgGo(); }, 150);
+    window.pixSt(function(){ var b = document.getElementById("boot"); if(b && b.parentNode && lastRenderedScreen) b.parentNode.removeChild(b); pixBgGo(); }, Math.max(150, PIX_GATE_MIN - (performance.now() - pixGateT0)));          // (never less than PIX_GATE_MIN on the screen: no flash)
   }
   function next(){
     while(running < 8 && qi < n){
