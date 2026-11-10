@@ -1220,6 +1220,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     opacity:.22;filter:none;cursor:pointer;transition:opacity .2s ease;}
   .pixMission .hbSpot.found{opacity:1;filter:drop-shadow(0 0 5px #FFF6C0);animation:hbPop .35s ease;pointer-events:none;}
   .pixMission .pzSvg{margin:6px 0;}
+  .pixMission.pixLower.pzHeartsScreen{padding-top:calc(env(safe-area-inset-top,0px) + 38px);}          /* (the heading and the text sit 20 px higher, the height of the row of hearts, so the picture stays where it was; 2026-11-10, per Dan) */
+  .pixMission .pzHearts{margin:0;}
   .pixMission .pzBoardRect{fill:#1E2F7A;stroke:#FFC93A;stroke-width:4;}
   .pixMission .pzTrayRect{fill:#2B4BA8;}
   @media (max-height:640px){
@@ -12316,6 +12318,7 @@ var pzFitTries = 0;
 var PZ_TRAY_PAD = 10;           // room around a tray piece for its knobs
 var PZ_SNAP_MIN = 24;           // snap distance is half the short side, but at least this
 var PZ_LIFT = 36;               // a held piece rides this far above the finger
+var PZ_CHANCES = 5;          // chance hearts for the whole game (2026-11-10, per Dan)
 var PZ_SOLVED_MS = 3000;        // how long the finished picture is shown
 var pzAdvancing = false;        // true while the "solved" hold is pending
 var pzCtx = null;               // geometry of the board currently on screen
@@ -12417,7 +12420,7 @@ function initStainedGlass(){
   for(var i=0;i<PZ_LEVELS.length;i++) seeds.push(1 + Math.floor(Math.random()*2000000000));
   state.session.stainedGlass = {
     round: 0, imgs: shuffle(PZ_POOL).slice(0, PZ_LEVELS.length),
-    seeds: seeds, placed: [], status: "playing"
+    seeds: seeds, placed: [], status: "playing", chances: PZ_CHANCES
   };
   saveState();
 }
@@ -12490,6 +12493,7 @@ function pzUp(ev){
   } else {
     d.el.style.transition = "transform .2s ease";
     pzSetPos(d.el, piece.tx, piece.ty, piece.k);
+    pzLoseChance(s, d);          // (2026-11-10, per Dan: a piece that snaps back from the picture costs a heart)
     pixSfxPlay("fmMiss", false);                                       // a piece dropped in the wrong place goes back to the tray: the Faith Match miss sound (2026-11-01, per Dan)
   }
 }
@@ -12558,7 +12562,7 @@ function pzAdvance(){
   if(state.screen === "stainedGlass") render();
 }
 function pzInterlude(){
-  pixRoundRun("stainedGlass", function(){ return state.session.stainedGlass; }, null,
+  pixRoundRun("stainedGlass", function(){ return state.session.stainedGlass; }, function(s2){ if(typeof s2.chances !== "number") s2.chances = PZ_CHANCES; if(s2.chances >= PZ_CHANCES) return false; s2.chances++; return true; },          // (a heart comes back if one was lost, 2026-11-10, per Dan)
     function(s){
       var last = s.interlude.final;
       s.interlude = null;
@@ -12568,6 +12572,22 @@ function pzInterlude(){
     });
 }
 
+// a piece let go over the picture (its centre inside the frame) but not in its own place costs a heart; one put back into the tray does not
+function pzLoseChance(s, d){
+  try {
+    var cx = d.x + pzCtx.pw / 2, cy = d.y + pzCtx.ph / 2;
+    if(!(cy < PZ_W && cx > 0 && cx < PZ_W)) return;
+    if(typeof s.chances !== "number") s.chances = PZ_CHANCES;
+    if(s.chances <= 0) return;
+    s.chances--; saveState();
+    var hb = document.getElementById("pzHearts"); if(hb) hb.innerHTML = chancesHeartsHtml(Math.max(0, s.chances), PZ_CHANCES);
+    if(s.chances <= 0){
+      s.status = "failed"; saveState();          // the last heart: the piece goes back to the tray first, then the Out of Chances! window comes
+      setTimeout(function(){ var s2 = state.session.stainedGlass; if(s2 === s && s2.status === "failed" && state.screen === "stainedGlass") render(); }, 700);
+    }
+  } catch(e){}
+}
+function pzTryAgain(){ pzCtx = null; pzDrag = null; initStainedGlass(); go("stainedGlass"); }
 function pzCollectAward(){ state.session.stainedGlass = null; grantMission("stainedGlass"); }
 function pzQuit(){ state.session.stainedGlass = null; pzCtx = null; pzDrag = null; go("mainMenu"); }
 
@@ -12584,6 +12604,11 @@ function screenStainedGlass(){
     return pixShell('<div class="spacer"></div><div class="pixPaper loadWait"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
   }
 
+  if(typeof s.chances !== "number") s.chances = PZ_CHANCES;          // (a game saved before the hearts existed gets all 5)
+  if(s.status === "failed"){
+    return pixResultHtml("stainedGlassName", {cls:"pixLower", title:t("fm_failTitle"), body:t("wu_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "pzTryAgain()") + pixBtnHtml(t("mainMenu"), "pzQuit()", true)});
+  }
   if(s.status === "passed"){
     return pixResultHtml("stainedGlassName", {title:t("pz_passTitle"), body:t("pz_passBody"), badge:"stainedGlass",
       buttons:pixBtnHtml(t("collectAward"), "pzCollectAward()")});
@@ -12591,6 +12616,7 @@ function screenStainedGlass(){
 
   if(s.interlude){
     return pixShell('<h2 class="pixMTitle">' + t("stainedGlassName") + '</h2>' +
+      '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, s.chances), PZ_CHANCES) + '</div>' +
       pixRoundDoneHtml(s.interlude));
   }
 
@@ -12631,8 +12657,9 @@ function screenStainedGlass(){
     pixPipsHtml(PZ_LEVELS.length, s.round, solved ? "done" : "now", t("pz_round")(s.round+1, PZ_LEVELS.length)) +
     '<div class="pixNote">' + t("pz_round")(s.round+1, PZ_LEVELS.length) + ' &nbsp;|&nbsp; <span id="pzProgress">' + t("pz_pieces")(solved ? g.n : s.placed.length, g.n) + '</span></div>' +
     '<div class="pzNoteBox' + (solved ? ' solved' : '') + '"><div class="pixNote">' + t("pz_intro") + '</div><div class="pixNote good">' + t("pz_solved") + '</div></div>' +
+    '<div class="pixChances pzHearts" id="pzHearts">' + chancesHeartsHtml(Math.max(0, s.chances), PZ_CHANCES) + '</div>' +          // the 5 hearts between the instruction and the picture (2026-11-10, per Dan)
     svg +
-    '<div class="spacer"></div>');
+    '<div class="spacer"></div>', "pzHeartsScreen");
 }
 
 /* ---------- Passport ---------- */
@@ -12854,7 +12881,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IQ";
+var APP_BUILD = "2026-11-10 IR";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
