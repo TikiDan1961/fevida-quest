@@ -2949,6 +2949,7 @@ function pixHoldForEngine(fn){
   pixReviveQueue.push(job); setTimeout(job, 700);
 }
 function pixSfxPlay(name, exclusive){
+  if(name === "fmLast") window.pixFmLastAt = performance.now();          // (when sound_effect_8 was last asked for: see the SO CLOSE! window)
   if(pixShouldHold()){ pixHoldForEngine(function(){ pixSfxPlayNow(name, exclusive); }); return false; }
   return pixSfxPlayNow(name, exclusive);
 }
@@ -3609,7 +3610,7 @@ function cwConfetti(tk){
 }
 // Confetti on the ROUND X COMPLETED! screens and on the badge screen (2026-11-05, per Dan): the same paper strips as the Golden Ticket's, a smaller burst from the middle of the screen and a rain from the top, for about 4 seconds.
 // It lies over the screen and never takes a touch. It stops by itself, and at once if another screen comes up. (Called from phWatch when a round is completed, and from renderApply when the badge screen comes up.)
-var pxConfettiRaf = 0, pxConfettiCv = null, pxConfettiFn = null, pxRoundKey = "", pxBadgeShown = false;
+var pxConfettiRaf = 0, pxConfettiCv = null, pxConfettiFn = null, pxRoundKey = "", pxBadgeShown = false, pxSoCloseShown = false;
 function pixConfettiStop(){
   cancelAnimationFrame(pxConfettiRaf); pxConfettiRaf = 0; pxConfettiFn = null;
   try { [].forEach.call(document.querySelectorAll(".shareWait"), function(e){ e.classList.remove("shareWait"); }); } catch(e){}          // (the SHARE button of the Badge Reward screen comes when the confetti is done)
@@ -4282,12 +4283,14 @@ function pixBtnHtml(label, js, secondary){
 
 // A won / lost screen: the mission's name, a cream card (with the 8-bit badge when won), then the buttons.
 // o = {title, body, badge: mission id or nothing, buttons}
+var PIX_FAIL_KEYS = ["fm_failTitle", "fl_failTitle", "wu_failTitle", "cl_failTitle", "ks_failTitle", "eb_failTitle", "tl_failTitle", "wt_failTitle", "ms_failTitle", "pb_failTitle", "dp_failTitle", "jl_failTitle", "hg_failTitle", "hg_outTitle"];
+function pixIsFailTitle(s){ for(var i = 0; i < PIX_FAIL_KEYS.length; i++){ if(t(PIX_FAIL_KEYS[i]) === s) return true; } return false; }          // (a window that says the game was lost)
 function pixResultHtml(nameKey, o){
   var m = o.badge ? missionById(o.badge) : null;
   // the game's name sits just above the window in the instruction screens' larger type, the pair centred together (2026-10-22, per Dan)
   return pixShell('<div class="pixResMid"><h2 class="pixMTitle pixIntroTitle">' + t(nameKey) + '</h2><div class="pixPaper">' +
       (m ? '<img class="pixResBadge" src="' + badge8Src(m) + '" alt="" decoding="sync">' : '') +
-      '<div class="pixResTitle">' + o.title + '</div>' +
+      '<div class="pixResTitle"' + (pixIsFailTitle(o.title) ? ' data-soclose="1"' : '') + '>' + o.title + '</div>' +
       '<p class="pixResBody">' + o.body + '</p>' +
     '</div></div>' + o.buttons, o.cls);
 }
@@ -4321,7 +4324,7 @@ function screenFaithFlash(){
     return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
       '<div class="pixResMid"><h2 class="pixMTitle pixIntroTitle">' + t("faithFlashName") + '</h2><div class="pixPaper">' +
         (pass ? '<img class="pixResBadge" src="tiles/badges96/b96_faith.png" alt="" decoding="sync">' : '') +
-        '<div class="pixResTitle">' + (perfect ? t("ff_resultsTitlePass") : (pass ? t("ff_resultsTitlePass2") : t("ff_resultsTitleFail"))) + '</div>' +
+        '<div class="pixResTitle"' + (!pass ? ' data-soclose="1"' : '') + '>' + (perfect ? t("ff_resultsTitlePass") : (pass ? t("ff_resultsTitlePass2") : t("ff_resultsTitleFail"))) + '</div>' +
         '<p class="pixResBody">' + (perfect ? t("ff_resultsBodyPass") : (pass ? t("ff_resultsBodyPass2") : t("ff_resultsBodyFail"))) + '</p>' +
         // Denominator is how many questions were actually ANSWERED (s.index+1
         // -- s.index is still the failed question's own 0-based index when a
@@ -5080,7 +5083,7 @@ function wuWrongLetter(s, e){
     var s2 = state.session.wordUnscramble;
     if(!s2 || s2 !== s || s2.feedback !== "wrong") return;
     s2.wrongSlot = null;
-    if(s2.chances <= 0){ s2.feedback = null; s2.status = "failed"; saveState(); render(); pixSfxPlay("fmLast", true); return; }       // the last heart: the SO CLOSE! screen, with sound_effect_8 (= fmLast, 2026-11-10, per Dan)
+    if(s2.chances <= 0){ s2.feedback = null; s2.status = "failed"; saveState(); render(); return; }       // the last heart: the SO CLOSE! screen (its sound_effect_8 is played by the screen itself: see change 49)
     if(s2.hinted.indexOf(e) === -1) s2.slots[e] = null;
     s2.feedback = null;
     saveState(); render();
@@ -12851,7 +12854,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IP";
+var APP_BUILD = "2026-11-10 IQ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13356,6 +13359,9 @@ function renderApply(html){
   var badgeNow = !!app.querySelector(".pixResBadge") || state.screen === "award";
   if(badgeNow && !pxBadgeShown) pixConfettiParty();
   pxBadgeShown = badgeNow;
+  var soCloseNow = !!app.querySelector("[data-soclose]");          // (2026-11-10, per Dan: sound_effect_8 when a SO CLOSE! window is displayed)
+  if(soCloseNow && !pxSoCloseShown && !(performance.now() - (window.pixFmLastAt || -99999) < 3000)) pixSfxPlay("fmLast", true);
+  pxSoCloseShown = soCloseNow;
   if(state.screen === "award" && pxConfettiCv){ [].forEach.call(app.querySelectorAll(".shareRow"), function(r){ r.classList.add("shareWait"); }); }          // (2026-11-10, per Dan: no SHARE button while the confetti flies)
   if(isNewScreen){
     var el = app.querySelector(".screen");
