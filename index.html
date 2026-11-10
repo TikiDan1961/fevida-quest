@@ -83,10 +83,12 @@
 
   /* ---- the Fe y Vida screen (2026-11-09, per Dan): a plain modern page, not 8-bit. Fe y Vida's own greens and purple (from feyvida.org). It is a window of its own on top of the Main Menu. ---- */
   /* the logo on the Main Menu is a button (2026-11-09, per Dan: so that players know to tap it): a cream plate with the app's dark outline, a drop edge like the other buttons, and a small "i" badge */
-  .pixMenuTitle[role="button"]{position:relative;cursor:pointer;width:-moz-fit-content;width:fit-content;margin:4px auto 6px;padding:3px 12px 3px;background:#CDEBC5;border-radius:12px;box-shadow:0 0 0 3px #1B1F3B,0 6px 0 3px rgba(27,31,59,.4);-webkit-tap-highlight-color:transparent;}
-  .pixMenuTitle[role="button"]:after{content:"i";position:absolute;right:-10px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1B1F3B;color:#FFC93A;box-shadow:0 0 0 2px #CDEBC5;font:700 16px/22px Georgia,"Times New Roman",serif;text-align:center;pointer-events:none;}
+  .pixMenuTitle[role="button"]{position:relative;top:20px;cursor:pointer;width:-moz-fit-content;width:fit-content;margin:4px auto 6px;padding:3px 12px 3px;background:#A8DC9C;border-radius:12px;box-shadow:0 0 0 3px #1B1F3B,0 6px 0 3px rgba(27,31,59,.4);-webkit-tap-highlight-color:transparent;}
+  .pixMenuTitle[role="button"]:after{content:"i";position:absolute;right:-10px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1B1F3B;color:#FFC93A;box-shadow:0 0 0 2px #A8DC9C;font:700 16px/22px Georgia,"Times New Roman",serif;text-align:center;pointer-events:none;}
+  /* (2026-11-09, per Dan: too much space between the score bar and the icons) the logo and the score bar sit 20 px lower; the icons and everything below stay where they are (top: moves only the thing itself) */
+  .pixMenu .progressWrap{position:relative;top:20px;}
   /* tapped: the same glow as the app buttons (the pressed look of the icons: it sinks 3 px, and the outline glows, the size --gBlur / --gSpread) */
-  .pixMenuTitle[role="button"]:active,.pixMenuTitle[role="button"].tapGlow,.pixMenuTitle[role="button"].tapHold{filter:none;transform:translateY(3px);background:#BDE5B2;box-shadow:0 0 0 3px #1B1F3B,0 0 var(--gBlur) var(--gSpread) rgba(255,236,120,.95);}
+  .pixMenuTitle[role="button"]:active,.pixMenuTitle[role="button"].tapGlow,.pixMenuTitle[role="button"].tapHold{filter:none;transform:translateY(3px);background:#94D487;box-shadow:0 0 0 3px #1B1F3B,0 0 var(--gBlur) var(--gSpread) rgba(255,236,120,.95);}
   .fvOverlay{position:fixed;left:0;top:0;right:0;bottom:0;z-index:80;background:#F5F8F6;color:#171A17;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
     font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;animation:folderFade .2s ease-out;-webkit-user-select:none;user-select:none;}
   .fvOverlay *{box-sizing:border-box;}
@@ -12733,7 +12735,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 HT";
+var APP_BUILD = "2026-11-09 HU";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
