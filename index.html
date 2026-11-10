@@ -1596,7 +1596,7 @@ var T = {
     guides:{
       faithFlash:{d:"Answer questions about the Catholic faith to earn your badge.", h:["Tap the right answer for each question.", "Finish 3 rounds of 10 questions.", "You have 3 chances. A wrong answer costs one, and a lost chance is given back after each round."]},
       faithMatch:{d:"Flip the tiles and find all the matching pairs.", h:["Tap two tiles to turn them over.", "A match stays face up. If they do not match, they flip back and you lose a chance.", "Match every pair to clear a level. Clear all 3 levels to win."]},
-      stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "Finish all 4 puzzles to win."]},
+      stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "You have 5 chance hearts. A piece put in the wrong place costs one, and finishing a level wins one back.", "Finish all 4 puzzles to win."]},
       followLight:{d:"Watch the tiles light up, then play the same notes back.", h:["Listen to the hymn notes and watch the tiles that light up.", "Tap the same tiles in the same order. Tap REPEAT to see the pattern again.", "A wrong tap costs a chance. You have 3 in all. Finish all 8 levels to win."]},
       wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "You have 5 chance hearts. A wrong letter costs one, and finishing a level wins one back.", "Finish 3 levels of 5 words to win."]},
       catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 8 rounds to win."]},
@@ -1775,7 +1775,7 @@ var T = {
     guides:{
       faithFlash:{d:"Responde preguntas sobre la fe católica para ganar tu sello.", h:["Toca la respuesta correcta para cada pregunta.", "Termina 3 rondas de 10 preguntas.", "Tienes 3 oportunidades. Una respuesta incorrecta cuesta una, y al terminar cada ronda se te devuelve la que perdiste."]},
       faithMatch:{d:"Voltea las fichas y encuentra todos los pares.", h:["Toca dos fichas para voltearlas.", "Si coinciden, permanecen boca arriba. Si no coinciden, se voltean de nuevo y pierdes una oportunidad.", "Empareja todos los pares para pasar de nivel. Supera los 3 niveles para ganar."]},
-      stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
+      stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Tienes 5 corazones de oportunidad. Una pieza puesta en el lugar equivocado te cuesta uno, y al terminar un nivel recuperas uno.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
       wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Tienes 5 corazones de oportunidad. Una letra incorrecta te cuesta uno, y al terminar un nivel recuperas uno.", "Termina 3 niveles de 5 palabras para ganar."]},
       catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo hacia la izquierda y hacia la derecha sobre la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que caiga. Si dejas escapar una, perderás una oportunidad. Tienes 5 oportunidades en total.", "Supera las 8 rondas para ganar."]},
@@ -12881,7 +12881,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IR";
+var APP_BUILD = "2026-11-10 IS";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
