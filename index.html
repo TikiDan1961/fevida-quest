@@ -70,7 +70,8 @@
   #boot{position:fixed;left:0;top:0;right:0;bottom:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#4FB0F2;transition:opacity .25s ease-out;}
   /* The church icon and the words wait 0.4 s before they show (2026-11-05, per Dan: "when the app first runs I can see the image of the church appear for 1 frame in the middle of the screen"). The first screen is usually up in 0.1 s, and since the loading
      screen no longer fades out the icon was seen for a few frames and then cut away. Now a quick start shows only the plain blue, and the icon only appears when the loading really takes a while (a cold start of the home-screen app). */
-  #boot > img,#boot > span{opacity:0;animation:bootShow .01s linear .4s forwards;}
+  #boot > img,#boot > span{opacity:0;animation:bootShow .01s linear 1.5s forwards;}
+  #boot.gate > img,#boot.gate > span{animation-delay:.4s;}          /* (the first visit of a build, with the loading bar, shows its picture at once) */
   @keyframes bootShow{to{opacity:1;}}
   .loadWait{opacity:0;animation:bootShow .01s linear .4s forwards;}      /* the "Loading tiles..." card of Faith Match and the Stained-Glass Puzzle shows only if loading takes more than 0.4 s (2026-11-05, per Dan: it flashed for one frame) */
   #boot img{width:144px;height:144px;border-radius:32px;image-rendering:pixelated;box-shadow:0 0 0 4px #1B1F3B,0 8px 0 4px rgba(27,31,59,.35);}
@@ -12796,7 +12797,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 IG";
+var APP_BUILD = "2026-11-09 IH";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13430,7 +13431,7 @@ function pixGateNeeded(){
 function pixGateStart(){
   if(!pixGateNeeded()) return;
   var boot = document.getElementById("boot"); if(!boot) return;
-  pixGateActive = true; pixGateT0 = performance.now();
+  pixGateActive = true; pixGateT0 = performance.now(); boot.classList.add("gate");
   // What it waits for: every picture the screens and games use, but not the 18 big badge pictures (3 MB, only the Passport shows them) nor the old faith_tile2 pictures (no screen uses them): those load in the background afterwards.
   var idxs = [], total = 0, got = 0, qi = 0, running = 0, finished = false, i, n;
   for(i = 0; i < PRELOAD_LIST.length; i++){ var nm = PRELOAD_LIST[i]; if(nm.indexOf("badge_") === 0 || nm.indexOf("faith_tile2_") === 0) continue; idxs.push(i); total += (PRELOAD_KB[i] || 1); }
