@@ -1559,7 +1559,7 @@ var T = {
     howTitle:"How It Works", howIntro:"Uh-oh! A pilgrim is trying to get to church, and he can’t make it without you. Ready to be his hero?",
     howMissions:function(need, n){ return "Dive into the Missions folder and conquer any " + need + " of the " + n + " missions. Pick your favorites, play them in any order, and have fun!"; },
     howPoints:"Every mission you finish scores 100 points and a shiny badge for your Passport. Watch the bar at the top fill up!",
-    howTicket:function(pts){ return "Hit " + pts + " points and you win a Golden Ticket! Tap it and show your screen to the crew at the Fe y Vida booth (#301) for a special prize!"; },
+    howTicket:function(pts){ return "Hit " + pts + " points and you win a Golden Ticket! Tap it and show your screen to the crew at the Fe y Vida booth (#301) for a special prize! Then play " + GOLDEN_TICKET_MISSIONS_NEEDED + " more missions to win a second Golden Ticket and a second prize!"; },
     howHope:"Bonus fun: play Anamaria’s Hope Garden, then come meet Anamaria in person at the Unfinished booth (#400)!", howGo:"LET’S GO!",
     // the button and the window that help a player put the game on the phone's home screen (2026-11-02, per Dan; wording drafted for the client to approve). {share} is the Share icon, drawn by the game
     install_btn:"INSTALL THE APP", install_title:"Add to Home Screen", install_why:"Fe y Vida Quest opens full screen like any other app, and plays even without internet.",
@@ -1740,7 +1740,7 @@ var T = {
     howTitle:"¿Cómo se juega?", howIntro:"¡Ay, no! Un peregrino quiere llegar a la iglesia y no puede lograrlo sin ti. ¿Te animas a ser su héroe?",
     howMissions:function(need, n){ return "Abre la carpeta de Misiones y conquista " + need + " de las " + n + " misiones. Escoge tus favoritas, juégalas en el orden que quieras y ¡diviértete!"; },
     howPoints:"¡Cada misión que termines te da 100 puntos y un sello brillante para tu Pasaporte! Observa cómo se llena la barra de progreso en la parte superior.",
-    howTicket:function(pts){ return "¡Alcanza " + pts + " puntos y ganarás un Boleto Dorado! ¡Tócalo y muestra tu pantalla al equipo del stand de Fe y Vida (#301) para recibir un premio especial!"; },
+    howTicket:function(pts){ return "¡Alcanza " + pts + " puntos y ganarás un Boleto Dorado! ¡Tócalo y muestra tu pantalla al equipo del stand de Fe y Vida (#301) para recibir un premio especial! ¡Luego juega otras " + GOLDEN_TICKET_MISSIONS_NEEDED + " misiones para ganar un segundo Boleto Dorado y un segundo premio!"; },
     howHope:"¡Diversión extra: juega el Jardín de Esperanza de Anamaria y luego ve a conocer a Anamaria en persona en el stand de Unfinished (#400)!", howGo:"¡VAMOS!",
     install_btn:"INSTALAR LA APP", install_title:"Añadir a la pantalla de inicio", install_why:"Fe y Vida Quest se abre en pantalla completa como cualquier otra app y funciona incluso sin internet.",
     install_safari:"Primero abre esta página en Safari: toca el botón ••• o Compartir y elige «Abrir en Safari». Luego:",
@@ -1778,7 +1778,7 @@ var T = {
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias en cada una de las 3 rondas. Tienes 5 oportunidades."]},
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 8 rondas. Cada ronda tiene un evento más que la anterior, de 4 eventos hasta 11. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen debe aparecer una sola vez en cada fila, en cada columna y en cada bloque.", "Si una imagen rompe la regla, se pondrá roja y desaparecerá. Toca PISTA si necesitas ayuda. Resuelve los 4 rompecabezas para ganar."]},
-      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Tienes 3 corazones de oportunidad. Unir letras que no forman una palabra de la lista te cuesta uno, y al terminar una ronda recuperas uno.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
+      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Tienes 3 corazones de oportunidad. Las letras que no forman una palabra de la lista te cuestan uno, y al terminar una ronda recuperas uno.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
       jacobLadder:{d:"Haz rebotar a Jacob de un peldaño a otro hasta llegar a la puerta del cielo.", h:["Jacob rebota por sí solo. Mantén presionada IZQUIERDA o DERECHA para moverlo. Rebotará al llegar a los bordes del cielo. La barra de la derecha muestra tu altura.", "Solo cae sobre un peldaño al bajar. Algunos se deslizan, otros se rompen tras un rebote, y los peldaños con alas lo lanzan muy alto.", "Evita las nubes de tormenta y no caigas por abajo, o pierdes una oportunidad y tendrás que comenzar a subir de nuevo. Tienes 3 oportunidades. Llega a la puerta en las 3 rondas para ganar."]},
       fruitsSpirit:{d:"Combina las frutas para recolectar los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que recolectas, como 3/5. Llena las 8 para terminar un nivel.", "Combina 4 frutas o más para crear una llama. La llama es comodín: colócala junto a 2 frutas iguales y eliminará toda la fila o columna.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para hacer que la paloma aletee y suba. Entre cada toque, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
@@ -1804,7 +1804,7 @@ var T = {
     shareBadgeText:function(game,theme){return "¡Gané el sello "+theme+" en "+game+" de Fe y Vida Quest! Ven a jugar tú también.";},
     shareFullText:function(game,theme){return "¡Terminé todas las rondas de "+game+" en Fe y Vida Quest y gané el sello "+theme+"! Ven a jugar tú también.";},
     shareTicketText:"¡Gané el Boleto Dorado en Fe y Vida Quest! Ven a jugar tú también.",
-    cardHeadBadge:"¡SELLO GANADO!", cardHeadFull:"¡TODAS LAS RONDAS!", cardHeadTicket:"¡BOLETO DORADO!", cardHeadApp:"¡JUEGA CONMIGO!", cardPlayAt:"Juega gratis en",
+    cardHeadBadge:"¡SELLO GANADO!", cardHeadFull:"¡TODAS LAS RONDAS HAN TERMINADO!", cardHeadTicket:"¡BOLETO DORADO!", cardHeadApp:"¡JUEGA CONMIGO!", cardPlayAt:"Juega gratis en",
     cj_title:"Comparte la Alegría",
     cj_body:"¡Visita el stand de Fe y Vida (#301) para tomarte una divertida foto instantánea con un amigo! Cuando hayas terminado, toca el botón de abajo.",
     awardTitle:"¡Misión Cumplida!",
@@ -12797,7 +12797,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 II";
+var APP_BUILD = "2026-11-10 IJ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
