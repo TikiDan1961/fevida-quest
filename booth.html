@@ -1362,6 +1362,15 @@ var BOOTH_WU_EARLY = 200;
   else if(/[?&]wuearly=default(&|$)/.test(q)){ try { localStorage.removeItem("boothWuEarly"); } catch(e1){} }
   else { try { var sv = localStorage.getItem("boothWuEarly"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_WU_EARLY = parseInt(sv, 10); } catch(e2){} }
 })();
+/* Follow the Light: the lit tile of each note of the pattern comes this many ms EARLIER than the plain delay (Dan, 2026-11-09: the notes started about .5 s early); ?flearly=NNN sets it (remembered), ?flearly=default forgets it */
+var BOOTH_FL_EARLY = 500;
+(function(){
+  var q = location.search || "", m = /[?&]flearly=([0-9]+)/.exec(q);
+  if(m){ BOOTH_FL_EARLY = parseInt(m[1], 10); try { localStorage.setItem("boothFlEarly", m[1]); } catch(e0){} }
+  else if(/[?&]flearly=default(&|$)/.test(q)){ try { localStorage.removeItem("boothFlEarly"); } catch(e1){} }
+  else { try { var sv = localStorage.getItem("boothFlEarly"); if(sv !== null && /^[0-9]+$/.test(sv)) BOOTH_FL_EARLY = parseInt(sv, 10); } catch(e2){} }
+})();
+function boothLaterFl(fn){ if(BOOTH_LAG > 0) setTimeout(fn, Math.max(0, BOOTH_LAG - BOOTH_FL_EARLY)); else fn(); }
 /* the thuds of the falling fruit (Fruits of the Spirit) start this many ms later than the plain delay says; ?fsshift=NNN sets it (remembered), ?fsshift=default forgets it */
 var BOOTH_FS_SHIFT = 600;          /* 700 ms matched the falling fruit on Dan's TV (2026-11-09 earlier), then it came a little late: 600 (the storage key was renamed so an old remembered value does not override the new default) */
 (function(){
@@ -4679,7 +4688,7 @@ function flPlayPattern(){
     }
     var tile = s2.pattern[step];
     flPlayTone(tile, FL_SHOW_ON_MS * 0.8);              // (booth page: the note starts now, the tile lights BOOTH_LAG later, when the note is heard)
-    boothLater(function(){
+    boothLaterFl(function(){
       var s3 = state.session.followLight;
       if(!s3 || s3.phase !== "showing") return;
       s3.showingIndex = tile;
@@ -12785,7 +12794,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B32</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B33</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
