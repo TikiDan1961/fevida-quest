@@ -131,17 +131,17 @@
   .fvFb:active{filter:none;transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.95);}
 
   /* ---- two Golden Tickets (2026-11-09, per Dan) ---- */
-  .gtTk{position:relative;width:100%;margin:0 auto;}
-  .gtTk .pixTicketBig{margin:-4px auto 6px;}
-  .gtCheck{position:absolute;top:-8px;right:calc(50% - min(43%,145px) - 6px);width:34px;height:34px;border-radius:50%;background:#2FA23F;border:3px solid #fff;color:#fff;font:900 20px/28px Arial,Helvetica,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:2;}
-  .gtTwo .gtTk .pixTicketBig{width:min(62%,184px);margin:0 auto 4px;}
-  .gtTwo .gtCheck{top:-10px;right:calc(50% - min(31%,92px) - 12px);width:30px;height:30px;font-size:18px;line-height:24px;}
+  .gtTk{position:relative;width:min(86%,290px);margin:-4px auto 6px;}
+  .gtTk .pixTicketBig{width:100%;margin:0;}
+  /* (2026-11-09, per Dan: the second ticket the same size as the first.) Both tickets are the same, and as big as the screen allows: up to the single ticket's size (290 px) on a tall phone, smaller on a short one so that both fit */
+  .gtTwo .gtTk{width:max(150px,min(86%,290px,calc((100vh - 300px) * .78)));width:max(150px,min(86%,290px,calc((100dvh - 300px) * .78)));margin:0 auto 6px;}
+  .gtCheck{position:absolute;top:-10px;right:-10px;width:34px;height:34px;border-radius:50%;background:#2FA23F;border:3px solid #fff;color:#fff;font:900 20px/28px Arial,Helvetica,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:2;}
   .gtTwo .pixResTitle{margin-top:2px;}
 
   /* the screen after a turn of the phone (2026-11-09, per Dan's iPhone test): no white behind the page, and the app's height can be corrected by script (--appH, see vpResync) */
   html{background:#4FB0F2;}
   /* (2026-11-09, per Dan's second iPhone test: "it works but it's not pretty": a blue bar at the bottom, a flash and a jump when the phone is turned back.) For a moment after the phone comes back upright a cover of the Rotate message's colour stays over the page, and fades away once the page has been put right, so the correction is not seen. */
-  #vpCover{position:fixed;left:-80px;top:-80px;right:-80px;bottom:-80px;background:#1D2350;opacity:0;pointer-events:none;z-index:99998;transition:opacity .28s ease-out;}
+  #vpCover{position:fixed;left:-80px;top:-80px;right:-80px;bottom:-80px;background:#1D2350;opacity:0;pointer-events:none;z-index:99998;transition:opacity .35s ease-out;}
   html.vpHold #vpCover{opacity:1;transition:none;}
   html.vpFix #app{height:var(--appH);}          /* (only while the numbers disagree: the class is put on by vpResync) */
   .screen{
@@ -356,6 +356,13 @@
        with its picture drawn a whole screen wide: 1688 x 1822 picture pixels a tile on an 844 point wide phone, more than a phone can keep as one piece (it is cut into tiles, and a tile is missing for a frame where two meet).
        Now each tile is 360 points wide (a portrait phone's width), and the layer is the screen plus one tile, 4000 pixels or less on any phone; it drifts one tile and starts again, at the speed it has upright. */
     body.awardWide .pixSkyClouds,body.hglMode .hglRound .pixSkyClouds{width:calc(100% + 360px);background-size:360px auto;animation-name:pixCloudDriftW;}      /* (the ROUND X COMPLETED! screens of Hope Garden and the Road to Emmaus, played on their side, have the same moving clouds: the same small tiles, 2026-11-05, per Dan) */
+  }
+
+  /* The Keep Going / Mission Completed screens of the Road to Emmaus on their side (2026-11-09, per Dan's iPhone photo): (1) purple bands at both edges: the sky is pulled out 18 px past the app's side padding (the safe area of the
+     phone), which left a band of (safe area - 18) px of the purple page; now the sky is pulled out the whole safe area, so it reaches the edge; (2) the buttons sat 8 px under the text window: they get room. */
+  @media (orientation:landscape){
+    body.awardWide .screen.pixSky{margin-left:calc(-1 * env(safe-area-inset-left,0px));margin-right:calc(-1 * env(safe-area-inset-right,0px));}
+    body.awardWide.needLandscape .pixTitlePin .pixResMid{padding-top:0;margin-bottom:16px;}          /* (the top padding of the pinned title is taken out to pay for the gap: the screen is short on its side) */
   }
   /* the landscape Hope Garden held upright: the same message, and the little phone turns the other way (2026-10-27, per Dan) */
   @media (orientation:portrait){ body.hglMode .rotateMsg{display:flex;} }
@@ -12757,7 +12764,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-09 HY";
+var APP_BUILD = "2026-11-09 IB";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -12770,7 +12777,7 @@ function screenOptions(){
       optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
       optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
     '</div>' +
-    (clearMissionsDue() ? '<div class="shareRow optShare"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();clearMissionsAsk()">' + t("clearMissions") + '</button></div>' : '') +
+    (clearMissionsDue() ? '<div class="shareRow optShare"><button class="btn pixBtn ' + (t("shareAppBtn").length > 16 ? "pixBtnSm" : "pixBtnMd") + '" onpointerdown="pixPressSfx()" onclick="pixClickSfx();clearMissionsAsk()">' + t("clearMissions") + '</button></div>' : '') +
     '<div class="shareRow optShare">' + shareBtnHtml("app", null, "options", t("shareAppBtn"), t("shareAppBtn").length > 16 ? "pixBtnSm" : "pixBtnMd") + '</div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
@@ -13524,7 +13531,8 @@ function clearMissionsGo(){
     state.tk2Check = true;
     track("missions_cleared", {ticket: 2});
   }
-  saveState(); render();
+  saveState();
+  closeToHome(4);          // (2026-11-09, per Dan: always close the Options screen and go back to the Main Menu, the way the red X does)
 }
 function ticketsHtml(){
   var n = Math.max(1, ticketCount()), out = "";
@@ -13563,14 +13571,17 @@ function vpHoldOn(){
   if(!el){ el = document.createElement("div"); el.id = "vpCover"; document.body.appendChild(el); }
   document.documentElement.classList.add("vpHold");
   window.clearTimeout(vpHoldTimer);
-  vpHoldTimer = window.setTimeout(function(){ document.documentElement.classList.remove("vpHold"); }, 800);
+  vpHoldTimer = window.setTimeout(function(){ document.documentElement.classList.remove("vpHold"); }, 1000);
 }
 function vpTurnCheck(){
   var land = window.innerWidth > window.innerHeight;
-  if(vpWasLandscape && !land){ vpHoldOn(); try { dbgLog("view: the phone is upright again, the page is covered for a moment while it is put right"); } catch(e){} }
+  if(land !== vpWasLandscape){          // the phone was turned, either way: cover the page while the layout settles (2026-11-09, per Dan: "the screen still flashes part of the current screen when turning")
+    vpHoldOn();
+    try { dbgLog("view: the phone is " + (land ? "on its side" : "upright") + ", the page is covered for a moment while it settles"); } catch(e){}
+  }
   vpWasLandscape = land;
 }
-window.addEventListener("orientationchange", function(){ vpTurnCheck(); vpResyncSoon("turned"); });
+window.addEventListener("orientationchange", function(){ vpHoldOn(); vpTurnCheck(); vpResyncSoon("turned"); });
 window.addEventListener("resize", function(){ vpTurnCheck(); vpResyncSoon("resized"); });
 if(window.visualViewport){ window.visualViewport.addEventListener("resize", function(){ vpResyncSoon("viewport"); }); window.visualViewport.addEventListener("scroll", function(){ if(Math.abs(window.visualViewport.offsetTop) > 1 || (window.pageYOffset || 0) !== 0) vpResyncSoon("scrolled"); }); }
 
