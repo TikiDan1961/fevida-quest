@@ -1823,7 +1823,7 @@ var T = {
     ticketTitle:"¡Boleto Dorado Desbloqueado!",
     ticketBody:"¡Muestra esta pantalla a un miembro del personal de Fe y Vida para reclamar un premio!",
     clearTicket:"BORRAR BOLETO",
-    clearMissions:"BORRAR MISIONES", sureTitle:"¿ESTÁS SEGURO?", sureBody1:"¿Borrar todas las misiones para que este jugador pueda intentar ganar otro premio? Las insignias y los corazones se quedan.", sureBody2:"¿Marcar el segundo premio como entregado?", sureYes:"SÍ", sureNo:"CANCELAR",
+    clearMissions:"BORRAR MISIONES", sureTitle:"¿ESTÁS SEGURO?", sureBody1:"¿Borrar todas las misiones para que este jugador pueda intentar ganar otro premio? Los sellos y los corazones se quedan.", sureBody2:"¿Marcar el segundo premio como entregado?", sureYes:"SÍ", sureNo:"CANCELAR",
     themeFaith:"Fe", themeLove:"El Amor de Dios", themeLight:"Sé una luz para el mundo",
     themeUnity:"Unidad", themeHope:"Esperanza",
     themeHoliness:"Santidad", themeGrace:"Gracia", themeSalvation:"Salvación",
@@ -12889,7 +12889,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IV";
+var APP_BUILD = "2026-11-11 IW";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
