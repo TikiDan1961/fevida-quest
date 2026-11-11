@@ -1,11 +1,77 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head><script>
+// ---- TEST ONLY (zz_freeze.html): every timer and frame of the page goes through here, so that it can be held and then run one frame per tap ----
+(function(){
+  var rST = window.setTimeout.bind(window), rCT = window.clearTimeout.bind(window), rSI = window.setInterval.bind(window), rCI = window.clearInterval.bind(window), rRAF = window.requestAnimationFrame.bind(window), rCAF = window.cancelAnimationFrame.bind(window);
+  var Z = window.__zz = {frozen: false, vnow: 0, step: 0, note: null};
+  var timers = {}, rafs = {}, vid = 2000000000, T0 = 0;
+  window.setTimeout = function(fn, ms){
+    if(typeof fn !== "function") return rST.apply(null, arguments);
+    var args = [].slice.call(arguments, 2); ms = +ms || 0;
+    if(Z.frozen){ var v = ++vid; timers[v] = {fn: fn, args: args, ms: ms, v: Z.vnow + ms, rep: false}; return v; }
+    var id = rST(function(){ var e = timers[id]; if(!e) return; delete timers[id]; fn.apply(window, args); }, ms);
+    timers[id] = {fn: fn, args: args, ms: ms, due: performance.now() + ms, rep: false, real: true};
+    return id;
+  };
+  window.clearTimeout = function(id){ var e = timers[id]; if(e){ if(e.real) rCT(id); delete timers[id]; } else rCT(id); };
+  window.setInterval = function(fn, ms){
+    if(typeof fn !== "function") return rSI.apply(null, arguments);
+    var args = [].slice.call(arguments, 2); ms = +ms || 0;
+    if(Z.frozen){ var v = ++vid; timers[v] = {fn: fn, args: args, ms: ms, v: Z.vnow + Math.max(ms, 1), rep: true}; return v; }
+    var id = rSI(function(){ var e = timers[id]; if(!e) return; e.due = performance.now() + ms; fn.apply(window, args); }, ms);
+    timers[id] = {fn: fn, args: args, ms: ms, due: performance.now() + ms, rep: true, real: true};
+    return id;
+  };
+  window.clearInterval = function(id){ var e = timers[id]; if(e){ if(e.real) rCI(id); delete timers[id]; } else rCI(id); };
+  window.requestAnimationFrame = function(cb){
+    if(Z.frozen){ var v = ++vid; rafs[v] = {cb: cb}; return v; }
+    var id = rRAF(function(ts){ var e = rafs[id]; if(!e) return; delete rafs[id]; cb(ts); });
+    rafs[id] = {cb: cb, real: true};
+    return id;
+  };
+  window.cancelAnimationFrame = function(id){ var e = rafs[id]; if(e){ if(e.real) rCAF(id); delete rafs[id]; } else rCAF(id); };
+  // hold everything: the timers that were running go on from where they were, but only when a tap runs a frame
+  Z.freeze = function(){
+    Z.frozen = true; Z.vnow = 0; T0 = performance.now();
+    Object.keys(timers).forEach(function(k){ var e = timers[k]; if(e.real){ if(e.rep) rCI(+k); else rCT(+k); e.real = false; e.v = Math.max(0, e.due - T0); } });
+    Object.keys(rafs).forEach(function(k){ var e = rafs[k]; if(e.real){ rCAF(+k); e.real = false; } });
+    var st = document.createElement("style");
+    st.textContent = "*,*::before,*::after{animation-play-state:paused !important;transition:none !important;}";
+    document.head.appendChild(st);
+  };
+  // one frame (16.7 ms) further: the timers that come due, the frame callbacks, the CSS animations
+  Z.run = function(){
+    Z.vnow += 16.7; Z.step++;
+    var guard = 0;
+    while(guard++ < 300){
+      var due = Object.keys(timers).filter(function(k){ return !timers[k].real && timers[k].v <= Z.vnow; }).sort(function(a, b){ return timers[a].v - timers[b].v || a - b; });
+      if(!due.length) break;
+      var k = due[0], e = timers[k];
+      if(e.rep) e.v += Math.max(e.ms, 1); else delete timers[k];
+      try { e.fn.apply(window, e.args); } catch(err){}
+    }
+    var q = rafs; rafs = {};
+    Object.keys(q).sort(function(a, b){ return a - b; }).forEach(function(k){ try { q[k].cb(T0 + Z.vnow); } catch(err){} });
+    try { document.getAnimations().forEach(function(a){ a.pause(); a.currentTime = (a.currentTime || 0) + 16.7; }); } catch(err){}
+  };
+  // while held, a tap anywhere is one frame; the app's own buttons and sounds do not get the touch. Tapping the note at the top loads the plain app.
+  ["pointerdown", "pointerup", "pointermove", "pointercancel", "touchstart", "touchend", "touchmove", "mousedown", "mouseup", "dblclick", "contextmenu", "click"].forEach(function(n){
+    window.addEventListener(n, function(e){
+      if(!Z.frozen) return;
+      var onNote = Z.note && Z.note.contains(e.target);
+      e.stopImmediatePropagation();          // (no preventDefault on the touch events: that would stop the browser's own click, and the frame is taken on the release of the finger)
+      if(n === "pointerup"){ if(onNote) location.href = "index.html"; else if(Z.tap) Z.tap(); }
+    }, {capture: true, passive: true});
+  });
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Fe y Vida Quest</title>
 <!-- Installable app (2026-11-02, per Dan): opens full screen from the home screen, with no browser address bar. manifest.webmanifest, sw.js and icons/ go next to this file. -->
-<link rel="manifest" href="manifest.webmanifest"><meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#4FB0F2">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13734,33 +13800,28 @@ pixGuardStart();
 phInit();
 try { pixSfxFetchOne("tap"); } catch(e){}          // (the button sound first of all, whether or not the loading screen runs)
 
-// ---- TEST ONLY (zz_freeze.html): freeze the app a few frames after the first screen is shown ----
+// ---- TEST ONLY (zz_freeze.html): hold the first screen; a tap = one frame ----
 (function(){
-  var m = /[?&]stage=([0-9]+)/.exec(location.search || ""), stage = m ? parseInt(m[1], 10) : 1;
-  var T0 = (window.performance && performance.timeOrigin) ? performance.timeOrigin : Date.now(), first = true;
-  var rafReal = window.requestAnimationFrame.bind(window);
-  var ra = renderApply;
+  var Z = window.__zz, first = true, held = null, inStep = false, ra = renderApply;
+  function mkNote(){
+    var n = document.createElement("div");
+    n.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:2147483647;background:rgba(40,40,40,.8);color:#fff;font:9px/1.2 system-ui,Arial,sans-serif;padding:2px 4px;text-align:center;white-space:nowrap;overflow:hidden;";
+    document.body.appendChild(n); Z.note = n; upd();
+  }
+  function upd(){
+    if(!Z.note) return;
+    var app = document.getElementById("app"), imgs = [].slice.call(document.querySelectorAll("#app img")), ok = imgs.filter(function(i){ return i.complete && i.naturalWidth > 0; }).length;
+    Z.note.textContent = (Z.step === 0 ? "LOADING SCREEN, last frame" : "FRAME " + Z.step + " (+" + Math.round(Z.vnow) + " ms)") + " | " + (state.screen || "") + " | pictures " + ok + "/" + imgs.length + " | loading screen " + (document.getElementById("boot") ? "there" : "gone") + " | tap = next frame, tap here = normal app";
+  }
   renderApply = function(html){
+    if(first){ first = false; held = html; Z.freeze(); mkNote(); return; }          // the first screen is not put up yet: the loading screen's last frame stays
+    if(Z.frozen && !inStep){ held = html; return; }                                // anything else that wants to draw waits for the next tap
     ra(html);
-    if(!first || stage < 1) return;
-    first = false;
-    var shownAt = Math.round(performance.now()), frames = 0, scr = state.screen;
-    function freeze(){
-      var st = document.createElement("style");
-      st.textContent = "*,*::before,*::after{animation-play-state:paused !important;transition:none !important;}";
-      document.head.appendChild(st);
-      var imgs = [].slice.call(document.querySelectorAll("#app img")), ok = imgs.filter(function(i){ return i.complete && i.naturalWidth > 0; }).length;
-      var boot = document.getElementById("boot");
-      window.setTimeout = window.setInterval = window.requestAnimationFrame = window.pixSt = function(){ return 0; };
-      renderApply = function(){}; window.render = function(){};
-      var note = document.createElement("div");
-      note.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:2147483647;background:rgba(40,40,40,.8);color:#fff;font:9px/1.2 system-ui,Arial,sans-serif;padding:2px 4px;text-align:center;white-space:nowrap;overflow:hidden;";
-      note.textContent = "FROZEN f" + stage + " | " + scr + " | " + shownAt + " ms | pictures " + ok + "/" + imgs.length + " | loading screen " + (boot ? "there" : "gone") + " | tap here = normal app";
-      note.onclick = function(){ location.href = "index.html"; };
-      document.body.appendChild(note);
-    }
-    function tick(){ frames++; if(frames >= stage) freeze(); else rafReal(tick); }
-    rafReal(tick);
+  };
+  Z.tap = function(){
+    inStep = true;
+    try { if(held){ var h = held; held = null; ra(h); } Z.run(); } finally { inStep = false; }
+    upd();
   };
 })();
 pixGateStart();
