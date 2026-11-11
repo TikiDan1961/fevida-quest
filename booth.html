@@ -85,6 +85,8 @@
   /* the logo on the Main Menu is a button (2026-11-09, per Dan: so that players know to tap it): a cream plate with the app's dark outline, a drop edge like the other buttons, and a small "i" badge */
   .pixMenuTitle[role="button"]{position:relative;top:20px;cursor:pointer;width:-moz-fit-content;width:fit-content;margin:4px auto 6px;padding:3px 12px 3px;background:#A8DC9C;border-radius:12px;box-shadow:0 0 0 3px #1B1F3B,0 6px 0 3px rgba(27,31,59,.4);-webkit-tap-highlight-color:transparent;}
   .pixMenuTitle[role="button"]:after{content:"i";position:absolute;right:-10px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1B1F3B;color:#FFC93A;box-shadow:0 0 0 2px #A8DC9C;font:700 16px/22px Georgia,"Times New Roman",serif;text-align:center;pointer-events:none;}
+  /* (2026-11-09, per Dan) the logo cannot be tapped while the pilgrim talks and walks after a badge, like the icons: it goes grey the same way */
+  .pixMenu.pilgrimBusy .pixMenuTitle[role="button"]{pointer-events:none;filter:grayscale(1);opacity:.55;}
   /* (2026-11-09, per Dan: too much space between the score bar and the icons) the logo and the score bar sit 20 px lower; the icons and everything below stay where they are (top: moves only the thing itself) */
   .pixMenu .progressWrap{position:relative;top:28px;}          /* (2026-11-09, per Dan: just the score bar and its 0 / 500 text 8 px lower than the logo, so 28) */
   /* tapped: the same glow as the app buttons (the pressed look of the icons: it sinks 3 px, and the outline glows, the size --gBlur / --gSpread) */
@@ -223,6 +225,7 @@
   .cwPilgrim.walking .cwSprite{animation:pilgrimStep .5s steps(1) infinite,pilgrimBob .5s steps(1) infinite;}
   .cwTicket{position:absolute;display:none;image-rendering:auto;}      /* the ticket is a smooth picture (tiles/golden_ticket.png, 1100 x 700 with GOLDEN TICKET on it since 2026-11-01), no longer the 48 x 48 pixel icon (2026-10-25, per Dan) */
   .cwConfetti{position:fixed;left:0;top:0;width:100%;height:100%;z-index:60;pointer-events:none;}
+  .shareRow.shareWait{visibility:hidden;}          /* (the SHARE button of the Badge Reward screen waits for the confetti to end) */
   .cwTicket.show{display:block;animation:cwTicketPop .45s ease-out 1,cwTicketGlow 1s ease-in-out .45s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,230,120,.95));}
   @keyframes cwTicketPop{0%{transform:scale(0);opacity:0;}65%{transform:scale(1.18);opacity:1;}100%{transform:scale(1);opacity:1;}}
   @keyframes cwTicketGlow{0%{filter:drop-shadow(0 0 5px rgba(255,230,120,.8));}100%{filter:drop-shadow(0 0 16px rgba(255,240,150,1));}}
@@ -850,11 +853,15 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   .pixSlot[role=button]{cursor:pointer;}
   .pixSlot.hinted{background:#7FD36F;border-color:#1E6B2B;}
   .pixWuRow.correct .pixSlot{background:#52C246;border-color:#1E6B2B;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);}
+  .pixSlot.wrongOne{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
   .pixWuRow.wrong .pixSlot{background:#D6343A;border-color:#7E1B22;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);animation:wuShake .4s;}
   .pixTray{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;margin:20px 0 6px;}   /* one row, even for 6 letters: the tiles shrink a little to fit */
   .pixTile{flex:1 1 0;min-width:0;max-width:46px;width:auto;height:52px;box-sizing:border-box;padding:0 0 3px;display:flex;align-items:center;justify-content:center;font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.375rem;
     color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.35);background:#3A93E8;border:3px solid #1C4E9A;border-bottom-width:6px;border-radius:10px;box-shadow:inset 0 3px 0 rgba(255,255,255,.4);cursor:pointer;}
   .pixTile:active,.pixTile.tapGlow,.pixTile.tapHold {transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 0 var(--gBlur) var(--gSpread) rgba(110,190,255,.85);}
+  .pixTile.locked{pointer-events:none;}          /* (no letter tap while a wrong letter is red, 2026-11-10, per Dan) */
+  .wuHearts + .pixPaper{margin-top:calc(1.9rem + 4px);}          /* (the window as far under the hearts as Word Trail's letter grid, 2026-11-10, per Dan) */
+  @media (max-height:640px){ .wuHearts + .pixPaper{margin-top:calc(1.5rem + 4px);} }
   .pixTile.used{pointer-events:none;background:rgba(27,31,59,.22);border-color:rgba(27,31,59,.4);color:transparent;text-shadow:none;box-shadow:none;}
   @media (max-height:640px){
     .pixWuIntro{margin-bottom:10px;font-size:1rem;}
@@ -1072,6 +1079,7 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
   @keyframes msPop{0%{transform:scale(.7);}60%{transform:scale(1.14);}100%{transform:scale(1);}}
   @keyframes msSpawn{0%{transform:scale(.3);opacity:.2;}100%{transform:scale(1);opacity:1;}}
   .msLegend{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 6px;}
+  .msArea .msLegend,.msArea .msBar{position:relative;top:var(--msDrop,0px);}          /* (2026-11-09, per Dan) the legend squares and DROP TILE sit up to 20 px lower (msFit sets --msDrop) */
   .msStage{width:30px;height:30px;flex:none;}
   .msStage.isGoal .msTile{box-shadow:0 0 0 3px #fff,0 0 0 6px #FFC93A;}
   .msArrow{flex:none;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #FFC93A;filter:drop-shadow(1px 1px 0 #1B1F3B);}
@@ -1179,6 +1187,8 @@ width:13.6%;aspect-ratio:17/13;animation:doveFly 28s linear infinite;animation-d
     opacity:.22;filter:none;cursor:pointer;transition:opacity .2s ease;}
   .pixMission .hbSpot.found{opacity:1;filter:drop-shadow(0 0 5px #FFF6C0);animation:hbPop .35s ease;pointer-events:none;}
   .pixMission .pzSvg{margin:6px 0;}
+  .pixMission.pixLower.pzHeartsScreen{padding-top:calc(env(safe-area-inset-top,0px) + 38px);}          /* (the heading and the text sit 20 px higher, the height of the row of hearts, so the picture stays where it was; 2026-11-10, per Dan) */
+  .pixMission .pzHearts{margin:0;}
   .pixMission .pzBoardRect{fill:#1E2F7A;stroke:#FFC93A;stroke-width:4;}
   .pixMission .pzTrayRect{fill:#2B4BA8;}
   @media (max-height:640px){
@@ -1636,9 +1646,9 @@ var T = {
     guides:{
       faithFlash:{d:"Answer questions about the Catholic faith to earn your badge.", h:["Tap the right answer for each question.", "Finish 3 rounds of 10 questions.", "You have 3 chances. A wrong answer costs one, and a lost chance is given back after each round."]},
       faithMatch:{d:"Flip the tiles and find all the matching pairs.", h:["Tap two tiles to turn them over.", "A match stays face up. If they do not match, they flip back and you lose a chance.", "Match every pair to clear a level. Clear all 3 levels to win."]},
-      stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "Finish all 4 puzzles to win."]},
+      stainedGlass:{d:"Rebuild a stained-glass picture from puzzle pieces.", h:["Drag each piece from the tray into the frame.", "A piece snaps into place when it fits.", "You have 5 chance hearts. A piece put in the wrong place costs one, and finishing a level wins one back.", "Finish all 4 puzzles to win."]},
       followLight:{d:"Watch the tiles light up, then play the same notes back.", h:["Listen to the hymn notes and watch the tiles that light up.", "Tap the same tiles in the same order. Tap REPEAT to see the pattern again.", "A wrong tap costs a chance. You have 3 in all. Finish all 8 levels to win."]},
-      wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "You have 5 chance hearts. A wrong word costs one, and finishing a level wins one back.", "Finish 3 levels of 5 words to win."]},
+      wordUnscramble:{d:"Unscramble words of faith.", h:["Tap the letters in the right order to spell each word.", "HINT places a correct letter, and SKIP moves on to the next word.", "You have 5 chance hearts. A wrong letter costs one, and finishing a level wins one back.", "Finish 3 levels of 5 words to win."]},
       catchLight:{d:"Catch the falling lights with your hands.", h:["Slide your finger left and right on the SLIDE bar to move the hands.","Catch each light before it falls past. A miss costs a chance. You have 5 in all.", "Clear all 8 rounds to win."]},
       kindnessSort:{d:"Decide if each situation is kind or not kind.", h:["Read each situation.", "Tap KIND or NOT KIND.", "A wrong answer costs a chance. You have 3."]},
       hiddenBlessings:{d:"Search the scene for hidden blessings.", h:["Look closely and tap each blessing you find.", "Find all 6 to win."]},
@@ -1814,9 +1824,9 @@ var T = {
     guides:{
       faithFlash:{d:"Responde preguntas sobre la fe católica para ganar tu sello.", h:["Toca la respuesta correcta para cada pregunta.", "Termina 3 rondas de 10 preguntas.", "Tienes 3 oportunidades. Una respuesta incorrecta cuesta una, y al terminar cada ronda se te devuelve la que perdiste."]},
       faithMatch:{d:"Voltea las fichas y encuentra todos los pares.", h:["Toca dos fichas para voltearlas.", "Si coinciden, permanecen boca arriba. Si no coinciden, se voltean de nuevo y pierdes una oportunidad.", "Empareja todos los pares para pasar de nivel. Supera los 3 niveles para ganar."]},
-      stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Completa los 4 rompecabezas para ganar."]},
+      stainedGlass:{d:"Arma una imagen de vitral con piezas de rompecabezas.", h:["Arrastra cada pieza de la bandeja al marco.", "La pieza encaja en su lugar cuando coincide.", "Tienes 5 corazones de oportunidad. Una pieza puesta en el lugar equivocado te cuesta uno, y al terminar un nivel recuperas uno.", "Completa los 4 rompecabezas para ganar."]},
       followLight:{d:"Mira cómo se iluminan las fichas y repite las mismas notas.", h:["Escucha las notas del himno y mira las fichas que se iluminan.", "Toca las mismas fichas en el mismo orden. Toca REPETIR para ver el patrón otra vez.", "Un toque incorrecto cuesta una oportunidad. Tienes 3 en total. Supera los 8 niveles para ganar."]},
-      wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Tienes 5 corazones de oportunidad. Una palabra incorrecta te cuesta uno, y al terminar un nivel recuperas uno.", "Termina 3 niveles de 5 palabras para ganar."]},
+      wordUnscramble:{d:"Descifra palabras de fe.", h:["Toca las letras en el orden correcto para formar cada palabra.", "PISTA coloca una letra correcta y SALTAR pasa a la siguiente palabra.", "Tienes 5 corazones de oportunidad. Una letra incorrecta te cuesta uno, y al terminar un nivel recuperas uno.", "Termina 3 niveles de 5 palabras para ganar."]},
       catchLight:{d:"Atrapa las luces que caen con tus manos.", h:["Desliza el dedo hacia la izquierda y hacia la derecha sobre la barra DESLIZA para mover las manos.","Atrapa cada luz antes de que caiga. Si dejas escapar una, perderás una oportunidad. Tienes 5 oportunidades en total.", "Supera las 8 rondas para ganar."]},
       kindnessSort:{d:"Decide si cada situación es un acto de bondad o no.", h:["Lee cada situación.", "Toca BONDAD o NO ES BONDAD.", "Una respuesta incorrecta cuesta una oportunidad. Tienes 3."]},
       hiddenBlessings:{d:"Busca bendiciones escondidas en la escena.", h:["Mira con atención y toca cada bendición que encuentres.", "Encuentra las 6 para ganar."]},
@@ -1824,7 +1834,7 @@ var T = {
       emojiStories:{d:"Adivina la historia bíblica con los emojis.", h:["Mira los emojis y toca la historia bíblica que muestran.", "Responde 8 historias en cada una de las 3 rondas. Tienes 5 oportunidades."]},
       jesusTimeline:{d:"Pon en orden los eventos de la vida de Jesús.", h:["Toca los eventos en el orden en que ocurrieron, del primero al último.", "Termina 8 rondas. Cada ronda tiene un evento más que la anterior, de 4 eventos hasta 11. Tienes 5 oportunidades."]},
       sacredSudoku:{d:"Un rompecabezas de imágenes con símbolos sagrados.", h:["Toca una casilla y luego una imagen para colocarla.", "Cada imagen debe aparecer una sola vez en cada fila, en cada columna y en cada bloque.", "Si una imagen rompe la regla, se pondrá roja y desaparecerá. Toca PISTA si necesitas ayuda. Resuelve los 4 rompecabezas para ganar."]},
-      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Tienes 3 corazones de oportunidad. Unir letras que no forman una palabra de la lista te cuesta uno, y al terminar una ronda recuperas uno.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
+      wordTrail:{d:"Encuentra las palabras escondidas en una cuadrícula de letras.", h:["Toca una letra y arrastra el dedo a la siguiente letra: arriba, abajo, izquierda o derecha.", "Forma una palabra de la lista de abajo. Levanta el dedo para comprobarla.", "Tienes 3 corazones de oportunidad. Las letras que no forman una palabra de la lista te cuestan uno, y al terminar una ronda recuperas uno.", "Una palabra que encuentres sale de la lista y sus letras se cambian por otras nuevas. Encuentra todas las palabras para terminar la ronda. Termina las 3 rondas para ganar."]},
       jacobLadder:{d:"Haz rebotar a Jacob de un peldaño a otro hasta llegar a la puerta del cielo.", h:["Jacob rebota por sí solo. Mantén presionada IZQUIERDA o DERECHA para moverlo. Rebotará al llegar a los bordes del cielo. La barra de la derecha muestra tu altura.", "Solo cae sobre un peldaño al bajar. Algunos se deslizan, otros se rompen tras un rebote, y los peldaños con alas lo lanzan muy alto.", "Evita las nubes de tormenta y no caigas por abajo, o pierdes una oportunidad y tendrás que comenzar a subir de nuevo. Tienes 3 oportunidades. Llega a la puerta en las 3 rondas para ganar."]},
       fruitsSpirit:{d:"Combina las frutas para recolectar los 8 frutos del Espíritu.", h:["Desliza una fruta hacia una vecina para cambiarlas. Forma una fila o columna de 3 o más frutas iguales, o vuelven a su lugar.", "Las palabras debajo del tablero cuentan cada fruta que recolectas, como 3/5. Llena las 8 para terminar un nivel.", "Combina 4 frutas o más para crear una llama. La llama es comodín: colócala junto a 2 frutas iguales y eliminará toda la fila o columna.", "¿Atascado? Toca PISTA (3 en todo el juego) para iluminar una combinación."]},
       dovePeace:{d:"Toca para aletear y llevar a la paloma entre las nubes de tormenta.", h:["Toca en cualquier parte de la pantalla para hacer que la paloma aletee y suba. Entre cada toque, baja.", "Vuela por el hueco de cada par de nubes de tormenta para llevar la rama de olivo. Si chocas con una nube, pierdes una oportunidad. Tienes 3 oportunidades.", "Pasa 10 nubes para terminar una ronda. Los huecos son más estrechos en cada ronda. En las rondas 2 y 3, de vez en cuando un buitre entra volando por la derecha: apártate de su camino. Termina las 3 rondas para ganar."]},
@@ -1850,7 +1860,7 @@ var T = {
     shareBadgeText:function(game,theme){return "¡Gané el sello "+theme+" en "+game+" de Fe y Vida Quest! Ven a jugar tú también.";},
     shareFullText:function(game,theme){return "¡Terminé todas las rondas de "+game+" en Fe y Vida Quest y gané el sello "+theme+"! Ven a jugar tú también.";},
     shareTicketText:"¡Gané el Boleto Dorado en Fe y Vida Quest! Ven a jugar tú también.",
-    cardHeadBadge:"¡SELLO GANADO!", cardHeadFull:"¡TODAS LAS RONDAS!", cardHeadTicket:"¡BOLETO DORADO!", cardHeadApp:"¡JUEGA CONMIGO!", cardPlayAt:"Juega gratis en",
+    cardHeadBadge:"¡SELLO GANADO!", cardHeadFull:"¡TODAS LAS RONDAS HAN TERMINADO!", cardHeadTicket:"¡BOLETO DORADO!", cardHeadApp:"¡JUEGA CONMIGO!", cardPlayAt:"Juega gratis en",
     cj_title:"Comparte la Alegría",
     cj_body:"¡Visita el stand de Fe y Vida (#301) para tomarte una divertida foto instantánea con un amigo! Cuando hayas terminado, toca el botón de abajo.",
     awardTitle:"¡Misión Cumplida!",
@@ -3631,6 +3641,7 @@ function cwConfetti(tk){
 var pxConfettiRaf = 0, pxConfettiCv = null, pxConfettiFn = null, pxRoundKey = "", pxBadgeShown = false;
 function pixConfettiStop(){
   cancelAnimationFrame(pxConfettiRaf); pxConfettiRaf = 0; pxConfettiFn = null;
+  try { [].forEach.call(document.querySelectorAll(".shareWait"), function(e){ e.classList.remove("shareWait"); }); } catch(e){}          // (the SHARE button of the Badge Reward screen comes when the confetti is done)
   if(pxConfettiCv && pxConfettiCv.parentNode) pxConfettiCv.parentNode.removeChild(pxConfettiCv);
   pxConfettiCv = null;
 }
@@ -3681,6 +3692,18 @@ function cwFinish(){
   track("golden_ticket_unlocked", {seconds_since_open: phSecs(phT0)});
   go("mainMenu");                      // the ticket icon is unlocked now
 }
+// where the ticket goes: halfway between the top of the screen and the top of the cross (row 114 of the church picture)
+var CW_CROSS_TOP = 114;
+function cwPlaceTicket(tk){
+  try {
+    var scr = document.querySelector(".cwScreen"), sc = document.getElementById("cwScene"); if(!scr || !sc || !tk) return;
+    var sr = scr.getBoundingClientRect(), cr = sc.getBoundingClientRect(), k = cr.width / CW.W;          // k = screen pixels in one picture pixel
+    var topPic = (sr.top - cr.top) / k, gap = CW_CROSS_TOP - topPic;                                    // the top of the screen in picture pixels (below 0: ceiling above the picture)
+    if(!(gap > 20)) return;                                                                            // (the cross is not in view, as on a phone on its side: the old place stays)
+    var tw = Math.min(CW.ticketW, (gap - 8) / CW.ticketAspect), th = tw * CW.ticketAspect, mid = (topPic + CW_CROSS_TOP) / 2;
+    tk.style.width = (tw / CW.W * 100) + "%"; tk.style.left = ((CW.x - tw / 2) / CW.W * 100) + "%"; tk.style.top = ((mid - th / 2) / CW.H * 100) + "%";
+  } catch(e){}
+}
 function cwStart(){
   if(cwRunning) return;
   var el = document.getElementById("cwPilgrim"), tk = document.getElementById("cwTicket"); if(!el) return;
@@ -3701,6 +3724,7 @@ function cwStart(){
     if(p < 1) pilgrimStepSfx(now);
     if(!shown && p >= CW.ticketAt){
       shown = true;
+      cwPlaceTicket(tk);
       if(tk) tk.classList.add("show");
       pixSfxPlay("ticket", true);                                  // sound_effect_12
       cwConfetti(tk);                                              // a big burst of confetti (2026-11-01, per Dan)
@@ -3992,7 +4016,7 @@ function screenAward(){
   var m = MISSIONS.filter(function(x){ return x.id === state.awardMissionId; })[0];
   if(!m) return screenMainMenu();
   return pixResultHtml(m.nameKey, {cls:"pixLower pixTitlePin", title:t("awardTitle"), body:m.noBadge ? t("awardBodyJoy") : missionIsGame(m.id) ? t("awardBody")(100, t(m.themeKey)) : t("awardBodyNoPts")(t(m.themeKey)), badge:m.noBadge ? null : m.id,
-    buttons: m.noBadge ? "" : (awardHeld ? pixBtnHtml(t("shareContinue"), "awardContinue()") : "") + '<div class="shareRow">' + shareBtnHtml("badge", m.id, "award") + '</div>'});
+    buttons: ""});          // (no SHARE button on the Badge Reward screen, 2026-11-10, per Dan: it times out to KEEP GOING)
 }
 function awardContinue(){ awardHeld = false; if(awardLeaveFn) awardLeaveFn(); else afterAward(); }
 
@@ -4697,10 +4721,27 @@ function initFollowLightRun(){
   flSetupLevel(0);
 }
 
+// a random pattern of `len` tiles (0 to 8): never the same tile twice in a row, and every tile of the grid is used about equally (a tile is picked from those least used so far), and never the same as `prev`
+function flRandomPattern(len, prev){
+  for(var tries = 0; tries < 20; tries++){
+    var pat = [], used = [0,0,0,0,0,0,0,0,0];
+    for(var i = 0; i < len; i++){
+      var low = Math.min.apply(null, used), pool = [];
+      for(var t = 0; t < FL_GRID_TILES; t++){ if(used[t] <= low + (i < 5 ? 0 : 1) && t !== pat[i - 1]) pool.push(t); }
+      if(!pool.length){ for(var t2 = 0; t2 < FL_GRID_TILES; t2++){ if(t2 !== pat[i - 1]) pool.push(t2); } }
+      var pick = pool[Math.floor(Math.random() * pool.length)];
+      pat.push(pick); used[pick]++;
+    }
+    var same = prev && prev.length >= pat.length;
+    if(same){ for(var k = 0; k < pat.length; k++){ if(prev[k] !== pat[k]){ same = false; break; } } }
+    if(!same) return pat;
+  }
+  return pat;
+}
 function flSetupLevel(levelIdx){
   var s = state.session.followLight;
   var patternLen = FL_LEVELS[levelIdx];
-  var pattern = FL_HYMNS[FL_LEVEL_HYMN[levelIdx % FL_LEVEL_HYMN.length]].notes.slice(0, patternLen);
+  var pattern = flRandomPattern(patternLen, s.pattern);          // (2026-11-10, per Dan: a new random pattern each level and each game, not a hymn's fixed notes)
   s.level = levelIdx;
   s.tiles = shuffle(MATCH_SYMBOLS).slice(0, FL_GRID_TILES);
   s.pattern = pattern;
@@ -5057,7 +5098,25 @@ function wuPick(letterPos){
   var e = wuFirstEmpty(s);
   if(e < 0) return;
   s.slots[e] = letterPos;
+  if(s.letters[letterPos] !== s.word.charAt(e)){ wuWrongLetter(s, e); return; }          // (2026-11-10, per Dan: a letter in the wrong square costs a heart)
   if(wuFirstEmpty(s) < 0) wuCheck(s); else { saveState(); render(); }
+}
+// a letter in a square where it does not belong: the heart goes, the square turns red and shakes, then the letter goes back to the row (2026-11-10, per Dan)
+function wuWrongLetter(s, e){
+  var wait = pixSfxWait("fmFirst", WU_SFX_EARLY_MS);
+  s.feedback = "wrong"; s.wrongSlot = e;
+  s.chances = Math.max(0, s.chances - 1);
+  // (booth page: no sound here, the booth's sounds are left as they were)
+  saveState(); render();
+  setTimeout(function(){
+    var s2 = state.session.wordUnscramble;
+    if(!s2 || s2 !== s || s2.feedback !== "wrong") return;
+    s2.wrongSlot = null;
+    if(s2.chances <= 0){ s2.feedback = null; s2.status = "failed"; saveState(); render(); return; }       // the last heart: the SO CLOSE! screen (its sound_effect_8 is played by the screen itself: see change 49)
+    if(s2.hinted.indexOf(e) === -1) s2.slots[e] = null;
+    s2.feedback = null;
+    saveState(); render();
+  }, 800 + wait);
 }
 // tapping a letter that has been placed sends it back to the row of letters (not one placed by a hint)
 function wuUnplace(i){
@@ -5211,18 +5270,18 @@ function screenWordUnscramble(){
   }
 
   wuEnsure(s); wuEnsureSkips(s);
-  var rowCls ="pixWuRow" + (s.feedback ? " " + s.feedback : "");
+  var rowCls ="pixWuRow" + (s.feedback && !(s.feedback === "wrong" && typeof s.wrongSlot === "number") ? " " + s.feedback : "");          // (one wrong letter reddens its own square only)
   var slotsHtml = "";
   for(var i=0;i<s.word.length;i++){
     var filled = s.slots[i] !== null, hinted = s.hinted.indexOf(i) !== -1;
     var tappable = filled && !hinted && !s.feedback;      // a placed letter goes back to the row when it is tapped
-    slotsHtml += '<div class="pixSlot' + (filled?' filled':'') + (hinted?' hinted':'') + '"' + (tappable ? ' role="button" onclick="wuUnplace(' + i + ')"' : '') + '>' + (filled ? s.letters[s.slots[i]] : "") + '</div>';
+    slotsHtml += '<div class="pixSlot' + (filled?' filled':'') + (hinted?' hinted':'') + (s.feedback === "wrong" && s.wrongSlot === i ? ' wrongOne' : '') + '"' + (tappable ? ' role="button" onclick="wuUnplace(' + i + ')"' : '') + '>' + (filled ? s.letters[s.slots[i]] : "") + '</div>';
   }
   var trayHtml = s.letters.map(function(ch, pos){
     var used = s.slots.indexOf(pos) !== -1;
     // Word Scramble's own sounds (2026-10-22, per Dan): a letter = sound_effect_10 (fmFirst), CLEAR = sound_effect_9 (fmMiss), HINT = sound_effect_1 (clCatch),
     // SKIP = sound_effect_2 (clFade); data-sfx="own" keeps the page-wide button sound from playing as well
-    return '<button class="pixTile' + (used?' used':'') + '" data-sfx="own" onpointerdown="pixPressSfx(\'fmFirst\')" onclick="pixClickSfx(\'fmFirst\');wuPick(' + pos + ')">' + ch + '</button>';
+    return '<button class="pixTile' + (used?' used':'') + (s.feedback ? ' locked' : '') + '" data-sfx="own" onpointerdown="pixPressSfx(\'fmFirst\')" onclick="pixClickSfx(\'fmFirst\');wuPick(' + pos + ')">' + ch + '</button>';
   }).join("");
 
   return '<div class="screen pixHome pixSky pixMission pixLower">' + cloudsHtml() +
@@ -5239,7 +5298,7 @@ function screenWordUnscramble(){
     '</div>' +
     '<div class="pixTray">' + trayHtml + '</div>' +
     '<div class="spacer"></div>' +
-    '<button class="btn pixBtn pixBtnSm" data-sfx="own" onpointerdown="pixPressSfx(\'fmMiss\')" onclick="pixClickSfx(\'fmMiss\');wuClear()">' + t("clearWord") + '</button>' +
+    '' +          // (no CLEAR button, 2026-11-10, per Dan)
     (s.feedback === "correct" ? '<div class="pixFlash"></div>' : '') +
   '</div>';
 }
@@ -7231,6 +7290,7 @@ function msFit(){
     var byW = (Math.min(area.clientWidth, 380) - 22 - (n - 1) * 5) / n;
     return Math.floor(Math.min(byH, byW, 62));
   }
+  area.style.setProperty("--msDrop", "0px");          // (measure without the shift)
   area.classList.remove("noLegend");
   var cell = solve();
   if(cell < 34){ area.classList.add("noLegend"); cell = solve(); }          // a short screen: the stage guide goes so the squares can stay big enough
@@ -7242,6 +7302,8 @@ function msFit(){
     if(Math.abs(extra) < .5) break;
     mt = Math.max(0, mt + extra); bar.style.marginTop = mt + "px";
   }
+  var brEnd = bar.getBoundingClientRect(), room = Math.max(0, vh - 6 - brEnd.bottom);
+  area.style.setProperty("--msDrop", Math.min(20, room) + "px");          // (2026-11-09, per Dan: the legend squares touched the bottom of the play area: they and DROP TILE go 20 px lower, if the screen has room)
   msPlace();
 }
 pixFitSoon("mustardSeed", msFit);
@@ -12293,6 +12355,7 @@ var pzFitTries = 0;
 var PZ_TRAY_PAD = 10;           // room around a tray piece for its knobs
 var PZ_SNAP_MIN = 24;           // snap distance is half the short side, but at least this
 var PZ_LIFT = 36;               // a held piece rides this far above the finger
+var PZ_CHANCES = 5;          // chance hearts for the whole game (2026-11-10, per Dan)
 var PZ_SOLVED_MS = 3000;        // how long the finished picture is shown
 var pzAdvancing = false;        // true while the "solved" hold is pending
 var pzCtx = null;               // geometry of the board currently on screen
@@ -12394,7 +12457,7 @@ function initStainedGlass(){
   for(var i=0;i<PZ_LEVELS.length;i++) seeds.push(1 + Math.floor(Math.random()*2000000000));
   state.session.stainedGlass = {
     round: 0, imgs: shuffle(PZ_POOL).slice(0, PZ_LEVELS.length),
-    seeds: seeds, placed: [], status: "playing"
+    seeds: seeds, placed: [], status: "playing", chances: PZ_CHANCES
   };
   saveState();
 }
@@ -12467,6 +12530,7 @@ function pzUp(ev){
   } else {
     d.el.style.transition = "transform .2s ease";
     pzSetPos(d.el, piece.tx, piece.ty, piece.k);
+    pzLoseChance(s, d);          // (2026-11-10, per Dan: a piece that snaps back from the picture costs a heart)
     pixSfxPlay("fmMiss", false);                                       // a piece dropped in the wrong place goes back to the tray: the Faith Match miss sound (2026-11-01, per Dan)
   }
 }
@@ -12535,7 +12599,7 @@ function pzAdvance(){
   if(state.screen === "stainedGlass") render();
 }
 function pzInterlude(){
-  pixRoundRun("stainedGlass", function(){ return state.session.stainedGlass; }, null,
+  pixRoundRun("stainedGlass", function(){ return state.session.stainedGlass; }, function(s2){ if(typeof s2.chances !== "number") s2.chances = PZ_CHANCES; if(s2.chances >= PZ_CHANCES) return false; s2.chances++; return true; },          // (a heart comes back if one was lost, 2026-11-10, per Dan)
     function(s){
       var last = s.interlude.final;
       s.interlude = null;
@@ -12545,6 +12609,22 @@ function pzInterlude(){
     });
 }
 
+// a piece let go over the picture (its centre inside the frame) but not in its own place costs a heart; one put back into the tray does not
+function pzLoseChance(s, d){
+  try {
+    var cx = d.x + pzCtx.pw / 2, cy = d.y + pzCtx.ph / 2;
+    if(!(cy < PZ_W && cx > 0 && cx < PZ_W)) return;
+    if(typeof s.chances !== "number") s.chances = PZ_CHANCES;
+    if(s.chances <= 0) return;
+    s.chances--; saveState();
+    var hb = document.getElementById("pzHearts"); if(hb) hb.innerHTML = chancesHeartsHtml(Math.max(0, s.chances), PZ_CHANCES);
+    if(s.chances <= 0){
+      s.status = "failed"; saveState();          // the last heart: the piece goes back to the tray first, then the Out of Chances! window comes
+      setTimeout(function(){ var s2 = state.session.stainedGlass; if(s2 === s && s2.status === "failed" && state.screen === "stainedGlass") render(); }, 700);
+    }
+  } catch(e){}
+}
+function pzTryAgain(){ pzCtx = null; pzDrag = null; initStainedGlass(); go("stainedGlass"); }
 function pzCollectAward(){ state.session.stainedGlass = null; grantMission("stainedGlass"); }
 function pzQuit(){ state.session.stainedGlass = null; pzCtx = null; pzDrag = null; go("mainMenu"); }
 
@@ -12561,6 +12641,11 @@ function screenStainedGlass(){
     return pixShell('<div class="spacer"></div><div class="pixPaper loadWait"><div class="pixQ">' + t("fm_loading") + '</div></div><div class="spacer"></div>');
   }
 
+  if(typeof s.chances !== "number") s.chances = PZ_CHANCES;          // (a game saved before the hearts existed gets all 5)
+  if(s.status === "failed"){
+    return pixResultHtml("stainedGlassName", {cls:"pixLower", title:t("fm_failTitle"), body:t("wu_failBody"),
+      buttons:pixBtnHtml(t("tryAgain"), "pzTryAgain()") + pixBtnHtml(t("mainMenu"), "pzQuit()", true)});
+  }
   if(s.status === "passed"){
     return pixResultHtml("stainedGlassName", {title:t("pz_passTitle"), body:t("pz_passBody"), badge:"stainedGlass",
       buttons:pixBtnHtml(t("collectAward"), "pzCollectAward()")});
@@ -12568,6 +12653,7 @@ function screenStainedGlass(){
 
   if(s.interlude){
     return pixShell('<h2 class="pixMTitle">' + t("stainedGlassName") + '</h2>' +
+      '<div class="pixChances"><span class="pixNote">' + t("chancesLeft") + '</span>' + chancesHeartsHtml(Math.max(0, s.chances), PZ_CHANCES) + '</div>' +
       pixRoundDoneHtml(s.interlude));
   }
 
@@ -12608,8 +12694,9 @@ function screenStainedGlass(){
     pixPipsHtml(PZ_LEVELS.length, s.round, solved ? "done" : "now", t("pz_round")(s.round+1, PZ_LEVELS.length)) +
     '<div class="pixNote">' + t("pz_round")(s.round+1, PZ_LEVELS.length) + ' &nbsp;|&nbsp; <span id="pzProgress">' + t("pz_pieces")(solved ? g.n : s.placed.length, g.n) + '</span></div>' +
     '<div class="pzNoteBox' + (solved ? ' solved' : '') + '"><div class="pixNote">' + t("pz_intro") + '</div><div class="pixNote good">' + t("pz_solved") + '</div></div>' +
+    '<div class="pixChances pzHearts" id="pzHearts">' + chancesHeartsHtml(Math.max(0, s.chances), PZ_CHANCES) + '</div>' +          // the 5 hearts between the instruction and the picture (2026-11-10, per Dan)
     svg +
-    '<div class="spacer"></div>');
+    '<div class="spacer"></div>', "pzHeartsScreen");
 }
 
 /* ---------- Passport ---------- */
@@ -12848,7 +12935,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B39</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B40</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -13334,6 +13421,7 @@ function renderApply(html){
   var badgeNow = !!app.querySelector(".pixResBadge") || state.screen === "award";
   if(badgeNow && !pxBadgeShown) pixConfettiParty();
   pxBadgeShown = badgeNow;
+  if(state.screen === "award" && pxConfettiCv){ [].forEach.call(app.querySelectorAll(".shareRow"), function(r){ r.classList.add("shareWait"); }); }          // (2026-11-10, per Dan: no SHARE button while the confetti flies)
   if(isNewScreen){
     var el = app.querySelector(".screen");
     // No fade at all (2026-11-04, per Dan: "all screens should instantly appear and not fade in"). Before, only a sky screen after a sky screen came up at once (2026-10-22: the fade starts from see-through, which
@@ -13531,6 +13619,9 @@ var FV_TEXT = {
 };
 function fvOpen(){
   if(document.getElementById("fvOverlay")) return;
+  if(document.querySelector(".pixMenu.pilgrimBusy")) return;          // (the pilgrim is talking or walking: the logo cannot be used, 2026-11-09, per Dan)
+  if(typeof toastHide === "function") toastHide();          // (a message such as "Earn 500 points..." must not stay over this page)
+  if(typeof toastHide === "function") toastHide();          // (a message such as "Earn 500 points..." must not stay over this page)
   var x = FV_TEXT[state && state.lang === "es" ? "es" : "en"], i, stats = "", progs = "";
   for(i = 0; i < x.stats.length; i++) stats += '<div class="fvStat fvS' + (i + 1) + '"><b>' + x.stats[i][0] + '</b><span>' + x.stats[i][1] + '</span></div>';
   for(i = 0; i < x.progs.length; i++) progs += '<li><b>' + x.progs[i][0] + '</b>: ' + x.progs[i][1] + '</li>';
