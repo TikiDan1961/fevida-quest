@@ -339,7 +339,7 @@
      LANDSCAPE_OK_SCREENS (the new landscape Hope Garden will be listed there). Only a phone-sized touch screen on its side counts: a computer window that is wider than it is tall does not. */
   .rotateMsg{display:none;position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;box-sizing:border-box;padding:12px 24px;background:#1D2350;color:#fff;text-align:center;flex-direction:column;align-items:center;justify-content:center;gap:10px;
     font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;}
-  @media (orientation:landscape){ .rotateMsg{justify-content:flex-start;padding-top:72px;} }      /* (2026-11-06, per Dan: turned while the hands were being moved, the phone showed only the little phone, at the very bottom: the box was still as tall as the upright screen for a moment, so what is centred in it fell off the bottom. From the top, it is always on the screen. Upright, it is still centred.) */
+  @media (orientation:landscape){ .rotateMsg{justify-content:center;padding-top:12px;} .rotateSub:empty{display:none;} }          /* (2026-11-10, per Dan: centered top to bottom on its side, the little phone and the words as one group (the empty line under them takes no room); it was from the top, 72 px down) */      /* (2026-11-06, per Dan: turned while the hands were being moved, the phone showed only the little phone, at the very bottom: the box was still as tall as the upright screen for a moment, so what is centred in it fell off the bottom. From the top, it is always on the screen. Upright, it is still centred.) */
   .rotGate{position:fixed;left:0;top:0;right:0;bottom:0;z-index:99990;box-sizing:border-box;padding:24px;display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(10,16,48,.5);font-family:"Jersey 10","Pixelify Sans",ui-monospace,monospace;font-weight:700;font-size:1.9rem;line-height:1.1;color:#fff;text-shadow:2px 2px 0 #0D1030;-webkit-user-select:none;user-select:none;touch-action:none;}
   .rotateText{font-size:1.75rem;line-height:1.1;letter-spacing:.06em;color:#FFC93A;text-shadow:3px 3px 0 #0D1030;}
   .rotateSub{font-size:1.125rem;line-height:1.1;letter-spacing:.05em;color:#BFD0FF;}
@@ -12889,7 +12889,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IU";
+var APP_BUILD = "2026-11-10 IV";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +

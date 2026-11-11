@@ -1378,6 +1378,9 @@ html,body{background:#000 !important;}
 html.boothSmooth .pixMission .matchCard img{image-rendering:auto !important;}
 /* no empty rows where the SHARE buttons were */
 .shareRow,.pxShareRow{display:none !important;}
+/* PLEASE ROTATE YOUR PHONE on a landscape TV too (2026-11-10, per Dan: leaving the Road to Emmaus or Hope Garden showed the Main Menu on its side and no message). The app shows the message only on a phone-sized touch screen on its
+   side (max-height 500 px and a coarse pointer), which a TV is not; here any landscape window shows it on every screen that is not played on its side (body.landscapeOK). */
+@media (orientation:landscape){ body:not(.landscapeOK) .rotateMsg{display:flex;} }
 /* the Golden Ticket screen shows both tickets (the app's two-ticket layout, 2026-11-10, per Dan) */
 .gtTk{position:relative;width:min(86%,290px);margin:-4px auto 6px;}
 .gtTk .pixTicketBig{width:100%;margin:0;}
@@ -3650,6 +3653,14 @@ function pixConfettiStop(){
   if(pxConfettiCv && pxConfettiCv.parentNode) pxConfettiCv.parentNode.removeChild(pxConfettiCv);
   pxConfettiCv = null;
 }
+// where the burst of confetti starts: the center of the message window on the screen (2026-11-10, per Dan); the middle of the screen if there is no window
+function pixConfettiOrigin(vw, vh){
+  try {
+    var w = document.querySelector(".pixRoundDone[data-rd]") || document.querySelector(".pixResMid .pixPaper") || document.querySelector(".pixPaper");
+    if(w){ var r = w.getBoundingClientRect(); if(r.width > 20 && r.height > 20) return {x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height}; }
+  } catch(e){}
+  return {x: vw / 2, y: vh * .45, w: vw * .3, h: 0};
+}
 function pixConfettiParty(){
   try {
     if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -3659,14 +3670,14 @@ function pixConfettiParty(){
     cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr);
     document.body.appendChild(cv); pxConfettiCv = cv;
     var g = cv.getContext("2d"); g.scale(dpr, dpr);
-    var colors = ["#FFC93A", "#FFE27A", "#E8433B", "#3B82E8", "#3FBF5F", "#F28AC0", "#FFFFFF", "#8A5CE0", "#FF8A2B"], bits = [], i, a, sp;
+    var colors = ["#FFC93A", "#FFE27A", "#E8433B", "#3B82E8", "#3FBF5F", "#F28AC0", "#FFFFFF", "#8A5CE0", "#FF8A2B"], bits = [], i, a, sp, org = pixConfettiOrigin(vw, vh);
     function add(x, y, vx, vy, delay){
       bits.push({x: x, y: y, vx: vx, vy: vy, w: (6 + Math.random() * 8) * k, h: (3 + Math.random() * 5) * k, rot: Math.random() * 6.28, vr: (Math.random() - .5) * 14,
         flip: Math.random() * 6.28, vf: 4 + Math.random() * 8, c: colors[Math.floor(Math.random() * colors.length)], delay: delay || 0});
     }
     for(i = 0; i < 70; i++){                                                                // the burst: a wide fan, mostly upwards, from the middle of the screen
       a = -Math.PI / 2 + (Math.random() - .5) * Math.PI * 1.4; sp = (220 + Math.random() * 520) * k;
-      add(vw / 2 + (Math.random() - .5) * vw * .3, vh * .45, Math.cos(a) * sp, Math.sin(a) * sp, 0);
+      add(org.x + (Math.random() - .5) * org.w * .2, org.y + (Math.random() - .5) * org.h * .12, Math.cos(a) * sp, Math.sin(a) * sp, 0);          // (from the center of the message window)
     }
     for(i = 0; i < 90; i++) add(Math.random() * vw, -20 - Math.random() * 60 * k, (Math.random() - .5) * 90 * k, (60 + Math.random() * 140) * k, .4 + Math.random() * 1.6);      // the rain
     var last = performance.now(), t = 0;
@@ -5106,22 +5117,28 @@ function wuPick(letterPos){
   if(s.letters[letterPos] !== s.word.charAt(e)){ wuWrongLetter(s, e); return; }          // (2026-11-10, per Dan: a letter in the wrong square costs a heart)
   if(wuFirstEmpty(s) < 0) wuCheck(s); else { saveState(); render(); }
 }
-// a letter in a square where it does not belong: the heart goes, the square turns red and shakes, then the letter goes back to the row (2026-11-10, per Dan)
+// a letter in a square where it does not belong (booth page): the sound now, the heart and the red square when it is heard (2026-11-10, per Dan)
 function wuWrongLetter(s, e){
   var wait = pixSfxWait("fmFirst", WU_SFX_EARLY_MS);
-  s.feedback = "wrong"; s.wrongSlot = e;
-  s.chances = Math.max(0, s.chances - 1);
-  // (booth page: no sound here, the booth's sounds are left as they were)
+  s.feedback = "hold";
+  pixAfterSfx("fmFirst", function(){ pixSfxPlay("clFade", true); }, WU_SFX_EARLY_MS);
   saveState(); render();
   setTimeout(function(){
-    var s2 = state.session.wordUnscramble;
-    if(!s2 || s2 !== s || s2.feedback !== "wrong") return;
-    s2.wrongSlot = null;
-    if(s2.chances <= 0){ s2.feedback = null; s2.status = "failed"; saveState(); render(); return; }       // the last heart: the SO CLOSE! screen (its sound_effect_8 is played by the screen itself: see change 49)
-    if(s2.hinted.indexOf(e) === -1) s2.slots[e] = null;
-    s2.feedback = null;
+    var s1 = state.session.wordUnscramble;
+    if(!s1 || s1 !== s || s1.feedback !== "hold") return;
+    s1.feedback = "wrong"; s1.wrongSlot = e;
+    s1.chances = Math.max(0, s1.chances - 1);
     saveState(); render();
-  }, 800 + wait);
+    setTimeout(function(){
+      var s2 = state.session.wordUnscramble;
+      if(!s2 || s2 !== s || s2.feedback !== "wrong") return;
+      s2.wrongSlot = null;
+      if(s2.chances <= 0){ s2.feedback = null; s2.status = "failed"; saveState(); render(); return; }       // the last heart: the SO CLOSE! screen
+      if(s2.hinted.indexOf(e) === -1) s2.slots[e] = null;
+      s2.feedback = null;
+      saveState(); render();
+    }, 800);
+  }, wait + (BOOTH_LAG > 0 ? Math.max(0, BOOTH_LAG - BOOTH_WU_EARLY) : 0));
 }
 // tapping a letter that has been placed sends it back to the row of letters (not one placed by a hint)
 function wuUnplace(i){
@@ -10868,10 +10885,10 @@ var emMoveSrc = null, emMoveName = "", emMoveCtx = null, emMoveGain = null;
 function emMoveSfxWant(){
   var e = em;
   if(!e || !e.L || e.confirm || hglUpright()) return "";
-  if(e.mode === "exit") return "emRun";
+  if(e.mode === "exit") return "";          // (booth page, 2026-11-10, per Dan: no running sound)
   if(e.mode !== "play") return "";
   if(e.p.vy !== 0 || e.p.h > .01) return "";
-  return e.ride ? "emCart" : "emRun";
+  return e.ride ? "emCart" : "";          // (booth page: the cart still rolls, the footsteps are gone)
 }
 function emMoveSfxSet(name){
   var ctx = pixCtx();
@@ -12940,7 +12957,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B41</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B43</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -13747,9 +13764,9 @@ setTimeout(pixBgGo, 4000);
   };
   function musVol(){ return Math.max(0, Math.min(1, pixVolGain("music"))); }
   // The music is two audio elements that take turns (2026-11-09, per Dan: a looping element stopped for about a second at every restart on this TV, because its sound is buffered for a long time and a loop
-  // restart flushes that buffer). The next one is started a little BEFORE the current one ends, MUSIC_LEAD ms (350 unless the address has ?musiclead=NNN, so it can be tuned by ear on the TV: a longer lead
+  // restart flushes that buffer). The next one is started a little BEFORE the current one ends, MUSIC_LEAD ms (850 unless the address has ?musiclead=NNN, so it can be tuned by ear on the TV; it was 350 until 2026-11-10, when Dan heard a gap of about 0.5 s at each restart on the TV, so the lead is 500 ms longer: a longer lead
   // overlaps the two a little, a shorter one leaves a gap).
-  var MUSIC_LEAD = 350, ml = /[?&]musiclead=([0-9]+)/.exec(q);
+  var MUSIC_LEAD = 850, ml = /[?&]musiclead=([0-9]+)/.exec(q);
   if(ml){ MUSIC_LEAD = parseInt(ml[1], 10); try { localStorage.setItem("boothMusicLead", ml[1]); } catch(e0){} }          // (remembered on the device, like ?lag)
   else { try { var sl = localStorage.getItem("boothMusicLead"); if(sl !== null && /^[0-9]+$/.test(sl)) MUSIC_LEAD = parseInt(sl, 10); } catch(e1){} }
   var musA = null, musB = null, musNext = null, musTimer = 0, musLongUrl = null, musLongTried = false;
