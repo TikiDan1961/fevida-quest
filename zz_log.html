@@ -10,10 +10,18 @@
       var cs = getComputedStyle(probe); return [parseFloat(cs.paddingTop), parseFloat(cs.paddingRight), parseFloat(cs.paddingBottom), parseFloat(cs.paddingLeft)];
     } catch(e){ return [-1, -1, -1, -1]; }
   }
+  var hp = null;
+  function heights(){
+    try {
+      if(!hp){ hp = document.createElement("div"); hp.style.cssText = "position:fixed;left:0;top:0;width:1px;height:0;visibility:hidden;pointer-events:none;"; document.documentElement.appendChild(hp);
+               hp.innerHTML = '<i style="display:block;height:100dvh"></i><i style="display:block;height:100svh"></i><i style="display:block;height:100lvh"></i><i style="display:block;height:100vh"></i>'; }
+      var k = hp.children; return [Math.round(k[0].getBoundingClientRect().height * 10) / 10, Math.round(k[1].getBoundingClientRect().height * 10) / 10, Math.round(k[2].getBoundingClientRect().height * 10) / 10, Math.round(k[3].getBoundingClientRect().height * 10) / 10];
+    } catch(e){ return [-1, -1, -1, -1]; }
+  }
   function rect(sel){ var e = document.querySelector(sel); if(!e) return null; var r = e.getBoundingClientRect(); return [Math.round(r.top * 10) / 10, Math.round(r.height * 10) / 10]; }
   function snap(){
-    var vv = window.visualViewport, de = document.documentElement, s = insets();
-    return {ih: innerHeight, iw: innerWidth, ch: de.clientHeight, vvh: vv ? Math.round(vv.height * 10) / 10 : null, vvt: vv ? Math.round(vv.offsetTop) : null, sy: Math.round(window.pageYOffset || 0),
+    var vv = window.visualViewport, de = document.documentElement, s = insets(), hh = heights();
+    return {ih: innerHeight, iw: innerWidth, oh: window.outerHeight, sh: screen.height, dvh: hh[0], svh: hh[1], lvh: hh[2], vh100: hh[3], vvs: vv ? Math.round(vv.scale * 100) / 100 : null, ch: de.clientHeight, vvh: vv ? Math.round(vv.height * 10) / 10 : null, vvt: vv ? Math.round(vv.offsetTop) : null, sy: Math.round(window.pageYOffset || 0),
       safeTop: s[0], safeBottom: s[2], app: rect("#app"), screen: rect("#app .screen"), logo: rect("#app .pixLogoSmall"), card: rect("#app .pixCard"), qr: rect("#app .pixQr"), spacer: rect("#app .spacer"),
       boot: !!document.getElementById("boot"), htmlClass: de.className, bodyClass: document.body ? document.body.className : "", mq640: !!(window.matchMedia && matchMedia("(max-height:640px)").matches)};
   }
@@ -24,6 +32,10 @@
     if(diff.length || why !== "frame") L.push(Math.round(performance.now() - T0) + " ms  " + why + ": " + (diff.join(" | ") || "(no change)"));
   }
   note("script start");
+  // the moment something is put on the page: the first screen
+  var seen = 0;
+  function watch(){ var a = document.getElementById("app"); if(!a){ window.setTimeout(watch, 1); return; } new MutationObserver(function(){ if(++seen <= 6) note("#app content changed (" + seen + ")"); }).observe(a, {childList: true}); }
+  watch();
   ["DOMContentLoaded", "load", "resize", "orientationchange", "pageshow", "visibilitychange"].forEach(function(n){ window.addEventListener(n, function(){ note(n); }, true); document.addEventListener(n, function(){ note("doc " + n); }, true); });
   if(window.visualViewport){ ["resize", "scroll"].forEach(function(n){ window.visualViewport.addEventListener(n, function(){ note("visualViewport " + n); }); }); }
   try { document.fonts.ready.then(function(){ note("fonts ready"); }); } catch(e){}
