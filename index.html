@@ -3619,6 +3619,14 @@ function pixConfettiStop(){
   if(pxConfettiCv && pxConfettiCv.parentNode) pxConfettiCv.parentNode.removeChild(pxConfettiCv);
   pxConfettiCv = null;
 }
+// where the burst of confetti starts: the center of the message window on the screen (2026-11-10, per Dan); the middle of the screen if there is no window
+function pixConfettiOrigin(vw, vh){
+  try {
+    var w = document.querySelector(".pixRoundDone[data-rd]") || document.querySelector(".pixResMid .pixPaper") || document.querySelector(".pixPaper");
+    if(w){ var r = w.getBoundingClientRect(); if(r.width > 20 && r.height > 20) return {x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height}; }
+  } catch(e){}
+  return {x: vw / 2, y: vh * .45, w: vw * .3, h: 0};
+}
 function pixConfettiParty(){
   try {
     if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -3628,14 +3636,14 @@ function pixConfettiParty(){
     cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr);
     document.body.appendChild(cv); pxConfettiCv = cv;
     var g = cv.getContext("2d"); g.scale(dpr, dpr);
-    var colors = ["#FFC93A", "#FFE27A", "#E8433B", "#3B82E8", "#3FBF5F", "#F28AC0", "#FFFFFF", "#8A5CE0", "#FF8A2B"], bits = [], i, a, sp;
+    var colors = ["#FFC93A", "#FFE27A", "#E8433B", "#3B82E8", "#3FBF5F", "#F28AC0", "#FFFFFF", "#8A5CE0", "#FF8A2B"], bits = [], i, a, sp, org = pixConfettiOrigin(vw, vh);
     function add(x, y, vx, vy, delay){
       bits.push({x: x, y: y, vx: vx, vy: vy, w: (6 + Math.random() * 8) * k, h: (3 + Math.random() * 5) * k, rot: Math.random() * 6.28, vr: (Math.random() - .5) * 14,
         flip: Math.random() * 6.28, vf: 4 + Math.random() * 8, c: colors[Math.floor(Math.random() * colors.length)], delay: delay || 0});
     }
     for(i = 0; i < 70; i++){                                                                // the burst: a wide fan, mostly upwards, from the middle of the screen
       a = -Math.PI / 2 + (Math.random() - .5) * Math.PI * 1.4; sp = (220 + Math.random() * 520) * k;
-      add(vw / 2 + (Math.random() - .5) * vw * .3, vh * .45, Math.cos(a) * sp, Math.sin(a) * sp, 0);
+      add(org.x + (Math.random() - .5) * org.w * .2, org.y + (Math.random() - .5) * org.h * .12, Math.cos(a) * sp, Math.sin(a) * sp, 0);          // (from the center of the message window)
     }
     for(i = 0; i < 90; i++) add(Math.random() * vw, -20 - Math.random() * 60 * k, (Math.random() - .5) * 90 * k, (60 + Math.random() * 140) * k, .4 + Math.random() * 1.6);      // the rain
     var last = performance.now(), t = 0;
@@ -12881,7 +12889,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-10 IS";
+var APP_BUILD = "2026-11-10 IU";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13297,7 +13305,38 @@ function pixGuardStart(){
   pixGuard.observe(document.getElementById("app"), {childList: true, subtree: true});
 }
 var renderToken = 0;
+// The first screen waits until the screen height is steady (Master Change List 57; see first_paint_fix.py).
+var pixViewSettled = false, pixSettleStarted = false, PIX_STEADY_MS = 80, PIX_SETTLE_MAX = 600;
+function pixSettleWait(){
+  if(pixSettleStarted) return;
+  pixSettleStarted = true;
+  var t0 = performance.now(), pr = null, since = t0, lastIh = -1, lastDv = -1, done = false;
+  try {
+    pr = document.createElement("div");
+    pr.style.cssText = "position:fixed;left:0;top:0;width:0;height:100dvh;visibility:hidden;pointer-events:none;";
+    (document.body || document.documentElement).appendChild(pr);
+  } catch(e){ pr = null; }
+  function finish(why){
+    if(done) return; done = true;
+    try { if(pr && pr.parentNode) pr.parentNode.removeChild(pr); } catch(e){}
+    pixViewSettled = true;
+    try { dbgLog("first screen: " + why + " after " + Math.round(performance.now() - t0) + " ms (innerHeight " + window.innerHeight + ")"); } catch(e){}
+    render();
+  }
+  function look(){
+    if(done) return;
+    var now = performance.now(), ih = window.innerHeight, dv = pr ? Math.round(pr.getBoundingClientRect().height * 10) / 10 : ih;
+    if(ih !== lastIh || dv !== lastDv || Math.abs(dv - ih) >= 1){ since = now; }          // something moved, or 100dvh is not the window height: start counting again
+    lastIh = ih; lastDv = dv;
+    if(now - since >= PIX_STEADY_MS) finish("screen height steady at " + ih + " px");
+    else if(now - t0 >= PIX_SETTLE_MAX) finish("no steady screen height after " + PIX_SETTLE_MAX + " ms (innerHeight " + ih + ", 100dvh " + dv + ")");
+    else window.requestAnimationFrame(look);
+  }
+  window.requestAnimationFrame(look);
+  window.setTimeout(function(){ finish("timer (no frames came)"); }, PIX_SETTLE_MAX + 150);
+}
 function render(){
+  if(!pixViewSettled){ pixSettleWait(); return; }
   var html;
   switch(state.screen){
     case "language": html = screenLanguage(); break;
