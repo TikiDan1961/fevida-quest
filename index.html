@@ -12900,7 +12900,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-11 IX";
+var APP_BUILD = "2026-11-11 IY";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13100,6 +13100,20 @@ function rotateMsgUpdate(){
 // A new screen is shown only when every picture on it has arrived (2026-10-27, per Dan: on the Anamaria screen some pictures came in late). The pictures of the whole game are also fetched in the background
 // soon after the app starts (pixPreloadAll), so this wait is hardly ever seen. The wait is never longer than 1.5 seconds, and the sky behind the screen stays up (no dark flash).
 var holdToken = 0;
+// (2026-11-11, per Dan: the Sudoku squares were blank for half a second) Pictures set inline as CSS backgrounds (Sacred Sudoku's squares and picture buttons) that this page has not decoded yet: found here, loaded and decoded
+// before the screen is shown, then kept in pixBgWarm so that they stay decoded. All 16 faith_tile8 pictures are done together (the later puzzles use other ones of them).
+var pixBgWarm = {};
+function pixBgNew(app){
+  var out = [];
+  function add(u){ if(u && u.indexOf("data:") !== 0 && !pixBgWarm[u] && out.indexOf(u) === -1) out.push(u); }
+  [].forEach.call(app.querySelectorAll('[style*="background-image"]'), function(el){
+    var m = /url\(\s*["']?([^"')]+)["']?\s*\)/.exec(el.getAttribute("style") || "");
+    if(!m) return;
+    add(m[1]);
+    if(m[1].indexOf("faith_tile8_") !== -1){ for(var k = 0; k < 16; k++) add(m[1].replace(/faith_tile8_\d+/, "faith_tile8_" + (k < 10 ? "0" : "") + k)); }
+  });
+  return out;
+}
 function pixHoldUntilLoaded(app){
   if(PIX_OFF) return;
   // (2026-11-04, per Dan's event log: on his iPhone a picture that was drawn into the page counts as "not complete" for a few milliseconds even when it has long been fetched and decoded, so EVERY new screen
@@ -13110,14 +13124,22 @@ function pixHoldUntilLoaded(app){
     var s = im.getAttribute("src");
     return !(s && pixReady[s.indexOf("data:") === 0 ? s : pixAbs(s)]);
   });
-  if(!pending.length) return;
+  var bgNew = pixBgNew(app);
+  if(!pending.length && !bgNew.length) return;
   var t0 = performance.now(), scr = state.screen, shown = false, wid = pixWaitBegin();
-  dbgLog("assets: HIDDEN " + scr + " was drawn with " + pending.length + " picture(s) not complete: the screen stays hidden until they are");
+  dbgLog("assets: HIDDEN " + scr + " was drawn with " + pending.length + " picture(s) not complete" + (bgNew.length ? " and " + bgNew.length + " background picture(s) not decoded yet" : "") + ": the screen stays hidden until they are");
   app.classList.add("assetsWait");
-  var left = pending.length;
+  var left = pending.length + bgNew.length;
   function reveal(){ pixWaitEnd(wid); if(mine === holdToken){ app.classList.remove("assetsWait"); if(!shown){ shown = true; dbgLog("assets: HIDDEN " + scr + " shown again after " + Math.round(performance.now() - t0) + " ms"); } } }
   function one(){ if(--left <= 0) reveal(); }
   pending.forEach(function(im){ im.addEventListener("load", one); im.addEventListener("error", one); });
+  bgNew.forEach(function(u){
+    var bi = new Image(), got = false;
+    function fin(){ if(got) return; got = true; pixBgWarm[u] = bi; one(); }
+    bi.onload = function(){ if(bi.decode) bi.decode().then(fin, fin); else fin(); };
+    bi.onerror = fin;
+    bi.src = u;
+  });
   setTimeout(reveal, 1500);
 }
 // Every picture of the game (tiles/, all the .png and .jpg: 299 of them, about 5.6 MB), fetched a few at a time in the background after the first screen is up. New pictures put in tiles/ must be added to this list.
