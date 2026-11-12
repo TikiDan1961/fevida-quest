@@ -3146,6 +3146,7 @@ var GUIDE_MISSIONS = ["faithFlash","faithMatch","stainedGlass","followLight","wo
   "jacobLadder","emojiStories","jesusTimeline","sacredSudoku","wordTrail","wordGroups","mustardSeed","prayBeads","pilgrimRoad","dovePeace","emmaus"];
 function openMission(id){
   toastHide();
+  if(id === "sacredSudoku") pixSudokuWarm();          // (decoded while the instruction screen is read, so the board has nothing to wait for; 2026-11-11)
   track("mission_icon_tapped", {mission_id: id, from: state.folderOpen ? "folder" : "menu", completed: !!(state.missions[id] && state.missions[id].done)});
   // Every mission can always be played again (2026-11-05, per Dan; the temporary "tapping a finished mission clears it" is gone). A game that is already done gives no second badge, points or step for the pilgrim:
   // round 1 of a replay goes straight on to round 2 (see roundOneGrant), and finishing all the rounds goes back to the Main Menu (see grantMission).
@@ -12900,7 +12901,7 @@ function setVolume(kind, v){
 function optionPreview(kind){ track("setting_changed", {setting: kind, value: kind === "music" ? state.volMusic : state.volSfx}); if(kind !== "music") pixSfxPlay("tap"); }
 
 // shown at the bottom of Options so it is plain which copy of the game a phone is running (a phone can keep an old one): change it with every push that matters
-var APP_BUILD = "2026-11-11 IY";
+var APP_BUILD = "2026-11-11 IZ";
 function screenOptions(){
   return '<div class="screen pixHome pixSky pixPassport">' +
     cloudsHtml() +
@@ -13114,6 +13115,16 @@ function pixBgNew(app){
   });
   return out;
 }
+function pixSudokuWarm(){
+  for(var k = 0; k < 16; k++){
+    (function(u){
+      if(pixBgWarm[u]) return;
+      var bi = new Image();
+      bi.onload = function(){ if(bi.decode) bi.decode().then(function(){ pixBgWarm[u] = bi; }, function(){ pixBgWarm[u] = bi; }); else pixBgWarm[u] = bi; };
+      bi.src = u;
+    })("tiles/faith_tile8_" + (k < 10 ? "0" : "") + k + ".png");
+  }
+}
 function pixHoldUntilLoaded(app){
   if(PIX_OFF) return;
   // (2026-11-04, per Dan's event log: on his iPhone a picture that was drawn into the page counts as "not complete" for a few milliseconds even when it has long been fetched and decoded, so EVERY new screen
@@ -13185,7 +13196,7 @@ function pixBgNext(){
     })(pixBgQ.shift());
   }
   if(!pixBgRunning && !pixBgQ.length && !pixBgAllDone){
-    pixBgAllDone = true; pixBgPicturesDone();
+    pixBgAllDone = true; pixBgPicturesDone(); pixSudokuWarm();
     dbgLog("assets: every picture and sound is loaded, " + Math.round(performance.now() / 1000) + " s after the page loaded");
     pixWarmSounds();
   }
