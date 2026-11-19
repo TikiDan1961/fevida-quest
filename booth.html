@@ -2280,8 +2280,9 @@ function defaultState(){
     pilgrimIn: false,    // the pilgrim has gone into the church (after the 5th game)
     pilgrimSteps: 0,     // games finished so far (each moves him one stop; see pilgrimSteps())
     ticketUnlocked: false, // the Golden Ticket icon is unlocked (at the end of the church scene)
-    volSfx: 45,     // Options screen: sound effects volume, 0-100 (starts at 45, per Dan 2026-10-20)
-    volMusic: 60,   // music volume, 0-100: it starts at 60 (2026-10-22, per Dan; the slider's 100% is a quiet background level)
+    volSfx: 100,    // booth B46: both sliders start at the maximum (2026-11-19, per Dan)
+    volScale: 3,    // marks a game saved with the louder booth sliders (B46)     // Options screen: sound effects volume, 0-100 (starts at 45, per Dan 2026-10-20)
+    volMusic: 100,   // music volume, 0-100: it starts at 60 (2026-10-22, per Dan; the slider's 100% is a quiet background level)
     musicScale: 2,  // marks a game saved with the new music slider
     passportPage: 0,
     introMission: null,  // the game whose instruction screen is showing
@@ -2317,6 +2318,7 @@ function loadState(){
     delete merged.photo;               // a photo saved in this tab by an older version is dropped: the app keeps no photo now
     // a tab saved before the music slider was rescaled would sound far too quiet at its old setting: it starts at the top of the new slider
     if(!parsed.musicScale){ merged.volMusic = 60; merged.musicScale = 2; }
+    if(parsed.volScale !== 3){ merged.volSfx = 100; merged.volMusic = 100; merged.volScale = 3; }          /* (booth B46) a TV that saved its sliders before the louder build starts at the maximum once */
     return merged;
   }catch(e){ return defaultState(); }
 }
@@ -2538,11 +2540,11 @@ function pixCtx(){
 // Two buses (gain nodes) per audio context: "sfx" for every sound effect and "music" for the music track. A slider position 0-100 becomes a
 // gain with a squared curve, which feels even to the ear (100 = the loudness the sounds were mixed at).
 // The music slider's 100% is the loudness the slider's 20% used to give (2026-10-22, per Dan), so the whole slider now lives in the useful range.
-var PIX_MUSIC_MAX = 0.04;     // = 0.2 squared
+var PIX_MUSIC_MAX = 0.4;      // booth B46 (2026-11-19, per Dan, for the TV): the top of the music slider is 10 times louder (was 0.04);     // = 0.2 squared
 var pixMusicDuck = 1;         // the music is turned down by this factor while a game wants its notes heard over it (Pray the Beads, 2026-10-25, per Dan: first half, then none at all)
 function pixVolGain(kind){
   var v = kind === "music" ? state.volMusic : state.volSfx;
-  if(typeof v !== "number") v = kind === "music" ? 60 : 45;
+  if(typeof v !== "number") v = 100;
   var g = Math.pow(Math.max(0, Math.min(100, v)) / 100, 2);
   return kind === "music" ? g * PIX_MUSIC_MAX * pixMusicDuck : g;
 }
@@ -12961,14 +12963,14 @@ function screenOptions(){
       '<button class="passClose" onpointerdown="pixPressSfx()" onclick="pixClickSfx();closeToHome(4)" aria-label="' + t("mainMenu") + '">X</button>' +
     '</div>' +
     '<div class="pixPaper optCard">' +
-      optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 45) +
-      optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 60) +
+      optionRow("sfx", t("sfxVolume"), typeof state.volSfx === "number" ? state.volSfx : 100) +
+      optionRow("music", t("musicVolume"), typeof state.volMusic === "number" ? state.volMusic : 100) +
     '</div>' +
     '<div class="shareRow optShare">' + shareBtnHtml("app", null, "options", t("shareAppBtn"), t("shareAppBtn").length > 16 ? "pixBtnSm" : "pixBtnMd") + '</div>' +
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B45</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B46</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
@@ -13733,6 +13735,8 @@ setTimeout(pixBgGo, 4000);
   // RAW_SFX: sounds that stay the original (the cleaning turned the bird flap of Dove of Peace into a thud, Dan 2026-11-09: its flutter is noise). Keep in step with KEEP_ORIGINAL in clean_sfx.py.
   var RAW_SFX = ["dpFlap", "jlBounce"];
   if(typeof PIX_SFX !== "undefined" && !/[?&]rawsfx(&|$)/.test(q)){ Object.keys(PIX_SFX).forEach(function(k){ if(RAW_SFX.indexOf(k) !== -1) return; var u = PIX_SFX[k].url; if(/^sounds[/]sfx_/.test(u)) PIX_SFX[k].url = u.replace("sounds/", "soundsb/").replace(".mp3", ".wav"); }); }
+  // LOUDER (booth B46, 2026-11-19, per Dan): the effects are baked louder in soundsc/ (boost_sfx.py), so the table gain is 1 and the Sound Effects slider alone sets the loudness. ?rawsfx = the originals, as before.
+  if(typeof PIX_SFX !== "undefined" && !/[?&]rawsfx(&|$)/.test(q)){ Object.keys(PIX_SFX).forEach(function(k){ var u = PIX_SFX[k].url; if(/^sounds[b]?[/]sfx_/.test(u)){ PIX_SFX[k].url = "soundsc/" + u.split("/").pop().replace(".mp3", ".wav"); PIX_SFX[k].gain = 1; } }); }
   if(/[?&]webaudio(&|$)/.test(q)) return;
   if(typeof PIX_SFX === "undefined" || typeof pixVolGain !== "function" || typeof pixMusic === "undefined") return;
   // The sound effects are ON, as in the version of 2026-11-09 (commit ff556e6): clean through the plain audio player, but this TV plays every sound the browser makes more than a second late
