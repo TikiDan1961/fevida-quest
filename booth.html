@@ -2400,7 +2400,7 @@ function phInit(){
   try{
     var key = phTest ? PH_KEY_TEST : PH_KEY_LIVE, first = !phGet("fevidaSeen");
     phSet("fevidaSeen", "1");
-    phOn = !!key && /^https?:$/.test(location.protocol);
+    phOn = false;          // booth page: no analytics (B47, per Dan)
     var res = EXIT_SCREENS.indexOf(state.screen) !== -1 && state.screen !== "missionIntro";
     track("app_opened", {first_screen: state.screen, returning: !first});
     if(res){ phBootGame = true; track("game_resumed_after_reload", {mission_id: phMissionId(state.screen)}); }
@@ -12970,7 +12970,7 @@ function screenOptions(){
     '<div class="optInstall"><button class="btn pixBtn pixBtnSm" onpointerdown="pixPressSfx()" onclick="pixClickSfx();boothClearTap(this)">' + (state.lang === 'es' ? 'BORRAR TODAS LAS MISIONES' : 'CLEAR ALL MISSIONS') + '</button></div>' +
     (instCanShow() ? '<div class="optInstall">' + instBtnHtml() + '</div>' : '') +
     '<div class="optPrivacy">' + t("privacyNote") + '</div>' +
-    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B46</div>' +
+    '<div class="optBuild" onclick="dbgShow()">Build ' + APP_BUILD + ' &middot; Booth B47</div>' +
     '<div class="spacer"></div>' +
   '</div>';
 }
